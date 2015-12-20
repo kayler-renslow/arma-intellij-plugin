@@ -1,0 +1,110 @@
+{
+  parserClass="com.kaylerrenslow.plugin.parser.SQFParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="SQF"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.kaylerrenslow.plugin.psi"
+  psiImplPackage="com.kaylerrenslow.plugin.psi.impl"
+
+  elementTypeHolderClass="com.kaylerrenslow.plugin.psi.SQFTypes"
+  elementTypeClass="com.kaylerrenslow.plugin.psi.SQFElementType"
+  tokenTypeClass="com.kaylerrenslow.plugin.psi.SQFTokenType"
+}
+sqfFile ::= item_*
+
+private item_ ::= WHITE_SPACE | DOC_COMMENT | comment_ | statement_ | BAD_CHARACTER
+
+private command_ ::= COMMAND
+private identifier_ ::= LOCAL_VAR | IDENTIFIER 
+
+private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
+
+literal ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
+
+private operator_ ::= GTGT
+private keyword_ ::= TYPE_NULL | NIL
+private constant_ ::= LANG_CONSTANT
+                   | NAMESPACE
+
+private statement_ ::= exp_ SEMICOLON
+
+private code_ ::= LBRACE (item_)* RBRACE
+
+private exp_ ::= private_declaration_
+                | assignmentExp_
+                | controlStructure_
+                | scopeManager_
+                | tryCatchExp_
+                | valueExp_
+                | commandExp_
+                | EXIT
+
+private assignmentExp_ ::= identifier_ EQ (mathExp_ | valueExp_ )
+
+private conditionalExp_ ::= TRUE | FALSE
+              | EXCL conditionalCompPart_
+              | NOT conditionalCompPart_
+              | conditionalCompPart_ AMPAMP conditionalCompPart_
+              | conditionalCompPart_ AND conditionalCompPart_
+              | conditionalCompPart_ BARBAR conditionalCompPart_
+              | conditionalCompPart_ OR conditionalCompPart_
+              | comparableVal_ EQEQ comparableVal_
+              | comparableVal_ NE comparableVal_
+              | comparableVal_ LT comparableVal_
+              | comparableVal_ GT comparableVal_
+              | comparableVal_ LE comparableVal_
+              | comparableVal_ GE comparableVal_
+              | ASSERT LPAREN conditionalExp_ RPAREN
+
+private conditionalGroupExp_ ::= (LPAREN conditionalExp_ RPAREN) | valueExp_
+
+private conditionalCompPart_ ::= conditionalGroupExp_
+private comparableVal_ ::= valueExp_ | conditionalExp_
+
+private commandExp_ ::= WITH NAMESPACE DO code_
+
+
+private mathExp_ ::= valueExp_ PLUS valueExp_
+          | valueExp_ MINUS valueExp_
+          | valueExp_ ASTERISK valueExp_
+          | valueExp_ CARET valueExp_
+          | valueExp_ PERC valueExp_
+          | valueExp_ MOD valueExp_
+          | valueExp_ FSLASH valueExp_
+          | LPAREN mathExp_ RPAREN
+
+
+private valueExp_ ::= identifier_ | literal | arrayVal_ | code_ | CONFIG
+
+private arrayItem_ ::= identifier_ | literal
+private arrayVal_ ::= LBRACKET RBRACKET | LBRACKET arrayItem_ (COMMA arrayItem_)* RBRACKET
+
+private private_declaration_ ::= PRIVATE LBRACKET ((identifier_ (COMMA identifier_)*) | (STRING_LITERAL (COMMA STRING_LITERAL)*)) RBRACKET
+
+private scopeManager_ ::= GOTO COLON STRING_LITERAL
+                | BREAK_TO STRING_LITERAL
+                | exp_? BREAK_OUT STRING_LITERAL
+                | CONTINUE
+                | BREAK
+                | SCOPE_NAME STRING_LITERAL
+
+private controlStructure_ ::= ifStatement_ | switchStatement_ | loop_ | quest_
+private ifStatement_ ::= IF LPAREN conditionalExp_ RPAREN (
+                        THEN code_ (ELSE code_)?
+                        | EXIT_WITH code_
+                        | THROW valueExp_
+                      )
+private switchStatement_ ::= SWITCH LPAREN identifier_ RPAREN DO LBRACE (switchCase_)+ RBRACE
+private switchCase_ ::= (CASE valueExp_ COLON code_ SEMICOLON)
+                     | (DEFAULT code_ SEMICOLON)
+private loop_ ::= whileLoop_ | forLoop_
+private whileLoop_ ::= WHILE LBRACE conditionalExp_ RBRACE DO code_
+private forLoop_ ::= forLoopReg_ | forLoopFrom_ | forEachLoop_
+private forLoopReg_ ::= FOR LBRACKET code_ COMMA LBRACE exp_ RBRACE COMMA code_ RBRACKET DO code_
+private forLoopFrom_ ::= FOR STRING_LITERAL FROM exp_ TO exp_ (STEP exp_)? DO code_
+private forEachLoop_ ::= code_ FOR_EACH exp_
+private quest_ ::= QUEST conditionalExp_ COLON conditionalExp_
+
+private tryCatchExp_ ::= TRY code_ CATCH code_
