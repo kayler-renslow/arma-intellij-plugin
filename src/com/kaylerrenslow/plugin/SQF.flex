@@ -95,11 +95,11 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "_x" { return SQFTypes.LANG_CONSTANT; }
 
 
-<YYINITIAL> "append" { return SQFTypes.COMMAND; }
-<YYINITIAL> "select" { return SQFTypes.COMMAND; }
-<YYINITIAL> "set" { return SQFTypes.COMMAND; }
-<YYINITIAL> "count" { return SQFTypes.COMMAND; }
-<YYINITIAL> "find" { return SQFTypes.COMMAND; }
+<YYINITIAL> "append" { return SQFTypes.APPEND; }
+<YYINITIAL> "select" { return SQFTypes.SELECT; }
+<YYINITIAL> "set" { return SQFTypes.SET; }
+<YYINITIAL> "count" { return SQFTypes.COUNT; }
+<YYINITIAL> "find" { return SQFTypes.FIND; }
 
 <YYINITIAL> "format" { return SQFTypes.COMMAND; }
 
@@ -136,27 +136,27 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 
 <YYINITIAL> "in" { return SQFTypes.COMMAND; }
 
-<YYINITIAL> "compile" { return SQFTypes.COMMAND; }
-<YYINITIAL> "compileFinal" { return SQFTypes.COMMAND; }
-<YYINITIAL> "call" { return SQFTypes.COMMAND; }
-<YYINITIAL> "callExtension" { return SQFTypes.COMMAND; }
-<YYINITIAL> "execEditorScript" { return SQFTypes.COMMAND; }
-<YYINITIAL> "exec" { return SQFTypes.COMMAND; }
-<YYINITIAL> "execFSM" { return SQFTypes.COMMAND; }
-<YYINITIAL> "execVM" { return SQFTypes.COMMAND; }
-<YYINITIAL> "spawn" { return SQFTypes.COMMAND; }
-<YYINITIAL> "loadFile" { return SQFTypes.COMMAND; }
-<YYINITIAL> "preprocessFile" { return SQFTypes.COMMAND; }
-<YYINITIAL> "preprocessFileLineNumbers" { return SQFTypes.COMMAND; }
+<YYINITIAL> "compile" { return SQFTypes.COMPILE; }
+<YYINITIAL> "compileFinal" { return SQFTypes.COMPILE_FINAL; }
+<YYINITIAL> "call" { return SQFTypes.CALL; }
+<YYINITIAL> "callExtension" { return SQFTypes.CALL_EXTENSION; }
+<YYINITIAL> "execEditorScript" { return SQFTypes.EXEC_EDITOR_SCRIPT; }
+<YYINITIAL> "exec" { return SQFTypes.EXEC; }
+<YYINITIAL> "execFSM" { return SQFTypes.EXEC_FSM; }
+<YYINITIAL> "execVM" { return SQFTypes.EXEC_VM; }
+<YYINITIAL> "spawn" { return SQFTypes.SPAWN; }
+<YYINITIAL> "loadFile" { return SQFTypes.LOAD_FILE; }
+<YYINITIAL> "preprocessFile" { return SQFTypes.PREPROCESS_FILE; }
+<YYINITIAL> "preprocessFileLineNumbers" { return SQFTypes.PREPROCESS_FILE; }
 
 <YYINITIAL> "param" { return SQFTypes.COMMAND; }
 <YYINITIAL> "params" { return SQFTypes.COMMAND; }
 
-<YYINITIAL> "exitWith" { return SQFTypes.COMMAND; }
-<YYINITIAL> "exit" { return SQFTypes.COMMAND; }
-<YYINITIAL> "throw" { return SQFTypes.COMMAND; }
-<YYINITIAL> "try" { return SQFTypes.COMMAND; }
-<YYINITIAL> "catch" { return SQFTypes.COMMAND; }
+<YYINITIAL> "exitWith" { return SQFTypes.EXIT_WITH; }
+<YYINITIAL> "exit" { return SQFTypes.EXIT; }
+<YYINITIAL> "throw" { return SQFTypes.THROW; }
+<YYINITIAL> "try" { return SQFTypes.TRY; }
+<YYINITIAL> "catch" { return SQFTypes.CATCH; }
 
 <YYINITIAL> "comment" { return SQFTypes.COMMENT_KEYWORD; }
 
@@ -167,9 +167,9 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "campaignConfigFile" { return SQFTypes.CONFIG; }
 <YYINITIAL> "missionConfigFile" { return SQFTypes.CONFIG; }
 
-<YYINITIAL> "hint" { return SQFTypes.COMMAND; }
-<YYINITIAL> "hintC" { return SQFTypes.COMMAND; }
-<YYINITIAL> "hintSilent" { return SQFTypes.COMMAND; }
+<YYINITIAL> "hint" { return SQFTypes.HINT; }
+<YYINITIAL> "hintC" { return SQFTypes.HINT_C; }
+<YYINITIAL> "hintSilent" { return SQFTypes.HINT_SILENT; }
 
 <YYINITIAL> "player" { return SQFTypes.COMMAND; }
 
