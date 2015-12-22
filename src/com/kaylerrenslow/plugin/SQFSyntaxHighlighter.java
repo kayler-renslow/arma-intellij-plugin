@@ -3,20 +3,13 @@ package com.kaylerrenslow.plugin;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
-import com.intellij.openapi.editor.SyntaxHighlighterColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.tokenindex.Token;
 import com.kaylerrenslow.plugin.psi.SQFTypes;
-import com.thaiopensource.xml.dtd.om.Def;
 import org.jetbrains.annotations.NotNull;
-
-import javax.xml.soap.Text;
-
-import java.util.HashMap;
-import java.util.Map;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 
@@ -37,6 +30,11 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey STRING = createTextAttributesKey("STRING", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey NUM = createTextAttributesKey("NUM", DefaultLanguageHighlighterColors.NUMBER);
 
+	public static final TextAttributesKey BRACKET = createTextAttributesKey("BRACKET", DefaultLanguageHighlighterColors.BRACKETS);
+	public static final TextAttributesKey BRACE = createTextAttributesKey("BRACE", DefaultLanguageHighlighterColors.BRACES);
+	public static final TextAttributesKey PAREN = createTextAttributesKey("PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
+	public static final TextAttributesKey COMMA = createTextAttributesKey("COMMA", DefaultLanguageHighlighterColors.COMMA);
+
 	private static final TextAttributesKey[] OPERATOR_KEYS = new TextAttributesKey[]{OPERATOR};
 	private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
 	private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
@@ -50,6 +48,11 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 
 	private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
 	private static final TextAttributesKey[] NUM_KEYS = new TextAttributesKey[]{NUM};
+
+	private static final TextAttributesKey[] BRACKET_KEYS = new TextAttributesKey[]{BRACKET};
+	private static final TextAttributesKey[] BRACE_KEYS = new TextAttributesKey[]{BRACE};
+	private static final TextAttributesKey[] PAREN_KEYS = new TextAttributesKey[]{PAREN};
+	private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
 
 	private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
@@ -68,6 +71,18 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	@NotNull
 	@Override
 	public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
+		if (tokenType.equals(SQFTypes.LBRACE) || tokenType.equals(SQFTypes.RBRACE)){
+			return BRACE_KEYS;
+		}
+		if(tokenType.equals(SQFTypes.LBRACKET) || tokenType.equals(SQFTypes.RBRACKET)){
+			return BRACKET_KEYS;
+		}
+		if(tokenType.equals(SQFTypes.LPAREN) || tokenType.equals(SQFTypes.RPAREN)){
+			return PAREN_KEYS;
+		}
+		if(tokenType.equals(SQFTypes.COMMA)){
+			return COMMA_KEYS;
+		}
 		if (tokenType.equals(SQFTypes.COMMENT)){
 			return COMMENT_KEYS;
 		}

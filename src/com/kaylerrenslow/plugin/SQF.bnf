@@ -21,7 +21,7 @@ private identifier_ ::= LOCAL_VAR | IDENTIFIER | LANG_CONSTANT
 
 private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
 
-literal ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
+literal_ ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
 
 //private unusedLexerKeywords_ ::=
 
@@ -40,26 +40,29 @@ private exp_ ::= assignmentExp_
                | commandExp_
                | valueExp_ /*this needs to be after commandExp_, otherwise [] spawn {...} will break because it is expecting [] to be the returning value*/
 
-private expGroup_ ::= LPAREN exp_ RPAREN | exp_
+private exp2_ ::= LPAREN exp_ RPAREN | exp_
 
-private assignmentExp_ ::= identifier_ EQ (expGroup_ | switchStatement_ | ifStatement_)
+private assignmentExp_ ::= identifier_ EQ (mathExp_ | conditionalExp_ | exp2_ | switchStatement_ | ifStatement_)
 
 private conditionalExp_ ::= TRUE | FALSE
                           | EXCL comparableVal_
                           | NOT comparableVal_
-                          | comparableVal_ AMPAMP comparableVal_
-                          | comparableVal_ AND comparableVal_
-                          | comparableVal_ BARBAR comparableVal_
-                          | comparableVal_ OR comparableVal_
-                          | comparableVal_ EQEQ comparableVal_
-                          | comparableVal_ NE comparableVal_
-                          | comparableVal_ LT comparableVal_
-                          | comparableVal_ GT comparableVal_
-                          | comparableVal_ LE comparableVal_
-                          | comparableVal_ GE comparableVal_
+                          | ( comparableVal_ ( AMPAMP
+                                               | AND
+                                               | BARBAR
+                                               | OR
+                                               | EQEQ
+                                               | NE
+                                               | LT
+                                               | GT
+                                               | LE
+                                               | GE
+                                             ) comparableVal_
+                            )
                           | ASSERT LPAREN conditionalExp_ RPAREN
+                          | LPAREN conditionalExp_ RPAREN
 
-private comparableVal_ ::= commandExpOrValueExp_ | (LPAREN conditionalExp_ RPAREN)
+private comparableVal_ ::= exp2_ //commandExpOrValueExp_
 
 private commandExp_ ::= DISABLE_SERIALIZATION
                       /*| commandParam_
@@ -82,23 +85,24 @@ private commandExp_ ::= DISABLE_SERIALIZATION
                       | (valueExp_ | COMMAND)* COMMAND (commandExpOrValueExp_)*
                       | LPAREN commandExp_ RPAREN
 
+private mathOp_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
 private mathExp_ ::= LPAREN mathExp_ RPAREN
-                   | commandExpOrValueExp_ PLUS mathExpRhs_
-                   | commandExpOrValueExp_ MINUS mathExpRhs_
+                   | commandExpOrValueExp_ mathOp_ mathExpRhs_
+/*                   | commandExpOrValueExp_ MINUS mathExpRhs_
                    | commandExpOrValueExp_ ASTERISK mathExpRhs_
                    | commandExpOrValueExp_ CARET mathExpRhs_
                    | commandExpOrValueExp_ PERC mathExpRhs_
                    | commandExpOrValueExp_ MOD mathExpRhs_
                    | commandExpOrValueExp_ FSLASH mathExpRhs_
-
-private mathExpRhs_ ::= (commandExpOrValueExp_ | mathExp_)
+*/
+private mathExpRhs_ ::= commandExpOrValueExp_ mathOp_ mathExpRhs_ | commandExpOrValueExp_
 
 /*begin value exps*/
 
-private valueExp_ ::= identifier_ | literal | arrayVal_ | configVal_ | TYPE_NULL | NIL | TRUE | FALSE | LPAREN valueExp_ RPAREN
+private valueExp_ ::= identifier_ | literal_ | arrayVal_ | configVal_ | TYPE_NULL | NIL | TRUE | FALSE | LPAREN valueExp_ RPAREN
 private commandExpOrValueExp_ ::= commandExp_ | valueExp_ ; /*commandExp must go first since some commands match valueExp_ for their pre-params ("arr select 1" -> arr is pre-param)*/
 
-private arrayVal_  ::= LBRACKET RBRACKET | LBRACKET expGroup_ (COMMA expGroup_)* RBRACKET
+private arrayVal_  ::= LBRACKET RBRACKET | LBRACKET exp2_ (COMMA exp2_)* RBRACKET
 
 private configVal_ ::= CONFIG
                      | CONFIG FSLASH (STRING_LITERAL | identifier_) (FSLASH (STRING_LITERAL | identifier_))*
@@ -130,9 +134,9 @@ private switchCase_ ::= (CASE valueExp_ COLON codeBlock_ SEMICOLON)
 private loop_ ::= whileLoop_ | forLoop_
 private whileLoop_   ::= WHILE LBRACE conditionalExp_ RBRACE DO codeBlock_
 private forLoop_     ::= forLoopReg_ | forLoopFrom_ | forEachLoop_
-private forLoopReg_  ::= FOR LBRACKET codeBlock_ COMMA LBRACE expGroup_ RBRACE COMMA codeBlock_ RBRACKET DO codeBlock_
-private forLoopFrom_ ::= FOR STRING_LITERAL FROM expGroup_ TO expGroup_ (STEP expGroup_)? DO codeBlock_
-private forEachLoop_ ::= codeBlock_ FOR_EACH expGroup_
+private forLoopReg_  ::= FOR LBRACKET codeBlock_ COMMA LBRACE exp2_ RBRACE COMMA codeBlock_ RBRACKET DO codeBlock_
+private forLoopFrom_ ::= FOR STRING_LITERAL FROM exp2_ TO exp2_ (STEP exp2_)? DO codeBlock_
+private forEachLoop_ ::= codeBlock_ FOR_EACH exp2_
 private quest_ ::= QUEST conditionalExp_ COLON conditionalExp_
 
 private tryCatch_ ::= TRY codeBlock_ CATCH codeBlock_
