@@ -93,13 +93,13 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 
 <YYINITIAL> "disableSerialization" { return SQFTypes.DISABLE_SERIALIZATION; }
 
-<YYINITIAL> "append" { return SQFTypes.APPEND; }
-<YYINITIAL> "select" { return SQFTypes.SELECT; }
-<YYINITIAL> "set" { return SQFTypes.SET; }
-<YYINITIAL> "count" { return SQFTypes.COUNT; }
-<YYINITIAL> "find" { return SQFTypes.FIND; }
+<YYINITIAL> "append" { return SQFTypes.COMMAND; }
+<YYINITIAL> "select" { return SQFTypes.COMMAND; }
+<YYINITIAL> "set" { return SQFTypes.COMMAND; }
+<YYINITIAL> "count" { return SQFTypes.COMMAND; }
+<YYINITIAL> "find" { return SQFTypes.COMMAND; }
 
-<YYINITIAL> "format" { return SQFTypes.FORMAT; }
+<YYINITIAL> "format" { return SQFTypes.COMMAND; }
 
 <YYINITIAL> "with" { return SQFTypes.WITH; }
 <YYINITIAL> "parsingNamespace" { return SQFTypes.NAMESPACE; }
@@ -165,9 +165,9 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "campaignConfigFile" { return SQFTypes.CONFIG; }
 <YYINITIAL> "missionConfigFile" { return SQFTypes.CONFIG; }
 
-<YYINITIAL> "hint" { return SQFTypes.HINT; }
-<YYINITIAL> "hintC" { return SQFTypes.HINT_C; }
-<YYINITIAL> "hintSilent" { return SQFTypes.HINT_SILENT; }
+<YYINITIAL> "hint" { return SQFTypes.COMMAND; }
+<YYINITIAL> "hintC" { return SQFTypes.COMMAND; }
+<YYINITIAL> "hintSilent" { return SQFTypes.COMMAND; }
 
 <YYINITIAL> "player" { return SQFTypes.COMMAND; }
 
