@@ -34,7 +34,7 @@ private statement_ ::= (
                         | EXIT
                      ) SEMICOLON
 
-private code_ ::= LBRACE RBRACE | LBRACE (item_)+ RBRACE
+private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)+ RBRACE
 
 private exp_ ::= assignmentExp_
                | commandExp_
@@ -78,8 +78,8 @@ private commandExp_ ::= DISABLE_SERIALIZATION
                       | commandThrow_*/
                       | codeExec_
                       | commandWithExp_
-                      | (valueExp_)* COMMAND LPAREN (valueExp_ | COMMAND)* RPAREN
-                      | (valueExp_ | COMMAND)* COMMAND (valueExp_ | COMMAND)*
+                      | (valueExp_ | COMMAND)* COMMAND LPAREN (commandExpOrValueExp_)* RPAREN
+                      | (valueExp_ | COMMAND)* COMMAND (commandExpOrValueExp_)*
                       | LPAREN commandExp_ RPAREN
 
 private mathExp_ ::= LPAREN mathExp_ RPAREN
@@ -119,28 +119,28 @@ private scopeManager_ ::= GOTO COLON STRING_LITERAL
 /* begin control structures*/
 private controlStructure_ ::= ifStatement_ | switchStatement_ | loop_ | quest_
 private ifStatement_ ::= IF LPAREN conditionalExp_ RPAREN (
-                          THEN code_ (ELSE code_)?
-                          | EXIT_WITH code_
+                          THEN codeBlock_ (ELSE codeBlock_)?
+                          | EXIT_WITH codeBlock_
                           | commandThrow_
                        )
 
 private switchStatement_ ::= SWITCH (LPAREN commandExpOrValueExp_ RPAREN | commandExpOrValueExp_) DO LBRACE (switchCase_)* RBRACE
-private switchCase_ ::= (CASE valueExp_ COLON code_ SEMICOLON)
-                     | (DEFAULT code_ SEMICOLON)
+private switchCase_ ::= (CASE valueExp_ COLON codeBlock_ SEMICOLON)
+                     | (DEFAULT codeBlock_ SEMICOLON)
 private loop_ ::= whileLoop_ | forLoop_
-private whileLoop_   ::= WHILE LBRACE conditionalExp_ RBRACE DO code_
+private whileLoop_   ::= WHILE LBRACE conditionalExp_ RBRACE DO codeBlock_
 private forLoop_     ::= forLoopReg_ | forLoopFrom_ | forEachLoop_
-private forLoopReg_  ::= FOR LBRACKET code_ COMMA LBRACE expGroup_ RBRACE COMMA code_ RBRACKET DO code_
-private forLoopFrom_ ::= FOR STRING_LITERAL FROM expGroup_ TO expGroup_ (STEP expGroup_)? DO code_
-private forEachLoop_ ::= code_ FOR_EACH expGroup_
+private forLoopReg_  ::= FOR LBRACKET codeBlock_ COMMA LBRACE expGroup_ RBRACE COMMA codeBlock_ RBRACKET DO codeBlock_
+private forLoopFrom_ ::= FOR STRING_LITERAL FROM expGroup_ TO expGroup_ (STEP expGroup_)? DO codeBlock_
+private forEachLoop_ ::= codeBlock_ FOR_EACH expGroup_
 private quest_ ::= QUEST conditionalExp_ COLON conditionalExp_
 
-private tryCatch_ ::= TRY code_ CATCH code_
+private tryCatch_ ::= TRY codeBlock_ CATCH codeBlock_
 /*end control structures*/
 
 
 private commandThrow_ ::= THROW valueExp_
-private commandWithExp_ ::= WITH NAMESPACE DO code_
+private commandWithExp_ ::= WITH NAMESPACE DO codeBlock_
 
 private codeExec_ ::= valueExp_? CALL func_
                     | valueExp_? EXEC_VM func_
@@ -152,7 +152,7 @@ private codeExec_ ::= valueExp_? CALL func_
 
 
 private func_ ::= codeCompile_
-                | code_
+                | codeBlock_
                 | codeString_
 
 private codeString_ ::= PREPROCESS_FILE valueExp_
