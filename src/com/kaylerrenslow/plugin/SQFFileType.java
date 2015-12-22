@@ -40,4 +40,6 @@ public class SQFFileType extends LanguageFileType{
 		return Static.ICON_FILE;
 	}
 
+
+
 }

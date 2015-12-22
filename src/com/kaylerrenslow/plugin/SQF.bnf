@@ -167,11 +167,9 @@ private commandSetExp_ ::= valueExp_ SET LBRACKET valueExp_ COMMA valueExp_ RBRA
 private commandCountExp_ ::= valueExp_? COUNT valueExp_
 private commandFindExp_ ::= commandExpOrValueExp_ FIND commandExpOrValueExp_
 private commandParam_ ::= arrayVal_? (PARAM | PARAMS) arrayVal_
-private commandHintExp_ ::= HINT (valueExp_ | commandFormatExp_)
-                          | HINT_C (valueExp_ | commandFormatExp_)
-                          | HINT_SILENT (valueExp_ | commandFormatExp_)
+private commandHintExp_ ::= (HINT | HINT_C | HINT_SILENT) (STRING_LITERAL | commandFormatExp_) //sqf won't allow any value except strings to be hinted directly. other values must pass the format command
 
-private commandFormatExp_ ::= FORMAT LBRACKET STRING_LITERAL COMMA valueExp_ (COMMA valueExp_)* RBRACKET
+private commandFormatExp_ ::= FORMAT LBRACKET STRING_LITERAL COMMA exp_ (COMMA exp_)* RBRACKET
 private commandSelectExp_ ::= valueExp_ SELECT valueExp_
                             | valueExp_ SELECT LBRACKET valueExp_ COMMA valueExp_ RBRACKET
 
