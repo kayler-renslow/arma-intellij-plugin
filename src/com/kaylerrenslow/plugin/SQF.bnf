@@ -12,85 +12,83 @@
   elementTypeClass="com.kaylerrenslow.plugin.psi.SQFElementType"
   tokenTypeClass="com.kaylerrenslow.plugin.psi.SQFTokenType"
 }
+// @formatter:off
 sqfFile ::= item_*
 
-private item_ ::= WHITE_SPACE | DOC_COMMENT | comment_ | statement_ | BAD_CHARACTER
+private item_ ::= WHITE_SPACE | comment_ | statement_ | BAD_CHARACTER
 
-private command_ ::= COMMAND
 private identifier_ ::= LOCAL_VAR | IDENTIFIER | LANG_CONSTANT
 
 private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
 
 literal ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
 
-private operator_ ::= GTGT
-private keyword_ ::= TYPE_NULL | NIL
-private constant_ ::= LANG_CONSTANT
-                   | NAMESPACE
+private unusedLexerKeywords_ ::= GTGT | TYPE_NULL | NIL | LANG_CONSTANT | NAMESPACE
 
 private statement_ ::= exp_ SEMICOLON
 
 private code_ ::= LBRACE RBRACE | LBRACE (item_)+ RBRACE
 
 private exp_ ::= private_declaration_
-                | assignmentExp_
-                | controlStructure_
-                | scopeManager_
-                | tryCatchExp_
-                | valueExp_
-                | commandExp_
-                | EXIT
+               | assignmentExp_
+               | controlStructure_
+               | scopeManager_
+               | tryCatchExp_
+               | commandExp_
+               | valueExp_ /*this needs to be last, otherwise [] spawn {...} will break because it is expecting [] to be the returning value*/
+               | EXIT
 
-private assignmentExp_ ::= identifier_ EQ (mathExp_ | commandExp_ | valueExp_ )
+private assignmentExp_ ::= identifier_ EQ (mathExp_ | valueExp_ | commandExp_ )
 
 private conditionalExp_ ::= TRUE | FALSE
-              | EXCL conditionalCompPart_
-              | NOT conditionalCompPart_
-              | conditionalCompPart_ AMPAMP conditionalCompPart_
-              | conditionalCompPart_ AND conditionalCompPart_
-              | conditionalCompPart_ BARBAR conditionalCompPart_
-              | conditionalCompPart_ OR conditionalCompPart_
-              | comparableVal_ EQEQ comparableVal_
-              | comparableVal_ NE comparableVal_
-              | comparableVal_ LT comparableVal_
-              | comparableVal_ GT comparableVal_
-              | comparableVal_ LE comparableVal_
-              | comparableVal_ GE comparableVal_
-              | ASSERT LPAREN conditionalExp_ RPAREN
+                          | EXCL conditionalCompPart_
+                          | NOT conditionalCompPart_
+                          | conditionalCompPart_ AMPAMP conditionalCompPart_
+                          | conditionalCompPart_ AND conditionalCompPart_
+                          | conditionalCompPart_ BARBAR conditionalCompPart_
+                          | conditionalCompPart_ OR conditionalCompPart_
+                          | comparableVal_ EQEQ comparableVal_
+                          | comparableVal_ NE comparableVal_
+                          | comparableVal_ LT comparableVal_
+                          | comparableVal_ GT comparableVal_
+                          | comparableVal_ LE comparableVal_
+                          | comparableVal_ GE comparableVal_
+                          | ASSERT LPAREN conditionalExp_ RPAREN
 
 private conditionalGroupExp_ ::= (LPAREN conditionalExp_ RPAREN) | valueExp_
 
 private conditionalCompPart_ ::= conditionalGroupExp_
-private comparableVal_ ::= valueExp_ | conditionalExp_
+private comparableVal_ ::= valueExp_ | commandExp_ | conditionalGroupExp_
 
-private commandExp_ ::= valueExp_ SELECT valueExp_
-                      | valueExp_ SELECT LBRACKET valueExp_ COMMA valueExp_ RBRACKET
-                      | valueExp_ APPEND valueExp_
-                      | valueExp_ SET LBRACKET valueExp_ COMMA valueExp_ RBRACKET
-                      | valueExp_? COUNT valueExp_
-                      | valueExp_ FIND valueExp_
-                      | FORMAT LBRACKET STRING_LITERAL (COMMA valueExp_)+ RBRACKET
-                      | WITH NAMESPACE DO code_
-                      | codeCompile_
-                      | commandCodeExec_
+private commandExp_ ::= DISABLE_SERIALIZATION
                       | commandParam_
-                      | valueExp_ CONFIG_CLASSES (configVal_ | LPAREN configVal_ RPAREN)
-                      | CONFIG_NAME configVal_
-                      | HINT valueExp_ | commandExp_
-                      | HINT_C valueExp_ | commandExp_
-                      | HINT_SILENT valueExp_ | commandExp_
+                      | commandCodeExec_
+                      | commandSelectExp_
+                      | codeCompile_
+                      | commandHintExp_
+                      | commandFormatExp_
+                      | commandCountExp_
+                      | commandSetExp_
+                      | commandConfigClassesExp_
+                      | CONFIG_NAME configVal_ /*example: missionConfigFile >> "test"*/
+                      | commandAppendExp_
+                      | commandFindExp_
+                      | commandWithExp_
                       | commandThrow_
-                      | (valueExp_)* COMMAND (valueExp_)*
+                      | (valueExp_ | COMMAND)* COMMAND (valueExp_ | COMMAND)*
 
-private mathExp_ ::= valueExp_ PLUS valueExp_
-          | valueExp_ MINUS valueExp_
-          | valueExp_ ASTERISK valueExp_
-          | valueExp_ CARET valueExp_
-          | valueExp_ PERC valueExp_
-          | valueExp_ MOD valueExp_
-          | valueExp_ FSLASH valueExp_
-          | LPAREN mathExp_ RPAREN
+private mathExp_ ::= valueExp_ PLUS mathExpRhs_
+                   | valueExp_ MINUS mathExpRhs_
+                   | valueExp_ ASTERISK mathExpRhs_
+                   | valueExp_ CARET mathExpRhs_
+                   | valueExp_ PERC mathExpRhs_
+                   | valueExp_ MOD mathExpRhs_
+                   | valueExp_ FSLASH mathExpRhs_
+                   | LPAREN mathExp_ RPAREN
 
+private mathExpRhs_ ::= (valueExp_ | mathExp_)
+
+/*begin value exps*/
 
 private valueExp_ ::= identifier_ | literal | arrayVal_ | configVal_
 
@@ -98,24 +96,28 @@ private arrayItem_ ::= identifier_ | literal
 private arrayVal_ ::= LBRACKET RBRACKET | LBRACKET arrayItem_ (COMMA arrayItem_)* RBRACKET
 
 private configVal_ ::= CONFIG
-                 | CONFIG FSLASH STRING_LITERAL (FSLASH STRING_LITERAL)*
-                 | CONFIG GTGT STRING_LITERAL (GTGT STRING_LITERAL)*
+                     | CONFIG FSLASH STRING_LITERAL (FSLASH STRING_LITERAL)*
+                     | CONFIG GTGT STRING_LITERAL (GTGT STRING_LITERAL)*
+
+/*end value exps*/
+
 
 private private_declaration_ ::= PRIVATE LBRACKET ((identifier_ (COMMA identifier_)*) | (STRING_LITERAL (COMMA STRING_LITERAL)*)) RBRACKET
 
 private scopeManager_ ::= GOTO COLON STRING_LITERAL
-                | BREAK_TO STRING_LITERAL
-                | exp_? BREAK_OUT STRING_LITERAL
-                | CONTINUE
-                | BREAK
-                | SCOPE_NAME STRING_LITERAL
+                        | BREAK_TO STRING_LITERAL
+                        | valueExp_? BREAK_OUT STRING_LITERAL
+                        | CONTINUE
+                        | BREAK
+                        | SCOPE_NAME STRING_LITERAL
 
+/* begin control structures*/
 private controlStructure_ ::= ifStatement_ | switchStatement_ | loop_ | quest_
 private ifStatement_ ::= IF LPAREN conditionalExp_ RPAREN (
-                        THEN code_ (ELSE code_)?
-                        | EXIT_WITH code_
-                        | commandThrow_
-                      )
+                          THEN code_ (ELSE code_)?
+                          | EXIT_WITH code_
+                          | commandThrow_
+                       )
 private switchStatement_ ::= SWITCH LPAREN identifier_ RPAREN DO LBRACE (switchCase_)* RBRACE
 private switchCase_ ::= (CASE valueExp_ COLON code_ SEMICOLON)
                      | (DEFAULT code_ SEMICOLON)
@@ -128,30 +130,48 @@ private forEachLoop_ ::= code_ FOR_EACH exp_
 private quest_ ::= QUEST conditionalExp_ COLON conditionalExp_
 
 private tryCatchExp_ ::= TRY code_ CATCH code_
-
+/*end control structures*/
 
 
 
 private commandThrow_ ::= THROW valueExp_
+private commandAppendExp_ ::= valueExp_ APPEND valueExp_
+private commandSetExp_ ::= valueExp_ SET LBRACKET valueExp_ COMMA valueExp_ RBRACKET
+private commandCountExp_ ::= valueExp_? COUNT valueExp_
+private commandFindExp_ ::= valueExp_ FIND valueExp_
+private commandWithExp_ ::= WITH NAMESPACE DO code_
 private commandParam_ ::= arrayVal_? (PARAM | PARAMS) arrayVal_
+private commandHintExp_ ::= HINT (valueExp_ | commandFormatExp_)
+                          | HINT_C (valueExp_ | commandFormatExp_)
+                          | HINT_SILENT (valueExp_ | commandFormatExp_)
 
-private funcParam_ ::= exp_?
+private commandFormatExp_ ::= FORMAT LBRACKET STRING_LITERAL COMMA valueExp_ (COMMA valueExp_)* RBRACKET
+private commandSelectExp_ ::= valueExp_ SELECT valueExp_
+                            | valueExp_ SELECT LBRACKET valueExp_ COMMA valueExp_ RBRACKET
+
+private commandConfigClassesExp_ ::= valueExp_ CONFIG_CLASSES (configVal_ | LPAREN configVal_ RPAREN)
+
 private commandCodeExec_ ::= funcParam_ CALL func_
-           | funcParam_ EXEC_VM func_
-           | funcParam_ SPAWN func_
-           | valueExp_ CALL_EXTENSION valueExp_
-           | funcParam_ EXEC func_
-           | funcParam_ EXEC_FSM func_
-           | valueExp_ EXEC_EDITOR_SCRIPT arrayVal_
+                           | funcParam_ EXEC_VM func_
+                           | funcParam_ SPAWN func_
+                           | STRING_LITERAL CALL_EXTENSION STRING_LITERAL
+                           | funcParam_ EXEC func_
+                           | funcParam_ EXEC_FSM func_
+                           | valueExp_ EXEC_EDITOR_SCRIPT arrayVal_
 
+private funcParam_ ::= valueExp_?
 
 private func_ ::= codeCompile_
-       | code_
-       | codeString_
+                | code_
+                | codeString_
 
 private codeString_ ::= PREPROCESS_FILE STRING_LITERAL
-             | LOAD_FILE STRING_LITERAL
-             | STRING_LITERAL
+                      | LOAD_FILE STRING_LITERAL
+                      | STRING_LITERAL
 
 private codeCompile_ ::= COMPILE codeString_
-              | COMPILE_FINAL codeString_
+                       | COMPILE_FINAL codeString_
+
+
+
+// @formatter:on

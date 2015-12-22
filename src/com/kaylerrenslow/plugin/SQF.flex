@@ -27,11 +27,9 @@ INPUT_CHARACTER = [^\r\n]
 WHITE_SPACE = {LINE_TERMINATOR} | [ \t\f]
 
 /* comments */
-COMMENT = {TRADITIONAL_COMMENT} | {END_OF_LINE_COMMENT} | 
-          {DOCUMENTATION_COMMENT}
+COMMENT = {TRADITIONAL_COMMENT} | {END_OF_LINE_COMMENT}
 
-DOCUMENTATION_COMMENT = "/*" "*"+ [^/*] ~"*/"
-TRADITIONAL_COMMENT = "/*" [^*] ~"*/" | "/*" "*"+ "/"
+TRADITIONAL_COMMENT = "/*" ~"*/" | "/*" "*"+ "/"
 END_OF_LINE_COMMENT = "//" {INPUT_CHARACTER}* {LINE_TERMINATOR}?
 
 DIGIT = [0-9]
@@ -50,7 +48,6 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 
 <YYINITIAL> {COMMENT} { return SQFTypes.COMMENT; }
 <YYINITIAL> {END_OF_LINE_COMMENT} { return SQFTypes.COMMENT; }
-<YYINITIAL> {DOCUMENTATION_COMMENT} { return SQFTypes.DOC_COMMENT; }
 
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
@@ -94,6 +91,7 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "_this" { return SQFTypes.LANG_CONSTANT; }
 <YYINITIAL> "_x" { return SQFTypes.LANG_CONSTANT; }
 
+<YYINITIAL> "disableSerialization" { return SQFTypes.DISABLE_SERIALIZATION; }
 
 <YYINITIAL> "append" { return SQFTypes.APPEND; }
 <YYINITIAL> "select" { return SQFTypes.SELECT; }
@@ -101,7 +99,7 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "count" { return SQFTypes.COUNT; }
 <YYINITIAL> "find" { return SQFTypes.FIND; }
 
-<YYINITIAL> "format" { return SQFTypes.COMMAND; }
+<YYINITIAL> "format" { return SQFTypes.FORMAT; }
 
 <YYINITIAL> "with" { return SQFTypes.WITH; }
 <YYINITIAL> "parsingNamespace" { return SQFTypes.NAMESPACE; }
@@ -640,7 +638,6 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "disableDebriefingStats" { return SQFTypes.COMMAND; }
 <YYINITIAL> "disableNVGEquipment" { return SQFTypes.COMMAND; }
 <YYINITIAL> "disableRemoteSensors" { return SQFTypes.COMMAND; }
-<YYINITIAL> "disableSerialization" { return SQFTypes.COMMAND; }
 <YYINITIAL> "disableTIEquipment" { return SQFTypes.COMMAND; }
 <YYINITIAL> "disableUAVConnectability" { return SQFTypes.COMMAND; }
 <YYINITIAL> "disableUserInput" { return SQFTypes.COMMAND; }

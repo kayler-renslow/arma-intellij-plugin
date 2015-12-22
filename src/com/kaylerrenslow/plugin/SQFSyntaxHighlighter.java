@@ -15,6 +15,9 @@ import org.jetbrains.annotations.NotNull;
 
 import javax.xml.soap.Text;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 
 /**
@@ -22,7 +25,6 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
  */
 public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey COMMENT = createTextAttributesKey("SQF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
-	public static final TextAttributesKey DOC_COMMENT = createTextAttributesKey("DOC_COMMENT", DefaultLanguageHighlighterColors.DOC_COMMENT);
 	public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("SQF_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
 	public static final TextAttributesKey IDENTIFIER = createTextAttributesKey("IDENTIFIER", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
 	public static final TextAttributesKey LOCAL_VAR = createTextAttributesKey("LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
@@ -38,7 +40,6 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	private static final TextAttributesKey[] OPERATOR_KEYS = new TextAttributesKey[]{OPERATOR};
 	private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
 	private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
-	private static final TextAttributesKey[] DOC_COMMENT_KEYS = new TextAttributesKey[]{DOC_COMMENT};
 
 	private static final TextAttributesKey[] CONSTANT_KEYS = new TextAttributesKey[]{CONSTANT};
 
@@ -55,7 +56,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	private static final IElementType[] OPERATORS = {SQFTypes.EQEQ, SQFTypes.EQ, SQFTypes.ASTERISK, SQFTypes.NE, SQFTypes.PERC, SQFTypes.MOD, SQFTypes.PLUS, SQFTypes.MINUS, SQFTypes.FSLASH, SQFTypes.CARET, SQFTypes.GTGT, SQFTypes.GT, SQFTypes.GE, SQFTypes.LT, SQFTypes.LE, SQFTypes.EXCL, SQFTypes.NOT, SQFTypes.AMPAMP, SQFTypes.AND, SQFTypes.BARBAR, SQFTypes.OR, SQFTypes.QUEST, SQFTypes.COLON};
 	private static final IElementType[] KEYWORDS = {SQFTypes.WITH, SQFTypes.TRUE, SQFTypes.FALSE, SQFTypes.NIL, SQFTypes.TYPE_NULL, SQFTypes.PRIVATE, SQFTypes.SCOPE_NAME, SQFTypes.BREAK, SQFTypes.BREAK_TO, SQFTypes.BREAK_OUT, SQFTypes.CONTINUE, SQFTypes.FOR, SQFTypes.TO, SQFTypes.FOR_EACH, SQFTypes.FROM, SQFTypes.WHILE, SQFTypes.GOTO, SQFTypes.ASSERT, SQFTypes.IF, SQFTypes.THEN, SQFTypes.ELSE, SQFTypes.SWITCH, SQFTypes.CASE, SQFTypes.DEFAULT, SQFTypes.DO};
 	private static final IElementType[] CONSTANTS = {SQFTypes.LANG_CONSTANT, SQFTypes.NAMESPACE, SQFTypes.CONFIG};
-
+	private static final IElementType[] COMMANDS = {SQFTypes.COMMAND, SQFTypes.DISABLE_SERIALIZATION, SQFTypes.APPEND, SQFTypes.SELECT, SQFTypes.SET, SQFTypes.COUNT, SQFTypes.FIND, SQFTypes.FORMAT, SQFTypes.COMPILE, SQFTypes.COMPILE_FINAL, SQFTypes.CALL, SQFTypes.CALL_EXTENSION, SQFTypes.EXEC_EDITOR_SCRIPT, SQFTypes.EXEC, SQFTypes.EXEC_FSM, SQFTypes.EXEC_VM, SQFTypes.SPAWN, SQFTypes.LOAD_FILE, SQFTypes.PREPROCESS_FILE};
 
 
 	@NotNull
@@ -82,11 +83,10 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(SQFTypes.IDENTIFIER)){
 			return IDENTIFIER_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.DOC_COMMENT)){
-			return DOC_COMMENT_KEYS;
-		}
-		if(tokenType.equals(SQFTypes.COMMAND)){
-			return COMMAND_KEYS;
+		for(IElementType e: COMMANDS){
+			if(tokenType.equals(e)){
+				return COMMAND_KEYS;
+			}
 		}
 		for(IElementType e: KEYWORDS){
 			if(tokenType.equals(e)){
