@@ -44,9 +44,8 @@ private exp2_ ::= LPAREN exp_ RPAREN | exp_
 private assignmentExp_ ::= identifier_ EQ (commandExpOrValue_ | mathExp_ | switchStatement_ | ifStatement_ | assignmentExp_ | conditionalExp_)
 
 private condition_ ::= TRUE | FALSE | commandExpOrValue_
-private conditionalExpPart_ ::= condition_
-                              | LPAREN conditionalExpPart_ RPAREN
-                              | EXCL condition_
+private conditionStandalone_ ::= TRUE | FALSE | commandExp_ | identifier_
+private conditionalExpPart_ ::= EXCL condition_
                               | NOT condition_
                               | ( condition_ (
                                                AMPAMP
@@ -62,6 +61,8 @@ private conditionalExpPart_ ::= condition_
                                              ) condition_
                                 )
                               | ASSERT LPAREN conditionalExpPart_ RPAREN
+                              | LPAREN conditionalExpPart_ RPAREN
+                              | conditionStandalone_
 
 
 private conditionalExp_ ::= conditionalExpPart_ (AND | AMPAMP) conditionalExpPart_
