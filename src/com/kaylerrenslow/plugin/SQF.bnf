@@ -17,14 +17,14 @@ sqfFile ::= item_*
 
 private item_ ::= WHITE_SPACE | comment_ | statement_ | BAD_CHARACTER
 
-private identifier_ ::= LOCAL_VAR | IDENTIFIER | LANG_CONSTANT
+private identifier_ ::= LOCAL_VAR | IDENTIFIER | LANG_CONSTANT | LPAREN identifier_ RPAREN
 
 private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
 
 literal_ ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
 
-//private unusedLexerKeywords_ ::=
-
+//TODO inside format String's, turn %x blue
+//TODO hintSilent parseText (localize _this);
 private statement_ ::= (
                         exp_
                         | private_declaration_
@@ -37,147 +37,154 @@ private statement_ ::= (
 private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)+ RBRACE
 
 private exp_ ::= assignmentExp_
-               | commandExp_
-               | valueExp_ /*this needs to be after commandExp_, otherwise [] spawn {...} will break because it is expecting [] to be the returning value*/
+               | commandExpOrValue_
 
 private exp2_ ::= LPAREN exp_ RPAREN | exp_
 
-private assignmentExp_ ::= identifier_ EQ (mathExp_ | conditionalExp_ | exp2_ | switchStatement_ | ifStatement_)
+private assignmentExp_ ::= identifier_ EQ (commandExpOrValue_ | mathExp_ | switchStatement_ | ifStatement_ | assignmentExp_ | conditionalExp_)
 
-private conditionalExp_ ::= TRUE | FALSE
-                          | EXCL comparableVal_
-                          | NOT comparableVal_
-                          | ( comparableVal_ ( AMPAMP
-                                               | AND
-                                               | BARBAR
-                                               | OR
-                                               | EQEQ
-                                               | NE
-                                               | LT
-                                               | GT
-                                               | LE
-                                               | GE
-                                             ) comparableVal_
-                            )
-                          | ASSERT LPAREN conditionalExp_ RPAREN
-                          | LPAREN conditionalExp_ RPAREN
+private condition_ ::= TRUE | FALSE | commandExpOrValue_
+private conditionalExpPart_ ::= condition_
+                              | LPAREN conditionalExpPart_ RPAREN
+                              | EXCL condition_
+                              | NOT condition_
+                              | ( condition_ (
+                                               AMPAMP
+                                              | AND
+                                              | BARBAR
+                                              | OR
+                                              | EQEQ
+                                              | NE
+                                              | LT
+                                              | GT
+                                              | LE
+                                              | GE
+                                             ) condition_
+                                )
+                              | ASSERT LPAREN conditionalExpPart_ RPAREN
 
-private comparableVal_ ::= exp2_ //commandExpOrValueExp_
+
+private conditionalExp_ ::= conditionalExpPart_ (AND | AMPAMP) conditionalExpPart_
+                          | conditionalExpPart_ (OR | BARBAR) conditionalExpPart_
+                          | conditionalExpPart_
+
 
 private commandExp_ ::= DISABLE_SERIALIZATION
                       /*| commandParam_
                       | commandCodeExec_
                       | commandSelectExp_
-                      | codeCompile_
-                      | commandHintExp_
-                      | commandFormatExp_
                       | commandCountExp_
                       | commandSetExp_
-                      | CONFIG_NAME configVal_ /*example: missionConfigFile >> "test"*/
+                      | CONFIG_NAME configVal_ /*example: configName missionConfigFile >> "test"*/
                       /*| commandConfigClassesExp_
                       | commandAppendExp_
                       | commandFindExp_
                       | commandWithExp_
-                      | commandThrow_*/
-                      | codeExec_
+                      */
+                      | commandStr_
+                      | commandHintExp_
+                      | commandFormatExp_
+                      | commandThrow_
+                      | commandCompile_
+                      | commandCodeExecs_
                       | commandWithExp_
-                      | (valueExp_ | COMMAND)* COMMAND LPAREN (commandExpOrValueExp_)* RPAREN
-                      | (valueExp_ | COMMAND)* COMMAND (commandExpOrValueExp_)*
+                      | localizeCommandExp_
+                      | (value_ | COMMAND)? COMMAND LPAREN commandExpOrValue_ RPAREN
+                      | (value_ | COMMAND)? COMMAND (commandExpOrValue_)?
                       | LPAREN commandExp_ RPAREN
 
 private mathOp_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
 private mathExp_ ::= LPAREN mathExp_ RPAREN
-                   | commandExpOrValueExp_ mathOp_ mathExpRhs_
-/*                   | commandExpOrValueExp_ MINUS mathExpRhs_
-                   | commandExpOrValueExp_ ASTERISK mathExpRhs_
-                   | commandExpOrValueExp_ CARET mathExpRhs_
-                   | commandExpOrValueExp_ PERC mathExpRhs_
-                   | commandExpOrValueExp_ MOD mathExpRhs_
-                   | commandExpOrValueExp_ FSLASH mathExpRhs_
-*/
-private mathExpRhs_ ::= commandExpOrValueExp_ mathOp_ mathExpRhs_ | commandExpOrValueExp_
+                   | commandExpOrValue_ mathOp_ mathExpRhs_
 
-/*begin value exps*/
+private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrValue_
 
-private valueExp_ ::= identifier_ | literal_ | arrayVal_ | configVal_ | TYPE_NULL | NIL | TRUE | FALSE | LPAREN valueExp_ RPAREN
-private commandExpOrValueExp_ ::= commandExp_ | valueExp_ ; /*commandExp must go first since some commands match valueExp_ for their pre-params ("arr select 1" -> arr is pre-param)*/
+/*VALUES*/
+    private value_ ::= identifier_ | literal_ | arrayVal_ | configVal_ | TYPE_NULL | NIL | TRUE | FALSE | LPAREN value_ RPAREN
+    private commandExpOrValue_ ::= commandExp_ | value_ ; /*commandExp must go first since some commands match value_ for their pre-params ("arr select 1" -> arr is pre-param)*/
 
-private arrayVal_  ::= LBRACKET RBRACKET | LBRACKET exp2_ (COMMA exp2_)* RBRACKET
+    private arrayVal_  ::= LBRACKET RBRACKET | LBRACKET exp2_ (COMMA exp2_)* RBRACKET
 
-private configVal_ ::= CONFIG
-                     | CONFIG FSLASH (STRING_LITERAL | identifier_) (FSLASH (STRING_LITERAL | identifier_))*
-                     | CONFIG GTGT (STRING_LITERAL | identifier_) (GTGT (STRING_LITERAL | identifier_))*
+    private configVal_ ::= CONFIG
+                         | CONFIG FSLASH (STRING_LITERAL | identifier_) (FSLASH (STRING_LITERAL | identifier_))*
+                         | CONFIG GTGT (STRING_LITERAL | identifier_) (GTGT (STRING_LITERAL | identifier_))*
 
-/*end value exps*/
+    private localizedStrVal_ ::= localizeCommandExp_ | STRING_LITERAL
 
 
-private private_declaration_ ::= PRIVATE LBRACKET ((identifier_ (COMMA identifier_)*) | (STRING_LITERAL (COMMA STRING_LITERAL)*)) RBRACKET
+/*CONTROL STRUCTURES AND OTHER THINGS*/
+    private private_declaration_ ::= PRIVATE LBRACKET ((identifier_ (COMMA identifier_)*) | (STRING_LITERAL (COMMA STRING_LITERAL)*)) RBRACKET
 
-private scopeManager_ ::= GOTO COLON STRING_LITERAL
-                        | BREAK_TO STRING_LITERAL
-                        | commandExpOrValueExp_? BREAK_OUT STRING_LITERAL
-                        | CONTINUE
-                        | BREAK
-                        | SCOPE_NAME STRING_LITERAL
+    private scopeManager_ ::= GOTO COLON STRING_LITERAL
+                            | BREAK_TO STRING_LITERAL
+                            | commandExpOrValue_? BREAK_OUT STRING_LITERAL
+                            | CONTINUE
+                            | BREAK
+                            | SCOPE_NAME STRING_LITERAL
 
-/* begin control structures*/
-private controlStructure_ ::= ifStatement_ | switchStatement_ | loop_ | quest_
-private ifStatement_ ::= IF LPAREN conditionalExp_ RPAREN (
-                          THEN codeBlock_ (ELSE codeBlock_)?
-                          | EXIT_WITH codeBlock_
-                          | commandThrow_
-                       )
+    private controlStructure_ ::= ifStatement_ | switchStatement_ | loop_ | quest_
+    private ifStatement_ ::= IF LPAREN conditionalExp_ RPAREN (
+                              THEN codeBlock_ (ELSE codeBlock_)?
+                              | EXIT_WITH codeBlock_
+                              | commandThrow_
+                           )
 
-private switchStatement_ ::= SWITCH (LPAREN commandExpOrValueExp_ RPAREN | commandExpOrValueExp_) DO LBRACE (switchCase_)* RBRACE
-private switchCase_ ::= (CASE valueExp_ COLON codeBlock_ SEMICOLON)
-                     | (DEFAULT codeBlock_ SEMICOLON)
-private loop_ ::= whileLoop_ | forLoop_
-private whileLoop_   ::= WHILE LBRACE conditionalExp_ RBRACE DO codeBlock_
-private forLoop_     ::= forLoopReg_ | forLoopFrom_ | forEachLoop_
-private forLoopReg_  ::= FOR LBRACKET codeBlock_ COMMA LBRACE exp2_ RBRACE COMMA codeBlock_ RBRACKET DO codeBlock_
-private forLoopFrom_ ::= FOR STRING_LITERAL FROM exp2_ TO exp2_ (STEP exp2_)? DO codeBlock_
-private forEachLoop_ ::= codeBlock_ FOR_EACH exp2_
-private quest_ ::= QUEST conditionalExp_ COLON conditionalExp_
+    private switchStatement_ ::= SWITCH (LPAREN commandExpOrValue_ RPAREN | commandExpOrValue_) DO LBRACE (switchCase_)* RBRACE
+    private switchCase_ ::= (CASE value_ COLON codeBlock_ SEMICOLON)
+                          | (DEFAULT codeBlock_ SEMICOLON)
 
-private tryCatch_ ::= TRY codeBlock_ CATCH codeBlock_
-/*end control structures*/
+    private loop_ ::= whileLoop_ | forLoop_
+    private whileLoop_   ::= WHILE LBRACE conditionalExp_ RBRACE DO codeBlock_
+    private forLoop_     ::= forLoopReg_ | forLoopFrom_ | forEachLoop_
+    private forLoopReg_  ::= FOR LBRACKET codeBlock_ COMMA LBRACE exp2_ RBRACE COMMA codeBlock_ RBRACKET DO codeBlock_
+    private forLoopFrom_ ::= FOR STRING_LITERAL FROM exp2_ TO exp2_ (STEP exp2_)? DO codeBlock_
+    private forEachLoop_ ::= codeBlock_ FOR_EACH exp2_
 
+    private quest_ ::= QUEST conditionalExp_ COLON commandExpOrValue_
 
-private commandThrow_ ::= THROW valueExp_
-private commandWithExp_ ::= WITH NAMESPACE DO codeBlock_
-
-private codeExec_ ::= valueExp_? CALL func_
-                    | valueExp_? EXEC_VM func_
-                    | valueExp_? SPAWN func_
-                    | STRING_LITERAL CALL_EXTENSION valueExp_
-                    | valueExp_? EXEC valueExp_
-                    | valueExp_? EXEC_FSM valueExp_
-                    | valueExp_ EXEC_EDITOR_SCRIPT arrayVal_
+    private tryCatch_ ::= TRY codeBlock_ CATCH codeBlock_ /*_exception is predefined in catch block*/
 
 
-private func_ ::= codeCompile_
-                | codeBlock_
-                | codeString_
+/*COMMANDS*/
+    private commandThrow_ ::= THROW value_
+    private commandWithExp_ ::= WITH NAMESPACE DO codeBlock_
 
-private codeString_ ::= PREPROCESS_FILE valueExp_
-                      | LOAD_FILE valueExp_
-                      | valueExp_
+    private commandCodeExecs_ ::= value_? CALL func_
+                                | value_? EXEC_VM func_
+                                | value_? SPAWN func_
+                                | STRING_LITERAL CALL_EXTENSION value_
+                                | value_? EXEC value_
+                                | value_? EXEC_FSM value_
+                                | value_ EXEC_EDITOR_SCRIPT arrayVal_
 
-private codeCompile_ ::= COMPILE codeString_
-                       | COMPILE_FINAL codeString_
+    private func_ ::= commandCompile_
+                    | codeBlock_
+                    | codeString_
+
+    private commandCompile_ ::= (COMPILE_FINAL | COMPILE) codeString_
+
+    private codeString_ ::= PREPROCESS_FILE value_
+                          | LOAD_FILE value_
+                          | value_
+
+    private commandHintExp_ ::= HINT (identifier_ | commandStr_ | commandFormatExp_) //sqf won't allow any value except strings to be hinted directly. other values must pass the format command
+
+    private commandFormatExp_ ::= FORMAT LBRACKET (localizeCommandExp_ | identifier_ | localizedStrVal_) (COMMA commandExpOrValue_)* RBRACKET /*format doesn't *require* params beyond the String literal*/
+
+    private commandStr_ ::= STR commandExpOrValue_ //str object/command
+
+    private localizeCommandExp_ ::= LOCALIZE (identifier_ | STRING_LITERAL)
+
 /*
-private commandAppendExp_ ::= valueExp_ APPEND valueExp_
-private commandSetExp_ ::= valueExp_ SET LBRACKET valueExp_ COMMA valueExp_ RBRACKET
-private commandCountExp_ ::= valueExp_? COUNT valueExp_
-private commandFindExp_ ::= commandExpOrValueExp_ FIND commandExpOrValueExp_
+private commandAppendExp_ ::= value_ APPEND value_
+private commandSetExp_ ::= value_ SET LBRACKET value_ COMMA value_ RBRACKET
+private commandCountExp_ ::= value_? COUNT value_
+private commandFindExp_ ::= commandExpOrValue_ FIND commandExpOrValue_
 private commandParam_ ::= arrayVal_? (PARAM | PARAMS) arrayVal_
-private commandHintExp_ ::= (HINT | HINT_C | HINT_SILENT) (STRING_LITERAL | commandFormatExp_) //sqf won't allow any value except strings to be hinted directly. other values must pass the format command
+private commandSelectExp_ ::= value_ SELECT value_
+                            | value_ SELECT LBRACKET value_ COMMA value_ RBRACKET
 
-private commandFormatExp_ ::= FORMAT LBRACKET STRING_LITERAL COMMA exp_ (COMMA exp_)* RBRACKET
-private commandSelectExp_ ::= valueExp_ SELECT valueExp_
-                            | valueExp_ SELECT LBRACKET valueExp_ COMMA valueExp_ RBRACKET
-
-private commandConfigClassesExp_ ::= valueExp_ CONFIG_CLASSES (configVal_ | LPAREN configVal_ RPAREN)
+private commandConfigClassesExp_ ::= value_ CONFIG_CLASSES (configVal_ | LPAREN configVal_ RPAREN)
 
 
 // @formatter:on

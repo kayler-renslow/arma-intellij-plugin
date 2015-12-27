@@ -16,4 +16,5 @@ public class SQFSyntaxHighlighterFactory extends SyntaxHighlighterFactory{
 	public SyntaxHighlighter getSyntaxHighlighter(Project project, VirtualFile virtualFile) {
 		return new SQFSyntaxHighlighter();
 	}
+
 }

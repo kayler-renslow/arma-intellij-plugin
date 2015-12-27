@@ -37,7 +37,7 @@ DIGITS = {DIGIT}+
 
 INTEGER_LITERAL = "-"? {DIGITS}
 DEC_SIGNIFICAND = "." {DIGITS} | {DIGITS} "." {DIGIT}+
-DEC_EXPONENT = {DEC_SIGNIFICAND} [Ee] [+-]? {DIGIT}*
+DEC_EXPONENT = ({DEC_SIGNIFICAND} | {INTEGER_LITERAL}) [Ee] [+-]? {DIGIT}*
 DEC_LITERAL = "-"? ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 
 ESCAPE_SEQUENCE = \\[^\r\n]
@@ -62,6 +62,7 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "grpNull" { return SQFTypes.TYPE_NULL; }
 <YYINITIAL> "objNull" { return SQFTypes.TYPE_NULL; }
 <YYINITIAL> "scriptNull" { return SQFTypes.TYPE_NULL; }
+<YYINITIAL> "locationNull" { return SQFTypes.TYPE_NULL; }
 
 <YYINITIAL> "private" { return SQFTypes.PRIVATE; }
 
@@ -77,6 +78,7 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "while" { return SQFTypes.WHILE; }
 <YYINITIAL> "goto" { return SQFTypes.GOTO; }
 <YYINITIAL> "assert" { return SQFTypes.ASSERT; }
+<YYINITIAL> "step" { return SQFTypes.STEP; }
 
 <YYINITIAL> "if" { return SQFTypes.IF; }
 <YYINITIAL> "then" { return SQFTypes.THEN; }
@@ -90,6 +92,7 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "this" { return SQFTypes.LANG_CONSTANT; }
 <YYINITIAL> "_this" { return SQFTypes.LANG_CONSTANT; }
 <YYINITIAL> "_x" { return SQFTypes.LANG_CONSTANT; }
+<YYINITIAL> "_exception" { return SQFTypes.LANG_CONSTANT; }
 
 <YYINITIAL> "disableSerialization" { return SQFTypes.DISABLE_SERIALIZATION; }
 
@@ -99,7 +102,13 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "count" { return SQFTypes.COMMAND; }
 <YYINITIAL> "find" { return SQFTypes.COMMAND; }
 
-<YYINITIAL> "format" { return SQFTypes.COMMAND; }
+<YYINITIAL> "hint" { return SQFTypes.HINT; }
+<YYINITIAL> "hintC" { return SQFTypes.HINT; }
+<YYINITIAL> "hintSilent" { return SQFTypes.HINT; }
+<YYINITIAL> "format" { return SQFTypes.FORMAT; }
+<YYINITIAL> "str" { return SQFTypes.STR; }
+
+<YYINITIAL> "localize" { return SQFTypes.LOCALIZE; }
 
 <YYINITIAL> "with" { return SQFTypes.WITH; }
 <YYINITIAL> "parsingNamespace" { return SQFTypes.NAMESPACE; }
@@ -113,24 +122,6 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "not" { return SQFTypes.NOT; }
 <YYINITIAL> "and" { return SQFTypes.AND; }
 <YYINITIAL> "or" { return SQFTypes.OR; }
-
-<YYINITIAL> "abs" { return SQFTypes.COMMAND; }
-<YYINITIAL> "rad" { return SQFTypes.COMMAND; }
-<YYINITIAL> "deg" { return SQFTypes.COMMAND; }
-<YYINITIAL> "cos" { return SQFTypes.COMMAND; }
-<YYINITIAL> "acos" { return SQFTypes.COMMAND; }
-<YYINITIAL> "sin" { return SQFTypes.COMMAND; }
-<YYINITIAL> "asin" { return SQFTypes.COMMAND; }
-<YYINITIAL> "tan" { return SQFTypes.COMMAND; }
-<YYINITIAL> "atan" { return SQFTypes.COMMAND; }
-<YYINITIAL> "atan2" { return SQFTypes.COMMAND; }
-<YYINITIAL> "atg" { return SQFTypes.COMMAND; }
-<YYINITIAL> "pi" { return SQFTypes.COMMAND; }
-
-<YYINITIAL> "floor" { return SQFTypes.COMMAND; }
-<YYINITIAL> "ceil" { return SQFTypes.COMMAND; }
-<YYINITIAL> "exp" { return SQFTypes.COMMAND; }
-<YYINITIAL> "finite" { return SQFTypes.COMMAND; }
 
 <YYINITIAL> "in" { return SQFTypes.COMMAND; }
 
@@ -165,12 +156,25 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "campaignConfigFile" { return SQFTypes.CONFIG; }
 <YYINITIAL> "missionConfigFile" { return SQFTypes.CONFIG; }
 
-<YYINITIAL> "hint" { return SQFTypes.COMMAND; }
-<YYINITIAL> "hintC" { return SQFTypes.COMMAND; }
-<YYINITIAL> "hintSilent" { return SQFTypes.COMMAND; }
-
 <YYINITIAL> "player" { return SQFTypes.COMMAND; }
 
+
+<YYINITIAL> "abs" { return SQFTypes.COMMAND; }
+<YYINITIAL> "rad" { return SQFTypes.COMMAND; }
+<YYINITIAL> "deg" { return SQFTypes.COMMAND; }
+<YYINITIAL> "cos" { return SQFTypes.COMMAND; }
+<YYINITIAL> "acos" { return SQFTypes.COMMAND; }
+<YYINITIAL> "sin" { return SQFTypes.COMMAND; }
+<YYINITIAL> "asin" { return SQFTypes.COMMAND; }
+<YYINITIAL> "tan" { return SQFTypes.COMMAND; }
+<YYINITIAL> "atan" { return SQFTypes.COMMAND; }
+<YYINITIAL> "atan2" { return SQFTypes.COMMAND; }
+<YYINITIAL> "atg" { return SQFTypes.COMMAND; }
+<YYINITIAL> "pi" { return SQFTypes.COMMAND; }
+<YYINITIAL> "floor" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ceil" { return SQFTypes.COMMAND; }
+<YYINITIAL> "exp" { return SQFTypes.COMMAND; }
+<YYINITIAL> "finite" { return SQFTypes.COMMAND; }
 <YYINITIAL> "accTime" { return SQFTypes.COMMAND; }
 <YYINITIAL> "action" { return SQFTypes.COMMAND; }
 <YYINITIAL> "actionKeys" { return SQFTypes.COMMAND; }
@@ -1097,8 +1101,6 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "loadUniform" { return SQFTypes.COMMAND; }
 <YYINITIAL> "loadVest" { return SQFTypes.COMMAND; }
 <YYINITIAL> "local" { return SQFTypes.COMMAND; }
-<YYINITIAL> "localize" { return SQFTypes.COMMAND; }
-<YYINITIAL> "locationNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "locationPosition" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lock" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lockCameraTo" { return SQFTypes.COMMAND; }
@@ -1731,10 +1733,8 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "squadParams" { return SQFTypes.COMMAND; }
 <YYINITIAL> "stance" { return SQFTypes.COMMAND; }
 <YYINITIAL> "startLoadingScreen" { return SQFTypes.COMMAND; }
-<YYINITIAL> "step" { return SQFTypes.COMMAND; }
 <YYINITIAL> "stop" { return SQFTypes.COMMAND; }
 <YYINITIAL> "stopped" { return SQFTypes.COMMAND; }
-<YYINITIAL> "str" { return SQFTypes.COMMAND; }
 <YYINITIAL> "sunOrMoon" { return SQFTypes.COMMAND; }
 <YYINITIAL> "supportInfo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "suppressFor" { return SQFTypes.COMMAND; }

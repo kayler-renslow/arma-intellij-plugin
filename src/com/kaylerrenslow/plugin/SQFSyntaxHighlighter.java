@@ -56,10 +56,17 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 
 	private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
-	private static final IElementType[] OPERATORS = {SQFTypes.EQEQ, SQFTypes.EQ, SQFTypes.ASTERISK, SQFTypes.NE, SQFTypes.PERC, SQFTypes.MOD, SQFTypes.PLUS, SQFTypes.MINUS, SQFTypes.FSLASH, SQFTypes.CARET, SQFTypes.GTGT, SQFTypes.GT, SQFTypes.GE, SQFTypes.LT, SQFTypes.LE, SQFTypes.EXCL, SQFTypes.NOT, SQFTypes.AMPAMP, SQFTypes.AND, SQFTypes.BARBAR, SQFTypes.OR, SQFTypes.QUEST, SQFTypes.COLON};
-	private static final IElementType[] KEYWORDS = {SQFTypes.WITH, SQFTypes.TRUE, SQFTypes.FALSE, SQFTypes.NIL, SQFTypes.TYPE_NULL, SQFTypes.PRIVATE, SQFTypes.SCOPE_NAME, SQFTypes.BREAK, SQFTypes.BREAK_TO, SQFTypes.BREAK_OUT, SQFTypes.CONTINUE, SQFTypes.FOR, SQFTypes.TO, SQFTypes.FOR_EACH, SQFTypes.FROM, SQFTypes.WHILE, SQFTypes.GOTO, SQFTypes.ASSERT, SQFTypes.IF, SQFTypes.THEN, SQFTypes.ELSE, SQFTypes.SWITCH, SQFTypes.CASE, SQFTypes.DEFAULT, SQFTypes.DO};
+	private static final IElementType[] OPERATORS = {SQFTypes.EQEQ, SQFTypes.EQ, SQFTypes.ASTERISK, SQFTypes.NE, SQFTypes.PERC, SQFTypes.PLUS, SQFTypes.MINUS, SQFTypes.FSLASH, SQFTypes.CARET, SQFTypes.GTGT, SQFTypes.GT, SQFTypes.GE,
+			SQFTypes.LT, SQFTypes.LE, SQFTypes.EXCL, SQFTypes.AMPAMP, SQFTypes.BARBAR, SQFTypes.QUEST, SQFTypes.COLON};
+
+	private static final IElementType[] KEYWORDS = {SQFTypes.WITH, SQFTypes.TRUE, SQFTypes.FALSE, SQFTypes.NOT, SQFTypes.AND, SQFTypes.OR, SQFTypes.MOD, SQFTypes.NIL, SQFTypes.TYPE_NULL, SQFTypes.PRIVATE, SQFTypes.SCOPE_NAME,
+			SQFTypes.BREAK, SQFTypes.BREAK_TO, SQFTypes.BREAK_OUT, SQFTypes.CONTINUE, SQFTypes.FOR, SQFTypes.TO, SQFTypes.STEP, SQFTypes.FOR_EACH, SQFTypes.FROM, SQFTypes.WHILE, SQFTypes.GOTO, SQFTypes.ASSERT, SQFTypes.IF,
+			SQFTypes.THEN, SQFTypes.ELSE, SQFTypes.SWITCH, SQFTypes.CASE, SQFTypes.DEFAULT, SQFTypes.DO};
+
 	private static final IElementType[] CONSTANTS = {SQFTypes.LANG_CONSTANT, SQFTypes.NAMESPACE, SQFTypes.CONFIG};
-	private static final IElementType[] COMMANDS = {SQFTypes.COMMAND, SQFTypes.DISABLE_SERIALIZATION, SQFTypes.COMPILE, SQFTypes.COMPILE_FINAL, SQFTypes.CALL, SQFTypes.CALL_EXTENSION, SQFTypes.EXEC_EDITOR_SCRIPT, SQFTypes.EXEC, SQFTypes.EXEC_FSM, SQFTypes.EXEC_VM, SQFTypes.SPAWN, SQFTypes.LOAD_FILE, SQFTypes.PREPROCESS_FILE};
+
+	private static final IElementType[] COMMANDS = {SQFTypes.COMMAND, SQFTypes.DISABLE_SERIALIZATION, SQFTypes.FORMAT, SQFTypes.HINT, SQFTypes.STR ,SQFTypes.COMPILE, SQFTypes.COMPILE_FINAL, SQFTypes.CALL, SQFTypes.CALL_EXTENSION,
+			SQFTypes.EXEC_EDITOR_SCRIPT, SQFTypes.EXEC, SQFTypes.EXEC_FSM, SQFTypes.EXEC_VM, SQFTypes.SPAWN, SQFTypes.LOAD_FILE, SQFTypes.PREPROCESS_FILE};
 
 
 	@NotNull
@@ -67,6 +74,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	public Lexer getHighlightingLexer() {
 		return new SQFLexerAdapter();
 	}
+
 
 	@NotNull
 	@Override
