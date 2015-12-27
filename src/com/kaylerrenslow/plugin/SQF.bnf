@@ -26,7 +26,6 @@ literal_ ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
 
 //TODO inside format String's, turn %x blue
 //TODO hintSilent parseText (localize _this);
-//TODO remove the commands that are specific
 
 private statement_ ::= (
                         exp_
@@ -34,7 +33,6 @@ private statement_ ::= (
                         | controlStructure_
                         | scopeManager_
                         | tryCatch_
-                        | EXIT
                      ) SEMICOLON
 
 private returnStatement_ ::= (commandExpOrValue_ | conditionalExp_) SEMICOLON? (ignore_ | BAD_CHARACTER)*
@@ -74,15 +72,10 @@ private conditionalExp_ ::= conditionalExpPart_ (AND | AMPAMP) conditionalExpPar
                           | conditionalExpPart_
 
 
-private commandExp_ ::= DISABLE_SERIALIZATION
-                      | commandStr_
-                      | commandHintExp_
-                      | commandFormatExp_
-                      | commandThrow_
-                      | commandCompile_
+private commandExp_ ::= commandCompile_
                       | commandCodeExecs_
                       | commandWithExp_
-                      | localizeCommandExp_
+                      | commandThrow_
                       | (value_)? COMMAND LPAREN commandExpOrValue_ RPAREN
                       | (value_)? COMMAND (commandExpOrValue_)?
                       | (value_)? COMMAND codeBlock_
@@ -146,34 +139,26 @@ private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrVal
     private commandThrow_ ::= THROW value_
     private commandWithExp_ ::= WITH NAMESPACE DO codeBlock_
 
-    private commandCodeExecs_ ::= value_? CALL func_
-                                | value_? EXEC_VM func_
-                                | value_? SPAWN func_
+    private commandCodeExecs_ ::= commandExpOrValue_? CALL func_
+                                | commandExpOrValue_? EXEC_VM func_
+                                | commandExpOrValue_? SPAWN func_
                                 | STRING_LITERAL CALL_EXTENSION value_
-                                | value_? EXEC value_
-                                | value_? EXEC_FSM value_
-                                | value_ EXEC_EDITOR_SCRIPT arrayVal_
+                                | commandExpOrValue_? EXEC value_
+                                | commandExpOrValue_? EXEC_FSM value_
+                                | commandExpOrValue_ EXEC_EDITOR_SCRIPT arrayVal_
                                 | LPAREN commandCodeExecs_ RPAREN
 
     private func_ ::= commandCompile_
                     | codeBlock_
                     | identifier_
                     | codeString_
+                    | commandExpOrValue_
 
     private commandCompile_ ::= (COMPILE_FINAL | COMPILE) (codeString_ | LPAREN codeString_ RPAREN)
 
     private codeString_ ::= PREPROCESS_FILE value_
                           | LOAD_FILE value_
-                          | STRING_LITERAL
-
-    private commandHintExp_ ::= HINT (identifier_ | commandStr_ | localizeCommandExp_ | commandFormatExp_ | commandCodeExecs_) //sqf won't allow any value except strings to be hinted directly. other values must pass the format command
-
-    private commandFormatExp_ ::= FORMAT LBRACKET (localizeCommandExp_ | identifier_ | localizedStrVal_) (COMMA commandExpOrValue_)* RBRACKET /*format doesn't *require* params beyond the String literal*/
-
-    private commandStr_ ::= STR exp2_
-
-    private localizable_ ::= (identifier_ | STRING_LITERAL)
-    private localizeCommandExp_ ::= LOCALIZE (localizable_ | LPAREN localizable_ RPAREN)
+                          | commandExpOrValue_
 
 /*
 private commandAppendExp_ ::= value_ APPEND value_

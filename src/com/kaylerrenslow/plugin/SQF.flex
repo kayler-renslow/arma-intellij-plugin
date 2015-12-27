@@ -96,7 +96,7 @@ STRING_LITERAL = "\"" ~"\"" | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
 <YYINITIAL> "_x" { return SQFTypes.LANG_CONSTANT; }
 <YYINITIAL> "_exception" { return SQFTypes.LANG_CONSTANT; }
 
-<YYINITIAL> "disableSerialization" { return SQFTypes.DISABLE_SERIALIZATION; }
+<YYINITIAL> "disableSerialization" { return SQFTypes.COMMAND; }
 
 <YYINITIAL> "append" { return SQFTypes.COMMAND; }
 <YYINITIAL> "select" { return SQFTypes.COMMAND; }
@@ -104,13 +104,13 @@ STRING_LITERAL = "\"" ~"\"" | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
 <YYINITIAL> "count" { return SQFTypes.COMMAND; }
 <YYINITIAL> "find" { return SQFTypes.COMMAND; }
 
-<YYINITIAL> "hint" { return SQFTypes.HINT; }
-<YYINITIAL> "hintC" { return SQFTypes.HINT; }
-<YYINITIAL> "hintSilent" { return SQFTypes.HINT; }
-<YYINITIAL> "format" { return SQFTypes.FORMAT; }
-<YYINITIAL> "str" { return SQFTypes.STR; }
+<YYINITIAL> "hint" { return SQFTypes.COMMAND; }
+<YYINITIAL> "hintC" { return SQFTypes.COMMAND; }
+<YYINITIAL> "hintSilent" { return SQFTypes.COMMAND; }
+<YYINITIAL> "format" { return SQFTypes.COMMAND; }
+<YYINITIAL> "str" { return SQFTypes.COMMAND; }
 
-<YYINITIAL> "localize" { return SQFTypes.LOCALIZE; }
+<YYINITIAL> "localize" { return SQFTypes.COMMAND; }
 
 <YYINITIAL> "with" { return SQFTypes.WITH; }
 <YYINITIAL> "parsingNamespace" { return SQFTypes.NAMESPACE; }

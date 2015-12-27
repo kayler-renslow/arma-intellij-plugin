@@ -31,9 +31,7 @@ private token_ ::= WHITE_SPACE
 
                  /*commands*/
                  | COMMAND
-                 | EXIT
                  | ASSERT
-                 | DISABLE_SERIALIZATION
                  | TRY
                  | CATCH
                  | THROW
@@ -49,10 +47,6 @@ private token_ ::= WHITE_SPACE
                  | COMPILE_FINAL
                  | PREPROCESS_FILE
                  | LOAD_FILE
-                 | HINT
-                 | FORMAT
-                 | STR
-                 | LOCALIZE
 
                  /*values*/
                  | TRUE
@@ -64,7 +58,6 @@ private token_ ::= WHITE_SPACE
                  | CONFIG
                  | LANG_CONSTANT
                  | NAMESPACE
-
 
                  /*control structure keywords*/
                  | PRIVATE
