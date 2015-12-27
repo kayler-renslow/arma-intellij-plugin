@@ -1,0 +1,129 @@
+{
+  parserClass="com.kaylerrenslow.plugin.parser.SQFParser_NoSyntax"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="SQF"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.kaylerrenslow.plugin.psiNoSyntax"
+  psiImplPackage="com.kaylerrenslow.plugin.psi.implNoSyntax"
+
+  elementTypeHolderClass="com.kaylerrenslow.plugin.psi.SQFTypesNoSyntax"
+  elementTypeClass="com.kaylerrenslow.plugin.psi.SQFElementTypeNoSyntax"
+  tokenTypeClass="com.kaylerrenslow.plugin.psi.SQFTokenTypeNoSyntax"
+}
+// @formatter:off
+sqfFile ::= token_*
+
+private token_ ::= WHITE_SPACE
+                 /*identifiers*/
+                 | LOCAL_VAR
+                 | IDENTIFIER
+
+                 /*comments*/
+                 | COMMENT
+                 | COMMENT_KEYWORD
+
+                 /*literals*/
+                 | STRING_LITERAL
+                 | INTEGER_LITERAL
+                 | DEC_LITERAL
+
+                 /*commands*/
+                 | COMMAND
+                 | EXIT
+                 | ASSERT
+                 | DISABLE_SERIALIZATION
+                 | TRY
+                 | CATCH
+                 | THROW
+                 | WITH
+                 | CALL
+                 | EXEC_VM
+                 | SPAWN
+                 | CALL_EXTENSION
+                 | EXEC
+                 | EXEC_FSM
+                 | EXEC_EDITOR_SCRIPT
+                 | COMPILE
+                 | COMPILE_FINAL
+                 | PREPROCESS_FILE
+                 | LOAD_FILE
+                 | HINT
+                 | FORMAT
+                 | STR
+                 | LOCALIZE
+
+                 /*values*/
+                 | TRUE
+                 | FALSE
+                 | NIL
+                 | TYPE_NULL
+
+                 /*lang constants*/
+                 | CONFIG
+                 | LANG_CONSTANT
+                 | NAMESPACE
+
+
+                 /*control structure keywords*/
+                 | PRIVATE
+                 | GOTO
+                 | BREAK
+                 | BREAK_TO
+                 | BREAK_OUT
+                 | CONTINUE
+                 | SCOPE_NAME
+                 | IF
+                 | THEN
+                 | ELSE
+                 | EXIT_WITH
+                 | SWITCH
+                 | DO
+                 | CASE
+                 | DEFAULT
+                 | WHILE
+                 | FOR
+                 | FOR_EACH
+                 | TO
+                 | STEP
+                 | FROM
+                 | WAIT_UNTIL
+
+                 /*operators and other symbols*/
+                 | LBRACE
+                 | RBRACE
+                 | LBRACKET
+                 | RBRACKET
+                 | LPAREN
+                 | RPAREN
+                 | SEMICOLON
+                 | EXCL
+                 | NOT
+                 | EQ
+                 | AMPAMP
+                 | AND
+                 | BARBAR
+                 | OR
+                 | EQEQ
+                 | NE
+                 | LT
+                 | GT
+                 | LE
+                 | GE
+                 | PLUS
+                 | MINUS
+                 | ASTERISK
+                 | CARET
+                 | PERC
+                 | MOD
+                 | FSLASH
+                 | GTGT
+                 | COMMA
+                 | COLON
+                 | QUEST
+
+                 | BAD_CHARACTER
+
+
+// @formatter:on

@@ -1,29 +1,17 @@
+
+
+
 <idea-plugin version="2">
   <id>com.kaylerrenslow.plugin.id</id>
   <name>Arma 3 SQF Language Plugin</name>
-  <version>1.0</version>
+  <version>1.0.0</version>
   <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 
-  <description><![CDATA[
-      Enter short description for your plugin here.<br>
-      <em>most HTML tags may be used</em>
-    ]]></description>
+  <description></description>
 
-  <change-notes><![CDATA[
-      Add change notes here.<br>
-      <em>most HTML tags may be used</em>
-    ]]>
-  </change-notes>
+  <change-notes></change-notes>
 
-  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Build+Number+Ranges for description -->
   <idea-version since-build="131"/>
-
-  <!-- please see https://confluence.jetbrains.com/display/IDEADEV/Plugin+Compatibility+with+IntelliJ+Platform+Products
-       on how to target different products -->
-  <!-- uncomment to enable plugin in all products
-  <depends>com.intellij.modules.lang</depends>
-  -->
-
   <extensions defaultExtensionNs="com.intellij">
     <fileTypeFactory implementation="com.kaylerrenslow.plugin.SQFFileTypeFactory"/>
     <lang.parserDefinition language="SQF" implementationClass="com.kaylerrenslow.plugin.psi.SQFParserDefinition"/>
@@ -31,16 +19,15 @@
     <colorSettingsPage implementation="com.kaylerrenslow.plugin.SQFColorSettingsPage"/>
   </extensions>
 
-  <application-components>
-    <!-- Add your application components here -->
-  </application-components>
+  <application-components></application-components>
 
-  <project-components>
-    <!-- Add your project components here -->
-  </project-components>
+  <project-components></project-components>
 
   <actions>
-    <!-- Add your actions here -->
+    <group id="com.kaylerrenslow.plugin.actions.mainMenu.group" text="_Arma 3" description="Arma 3 menu">
+      <add-to-group group-id="MainMenu" anchor="last" />
+      <action id="Myplugin.Textboxes" class="com.kaylerrenslow.plugin.actions.mainMenu.HiAction" text="Hi" description="A test menu item" />
+    </group>
   </actions>
 
 

@@ -13,9 +13,10 @@
   tokenTypeClass="com.kaylerrenslow.plugin.psi.SQFTokenType"
 }
 // @formatter:off
-sqfFile ::= item_*
+sqfFile ::= item_* (returnStatement_)?
 
-private item_ ::= WHITE_SPACE | comment_ | statement_ | BAD_CHARACTER
+private ignore_ ::= WHITE_SPACE | comment_
+private item_ ::= ignore_ | statement_ | BAD_CHARACTER
 
 private identifier_ ::= LOCAL_VAR | IDENTIFIER | LANG_CONSTANT | LPAREN identifier_ RPAREN
 
@@ -25,6 +26,8 @@ literal_ ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
 
 //TODO inside format String's, turn %x blue
 //TODO hintSilent parseText (localize _this);
+//TODO remove the commands that are specific
+
 private statement_ ::= (
                         exp_
                         | private_declaration_
@@ -34,7 +37,8 @@ private statement_ ::= (
                         | EXIT
                      ) SEMICOLON
 
-private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)+ RBRACE
+private returnStatement_ ::= (commandExpOrValue_ | conditionalExp_) SEMICOLON? (ignore_ | BAD_CHARACTER)*
+private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)+ (returnStatement_)? RBRACE
 
 private exp_ ::= assignmentExp_
                | commandExpOrValue_
@@ -71,17 +75,6 @@ private conditionalExp_ ::= conditionalExpPart_ (AND | AMPAMP) conditionalExpPar
 
 
 private commandExp_ ::= DISABLE_SERIALIZATION
-                      /*| commandParam_
-                      | commandCodeExec_
-                      | commandSelectExp_
-                      | commandCountExp_
-                      | commandSetExp_
-                      | CONFIG_NAME configVal_ /*example: configName missionConfigFile >> "test"*/
-                      /*| commandConfigClassesExp_
-                      | commandAppendExp_
-                      | commandFindExp_
-                      | commandWithExp_
-                      */
                       | commandStr_
                       | commandHintExp_
                       | commandFormatExp_
@@ -90,8 +83,9 @@ private commandExp_ ::= DISABLE_SERIALIZATION
                       | commandCodeExecs_
                       | commandWithExp_
                       | localizeCommandExp_
-                      | (value_ | COMMAND)? COMMAND LPAREN commandExpOrValue_ RPAREN
-                      | (value_ | COMMAND)? COMMAND (commandExpOrValue_)?
+                      | (value_)? COMMAND LPAREN commandExpOrValue_ RPAREN
+                      | (value_)? COMMAND (commandExpOrValue_)?
+                      | (value_)? COMMAND codeBlock_
                       | LPAREN commandExp_ RPAREN
 
 private mathOp_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
@@ -114,7 +108,7 @@ private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrVal
 
 
 /*CONTROL STRUCTURES AND OTHER THINGS*/
-    private private_declaration_ ::= PRIVATE LBRACKET ((identifier_ (COMMA identifier_)*) | (STRING_LITERAL (COMMA STRING_LITERAL)*)) RBRACKET
+    private private_declaration_ ::= PRIVATE (STRING_LITERAL | LBRACKET (STRING_LITERAL (COMMA STRING_LITERAL)*) RBRACKET)
 
     private scopeManager_ ::= GOTO COLON STRING_LITERAL
                             | BREAK_TO STRING_LITERAL
@@ -123,7 +117,7 @@ private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrVal
                             | BREAK
                             | SCOPE_NAME STRING_LITERAL
 
-    private controlStructure_ ::= ifStatement_ | switchStatement_ | loop_ | quest_
+    private controlStructure_ ::= ifStatement_ | switchStatement_ | loop_ | waitUntil_ | quest_
     private ifStatement_ ::= IF LPAREN conditionalExp_ RPAREN (
                               THEN codeBlock_ (ELSE codeBlock_)?
                               | EXIT_WITH codeBlock_
@@ -145,6 +139,8 @@ private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrVal
 
     private tryCatch_ ::= TRY codeBlock_ CATCH codeBlock_ /*_exception is predefined in catch block*/
 
+    private waitUntil_ ::= WAIT_UNTIL codeBlock_
+
 
 /*COMMANDS*/
     private commandThrow_ ::= THROW value_
@@ -157,24 +153,27 @@ private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrVal
                                 | value_? EXEC value_
                                 | value_? EXEC_FSM value_
                                 | value_ EXEC_EDITOR_SCRIPT arrayVal_
+                                | LPAREN commandCodeExecs_ RPAREN
 
     private func_ ::= commandCompile_
                     | codeBlock_
+                    | identifier_
                     | codeString_
 
-    private commandCompile_ ::= (COMPILE_FINAL | COMPILE) codeString_
+    private commandCompile_ ::= (COMPILE_FINAL | COMPILE) (codeString_ | LPAREN codeString_ RPAREN)
 
     private codeString_ ::= PREPROCESS_FILE value_
                           | LOAD_FILE value_
-                          | value_
+                          | STRING_LITERAL
 
-    private commandHintExp_ ::= HINT (identifier_ | commandStr_ | commandFormatExp_) //sqf won't allow any value except strings to be hinted directly. other values must pass the format command
+    private commandHintExp_ ::= HINT (identifier_ | commandStr_ | localizeCommandExp_ | commandFormatExp_ | commandCodeExecs_) //sqf won't allow any value except strings to be hinted directly. other values must pass the format command
 
     private commandFormatExp_ ::= FORMAT LBRACKET (localizeCommandExp_ | identifier_ | localizedStrVal_) (COMMA commandExpOrValue_)* RBRACKET /*format doesn't *require* params beyond the String literal*/
 
-    private commandStr_ ::= STR commandExpOrValue_ //str object/command
+    private commandStr_ ::= STR exp2_
 
-    private localizeCommandExp_ ::= LOCALIZE (identifier_ | STRING_LITERAL)
+    private localizable_ ::= (identifier_ | STRING_LITERAL)
+    private localizeCommandExp_ ::= LOCALIZE (localizable_ | LPAREN localizable_ RPAREN)
 
 /*
 private commandAppendExp_ ::= value_ APPEND value_
@@ -187,5 +186,3 @@ private commandSelectExp_ ::= value_ SELECT value_
 
 private commandConfigClassesExp_ ::= value_ CONFIG_CLASSES (configVal_ | LPAREN configVal_ RPAREN)
 
-
-// @formatter:on

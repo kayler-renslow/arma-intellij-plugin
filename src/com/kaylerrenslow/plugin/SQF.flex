@@ -41,7 +41,8 @@ DEC_EXPONENT = ({DEC_SIGNIFICAND} | {INTEGER_LITERAL}) [Ee] [+-]? {DIGIT}*
 DEC_LITERAL = "-"? ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 
 ESCAPE_SEQUENCE = \\[^\r\n]
-STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
+//STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
+STRING_LITERAL = "\"" ~"\"" | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
 %%
 
 <YYINITIAL> {WHITE_SPACE}+ { return SQFTypes.WHITE_SPACE; }
@@ -87,6 +88,7 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "case" { return SQFTypes.CASE; }
 <YYINITIAL> "default" { return SQFTypes.DEFAULT; }
 <YYINITIAL> "do" { return SQFTypes.DO; }
+<YYINITIAL> "waitUntil" { return SQFTypes.WAIT_UNTIL; }
 
 
 <YYINITIAL> "this" { return SQFTypes.LANG_CONSTANT; }
@@ -1890,7 +1892,6 @@ STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'
 <YYINITIAL> "visiblePosition" { return SQFTypes.COMMAND; }
 <YYINITIAL> "visiblePositionASL" { return SQFTypes.COMMAND; }
 <YYINITIAL> "visibleWatch" { return SQFTypes.COMMAND; }
-<YYINITIAL> "waitUntil" { return SQFTypes.COMMAND; }
 <YYINITIAL> "waves" { return SQFTypes.COMMAND; }
 <YYINITIAL> "waypointAttachedObject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "waypointAttachedVehicle" { return SQFTypes.COMMAND; }

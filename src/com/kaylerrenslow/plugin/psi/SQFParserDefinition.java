@@ -9,12 +9,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.plugin.SQFLanguage;
 import com.kaylerrenslow.plugin.SQFLexerAdapter;
+import com.kaylerrenslow.plugin.Static;
 import com.kaylerrenslow.plugin.parser.SQFParser;
+import com.kaylerrenslow.plugin.parser.SQFParser_NoSyntax;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -33,6 +34,10 @@ public class SQFParserDefinition implements ParserDefinition{
 
 	@Override
 	public PsiParser createParser(Project project) {
+		String syntax = Static.plugin.getPluginProperty(Static.PluginPropertiesKey.PARSER);
+		if(syntax.equalsIgnoreCase("false")){
+			return new SQFParser_NoSyntax();
+		}
 		return new SQFParser();
 	}
 
