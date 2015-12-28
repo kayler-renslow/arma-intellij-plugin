@@ -43,11 +43,11 @@ private returnStatement_ ::= (commandExpOrValue_ | conditionalExp_) SEMICOLON? (
 private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement_)? RBRACE
 
 
-private exp_ ::= commandExp_
+private exp_ ::= LPAREN exp_ RPAREN
+               | commandExp_
                | mathExp_
                | value_
                | conditionalExp_
-               | LPAREN exp_ RPAREN
 
 private assignment_ ::= identifier_ EQ ( (exp_ | codeBlock_ | assignment_) | (switchStatement_ | ifStatement_ ) )
 
@@ -79,8 +79,8 @@ private conditionalExp_ ::= conditionalExpPart_ (AND | AMPAMP) conditionalExpPar
 
 
 private commandExp_ ::= (value_)? COMMAND codeBlock_
-                      | (value_)? COMMAND LPAREN commandExpOrValue_ RPAREN
-                      | (value_)? COMMAND (commandExpOrValue_)?
+                      | (value_)? COMMAND LPAREN exp_ RPAREN
+                      | (value_)? COMMAND (exp_)?
                       | LPAREN commandExp_ RPAREN
 
 private mathOp_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH

@@ -15,10 +15,10 @@
 // @formatter:off
 headerFile ::= item_*
 
+//TODO add in \ lexer rule that is a waiting value just like in the properties custom language demo
+private item_ ::= COMMENT | statement_ | preprocessor_ | WHITE_SPACE |BAD_CHARACTER
 
-private item_ ::= COMMENT | statement_ | WHITE_SPACE | LINE_TERMINATOR | BAD_CHARACTER
-
-private statement_ ::= (assignment_ | classDeclaration_ | preprocessor_) SEMICOLON
+private statement_ ::= (assignment_ | classDeclaration_ ) SEMICOLON
 
 private assignment_ ::= basicAssignment_ | arrayAssignment_
 private basicAssignment_ ::= IDENTIFIER EQ value_
@@ -28,9 +28,10 @@ private array_ ::= LBRACE RBRACE | LBRACE value_ (COMMA value_)* RBRACE
 
 private value_ ::= STRING_LITERAL | NUMBER_LITERAL | CONSTANT | IDENTIFIER
 
-private classDeclaration_ ::= CLASS IDENTIFIER (
-                                                LBRACE RBRACE
-                                                | LINE_TERMINATOR LBRACE LINE_TERMINATOR (item_)* RBRACE
-                                               )?
+private classDeclaration_ ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (LBRACE (item_)* RBRACE)?
 
-private preprocessor_ ::= COMMA COLON PREPROCESS_HASH//TODO
+//Preprocessor things
+private preprocessor_ ::= pre_include_ //| pre_define_//TODO
+
+private pre_include_ ::= PREPROCESS_INCLUDE (STRING_LITERAL | INCLUDE_VALUE_ANGBR) //TODO does include or other preprocessor commands allow multilines? (https://community.bistudio.com/wiki/PreProcessor_Commands#Multi-line
+//private pre_define_ ::= PREPROCESS_DEFINE

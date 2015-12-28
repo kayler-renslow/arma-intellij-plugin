@@ -31,7 +31,9 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey BRACE = createTextAttributesKey("BRACE", DefaultLanguageHighlighterColors.BRACES);
 	public static final TextAttributesKey PAREN = createTextAttributesKey("PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
 	public static final TextAttributesKey COMMA = createTextAttributesKey("COMMA", DefaultLanguageHighlighterColors.COMMA);
-	
+
+	public static final TextAttributesKey PREPROCESSOR = createTextAttributesKey("PREPROCESSOR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+
 	public static final TextAttributesKey STRING = createTextAttributesKey("STRING", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey NUM = createTextAttributesKey("NUM", DefaultLanguageHighlighterColors.NUMBER);
 	
@@ -53,11 +55,14 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 	//private static final TextAttributesKey[] PAREN_KEYS = new TextAttributesKey[]{PAREN};
 	private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
 
+	private static final TextAttributesKey[] PREPROCESSOR_KEYS = new TextAttributesKey[]{PREPROCESSOR};
+
 	private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
 	private static final IElementType[] OPERATORS = {HeaderTypes.EQ};
 	private static final IElementType[] KEYWORDS = {HeaderTypes.CLASS};
 	private static final IElementType[] CONSTANTS = {HeaderTypes.CONSTANT};
+	private static final IElementType[] PREPROCESSORS = {HeaderTypes.PREPROCESS_INCLUDE};
 
 
 	@NotNull
@@ -109,6 +114,11 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 		for(IElementType e: CONSTANTS){
 			if(tokenType.equals(e)){
 				return CONSTANT_KEYS;
+			}
+		}
+		for(IElementType e: PREPROCESSORS){
+			if(tokenType.equals(e)){
+				return PREPROCESSOR_KEYS;
 			}
 		}
 		if (tokenType.equals(TokenType.BAD_CHARACTER)){
