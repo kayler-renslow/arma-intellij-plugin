@@ -25,7 +25,7 @@ private assignment_ ::= basicAssignment_ | arrayAssignment_
 private basicAssignment_ ::= IDENTIFIER EQ (math_ | value_ | constantNoMath_)
 private arrayAssignment_ ::= IDENTIFIER BRACKET_PAIR EQ array_
 
-private array_ ::= LBRACE RBRACE | LBRACE (value_ | math_)(COMMA (value_ | math_))* RBRACE
+private array_ ::= LBRACE RBRACE | LBRACE (math_ | value_)(COMMA (math_ | value_))* RBRACE
 
 private constantNoMath_ ::= TRUE | FALSE
 private value_ ::= STRING_LITERAL | NUMBER_LITERAL | CONSTANT | IDENTIFIER
@@ -33,7 +33,7 @@ private value_ ::= STRING_LITERAL | NUMBER_LITERAL | CONSTANT | IDENTIFIER
 private math_ ::= LPAREN math_ RPAREN
                 | operand_ (PLUS | MINUS | FSLASH) (math_ | operand_)
 
-private operand_ ::= LPAREN operand_ RPAREN | (NUMBER_LITERAL | IDENTIFIER)
+private operand_ ::= LPAREN operand_ RPAREN | ((MINUS)? NUMBER_LITERAL | IDENTIFIER)
 private classDeclaration_ ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (LBRACE (item_)* RBRACE)?
 
 //Preprocessor things

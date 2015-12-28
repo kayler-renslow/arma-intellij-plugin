@@ -23,7 +23,7 @@ private identifier_ ::= LOCAL_VAR | IDENTIFIER | LANG_CONSTANT | LPAREN identifi
 
 private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
 
-private literal_ ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
+private literal_ ::= STRING_LITERAL | (MINUS)? INTEGER_LITERAL | (MINUS)? DEC_LITERAL
 
 //TODO allow copy of arrays: _test=+[0,1]
 //TODO support #define

@@ -33,14 +33,14 @@ END_OF_LINE_COMMENT = "//" {INPUT_CHARACTER}* {LINE_TERMINATOR}?
 DIGIT = [0-9]
 DIGITS = {DIGIT}+
 
-INTEGER_LITERAL = "-"? {DIGITS}
+INTEGER_LITERAL = {DIGITS}
 DEC_SIGNIFICAND = "." {DIGITS} | {DIGITS} "." {DIGIT}+
 DEC_EXPONENT = ({DEC_SIGNIFICAND} | {INTEGER_LITERAL}) [Ee] [+-]? {DIGIT}*
-DEC_LITERAL = "-"? ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
+DEC_LITERAL = ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 
 ESCAPE_SEQUENCE = \\[^\r\n]
 //STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
-STRING_LITERAL = "\""  ~("\"") | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
+STRING_LITERAL = "\""  ~( "\"") | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
 %%
 
 <YYINITIAL> {WHITE_SPACE}+ { return SQFTypes.WHITE_SPACE; }
@@ -50,7 +50,7 @@ STRING_LITERAL = "\""  ~("\"") | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\
 
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
-<YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; }
+<YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; } //TODO fix "" inside String. recommended to use another type of rule where YYINITIAL is split (<YYINITIAL>{...})
 
 <YYINITIAL> "true" { return SQFTypes.TRUE; }
 <YYINITIAL> "false" { return SQFTypes.FALSE; }
