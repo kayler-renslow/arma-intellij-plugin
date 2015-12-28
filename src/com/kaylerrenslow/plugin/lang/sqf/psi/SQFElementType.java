@@ -1,7 +1,7 @@
-package com.kaylerrenslow.plugin.psi;
+package com.kaylerrenslow.plugin.lang.sqf.psi;
 
 import com.intellij.psi.tree.IElementType;
-import com.kaylerrenslow.plugin.SQFLanguage;
+import com.kaylerrenslow.plugin.lang.sqf.SQFLanguage;
 
 /**
  * Created by Kayler on 10/31/2015.

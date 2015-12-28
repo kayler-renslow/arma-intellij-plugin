@@ -23,7 +23,7 @@ public class Static {
 
     public enum PluginPropertiesKey{
         VERSION("version", Static.version, "Version of the plugin of when this file was created. (Please don't change this.)"),
-        PARSER("parser", "true", "Set parser to true to use the parser that checks syntax. Set parser to false to disable the parser.");
+        SQF_SYNTAX_CHECK("SQF_syntax_check", "true", "Set SQF_syntax_check to true to use the parser that checks syntax. Set SQF_syntax_check to false to disable the syntax checking.");
 
         public String keyName;
         public String defaultValue;

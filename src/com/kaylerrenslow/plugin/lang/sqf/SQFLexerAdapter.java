@@ -1,4 +1,4 @@
-package com.kaylerrenslow.plugin;
+package com.kaylerrenslow.plugin.lang.sqf;
 
 import com.intellij.lexer.FlexAdapter;
 

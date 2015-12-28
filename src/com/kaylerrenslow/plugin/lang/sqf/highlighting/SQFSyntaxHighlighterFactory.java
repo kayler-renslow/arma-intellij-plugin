@@ -1,4 +1,4 @@
-package com.kaylerrenslow.plugin;
+package com.kaylerrenslow.plugin.lang.sqf.highlighting;
 
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterFactory;

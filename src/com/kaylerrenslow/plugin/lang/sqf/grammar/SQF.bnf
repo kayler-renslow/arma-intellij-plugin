@@ -6,11 +6,11 @@
   psiClassPrefix="SQF"
   psiImplClassSuffix="Impl"
   psiPackage="com.kaylerrenslow.plugin.psi"
-  psiImplPackage="com.kaylerrenslow.plugin.psi.impl"
+  psiImplPackage="com.kaylerrenslow.plugin.lang.sqf.psi.impl"
 
-  elementTypeHolderClass="com.kaylerrenslow.plugin.psi.SQFTypes"
-  elementTypeClass="com.kaylerrenslow.plugin.psi.SQFElementType"
-  tokenTypeClass="com.kaylerrenslow.plugin.psi.SQFTokenType"
+  elementTypeHolderClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFTypes"
+  elementTypeClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFElementType"
+  tokenTypeClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFTokenType"
 }
 // @formatter:off
 sqfFile ::= item_* (returnStatement_)?
@@ -24,11 +24,12 @@ private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
 
 literal_ ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
 
-//TODO inside format String's, turn %x blue
-//TODO hintSilent parseText (localize _this);
+//TODO allow copy of arrays: _test=+[0,1]
+//TODO support #define
 
 private statement_ ::= (
-                        exp_
+                        assignment_
+                        | commandExp_
                         | private_declaration_
                         | controlStructure_
                         | scopeManager_
@@ -36,14 +37,16 @@ private statement_ ::= (
                      ) SEMICOLON
 
 private returnStatement_ ::= (commandExpOrValue_ | conditionalExp_) SEMICOLON? (ignore_ | BAD_CHARACTER)*
-private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)+ (returnStatement_)? RBRACE
+private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement_)? RBRACE
 
-private exp_ ::= assignmentExp_
-               | commandExpOrValue_
 
-private exp2_ ::= LPAREN exp_ RPAREN | exp_
+private exp_ ::= commandExp_
+               | mathExp_
+               | value_
+               | conditionalExp_
+               | LPAREN exp_ RPAREN
 
-private assignmentExp_ ::= identifier_ EQ (commandExpOrValue_ | mathExp_ | switchStatement_ | ifStatement_ | assignmentExp_ | conditionalExp_)
+private assignment_ ::= identifier_ EQ ( (exp_ | codeBlock_ | assignment_) | (switchStatement_ | ifStatement_ ) )
 
 private condition_ ::= TRUE | FALSE | commandExpOrValue_
 private conditionStandalone_ ::= TRUE | FALSE | commandExp_ | identifier_
@@ -72,32 +75,26 @@ private conditionalExp_ ::= conditionalExpPart_ (AND | AMPAMP) conditionalExpPar
                           | conditionalExpPart_
 
 
-private commandExp_ ::= commandCompile_
-                      | commandCodeExecs_
-                      | commandWithExp_
-                      | commandThrow_
+private commandExp_ ::= (value_)? COMMAND codeBlock_
                       | (value_)? COMMAND LPAREN commandExpOrValue_ RPAREN
                       | (value_)? COMMAND (commandExpOrValue_)?
-                      | (value_)? COMMAND codeBlock_
                       | LPAREN commandExp_ RPAREN
 
 private mathOp_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
 private mathExp_ ::= LPAREN mathExp_ RPAREN
-                   | commandExpOrValue_ mathOp_ mathExpRhs_
+                   | commandExpOrValue_ mathOp_ mathRhs_
 
-private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrValue_
+private mathRhs_ ::= commandExpOrValue_ mathOp_ mathRhs_ | commandExpOrValue_
 
 /*VALUES*/
-    private value_ ::= identifier_ | literal_ | arrayVal_ | configVal_ | TYPE_NULL | NIL | TRUE | FALSE | LPAREN value_ RPAREN
+    private value_ ::= identifier_ | literal_ | arrayVal_ | configVal_ | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
     private commandExpOrValue_ ::= commandExp_ | value_ ; /*commandExp must go first since some commands match value_ for their pre-params ("arr select 1" -> arr is pre-param)*/
 
-    private arrayVal_  ::= LBRACKET RBRACKET | LBRACKET exp2_ (COMMA exp2_)* RBRACKET
+    private arrayVal_  ::= LBRACKET RBRACKET | LBRACKET (exp_ | codeBlock_) (COMMA (exp_ | codeBlock_))* RBRACKET
 
     private configVal_ ::= CONFIG
                          | CONFIG FSLASH (STRING_LITERAL | identifier_) (FSLASH (STRING_LITERAL | identifier_))*
                          | CONFIG GTGT (STRING_LITERAL | identifier_) (GTGT (STRING_LITERAL | identifier_))*
-
-    private localizedStrVal_ ::= localizeCommandExp_ | STRING_LITERAL
 
 
 /*CONTROL STRUCTURES AND OTHER THINGS*/
@@ -110,11 +107,11 @@ private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrVal
                             | BREAK
                             | SCOPE_NAME STRING_LITERAL
 
-    private controlStructure_ ::= ifStatement_ | switchStatement_ | loop_ | waitUntil_ | quest_
+    private controlStructure_ ::= ifStatement_ | switchStatement_ | loop_ | waitUntil_ | withStatement_ | quest_
     private ifStatement_ ::= IF LPAREN conditionalExp_ RPAREN (
                               THEN codeBlock_ (ELSE codeBlock_)?
                               | EXIT_WITH codeBlock_
-                              | commandThrow_
+                              | THROW value_
                            )
 
     private switchStatement_ ::= SWITCH (LPAREN commandExpOrValue_ RPAREN | commandExpOrValue_) DO LBRACE (switchCase_)* RBRACE
@@ -124,9 +121,9 @@ private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrVal
     private loop_ ::= whileLoop_ | forLoop_
     private whileLoop_   ::= WHILE LBRACE conditionalExp_ RBRACE DO codeBlock_
     private forLoop_     ::= forLoopReg_ | forLoopFrom_ | forEachLoop_
-    private forLoopReg_  ::= FOR LBRACKET codeBlock_ COMMA LBRACE exp2_ RBRACE COMMA codeBlock_ RBRACKET DO codeBlock_
-    private forLoopFrom_ ::= FOR STRING_LITERAL FROM exp2_ TO exp2_ (STEP exp2_)? DO codeBlock_
-    private forEachLoop_ ::= codeBlock_ FOR_EACH exp2_
+    private forLoopReg_  ::= FOR LBRACKET codeBlock_ COMMA LBRACE exp_ RBRACE COMMA codeBlock_ RBRACKET DO codeBlock_
+    private forLoopFrom_ ::= FOR STRING_LITERAL FROM exp_ TO exp_ (STEP exp_)? DO codeBlock_
+    private forEachLoop_ ::= codeBlock_ FOR_EACH exp_
 
     private quest_ ::= QUEST conditionalExp_ COLON commandExpOrValue_
 
@@ -134,40 +131,4 @@ private mathExpRhs_ ::= commandExpOrValue_ mathOp_ mathExpRhs_ | commandExpOrVal
 
     private waitUntil_ ::= WAIT_UNTIL codeBlock_
 
-
-/*COMMANDS*/
-    private commandThrow_ ::= THROW value_
-    private commandWithExp_ ::= WITH NAMESPACE DO codeBlock_
-
-    private commandCodeExecs_ ::= commandExpOrValue_? CALL func_
-                                | commandExpOrValue_? EXEC_VM func_
-                                | commandExpOrValue_? SPAWN func_
-                                | STRING_LITERAL CALL_EXTENSION value_
-                                | commandExpOrValue_? EXEC value_
-                                | commandExpOrValue_? EXEC_FSM value_
-                                | commandExpOrValue_ EXEC_EDITOR_SCRIPT arrayVal_
-                                | LPAREN commandCodeExecs_ RPAREN
-
-    private func_ ::= commandCompile_
-                    | codeBlock_
-                    | identifier_
-                    | codeString_
-                    | commandExpOrValue_
-
-    private commandCompile_ ::= (COMPILE_FINAL | COMPILE) (codeString_ | LPAREN codeString_ RPAREN)
-
-    private codeString_ ::= PREPROCESS_FILE value_
-                          | LOAD_FILE value_
-                          | commandExpOrValue_
-
-/*
-private commandAppendExp_ ::= value_ APPEND value_
-private commandSetExp_ ::= value_ SET LBRACKET value_ COMMA value_ RBRACKET
-private commandCountExp_ ::= value_? COUNT value_
-private commandFindExp_ ::= commandExpOrValue_ FIND commandExpOrValue_
-private commandParam_ ::= arrayVal_? (PARAM | PARAMS) arrayVal_
-private commandSelectExp_ ::= value_ SELECT value_
-                            | value_ SELECT LBRACKET value_ COMMA value_ RBRACKET
-
-private commandConfigClassesExp_ ::= value_ CONFIG_CLASSES (configVal_ | LPAREN configVal_ RPAREN)
-
+    private withStatement_ ::= WITH NAMESPACE DO codeBlock_

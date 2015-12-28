@@ -1,6 +1,7 @@
-package com.kaylerrenslow.plugin;
+package com.kaylerrenslow.plugin.lang.sqf;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
+import com.kaylerrenslow.plugin.Static;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

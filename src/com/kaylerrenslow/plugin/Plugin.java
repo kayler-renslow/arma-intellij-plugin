@@ -11,7 +11,7 @@ import java.util.Properties;
 public class Plugin{
 	private Properties pluginProps = new Properties();
 	public final File appdataFolder = new File(System.getenv().get("APPDATA") + "/" + Static.APP_DATA_FOLDER);
-
+	private File pluginPropsFile;
 	public Plugin() {
 		load();
 	}
@@ -28,26 +28,39 @@ public class Plugin{
 		if(!appdataFolder.exists()){
 			appdataFolder.mkdir();
 		}
-		File f = new File(appdataFolder.getPath() + "/"+ Static.PLUGIN_PROPERTIES_FILE);
-		if(!f.exists()){
-			createPluginProps(f);
+		pluginPropsFile = new File(appdataFolder.getPath() + "/"+ Static.PLUGIN_PROPERTIES_FILE);
+		if(!pluginPropsFile.exists()){
+			createPluginProps();
 		}
 		try{
-			FileInputStream fis = new FileInputStream(f);
+			FileInputStream fis = new FileInputStream(pluginPropsFile);
 			pluginProps.load(fis);
 		}catch(Exception e){
 			//e.printStackTrace();
 		}
 	}
 
-	private void createPluginProps(File f) {
+	private void createPluginProps() {
+		for(Static.PluginPropertiesKey ppk : Static.PluginPropertiesKey.values()){
+			pluginProps.put(ppk.keyName, ppk.defaultValue);
+		}
+		savePluginPropsToFile();
+	}
+
+	public void overridePluginProps(Static.PluginPropertiesKey key, String newValue){
+		pluginProps.setProperty(key.keyName, newValue);
+	}
+
+	public void savePluginPropsToFile(){
 		try{
-			f.createNewFile();
-			PrintWriter pw = new PrintWriter(f);
+			if(!pluginPropsFile.exists()){
+				pluginPropsFile.createNewFile();
+			}
+			PrintWriter pw = new PrintWriter(pluginPropsFile);
 			pw.println("#All changes made to this file will take effect when Intellij is restarted.\n");
 			for(Static.PluginPropertiesKey ppk : Static.PluginPropertiesKey.values()){
 				pw.println("#" + ppk.doc);
-				pw.println(ppk.keyName + "=" + ppk.defaultValue);
+				pw.println(ppk.keyName + "=" + pluginProps.getProperty(ppk.keyName));
 				pw.println();
 			}
 			pw.flush();
@@ -55,6 +68,5 @@ public class Plugin{
 		}catch(Exception e){
 			e.printStackTrace();
 		}
-
 	}
 }

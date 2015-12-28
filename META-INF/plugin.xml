@@ -13,10 +13,10 @@
 
   <idea-version since-build="131"/>
   <extensions defaultExtensionNs="com.intellij">
-    <fileTypeFactory implementation="com.kaylerrenslow.plugin.SQFFileTypeFactory"/>
-    <lang.parserDefinition language="SQF" implementationClass="com.kaylerrenslow.plugin.psi.SQFParserDefinition"/>
-    <lang.syntaxHighlighterFactory key="SQF" implementationClass="com.kaylerrenslow.plugin.SQFSyntaxHighlighterFactory"/>
-    <colorSettingsPage implementation="com.kaylerrenslow.plugin.SQFColorSettingsPage"/>
+    <fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.sqf.SQFFileTypeFactory"/>
+    <lang.parserDefinition language="SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFParserDefinition"/>
+    <lang.syntaxHighlighterFactory key="SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFSyntaxHighlighterFactory"/>
+    <colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFColorSettingsPage"/>
   </extensions>
 
   <application-components></application-components>

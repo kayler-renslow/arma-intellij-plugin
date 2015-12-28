@@ -1,10 +1,10 @@
-package com.kaylerrenslow.plugin.psi;
+package com.kaylerrenslow.plugin.lang.sqf.psi;
 
 import com.intellij.extapi.psi.PsiFileBase;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
-import com.kaylerrenslow.plugin.SQFFileType;
-import com.kaylerrenslow.plugin.SQFLanguage;
+import com.kaylerrenslow.plugin.lang.sqf.SQFFileType;
+import com.kaylerrenslow.plugin.lang.sqf.SQFLanguage;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;

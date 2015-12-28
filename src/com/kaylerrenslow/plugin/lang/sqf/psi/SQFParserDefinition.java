@@ -1,4 +1,4 @@
-package com.kaylerrenslow.plugin.psi;
+package com.kaylerrenslow.plugin.lang.sqf.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.Language;
@@ -11,8 +11,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.kaylerrenslow.plugin.SQFLanguage;
-import com.kaylerrenslow.plugin.SQFLexerAdapter;
+import com.kaylerrenslow.plugin.lang.sqf.SQFLanguage;
+import com.kaylerrenslow.plugin.lang.sqf.SQFLexerAdapter;
 import com.kaylerrenslow.plugin.Static;
 import com.kaylerrenslow.plugin.parser.SQFParser;
 import com.kaylerrenslow.plugin.parser.SQFParser_NoSyntax;
@@ -34,7 +34,7 @@ public class SQFParserDefinition implements ParserDefinition{
 
 	@Override
 	public PsiParser createParser(Project project) {
-		String syntax = Static.plugin.getPluginProperty(Static.PluginPropertiesKey.PARSER);
+		String syntax = Static.plugin.getPluginProperty(Static.PluginPropertiesKey.SQF_SYNTAX_CHECK);
 		if(syntax.equalsIgnoreCase("false")){
 			return new SQFParser_NoSyntax();
 		}

@@ -1,10 +1,10 @@
-package com.kaylerrenslow.plugin;
+package com.kaylerrenslow.plugin.lang.sqf;
 
 import com.intellij.lang.Language;
+import com.kaylerrenslow.plugin.ListUtil;
+import com.kaylerrenslow.plugin.Static;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**

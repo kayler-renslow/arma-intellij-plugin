@@ -3,7 +3,7 @@ package com.kaylerrenslow.plugin;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
-import com.kaylerrenslow.plugin.psi.SQFTypes;
+import com.kaylerrenslow.plugin.lang.sqf.psi.SQFTypes;
 import com.intellij.psi.impl.source.tree.JavaDocElementType;
 
 %%
@@ -20,13 +20,11 @@ import com.intellij.psi.impl.source.tree.JavaDocElementType;
 LOCAL_VAR = [_][:jletterdigit:]+
 IDENTIFIER = [:jletter:] [:jletterdigit:]*
 
-/* main character classes */
 LINE_TERMINATOR = \r|\n|\r\n
 INPUT_CHARACTER = [^\r\n]
 
 WHITE_SPACE = {LINE_TERMINATOR} | [ \t\f]
 
-/* comments */
 COMMENT = {TRADITIONAL_COMMENT} | {END_OF_LINE_COMMENT}
 
 TRADITIONAL_COMMENT = "/*" ~"*/" | "/*" "*"+ "/"
@@ -42,7 +40,7 @@ DEC_LITERAL = "-"? ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 
 ESCAPE_SEQUENCE = \\[^\r\n]
 //STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
-STRING_LITERAL = "\"" ~"\"" | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
+STRING_LITERAL = "\""  ~("\"") | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
 %%
 
 <YYINITIAL> {WHITE_SPACE}+ { return SQFTypes.WHITE_SPACE; }
@@ -89,6 +87,7 @@ STRING_LITERAL = "\"" ~"\"" | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
 <YYINITIAL> "default" { return SQFTypes.DEFAULT; }
 <YYINITIAL> "do" { return SQFTypes.DO; }
 <YYINITIAL> "waitUntil" { return SQFTypes.WAIT_UNTIL; }
+<YYINITIAL> "exitWith" { return SQFTypes.EXIT_WITH; }
 
 
 <YYINITIAL> "this" { return SQFTypes.LANG_CONSTANT; }
@@ -127,27 +126,26 @@ STRING_LITERAL = "\"" ~"\"" | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
 
 <YYINITIAL> "in" { return SQFTypes.COMMAND; }
 
-<YYINITIAL> "compile" { return SQFTypes.COMPILE; }
-<YYINITIAL> "compileFinal" { return SQFTypes.COMPILE_FINAL; }
-<YYINITIAL> "call" { return SQFTypes.CALL; }
-<YYINITIAL> "callExtension" { return SQFTypes.CALL_EXTENSION; }
-<YYINITIAL> "execEditorScript" { return SQFTypes.EXEC_EDITOR_SCRIPT; }
-<YYINITIAL> "exec" { return SQFTypes.EXEC; }
-<YYINITIAL> "execFSM" { return SQFTypes.EXEC_FSM; }
-<YYINITIAL> "execVM" { return SQFTypes.EXEC_VM; }
-<YYINITIAL> "spawn" { return SQFTypes.SPAWN; }
-<YYINITIAL> "loadFile" { return SQFTypes.LOAD_FILE; }
-<YYINITIAL> "preprocessFile" { return SQFTypes.PREPROCESS_FILE; }
-<YYINITIAL> "preprocessFileLineNumbers" { return SQFTypes.PREPROCESS_FILE; }
+<YYINITIAL> "compile" { return SQFTypes.COMMAND; }
+<YYINITIAL> "compileFinal" { return SQFTypes.COMMAND; }
+<YYINITIAL> "call" { return SQFTypes.COMMAND; }
+<YYINITIAL> "callExtension" { return SQFTypes.COMMAND; }
+<YYINITIAL> "execEditorScript" { return SQFTypes.COMMAND; }
+<YYINITIAL> "exec" { return SQFTypes.COMMAND; }
+<YYINITIAL> "execFSM" { return SQFTypes.COMMAND; }
+<YYINITIAL> "execVM" { return SQFTypes.COMMAND; }
+<YYINITIAL> "spawn" { return SQFTypes.COMMAND; }
+<YYINITIAL> "loadFile" { return SQFTypes.COMMAND; }
+<YYINITIAL> "preprocessFile" { return SQFTypes.COMMAND; }
+<YYINITIAL> "preprocessFileLineNumbers" { return SQFTypes.COMMAND; }
 
 <YYINITIAL> "param" { return SQFTypes.COMMAND; }
 <YYINITIAL> "params" { return SQFTypes.COMMAND; }
 
-<YYINITIAL> "exitWith" { return SQFTypes.EXIT_WITH; }
-<YYINITIAL> "exit" { return SQFTypes.EXIT; }
-<YYINITIAL> "throw" { return SQFTypes.THROW; }
+<YYINITIAL> "exit" { return SQFTypes.COMMAND; }
 <YYINITIAL> "try" { return SQFTypes.TRY; }
 <YYINITIAL> "catch" { return SQFTypes.CATCH; }
+<YYINITIAL> "throw" { return SQFTypes.THROW; }
 
 <YYINITIAL> "comment" { return SQFTypes.COMMENT_KEYWORD; }
 

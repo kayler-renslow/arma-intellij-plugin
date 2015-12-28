@@ -1,4 +1,4 @@
-package com.kaylerrenslow.plugin;
+package com.kaylerrenslow.plugin.lang.sqf.highlighting;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
@@ -7,8 +7,8 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.tokenindex.Token;
-import com.kaylerrenslow.plugin.psi.SQFTypes;
+import com.kaylerrenslow.plugin.lang.sqf.SQFLexerAdapter;
+import com.kaylerrenslow.plugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
@@ -61,12 +61,11 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 
 	private static final IElementType[] KEYWORDS = {SQFTypes.WITH, SQFTypes.TRUE, SQFTypes.FALSE, SQFTypes.NOT, SQFTypes.AND, SQFTypes.OR, SQFTypes.MOD, SQFTypes.NIL, SQFTypes.TYPE_NULL, SQFTypes.PRIVATE, SQFTypes.SCOPE_NAME,
 			SQFTypes.BREAK, SQFTypes.BREAK_TO, SQFTypes.BREAK_OUT, SQFTypes.CONTINUE, SQFTypes.FOR, SQFTypes.TO, SQFTypes.STEP, SQFTypes.FOR_EACH, SQFTypes.FROM, SQFTypes.WHILE, SQFTypes.GOTO, SQFTypes.ASSERT, SQFTypes.IF,
-			SQFTypes.THEN, SQFTypes.ELSE, SQFTypes.SWITCH, SQFTypes.CASE, SQFTypes.DEFAULT, SQFTypes.DO, SQFTypes.WAIT_UNTIL, SQFTypes.EXIT_WITH, SQFTypes.EXIT};
+			SQFTypes.THEN, SQFTypes.ELSE, SQFTypes.SWITCH, SQFTypes.CASE, SQFTypes.DEFAULT, SQFTypes.DO, SQFTypes.WAIT_UNTIL, SQFTypes.EXIT_WITH, };
 
 	private static final IElementType[] CONSTANTS = {SQFTypes.LANG_CONSTANT, SQFTypes.NAMESPACE, SQFTypes.CONFIG};
 
-	private static final IElementType[] COMMANDS = {SQFTypes.COMMAND, SQFTypes.DISABLE_SERIALIZATION, SQFTypes.FORMAT, SQFTypes.HINT, SQFTypes.STR ,SQFTypes.COMPILE, SQFTypes.COMPILE_FINAL, SQFTypes.CALL, SQFTypes.CALL_EXTENSION,
-			SQFTypes.EXEC_EDITOR_SCRIPT, SQFTypes.EXEC, SQFTypes.EXEC_FSM, SQFTypes.EXEC_VM, SQFTypes.SPAWN, SQFTypes.LOAD_FILE, SQFTypes.PREPROCESS_FILE, SQFTypes.LOCALIZE};
+	private static final IElementType[] COMMANDS = {SQFTypes.COMMAND};
 
 
 	@NotNull
