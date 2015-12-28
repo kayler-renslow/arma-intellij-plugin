@@ -15,23 +15,30 @@
 // @formatter:off
 headerFile ::= item_*
 
-//TODO add in \ lexer rule that is a waiting value just like in the properties custom language demo
-private item_ ::= COMMENT | statement_ | preprocessor_ | WHITE_SPACE |BAD_CHARACTER
+//TODO when $ is typed, look into stringtable.xml
+//TODO add in \ lexer rule that is a waiting value just like in the properties custom language demo. This will work for any assignment
+private item_ ::= COMMENT | statement_ | preprocessor_ | WHITE_SPACE | BAD_CHARACTER
 
 private statement_ ::= (assignment_ | classDeclaration_ ) SEMICOLON
 
 private assignment_ ::= basicAssignment_ | arrayAssignment_
-private basicAssignment_ ::= IDENTIFIER EQ value_
+private basicAssignment_ ::= IDENTIFIER EQ (math_ | value_ | constantNoMath_)
 private arrayAssignment_ ::= IDENTIFIER BRACKET_PAIR EQ array_
 
-private array_ ::= LBRACE RBRACE | LBRACE value_ (COMMA value_)* RBRACE
+private array_ ::= LBRACE RBRACE | LBRACE (value_ | math_)(COMMA (value_ | math_))* RBRACE
 
+private constantNoMath_ ::= TRUE | FALSE
 private value_ ::= STRING_LITERAL | NUMBER_LITERAL | CONSTANT | IDENTIFIER
 
+private math_ ::= LPAREN math_ RPAREN
+                | operand_ (PLUS | MINUS | FSLASH) (math_ | operand_)
+
+private operand_ ::= LPAREN operand_ RPAREN | (NUMBER_LITERAL | IDENTIFIER)
 private classDeclaration_ ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (LBRACE (item_)* RBRACE)?
 
 //Preprocessor things
 private preprocessor_ ::= pre_include_ //| pre_define_//TODO
 
+//TODO don't allow include strings on next line (even if there is a \)
 private pre_include_ ::= PREPROCESS_INCLUDE (STRING_LITERAL | INCLUDE_VALUE_ANGBR) //TODO does include or other preprocessor commands allow multilines? (https://community.bistudio.com/wiki/PreProcessor_Commands#Multi-line
 //private pre_define_ ::= PREPROCESS_DEFINE

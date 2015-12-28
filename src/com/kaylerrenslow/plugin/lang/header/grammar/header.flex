@@ -19,7 +19,7 @@ import com.intellij.psi.impl.source.tree.JavaDocElementType;
 
 IDENTIFIER = [:jletter:] [:jletterdigit:]*
 
-LINE_TERMINATOR = \r|\n|\r\n
+LINE_TERMINATOR = \r | \n | \r\n
 INPUT_CHARACTER = [^\r\n]
 
 WHITE_SPACE = [ \t\f] | {LINE_TERMINATOR}
@@ -58,7 +58,9 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 
 <YYINITIAL> "class" { return HeaderTypes.CLASS; }
 
-<YYINITIAL> "db" ("-" | "+") {NUMBER_LITERAL} { return HeaderTypes.CONSTANT; }
+<YYINITIAL> "true" { return HeaderTypes.TRUE; }
+<YYINITIAL> "false" { return HeaderTypes.FALSE; }
+
 <YYINITIAL> "#include"  { return HeaderTypes.PREPROCESS_INCLUDE; }
 /*
 <YYINITIAL> "#define"  { return HeaderTypes.PREPROCESS_DEFINE; }
@@ -79,16 +81,18 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 //<YYINITIAL> "\\" { return HeaderTypes.BSLASH; }
 
 <YYINITIAL> "="   { return HeaderTypes.EQ; }
-/*
+
 <YYINITIAL> "+"   { return HeaderTypes.PLUS; }
 <YYINITIAL> "-"   { return HeaderTypes.MINUS; }
-*/
+<YYINITIAL> "/"   { return HeaderTypes.FSLASH; }
+
 <YYINITIAL> "{"   { return HeaderTypes.LBRACE; }
 <YYINITIAL> "}"   { return HeaderTypes.RBRACE; }
-/*
+
 <YYINITIAL> "("   { return HeaderTypes.LPAREN; }
 <YYINITIAL> ")"   { return HeaderTypes.RPAREN; }
-*/
+
+
 
 <YYINITIAL> "[]"   { return HeaderTypes.BRACKET_PAIR; }
 <YYINITIAL> ","   { return HeaderTypes.COMMA; }
