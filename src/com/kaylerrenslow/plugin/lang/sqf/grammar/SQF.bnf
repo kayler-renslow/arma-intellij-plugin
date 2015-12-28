@@ -1,12 +1,12 @@
 {
-  parserClass="com.kaylerrenslow.plugin.parser.SQFParser"
+  parserClass="com.kaylerrenslow.plugin.lang.sqf.parser.SQFParser"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="SQF"
   psiImplClassSuffix="Impl"
-  psiPackage="com.kaylerrenslow.plugin.psi"
-  psiImplPackage="com.kaylerrenslow.plugin.lang.sqf.psi.impl"
+  psiPackage="com.kaylerrenslow.plugin.lang.sqf.psi"
+  //psiImplPackage="com.kaylerrenslow.plugin.lang.sqf.psi.impl"
 
   elementTypeHolderClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFTypes"
   elementTypeClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFElementType"
@@ -15,17 +15,20 @@
 // @formatter:off
 sqfFile ::= item_* (returnStatement_)?
 
-private ignore_ ::= WHITE_SPACE | comment_
-private item_ ::= ignore_ | statement_ | BAD_CHARACTER
+private item_ ::= whitespace_comment_ | statement_ | BAD_CHARACTER
+
+private whitespace_comment_ ::= WHITE_SPACE | comment_
 
 private identifier_ ::= LOCAL_VAR | IDENTIFIER | LANG_CONSTANT | LPAREN identifier_ RPAREN
 
 private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
 
-literal_ ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
+private literal_ ::= STRING_LITERAL | INTEGER_LITERAL | DEC_LITERAL
 
 //TODO allow copy of arrays: _test=+[0,1]
 //TODO support #define
+//TODO fix Strings that allow "" inside them. example="""hello""";
+//TODO when making the header parser, use that parser for the .sqm and .ext. But .sqm and .ext will have their own lexer so that keywords can be highlighted.
 
 private statement_ ::= (
                         assignment_
@@ -36,7 +39,7 @@ private statement_ ::= (
                         | tryCatch_
                      ) SEMICOLON
 
-private returnStatement_ ::= (commandExpOrValue_ | conditionalExp_) SEMICOLON? (ignore_ | BAD_CHARACTER)*
+private returnStatement_ ::= (commandExpOrValue_ | conditionalExp_) SEMICOLON? (whitespace_comment_ | BAD_CHARACTER)*
 private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement_)? RBRACE
 
 

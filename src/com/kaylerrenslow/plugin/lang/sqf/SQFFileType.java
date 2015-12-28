@@ -20,19 +20,19 @@ public class SQFFileType extends LanguageFileType{
 	@NotNull
 	@Override
 	public String getName() {
-		return Static.NAME;
+		return SQFStatic.NAME;
 	}
 
 	@NotNull
 	@Override
 	public String getDescription() {
-		return Static.DESCRIPTION;
+		return SQFStatic.DESCRIPTION;
 	}
 
 	@NotNull
 	@Override
 	public String getDefaultExtension() {
-		return Static.FILE_EXTENSION_DEFAULT;
+		return SQFStatic.FILE_EXTENSION_DEFAULT;
 	}
 
 	@Nullable

@@ -11,11 +11,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.kaylerrenslow.plugin.Static;
 import com.kaylerrenslow.plugin.lang.sqf.SQFLanguage;
 import com.kaylerrenslow.plugin.lang.sqf.SQFLexerAdapter;
-import com.kaylerrenslow.plugin.Static;
-import com.kaylerrenslow.plugin.parser.SQFParser;
-import com.kaylerrenslow.plugin.parser.SQFParser_NoSyntax;
+import com.kaylerrenslow.plugin.lang.sqf.parser.SQFParser;
+import com.kaylerrenslow.plugin.lang.sqf.parser.SQFParser_NoSyntax;
 import org.jetbrains.annotations.NotNull;
 
 /**

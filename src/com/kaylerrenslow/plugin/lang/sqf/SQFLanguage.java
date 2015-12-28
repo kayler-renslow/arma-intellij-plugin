@@ -12,15 +12,9 @@ import java.util.List;
  */
 public class SQFLanguage extends Language{
     public static final SQFLanguage INSTANCE = new SQFLanguage();
-	private static final List<Language> dialects = new ListUtil<Language>().createList();
 
     public SQFLanguage(){
-        super(Static.NAME);
+        super(SQFStatic.NAME);
 	}
 
-	@NotNull
-	@Override
-	public List<Language> getDialects() {
-		return dialects;
-	}
 }

@@ -6,6 +6,7 @@ import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
 import com.kaylerrenslow.plugin.Static;
+import com.kaylerrenslow.plugin.lang.sqf.SQFStatic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,6 +69,6 @@ public class SQFColorSettingsPage implements ColorSettingsPage{
 	@NotNull
 	@Override
 	public String getDisplayName() {
-		return Static.NAME;
+		return SQFStatic.NAME;
 	}
 }

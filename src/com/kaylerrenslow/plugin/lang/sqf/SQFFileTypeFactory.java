@@ -12,6 +12,6 @@ public class SQFFileTypeFactory extends FileTypeFactory {
 
     @Override
     public void createFileTypes(@NotNull FileTypeConsumer consumer){
-        consumer.consume(SQFFileType.INSTANCE, Static.FILE_EXTENSION);
+        consumer.consume(SQFFileType.INSTANCE, SQFStatic.FILE_EXTENSION);
     }
 }

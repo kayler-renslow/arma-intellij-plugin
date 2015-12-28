@@ -1,12 +1,12 @@
 {
-  parserClass="com.kaylerrenslow.plugin.parser.SQFParser_NoSyntax"
+  parserClass="com.kaylerrenslow.plugin.lang.sqf.parser.SQFParser_NoSyntax"
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
   psiClassPrefix="SQF"
   psiImplClassSuffix="Impl"
-  psiPackage="com.kaylerrenslow.plugin.psiNoSyntax"
-  psiImplPackage="com.kaylerrenslow.plugin.lang.sqf.psi.implNoSyntax"
+  psiPackage="com.kaylerrenslow.plugin.lang.sqf.psi_noSyntax"
+  //psiImplPackage="com.kaylerrenslow.plugin.lang.sqf.psi.impl_noSyntax"
 
   elementTypeHolderClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFTypes"
   elementTypeClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFElementType"
@@ -16,96 +16,94 @@
 sqfFile ::= token_*
 
 private token_ ::= WHITE_SPACE
-                 /*identifiers*/
-                 | LOCAL_VAR
-                 | IDENTIFIER
+        /*identifiers*/
+        | LOCAL_VAR
+        | IDENTIFIER
 
-                 /*comments*/
-                 | COMMENT
-                 | COMMENT_KEYWORD
+        /*comments*/
+        | COMMENT
+        | COMMENT_KEYWORD
 
-                 /*literals*/
-                 | STRING_LITERAL
-                 | INTEGER_LITERAL
-                 | DEC_LITERAL
+        /*literals*/
+        | STRING_LITERAL
+        | INTEGER_LITERAL
+        | DEC_LITERAL
 
-                 /*commands*/
-                 | COMMAND
+        /*commands*/
+        | COMMAND
 
-                 /*values*/
-                 | TRUE
-                 | FALSE
-                 | NIL
-                 | TYPE_NULL
+        /*values*/
+        | TRUE
+        | FALSE
+        | NIL
+        | TYPE_NULL
 
-                 /*lang constants*/
-                 | CONFIG
-                 | LANG_CONSTANT
-                 | NAMESPACE
+        /*lang constants*/
+        | CONFIG
+        | LANG_CONSTANT
+        | NAMESPACE
 
-                 /*control structure keywords*/
-                 | PRIVATE
-                 | GOTO
-                 | BREAK
-                 | BREAK_TO
-                 | BREAK_OUT
-                 | CONTINUE
-                 | SCOPE_NAME
-                 | IF
-                 | THEN
-                 | ELSE
-                 | EXIT_WITH
-                 | SWITCH
-                 | DO
-                 | CASE
-                 | DEFAULT
-                 | WHILE
-                 | FOR
-                 | FOR_EACH
-                 | TO
-                 | STEP
-                 | FROM
-                 | WAIT_UNTIL
-                 | ASSERT
-                 | TRY
-                 | CATCH
-                 | THROW
-                 | WITH
+        /*control structure keywords*/
+        | PRIVATE
+        | GOTO
+        | BREAK
+        | BREAK_TO
+        | BREAK_OUT
+        | CONTINUE
+        | SCOPE_NAME
+        | IF
+        | THEN
+        | ELSE
+        | EXIT_WITH
+        | SWITCH
+        | DO
+        | CASE
+        | DEFAULT
+        | WHILE
+        | FOR
+        | FOR_EACH
+        | TO
+        | STEP
+        | FROM
+        | WAIT_UNTIL
+        | ASSERT
+        | TRY
+        | CATCH
+        | THROW
+        | WITH
 
-                 /*operators and other symbols*/
-                 | LBRACE
-                 | RBRACE
-                 | LBRACKET
-                 | RBRACKET
-                 | LPAREN
-                 | RPAREN
-                 | SEMICOLON
-                 | EXCL
-                 | NOT
-                 | EQ
-                 | AMPAMP
-                 | AND
-                 | BARBAR
-                 | OR
-                 | EQEQ
-                 | NE
-                 | LT
-                 | GT
-                 | LE
-                 | GE
-                 | PLUS
-                 | MINUS
-                 | ASTERISK
-                 | CARET
-                 | PERC
-                 | MOD
-                 | FSLASH
-                 | GTGT
-                 | COMMA
-                 | COLON
-                 | QUEST
+        /*operators and other symbols*/
+        | LBRACE
+        | RBRACE
+        | LBRACKET
+        | RBRACKET
+        | LPAREN
+        | RPAREN
+        | SEMICOLON
+        | EXCL
+        | NOT
+        | EQ
+        | AMPAMP
+        | AND
+        | BARBAR
+        | OR
+        | EQEQ
+        | NE
+        | LT
+        | GT
+        | LE
+        | GE
+        | PLUS
+        | MINUS
+        | ASTERISK
+        | CARET
+        | PERC
+        | MOD
+        | FSLASH
+        | GTGT
+        | COMMA
+        | COLON
+        | QUEST
 
-                 | BAD_CHARACTER
+        | BAD_CHARACTER
 
-
-// @formatter:on
