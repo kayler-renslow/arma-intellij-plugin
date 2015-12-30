@@ -58,9 +58,6 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 
 <YYINITIAL> "class" { return HeaderTypes.CLASS; }
 
-<YYINITIAL> "true" { return HeaderTypes.TRUE; }
-<YYINITIAL> "false" { return HeaderTypes.FALSE; }
-
 <YYINITIAL> "#include"  { return HeaderTypes.PREPROCESS_INCLUDE; }
 /*
 <YYINITIAL> "#define"  { return HeaderTypes.PREPROCESS_DEFINE; }

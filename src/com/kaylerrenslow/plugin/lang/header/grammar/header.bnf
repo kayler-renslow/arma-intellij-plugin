@@ -22,18 +22,19 @@ private item_ ::= COMMENT | statement_ | preprocessor_ | WHITE_SPACE | BAD_CHARA
 private statement_ ::= (assignment_ | classDeclaration_ ) SEMICOLON
 
 private assignment_ ::= basicAssignment_ | arrayAssignment_
-private basicAssignment_ ::= IDENTIFIER EQ (math_ | value_ | constantNoMath_)
+private basicAssignment_ ::= IDENTIFIER EQ (math_ | value_ /*| constantNoMath_*/)
 private arrayAssignment_ ::= IDENTIFIER BRACKET_PAIR EQ array_
 
 private array_ ::= LBRACE RBRACE | LBRACE (math_ | value_)(COMMA (math_ | value_))* RBRACE
 
-private constantNoMath_ ::= TRUE | FALSE
-private value_ ::= STRING_LITERAL | NUMBER_LITERAL | CONSTANT | IDENTIFIER
+//private constantNoMath_ ::=
+private numberLiteral_ ::= (MINUS)? NUMBER_LITERAL
+private value_ ::= STRING_LITERAL | numberLiteral_ | CONSTANT | IDENTIFIER
 
 private math_ ::= LPAREN math_ RPAREN
                 | operand_ (PLUS | MINUS | FSLASH) (math_ | operand_)
 
-private operand_ ::= LPAREN operand_ RPAREN | ((MINUS)? NUMBER_LITERAL | IDENTIFIER)
+private operand_ ::= LPAREN operand_ RPAREN | (numberLiteral_ | IDENTIFIER)
 private classDeclaration_ ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (LBRACE (item_)* RBRACE)?
 
 //Preprocessor things

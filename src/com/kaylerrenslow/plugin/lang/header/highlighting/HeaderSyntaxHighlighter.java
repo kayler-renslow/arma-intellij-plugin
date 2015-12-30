@@ -61,7 +61,7 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 
 	private static final IElementType[] OPERATORS = {HeaderTypes.EQ, HeaderTypes.BRACKET_PAIR, HeaderTypes.COLON, HeaderTypes.FSLASH, HeaderTypes.MINUS, HeaderTypes.PLUS};
 	private static final IElementType[] KEYWORDS = {HeaderTypes.CLASS};
-	private static final IElementType[] CONSTANTS = {HeaderTypes.TRUE, HeaderTypes.FALSE};
+	private static final IElementType[] CONSTANTS = {};
 	private static final IElementType[] PREPROCESSORS = {HeaderTypes.PREPROCESS_INCLUDE};
 
 

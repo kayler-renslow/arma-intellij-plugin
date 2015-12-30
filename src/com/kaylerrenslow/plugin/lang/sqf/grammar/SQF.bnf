@@ -44,8 +44,8 @@ private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement_)? RBRAC
 
 
 private exp_ ::= LPAREN exp_ RPAREN
-               | commandExp_
                | mathExp_
+               | commandExp_ //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
                | value_
                | conditionalExp_
 

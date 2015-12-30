@@ -17,7 +17,7 @@ import com.intellij.psi.impl.source.tree.JavaDocElementType;
     return;
 %eof}
 
-LOCAL_VAR = [_][:jletterdigit:]+
+LOCAL_VAR = [_][:jletterdigit:]*
 IDENTIFIER = [:jletter:] [:jletterdigit:]*
 
 LINE_TERMINATOR = \r|\n|\r\n
@@ -40,7 +40,14 @@ DEC_LITERAL = ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 
 ESCAPE_SEQUENCE = \\[^\r\n]
 //STRING_LITERAL = (\" ([^\\\"\r\n] | {ESCAPE_SEQUENCE})* (\"|\\)?) | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
-STRING_LITERAL = "\""  ~( "\"") | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\\)?)
+
+STRING_PART = "\"" ~"\""
+STRING_PART2 = "'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* "'" //single quote strings aren't allowed to spread across multiple lines
+
+/*janky as hell, but works. This is done to help match "" inside an existing double quote String or '' inside a single quote String.
+Examples: "test"""="test"" in Arma 3
+'test''' = 'test'' in Arma 3*/
+STRING_LITERAL = {STRING_PART} {STRING_PART}* | {STRING_PART2} {STRING_PART2}*
 %%
 
 <YYINITIAL> {WHITE_SPACE}+ { return SQFTypes.WHITE_SPACE; }
@@ -50,7 +57,8 @@ STRING_LITERAL = "\""  ~( "\"") | ("'" ([^\\\'\r\n] | {ESCAPE_SEQUENCE})* ("'"|\
 
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
-<YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; } //TODO fix "" inside String. recommended to use another type of rule where YYINITIAL is split (<YYINITIAL>{...})
+<YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; }
+//<YYINITIAL> {STRING_LITERAL2} { return SQFTypes.STRING_LITERAL; }
 
 <YYINITIAL> "true" { return SQFTypes.TRUE; }
 <YYINITIAL> "false" { return SQFTypes.FALSE; }
