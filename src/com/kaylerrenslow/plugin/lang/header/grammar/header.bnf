@@ -19,7 +19,7 @@ headerFile ::= item_*
 //TODO add in \ lexer rule that is a waiting value just like in the properties custom language demo. This will work for any assignment
 private item_ ::= COMMENT | statement_ | preprocessor_ | WHITE_SPACE | BAD_CHARACTER
 
-private statement_ ::= (assignment_ | classDeclaration_ ) SEMICOLON
+private statement_ ::= (assignment_ | classDeclaration_) SEMICOLON
 
 private assignment_ ::= basicAssignment_ | arrayAssignment_
 private basicAssignment_ ::= IDENTIFIER EQ (math_ | value_ /*| constantNoMath_*/)
