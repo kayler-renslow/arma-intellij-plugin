@@ -2,20 +2,20 @@ package com.kaylerrenslow.plugin.actions.mainMenu;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.kaylerrenslow.plugin.Static;
-
-import javax.swing.*;
+import com.kaylerrenslow.plugin.dialog.Dialog_About;
+import com.kaylerrenslow.plugin.dialog.Dialog_PluginProperties;
 
 /**
  * Created by Kayler on 12/27/2015.
  */
-public class HiAction extends AnAction{
-	public HiAction() {
-		super(Static.ICON_FILE);
+public class Action_About extends AnAction{
+	public Action_About() {
+		super();
 	}
 
 	@Override
 	public void actionPerformed(AnActionEvent e) {
-		System.out.println("HiAction action performed");
+		Dialog_About d = new Dialog_About(e.getProject(), false);
+		d.show();
 	}
 }

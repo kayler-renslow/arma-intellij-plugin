@@ -11,9 +11,11 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
+import com.kaylerrenslow.plugin.Plugin;
 import com.kaylerrenslow.plugin.lang.header.HeaderLanguage;
 import com.kaylerrenslow.plugin.lang.header.HeaderLexerAdapter;
 import com.kaylerrenslow.plugin.lang.header.parser.HeaderParser;
+import com.kaylerrenslow.plugin.lang.header.parser.HeaderParser_NoSyntax;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -32,6 +34,10 @@ public class HeaderParserDefinition implements ParserDefinition{
 
 	@Override
 	public PsiParser createParser(Project project) {
+		String syntax = Plugin.pluginProps.getPluginProperty(Plugin.PluginPropertiesKey.HEADER_SYNTAX_CHECK);
+		if(syntax.equalsIgnoreCase("false")){
+			return new HeaderParser_NoSyntax();
+		}
 		return new HeaderParser();
 	}
 

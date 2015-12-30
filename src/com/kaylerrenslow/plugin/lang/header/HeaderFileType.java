@@ -1,7 +1,7 @@
 package com.kaylerrenslow.plugin.lang.header;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
-import com.kaylerrenslow.plugin.Static;
+import com.kaylerrenslow.plugin.Plugin;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,7 +38,7 @@ public class HeaderFileType extends LanguageFileType{
 	@Nullable
 	@Override
 	public Icon getIcon() {
-		return Static.ICON_FILE;
+		return Plugin.ICON_FILE;
 	}
 
 

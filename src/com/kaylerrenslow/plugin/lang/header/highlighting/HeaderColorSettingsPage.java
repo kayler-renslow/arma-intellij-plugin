@@ -5,7 +5,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
-import com.kaylerrenslow.plugin.Static;
+import com.kaylerrenslow.plugin.Plugin;
 import com.kaylerrenslow.plugin.lang.header.HeaderStatic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,7 +22,7 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 	@Nullable
 	@Override
 	public Icon getIcon() {
-		return Static.ICON_FILE;
+		return Plugin.ICON_FILE;
 	}
 
 	@NotNull

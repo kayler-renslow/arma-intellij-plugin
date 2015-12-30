@@ -24,6 +24,9 @@
     <lang.parserDefinition language="Header" implementationClass="com.kaylerrenslow.plugin.lang.header.psi.HeaderParserDefinition"/>
     <lang.syntaxHighlighterFactory key="Header" implementationClass="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderSyntaxHighlighterFactory"/>
     <colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderColorSettingsPage"/>
+
+    <!-- Other things-->
+
   </extensions>
 
   <application-components></application-components>
@@ -31,9 +34,10 @@
   <project-components></project-components>
 
   <actions>
-    <group id="com.kaylerrenslow.plugin.actions.mainMenu.group" text="_Arma 3" description="Arma 3 menu">
+    <group id="com.kaylerrenslow.plugin.actions.mainMenu.group" text="_Arma 3" description="Arma 3 Plugin Menu">
       <add-to-group group-id="MainMenu" anchor="last" />
-      <action id="Myplugin.Textboxes" class="com.kaylerrenslow.plugin.actions.mainMenu.HiAction" text="Hi" description="A test menu item" />
+      <action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.plugin.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma 3 Plugin Properties" />
+      <action id="a3plugin.action.mm.about" class="com.kaylerrenslow.plugin.actions.mainMenu.Action_About" text="About" description="About the Plugin" />
     </group>
   </actions>
 

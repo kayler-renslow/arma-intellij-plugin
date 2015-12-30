@@ -6,7 +6,7 @@
   psiClassPrefix="SQF"
   psiImplClassSuffix="Impl"
   psiPackage="com.kaylerrenslow.plugin.lang.sqf.psi"
-  //psiImplPackage="com.kaylerrenslow.plugin.lang.sqf.psi.impl"
+  //psiImplPackage="com.kaylerrenslow.instance.lang.sqf.psi.impl"
 
   elementTypeHolderClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFTypes"
   elementTypeClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFElementType"
@@ -30,6 +30,8 @@ private literal_ ::= STRING_LITERAL | (MINUS)? INTEGER_LITERAL | (MINUS)? DEC_LI
 //TODO fix Strings that allow "" inside them. example="""hello""";
 //TODO when making the header parser, use that parser for the .sqm and .ext. But .sqm and .ext will have their own lexer so that keywords can be highlighted.
 
+
+//TODO SQF PARSER IS TURNED OFF
 private statement_ ::= (
                         assignment_
                         | commandExp_
@@ -44,44 +46,41 @@ private codeBlock_ ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement_)? RBRAC
 
 
 private exp_ ::= LPAREN exp_ RPAREN
-               | mathExp_
-               | commandExp_ //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
-               | value_
+               | mathExp_ //math must come before value because math contains values before operator
                | conditionalExp_
+               | commandExp_ //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
+               | configExp_ //must come before value
+               | value_
 
 private assignment_ ::= identifier_ EQ ( (exp_ | codeBlock_ | assignment_) | (switchStatement_ | ifStatement_ ) )
 
-private condition_ ::= TRUE | FALSE | commandExpOrValue_
-private conditionStandalone_ ::= TRUE | FALSE | commandExp_ | identifier_
-private conditionalExpPart_ ::= EXCL condition_
+private condition_ ::= LPAREN condition_ RPAREN
+                     | mathExp_ //math must come before value because math contains values before operator
+                     | commandExp_ //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
+                     | value_
+
+private conditionStandalone_ ::= commandExp_ | identifier_ | TRUE | FALSE
+private conditionalOp_ ::=  AMPAMP | AND | BARBAR | OR | EQEQ | NE | LT | GT | LE | GE
+private conditionalExpPart_ ::= ( condition_ conditionalOp_ condition_)
+                              | EXCL condition_ //must come after condition_ operator condition_ because ! would be preferred over != if it wasn't
                               | NOT condition_
-                              | ( condition_ (
-                                               AMPAMP
-                                              | AND
-                                              | BARBAR
-                                              | OR
-                                              | EQEQ
-                                              | NE
-                                              | LT
-                                              | GT
-                                              | LE
-                                              | GE
-                                             ) condition_
-                                )
                               | ASSERT LPAREN conditionalExpPart_ RPAREN
                               | LPAREN conditionalExpPart_ RPAREN
                               | conditionStandalone_
 
 
-private conditionalExp_ ::= conditionalExpPart_ (AND | AMPAMP) conditionalExpPart_
-                          | conditionalExpPart_ (OR | BARBAR) conditionalExpPart_
+private conditionalExp_ ::= conditionalExpPart_ ((AND | AMPAMP | OR | BARBAR) conditionalExp_)?
                           | conditionalExpPart_
 
 
 private commandExp_ ::= (value_)? COMMAND codeBlock_
-                      | (value_)? COMMAND LPAREN exp_ RPAREN
                       | (value_)? COMMAND (exp_)?
-                      | LPAREN commandExp_ RPAREN
+
+private configHolder_ ::= CONFIG | identifier_ | STRING_LITERAL | commandExp_
+private configExp_ ::= configHolder_
+                     | configHolder_ GTGT configHolder_ (GTGT configHolder_)*
+                     | configHolder_ FSLASH configHolder_ (FSLASH configHolder_)*
+
 
 private mathOp_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
 private mathExp_ ::= LPAREN mathExp_ RPAREN
@@ -90,14 +89,10 @@ private mathExp_ ::= LPAREN mathExp_ RPAREN
 private mathRhs_ ::= commandExpOrValue_ mathOp_ mathRhs_ | commandExpOrValue_
 
 /*VALUES*/
-    private value_ ::= identifier_ | literal_ | arrayVal_ | configVal_ | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
+    private value_ ::= identifier_ | literal_ | arrayVal_ | CONFIG | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
     private commandExpOrValue_ ::= commandExp_ | value_ ; /*commandExp must go first since some commands match value_ for their pre-params ("arr select 1" -> arr is pre-param)*/
 
     private arrayVal_  ::= LBRACKET RBRACKET | LBRACKET (exp_ | codeBlock_) (COMMA (exp_ | codeBlock_))* RBRACKET
-
-    private configVal_ ::= CONFIG
-                         | CONFIG FSLASH (STRING_LITERAL | identifier_) (FSLASH (STRING_LITERAL | identifier_))*
-                         | CONFIG GTGT (STRING_LITERAL | identifier_) (GTGT (STRING_LITERAL | identifier_))*
 
 
 /*CONTROL STRUCTURES AND OTHER THINGS*/

@@ -6,7 +6,7 @@
   psiClassPrefix="SQF"
   psiImplClassSuffix="Impl"
   psiPackage="com.kaylerrenslow.plugin.lang.sqf.psi_noSyntax"
-  //psiImplPackage="com.kaylerrenslow.plugin.lang.sqf.psi.impl_noSyntax"
+  //psiImplPackage="com.kaylerrenslow.instance.lang.sqf.psi.impl_noSyntax"
 
   elementTypeHolderClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFTypes"
   elementTypeClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFElementType"

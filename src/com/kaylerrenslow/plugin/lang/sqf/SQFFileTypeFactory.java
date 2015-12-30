@@ -2,7 +2,6 @@ package com.kaylerrenslow.plugin.lang.sqf;
 
 import com.intellij.openapi.fileTypes.FileTypeConsumer;
 import com.intellij.openapi.fileTypes.FileTypeFactory;
-import com.kaylerrenslow.plugin.Static;
 import org.jetbrains.annotations.NotNull;
 
 /**

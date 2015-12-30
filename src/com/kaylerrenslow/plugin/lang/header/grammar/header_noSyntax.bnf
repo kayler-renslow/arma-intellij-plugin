@@ -1,0 +1,44 @@
+{
+  parserClass="com.kaylerrenslow.plugin.lang.header.parser.HeaderParser_NoSyntax"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Header"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.kaylerrenslow.plugin.lang.header.psi_noSyntax"
+  psiImplPackage="com.kaylerrenslow.plugin.lang.header.psi.impl" //comment out the import statement in the HeaderTypes class if the impl package isn't used
+
+  elementTypeHolderClass="com.kaylerrenslow.plugin.lang.header.psi.HeaderTypes"
+  elementTypeClass="com.kaylerrenslow.plugin.lang.header.psi.HeaderElementType"
+  tokenTypeClass="com.kaylerrenslow.plugin.lang.header.psi.HeaderTokenType"
+}
+// @formatter:off
+headerFile ::= token_*
+
+private token_ ::= COMMENT
+                 | IDENTIFIER
+                 | NUMBER_LITERAL
+                 | STRING_LITERAL
+                 | CONSTANT
+
+                 | EQ
+                 | PLUS
+                 | MINUS
+                 | FSLASH
+
+                 | BRACKET_PAIR
+                 | LBRACE
+                 | RBRACE
+                 | LPAREN
+                 | RPAREN
+                 | COMMA
+                 | COLON
+
+                 | CLASS
+
+                 | PREPROCESS_INCLUDE
+                 | INCLUDE_VALUE_ANGBR //<thing.h>
+
+                 | SEMICOLON
+                 | WHITE_SPACE
+                 | BAD_CHARACTER

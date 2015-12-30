@@ -3,7 +3,7 @@
 
   extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
 
-  psiClassPrefix="SQF"
+  psiClassPrefix="Header"
   psiImplClassSuffix="Impl"
   psiPackage="com.kaylerrenslow.plugin.lang.header.psi"
   psiImplPackage="com.kaylerrenslow.plugin.lang.header.psi.impl" //comment out the import statement in the HeaderTypes class if the impl package isn't used
