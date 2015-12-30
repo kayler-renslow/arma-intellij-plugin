@@ -57,7 +57,8 @@ public class PluginProperties{
 	}
 
 
-	public void savePluginPropsToFile(){
+	/**Saves the plugin properties to file in appdata. Returns true if the save was successful, false otherwise*/
+	public boolean savePluginPropsToFile(){
 		try{
 			if(!pluginPropsFile.exists()){
 				pluginPropsFile.createNewFile();
@@ -65,7 +66,7 @@ public class PluginProperties{
 			PrintWriter pw = new PrintWriter(pluginPropsFile);
 			pw.println("#All changes made to this file will take effect when Intellij is restarted.\n");
 			for(Plugin.PluginPropertiesKey ppk : Plugin.PluginPropertiesKey.values()){
-				pw.println("#" + ppk.doc);
+				pw.println("#" + ppk.doc.replaceAll("\n", " "));
 				pw.println(ppk.keyName + "=" + pluginProps.getProperty(ppk.keyName));
 				pw.println();
 			}
@@ -73,7 +74,9 @@ public class PluginProperties{
 			pw.close();
 		}catch(Exception e){
 			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 
 

@@ -51,19 +51,24 @@ public class Dialog_PluginProperties extends DialogWrapper implements DialogActi
 		int i;
 		JLabel lblKey, lblDoc, spacer;
 
+		String[] split;
+
 		for(Plugin.PluginPropertiesKey ppk : Plugin.PluginPropertiesKey.values()){
 			if(ppk.possibleVals == null || ppk.possibleVals.length == 0){
 				continue;
 			}
 			spacer = new JLabel(" ");
 			lblKey = new JLabel(ppk.keyName);
-			lblDoc = new JLabel(ppk.doc);
-			lblDoc.setForeground(JBColor.GREEN);
 
 			panel.add(lblKey, cons);
 			cons.gridy++;
-			panel.add(lblDoc, cons);
-			cons.gridy++;
+			split = ppk.doc.split("\n");
+			for(int j = 0; j < split.length || split.length == 0 && j == 0; j++){
+				lblDoc = new JLabel((split.length != 0 ? split[j] : ppk.doc));
+				lblDoc.setForeground(JBColor.GREEN);
+				panel.add(lblDoc, cons);
+				cons.gridy++;
+			}
 
 			cb = new ComboBox();
 			cb.addItem(ppk.defaultValue);
@@ -90,11 +95,21 @@ public class Dialog_PluginProperties extends DialogWrapper implements DialogActi
 		KVPair<Plugin.PluginPropertiesKey, String> pop;
 		boolean madeChanges = changes.size() > 0;
 		Iterator<KVPair> iter = changes.iterator();
+		boolean good;
 		while(iter.hasNext()){
 			pop = changes.removeFirst();
 			Plugin.pluginProps.overridePluginProps(pop.key, pop.value);
+
 		}
-		Plugin.pluginProps.savePluginPropsToFile();
+		good = Plugin.pluginProps.savePluginPropsToFile();
+		if(!good){
+			DialogBuilder alert = new DialogBuilder();
+			alert.addCloseButton();
+			alert.setTitle("Error");
+			alert.centerPanel(new JLabel("An error occurred when saving the updated properties to file. Try restarting Intellij."));
+			alert.show();
+			return;
+		}
 		if(!madeChanges){
 			return;
 		}
