@@ -18,23 +18,23 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
  * Created by Kayler on 11/01/2015.
  */
 public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
-	public static final TextAttributesKey COMMENT = createTextAttributesKey("SQF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
-	public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("HEADER_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
+	public static final TextAttributesKey COMMENT = createTextAttributesKey("A3_HEADER_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
+	public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("A3_HEADER_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
 
-	public static final TextAttributesKey IDENTIFIER = createTextAttributesKey("IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER);
+	public static final TextAttributesKey IDENTIFIER = createTextAttributesKey("A3_HEADER_GLOBAL_VAR", DefaultLanguageHighlighterColors.IDENTIFIER);
 
-	public static final TextAttributesKey KEYWORD = createTextAttributesKey("KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
-	public static final TextAttributesKey OPERATOR = createTextAttributesKey("OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
+	public static final TextAttributesKey KEYWORD = createTextAttributesKey("A3_HEADER_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
+	public static final TextAttributesKey OPERATOR = createTextAttributesKey("A3_HEADER_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
 
-	public static final TextAttributesKey BRACKET = createTextAttributesKey("BRACKET", DefaultLanguageHighlighterColors.BRACKETS);
-	public static final TextAttributesKey BRACE = createTextAttributesKey("BRACE", DefaultLanguageHighlighterColors.BRACES);
-	public static final TextAttributesKey PAREN = createTextAttributesKey("PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
-	public static final TextAttributesKey COMMA = createTextAttributesKey("COMMA", DefaultLanguageHighlighterColors.COMMA);
+	public static final TextAttributesKey BRACKET = createTextAttributesKey("A3_HEADER_BRACKET", DefaultLanguageHighlighterColors.BRACKETS);
+	public static final TextAttributesKey BRACE = createTextAttributesKey("A3_HEADER_BRACE", DefaultLanguageHighlighterColors.BRACES);
+	public static final TextAttributesKey PAREN = createTextAttributesKey("A3_HEADER_PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
+	public static final TextAttributesKey COMMA = createTextAttributesKey("A3_HEADER_COMMA", DefaultLanguageHighlighterColors.COMMA);
 
-	public static final TextAttributesKey PREPROCESSOR = createTextAttributesKey("PREPROCESSOR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+	public static final TextAttributesKey PREPROCESSOR = createTextAttributesKey("A3_HEADER_PREPROCESSOR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
 
-	public static final TextAttributesKey STRING = createTextAttributesKey("STRING", DefaultLanguageHighlighterColors.STRING);
-	public static final TextAttributesKey NUM = createTextAttributesKey("NUM", DefaultLanguageHighlighterColors.NUMBER);
+	public static final TextAttributesKey STRING = createTextAttributesKey("A3_HEADER_STRING", DefaultLanguageHighlighterColors.STRING);
+	public static final TextAttributesKey NUM = createTextAttributesKey("A3_HEADER_NUM", DefaultLanguageHighlighterColors.NUMBER);
 
 	private static final TextAttributesKey[] OPERATOR_KEYS = new TextAttributesKey[]{OPERATOR};
 	private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};

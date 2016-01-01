@@ -34,7 +34,7 @@ public class SQFParserDefinition implements ParserDefinition{
 
 	@Override
 	public PsiParser createParser(Project project) {
-		String syntax = Plugin.pluginProps.getPluginProperty(Plugin.PluginPropertiesKey.SQF_SYNTAX_CHECK);
+		String syntax = Plugin.pluginProps.getPluginProperty(Plugin.UserPropertiesKey.SQF_SYNTAX_CHECK);
 		if(syntax.equalsIgnoreCase("false")){
 			return new SQFParser_NoSyntax();
 		}

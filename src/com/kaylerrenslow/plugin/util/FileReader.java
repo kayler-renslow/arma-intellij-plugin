@@ -1,16 +1,13 @@
-package com.kaylerrenslow.plugin;
+package com.kaylerrenslow.plugin.util;
 
 import java.io.BufferedInputStream;
 
 /**
  * Created by Kayler on 12/31/2015.
  */
-public class PluginNonStaticLoader{
-	public final String SQF_COLOR_SETTINGS_PAGE_TEXT = getText("/com/kaylerrenslow/plugin/lang/sqf/highlighting/sqfHighlightingDemo.sqf");
-	public final String HEADER_COLOR_SETTINGS_PAGE_TEXT = getText("/com/kaylerrenslow/plugin/lang/header/highlighting/headerHighlightingDemo.h");
+public class FileReader{
 
-
-	private String getText(String path) {
+	public String getText(String path) {
 		BufferedInputStream bis = new BufferedInputStream(getClass().getResourceAsStream(path));
 		int size = 0;
 		int in;

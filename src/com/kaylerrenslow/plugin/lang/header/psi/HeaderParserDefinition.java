@@ -34,7 +34,7 @@ public class HeaderParserDefinition implements ParserDefinition{
 
 	@Override
 	public PsiParser createParser(Project project) {
-		String syntax = Plugin.pluginProps.getPluginProperty(Plugin.PluginPropertiesKey.HEADER_SYNTAX_CHECK);
+		String syntax = Plugin.pluginProps.getPluginProperty(Plugin.UserPropertiesKey.HEADER_SYNTAX_CHECK);
 		if(syntax.equalsIgnoreCase("false")){
 			return new HeaderParser_NoSyntax();
 		}

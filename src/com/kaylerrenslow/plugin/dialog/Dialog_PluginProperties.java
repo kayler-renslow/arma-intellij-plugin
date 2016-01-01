@@ -1,6 +1,5 @@
 package com.kaylerrenslow.plugin.dialog;
 
-import com.intellij.execution.ui.layout.Grid;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.ComboBox;
 import com.intellij.openapi.ui.DialogBuilder;
@@ -10,18 +9,17 @@ import com.kaylerrenslow.plugin.Plugin;
 import com.kaylerrenslow.plugin.dialog.util.ActionListenerWrapper;
 import com.kaylerrenslow.plugin.dialog.util.DialogActionResponder;
 import org.jetbrains.annotations.Nullable;
-import util.KVPair;
+import com.kaylerrenslow.plugin.util.KVPair;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.Stack;
 
 /**
  * Created by Kayler on 12/30/2015.
  */
-public class Dialog_PluginProperties extends DialogWrapper implements DialogActionResponder<ComboBox, Plugin.PluginPropertiesKey>{
+public class Dialog_PluginProperties extends DialogWrapper implements DialogActionResponder<ComboBox, Plugin.UserPropertiesKey>{
 	private static final String TITLE = "Configure Arma 3 Plugin Properties";
 
 	private LinkedList<KVPair> changes = new LinkedList<>();
@@ -53,7 +51,7 @@ public class Dialog_PluginProperties extends DialogWrapper implements DialogActi
 
 		String[] split;
 
-		for(Plugin.PluginPropertiesKey ppk : Plugin.PluginPropertiesKey.values()){
+		for(Plugin.UserPropertiesKey ppk : Plugin.UserPropertiesKey.values()){
 			if(ppk.possibleVals == null || ppk.possibleVals.length == 0){
 				continue;
 			}
@@ -78,7 +76,7 @@ public class Dialog_PluginProperties extends DialogWrapper implements DialogActi
 
 			System.out.println(getClass() + " " + Plugin.pluginProps.getPluginProperty(ppk));
 			cb.setSelectedItem(Plugin.pluginProps.getPluginProperty(ppk));
-			cb.addActionListener(new ActionListenerWrapper<ComboBox, Plugin.PluginPropertiesKey>(this, cb, ppk));
+			cb.addActionListener(new ActionListenerWrapper<ComboBox, Plugin.UserPropertiesKey>(this, cb, ppk));
 
 			panel.add(cb, cons);
 			cons.gridy++;
@@ -92,7 +90,7 @@ public class Dialog_PluginProperties extends DialogWrapper implements DialogActi
 	@Override
 	protected void doOKAction() {
 		super.doOKAction();
-		KVPair<Plugin.PluginPropertiesKey, String> pop;
+		KVPair<Plugin.UserPropertiesKey, String> pop;
 		boolean madeChanges = changes.size() > 0;
 		Iterator<KVPair> iter = changes.iterator();
 		boolean good;
@@ -121,7 +119,7 @@ public class Dialog_PluginProperties extends DialogWrapper implements DialogActi
 	}
 
 	@Override
-	public void actionPerformed(ComboBox cb, Plugin.PluginPropertiesKey key) {
-		changes.add(new KVPair<Plugin.PluginPropertiesKey, String>(key, (String)cb.getSelectedItem()));
+	public void actionPerformed(ComboBox cb, Plugin.UserPropertiesKey key) {
+		changes.add(new KVPair<Plugin.UserPropertiesKey, String>(key, (String)cb.getSelectedItem()));
 	}
 }

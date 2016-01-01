@@ -23,13 +23,12 @@ private identifier_ ::= LOCAL_VAR | IDENTIFIER | LANG_CONSTANT | LPAREN identifi
 
 private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
 
-literal_ ::= STRING_LITERAL | (MINUS)? INTEGER_LITERAL | (MINUS)? DEC_LITERAL
+literal_ ::= STRING_LITERAL | (MINUS | PLUS)? INTEGER_LITERAL | (MINUS | PLUS)? DEC_LITERAL
 
 //TODO allow copy of arrays: _test=+[0,1]
 //TODO support #define
 
 
-//TODO SQF PARSER IS TURNED OFF
 private statement_ ::= (
                         assignment_
                         | commandExp_
@@ -86,17 +85,19 @@ private exp_ ::= LPAREN exp_ RPAREN
     private mathOp_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
     private mathExp_ ::= commandExpOrValue_ mathOp_ mathRhs_
 
-    private mathRhs_ ::= (commandExpOrValue_ mathOp_ mathRhs_)+
+    private mathRhs_ ::= LPAREN mathRhs_ RPAREN
+					   | (commandExpOrValue_ mathOp_ mathRhs_)+
                        | commandExpOrValue_
 
 /*valueExp_*/
     private valueExp_ ::= identifier_ | literal_ | arrayVal_ | CONFIG | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
     private commandExpOrValue_ ::= commandExp_ | valueExp_ ; /*commandExp must go first since some commands match value_ for their pre-params ("arr select 1" -> arr is pre-param)*/
 
-    private arrayVal_ ::= LBRACKET RBRACKET | LBRACKET (exp_ | codeBlock_) (COMMA (exp_ | codeBlock_))* RBRACKET
+    private arrayVal_ ::= PLUS? LBRACKET RBRACKET
+                        | PLUS? LBRACKET (exp_ | codeBlock_) (COMMA (exp_ | codeBlock_))* RBRACKET
 
 
-/*CONTROL STRUCTURES AND OTHER THINGS*/
+/*control structures and other things*/
     private private_declaration_ ::= PRIVATE (STRING_LITERAL | LBRACKET (STRING_LITERAL (COMMA STRING_LITERAL)*) RBRACKET)
 
     private scopeManager_ ::= GOTO COLON STRING_LITERAL

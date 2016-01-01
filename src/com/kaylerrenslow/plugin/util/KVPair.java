@@ -1,4 +1,4 @@
-package util;
+package com.kaylerrenslow.plugin.util;
 
 /**
  * Created by Kayler on 12/30/2015.

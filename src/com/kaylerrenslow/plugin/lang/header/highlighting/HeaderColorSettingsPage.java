@@ -6,6 +6,7 @@ import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
 import com.kaylerrenslow.plugin.Plugin;
+import com.kaylerrenslow.plugin.PluginIcons;
 import com.kaylerrenslow.plugin.lang.header.HeaderStatic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,7 +35,7 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 	@Nullable
 	@Override
 	public Icon getIcon() {
-		return Plugin.ICON_FILE;
+		return PluginIcons.ICON_FILE;
 	}
 
 	@NotNull
@@ -46,7 +47,7 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 	@NotNull
 	@Override
 	public String getDemoText() {
-		return Plugin.LOADER.HEADER_COLOR_SETTINGS_PAGE_TEXT;
+		return Plugin.HEADER_COLOR_SETTINGS_PAGE_TEXT;
 	}
 
 	@Nullable

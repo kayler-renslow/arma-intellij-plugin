@@ -17,23 +17,23 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
  * Created by Kayler on 11/01/2015.
  */
 public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
-	public static final TextAttributesKey COMMENT = createTextAttributesKey("SQF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
-	public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("SQF_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
-	public static final TextAttributesKey IDENTIFIER = createTextAttributesKey("IDENTIFIER", DefaultLanguageHighlighterColors.DOC_COMMENT/*INSTANCE_FIELD*/);
-	public static final TextAttributesKey LOCAL_VAR = createTextAttributesKey("LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
+	public static final TextAttributesKey COMMENT = createTextAttributesKey("A3_SQF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
+	public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("A3_SQF_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
+	public static final TextAttributesKey GLOBAL_VAR = createTextAttributesKey("A3_SQF_GLOBAL_VAR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+	public static final TextAttributesKey LOCAL_VAR = createTextAttributesKey("A3_SQF_LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
 
-	public static final TextAttributesKey CONSTANT = createTextAttributesKey("CONSTANT", DefaultLanguageHighlighterColors.CONSTANT);
-	public static final TextAttributesKey KEYWORD = createTextAttributesKey("KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
-	public static final TextAttributesKey COMMAND = createTextAttributesKey("COMMAND", DefaultLanguageHighlighterColors.METADATA);
-	public static final TextAttributesKey OPERATOR = createTextAttributesKey("OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
+	public static final TextAttributesKey CONSTANT = createTextAttributesKey("A3_SQF_CONSTANT", DefaultLanguageHighlighterColors.CONSTANT);
+	public static final TextAttributesKey KEYWORD = createTextAttributesKey("A3_SQF_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
+	public static final TextAttributesKey COMMAND = createTextAttributesKey("A3_SQF_COMMAND", DefaultLanguageHighlighterColors.METADATA);
+	public static final TextAttributesKey OPERATOR = createTextAttributesKey("A3_SQF_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
 
-	public static final TextAttributesKey STRING = createTextAttributesKey("STRING", DefaultLanguageHighlighterColors.STRING);
-	public static final TextAttributesKey NUM = createTextAttributesKey("NUM", DefaultLanguageHighlighterColors.NUMBER);
+	public static final TextAttributesKey STRING = createTextAttributesKey("A3_SQF_STRING", DefaultLanguageHighlighterColors.STRING);
+	public static final TextAttributesKey NUM = createTextAttributesKey("A3_SQF_NUM", DefaultLanguageHighlighterColors.NUMBER);
 
-	public static final TextAttributesKey BRACKET = createTextAttributesKey("BRACKET", DefaultLanguageHighlighterColors.BRACKETS);
-	public static final TextAttributesKey BRACE = createTextAttributesKey("BRACE", DefaultLanguageHighlighterColors.BRACES);
-	public static final TextAttributesKey PAREN = createTextAttributesKey("PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
-	public static final TextAttributesKey COMMA = createTextAttributesKey("COMMA", DefaultLanguageHighlighterColors.COMMA);
+	public static final TextAttributesKey BRACKET = createTextAttributesKey("A3_SQF_BRACKET", DefaultLanguageHighlighterColors.BRACKETS);
+	public static final TextAttributesKey BRACE = createTextAttributesKey("A3_SQF_BRACE", DefaultLanguageHighlighterColors.BRACES);
+	public static final TextAttributesKey PAREN = createTextAttributesKey("A3_SQF_PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
+	public static final TextAttributesKey COMMA = createTextAttributesKey("A3_SQF_COMMA", DefaultLanguageHighlighterColors.COMMA);
 
 	private static final TextAttributesKey[] OPERATOR_KEYS = new TextAttributesKey[]{OPERATOR};
 	private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
@@ -42,7 +42,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	private static final TextAttributesKey[] CONSTANT_KEYS = new TextAttributesKey[]{CONSTANT};
 
 	private static final TextAttributesKey[] COMMAND_KEYS = new TextAttributesKey[]{COMMAND};
-	private static final TextAttributesKey[] IDENTIFIER_KEYS = new TextAttributesKey[]{IDENTIFIER};
+	private static final TextAttributesKey[] GLOBAL_VAR_KEYS = new TextAttributesKey[]{GLOBAL_VAR};
 	private static final TextAttributesKey[] LOCAL_VAR_KEYS = new TextAttributesKey[]{LOCAL_VAR};
 	private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
 
@@ -103,7 +103,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 			return LOCAL_VAR_KEYS;
 		}
 		if(tokenType.equals(SQFTypes.IDENTIFIER)){
-			return IDENTIFIER_KEYS;
+			return GLOBAL_VAR_KEYS;
 		}
 		for(IElementType e: COMMANDS){
 			if(tokenType.equals(e)){
@@ -130,4 +130,5 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		}
 		return EMPTY_KEYS;
 	}
+
 }

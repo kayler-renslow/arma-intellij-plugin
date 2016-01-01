@@ -1,45 +1,43 @@
 
-
-
 <idea-plugin version="2">
-  <id>com.kaylerrenslow.plugin.id</id>
-  <name>Arma 3 SQF Language Plugin</name>
-  <version>1.0.0</version>
-  <vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
+	<name>Arma SQF Language Plugin</name>
+	<version>1.0.0</version>
+	<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+	<description></description>
 
-  <description></description>
+	<change-notes></change-notes>
 
-  <change-notes></change-notes>
+	<idea-version since-build="131"/>
+	<extensions defaultExtensionNs="com.intellij">
+		<!-- SQF Language -->
+		<fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.sqf.SQFFileTypeFactory"/>
+		<lang.parserDefinition language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFParserDefinition"/>
+		<lang.syntaxHighlighterFactory key="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFSyntaxHighlighterFactory"/>
+		<colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFColorSettingsPage"/>
 
-  <idea-version since-build="131"/>
-  <extensions defaultExtensionNs="com.intellij">
-    <!-- SQF Language -->
-    <fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.sqf.SQFFileTypeFactory"/>
-    <lang.parserDefinition language="Arma3.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFParserDefinition"/>
-    <lang.syntaxHighlighterFactory key="Arma3.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFSyntaxHighlighterFactory"/>
-    <colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFColorSettingsPage"/>
+		<!-- Header Language -->
+		<fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.header.HeaderFileTypeFactory"/>
+		<lang.parserDefinition language="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.psi.HeaderParserDefinition"/>
+		<lang.syntaxHighlighterFactory key="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderSyntaxHighlighterFactory"/>
+		<colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderColorSettingsPage"/>
 
-    <!-- Header Language -->
-    <fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.header.HeaderFileTypeFactory"/>
-    <lang.parserDefinition language="Arma3.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.psi.HeaderParserDefinition"/>
-    <lang.syntaxHighlighterFactory key="Arma3.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderSyntaxHighlighterFactory"/>
-    <colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderColorSettingsPage"/>
+		<!-- Other things-->
+		<moduleBuilder builderClass="com.kaylerrenslow.plugin.wizards.ArmaModuleBuilder" />
+		<moduleType implementationClass="com.kaylerrenslow.plugin.wizards.ArmaModuleType" id="arma.moduleType" />
+	</extensions>
 
-    <!-- Other things-->
+	<application-components></application-components>
 
-  </extensions>
+	<project-components></project-components>
 
-  <application-components></application-components>
-
-  <project-components></project-components>
-
-  <actions>
-    <group id="com.kaylerrenslow.plugin.dialog.actions.mainMenu.group" text="_Arma 3" description="Arma 3 Plugin Menu">
-      <add-to-group group-id="MainMenu" anchor="last" />
-      <action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma 3 Plugin Properties" />
-      <action id="a3plugin.action.mm.about" class="com.kaylerrenslow.plugin.dialog.actions.mainMenu.Action_About" text="About" description="About the Plugin" />
-    </group>
-  </actions>
+	<actions>
+		<group id="com.kaylerrenslow.plugin.dialog.actions.mainMenu.group" text="_Arma 3" description="Arma 3 Plugin Menu">
+			<add-to-group group-id="MainMenu" anchor="last" />
+			<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma 3 Plugin Properties" />
+			<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.plugin.dialog.actions.mainMenu.Action_About" text="About" description="About the Plugin" />
+		</group>
+	</actions>
 
 
 </idea-plugin>
