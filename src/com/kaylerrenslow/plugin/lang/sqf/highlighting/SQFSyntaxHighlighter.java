@@ -19,7 +19,7 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
 public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey COMMENT = createTextAttributesKey("SQF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
 	public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("SQF_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
-	public static final TextAttributesKey IDENTIFIER = createTextAttributesKey("IDENTIFIER", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
+	public static final TextAttributesKey IDENTIFIER = createTextAttributesKey("IDENTIFIER", DefaultLanguageHighlighterColors.DOC_COMMENT/*INSTANCE_FIELD*/);
 	public static final TextAttributesKey LOCAL_VAR = createTextAttributesKey("LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
 
 	public static final TextAttributesKey CONSTANT = createTextAttributesKey("CONSTANT", DefaultLanguageHighlighterColors.CONSTANT);

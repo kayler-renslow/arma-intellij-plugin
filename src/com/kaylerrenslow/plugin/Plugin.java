@@ -19,6 +19,8 @@ public class Plugin{
 
 	public static final PluginProperties pluginProps = new PluginProperties(APPDATA_FOLDER);
 
+	public static final PluginNonStaticLoader LOADER = new PluginNonStaticLoader();
+
 	private static final String t = "true";
 	private static final String f = "false";
 

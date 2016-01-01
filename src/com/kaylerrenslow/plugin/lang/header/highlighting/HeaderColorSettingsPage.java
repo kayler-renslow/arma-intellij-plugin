@@ -17,7 +17,19 @@ import java.util.Map;
  * Created by Kayler on 11/01/2015.
  */
 public class HeaderColorSettingsPage implements ColorSettingsPage{
-	private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{};
+	private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
+			new AttributesDescriptor("Identifier", HeaderSyntaxHighlighter.IDENTIFIER),
+			new AttributesDescriptor("Keyword", HeaderSyntaxHighlighter.KEYWORD),
+			new AttributesDescriptor("Preprocessor Keyword", HeaderSyntaxHighlighter.PREPROCESSOR),
+			new AttributesDescriptor("String", HeaderSyntaxHighlighter.STRING),
+			new AttributesDescriptor("Number", HeaderSyntaxHighlighter.NUM),
+			new AttributesDescriptor("Comment", HeaderSyntaxHighlighter.COMMENT),
+			new AttributesDescriptor("Operator", HeaderSyntaxHighlighter.OPERATOR),
+			new AttributesDescriptor("Brace", HeaderSyntaxHighlighter.BRACE),
+			new AttributesDescriptor("Bracket", HeaderSyntaxHighlighter.BRACKET),
+			new AttributesDescriptor("Parenthesis", HeaderSyntaxHighlighter.PAREN),
+			new AttributesDescriptor("Comma", HeaderSyntaxHighlighter.COMMA)
+	};
 
 	@Nullable
 	@Override
@@ -34,18 +46,7 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 	@NotNull
 	@Override
 	public String getDemoText() {
-		return "# You are reading the \".properties\" entry.\n" +
-				"! The exclamation mark can also mark text as comments.\n" +
-				"website = http://en.wikipedia.org/\n" +
-				"language = English\n" +
-				"# The backslash below tells the application to continue reading\n" +
-				"# the value onto the next line.\n" +
-				"message = Welcome to \\\n" +
-				"          Wikipedia!\n" +
-				"# Add spaces to the key\n" +
-				"key\\ with\\ spaces = This is the value that could be looked up with the key \"key with spaces\".\n" +
-				"# Unicode\n" +
-				"tab : \\u0009";
+		return Plugin.LOADER.HEADER_COLOR_SETTINGS_PAGE_TEXT;
 	}
 
 	@Nullable

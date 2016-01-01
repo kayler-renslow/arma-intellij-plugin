@@ -7,6 +7,7 @@ import com.intellij.openapi.options.colors.ColorDescriptor;
 import com.intellij.openapi.options.colors.ColorSettingsPage;
 import com.kaylerrenslow.plugin.Plugin;
 import com.kaylerrenslow.plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.plugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,7 +18,21 @@ import java.util.Map;
  * Created by Kayler on 11/01/2015.
  */
 public class SQFColorSettingsPage implements ColorSettingsPage{
-	private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{};
+	private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
+			new AttributesDescriptor("Global Variable", SQFSyntaxHighlighter.IDENTIFIER),
+			new AttributesDescriptor("Local Variable", SQFSyntaxHighlighter.LOCAL_VAR),
+			new AttributesDescriptor("Command", SQFSyntaxHighlighter.COMMAND),
+			new AttributesDescriptor("Comment", SQFSyntaxHighlighter.COMMENT),
+			new AttributesDescriptor("Constant", SQFSyntaxHighlighter.CONSTANT),
+			new AttributesDescriptor("Keyword", SQFSyntaxHighlighter.KEYWORD),
+			new AttributesDescriptor("String", SQFSyntaxHighlighter.STRING),
+			new AttributesDescriptor("Number", SQFSyntaxHighlighter.NUM),
+			new AttributesDescriptor("Operator", SQFSyntaxHighlighter.OPERATOR),
+			new AttributesDescriptor("Parenthesis", SQFSyntaxHighlighter.PAREN),
+			new AttributesDescriptor("Brace", SQFSyntaxHighlighter.BRACE),
+			new AttributesDescriptor("Bracket", SQFSyntaxHighlighter.BRACKET),
+			new AttributesDescriptor("Comma", SQFSyntaxHighlighter.COMMA),
+	};
 
 	@Nullable
 	@Override
@@ -34,18 +49,7 @@ public class SQFColorSettingsPage implements ColorSettingsPage{
 	@NotNull
 	@Override
 	public String getDemoText() {
-		return "# You are reading the \".properties\" entry.\n" +
-				"! The exclamation mark can also mark text as comments.\n" +
-				"website = http://en.wikipedia.org/\n" +
-				"language = English\n" +
-				"# The backslash below tells the application to continue reading\n" +
-				"# the value onto the next line.\n" +
-				"message = Welcome to \\\n" +
-				"          Wikipedia!\n" +
-				"# Add spaces to the key\n" +
-				"key\\ with\\ spaces = This is the value that could be looked up with the key \"key with spaces\".\n" +
-				"# Unicode\n" +
-				"tab : \\u0009";
+		return Plugin.LOADER.SQF_COLOR_SETTINGS_PAGE_TEXT;
 	}
 
 	@Nullable

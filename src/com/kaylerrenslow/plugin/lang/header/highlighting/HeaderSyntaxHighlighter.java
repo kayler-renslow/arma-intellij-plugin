@@ -21,7 +21,6 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey COMMENT = createTextAttributesKey("SQF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
 	public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("HEADER_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
 
-	public static final TextAttributesKey CONSTANT = createTextAttributesKey("CONSTANT", DefaultLanguageHighlighterColors.CONSTANT);
 	public static final TextAttributesKey IDENTIFIER = createTextAttributesKey("IDENTIFIER", DefaultLanguageHighlighterColors.IDENTIFIER);
 
 	public static final TextAttributesKey KEYWORD = createTextAttributesKey("KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
@@ -36,13 +35,10 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 
 	public static final TextAttributesKey STRING = createTextAttributesKey("STRING", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey NUM = createTextAttributesKey("NUM", DefaultLanguageHighlighterColors.NUMBER);
-	
-	
+
 	private static final TextAttributesKey[] OPERATOR_KEYS = new TextAttributesKey[]{OPERATOR};
 	private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
 	private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
-
-	private static final TextAttributesKey[] CONSTANT_KEYS = new TextAttributesKey[]{CONSTANT};
 
 	private static final TextAttributesKey[] IDENTIFIER_KEYS = new TextAttributesKey[]{IDENTIFIER};
 	private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
@@ -52,7 +48,7 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 
 	private static final TextAttributesKey[] BRACKET_KEYS = new TextAttributesKey[]{BRACKET};
 	private static final TextAttributesKey[] BRACE_KEYS = new TextAttributesKey[]{BRACE};
-	//private static final TextAttributesKey[] PAREN_KEYS = new TextAttributesKey[]{PAREN};
+	private static final TextAttributesKey[] PAREN_KEYS = new TextAttributesKey[]{PAREN};
 	private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
 
 	private static final TextAttributesKey[] PREPROCESSOR_KEYS = new TextAttributesKey[]{PREPROCESSOR};
@@ -61,7 +57,6 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 
 	private static final IElementType[] OPERATORS = {HeaderTypes.EQ, HeaderTypes.BRACKET_PAIR, HeaderTypes.COLON, HeaderTypes.FSLASH, HeaderTypes.MINUS, HeaderTypes.PLUS};
 	private static final IElementType[] KEYWORDS = {HeaderTypes.CLASS};
-	private static final IElementType[] CONSTANTS = {};
 	private static final IElementType[] PREPROCESSORS = {HeaderTypes.PREPROCESS_INCLUDE};
 
 
@@ -81,11 +76,9 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(HeaderTypes.BRACKET_PAIR)){
 			return BRACKET_KEYS;
 		}
-		/*
 		if(tokenType.equals(HeaderTypes.LPAREN) || tokenType.equals(HeaderTypes.RPAREN)){
 			return PAREN_KEYS;
 		}
-		*/
 		if(tokenType.equals(HeaderTypes.COMMA)){
 			return COMMA_KEYS;
 		}
@@ -109,11 +102,6 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 		for(IElementType e: OPERATORS){
 			if(tokenType.equals(e)){
 				return OPERATOR_KEYS;
-			}
-		}
-		for(IElementType e: CONSTANTS){
-			if(tokenType.equals(e)){
-				return CONSTANT_KEYS;
 			}
 		}
 		for(IElementType e: PREPROCESSORS){
