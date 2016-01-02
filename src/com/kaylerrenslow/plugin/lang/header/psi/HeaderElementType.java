@@ -1,6 +1,7 @@
 package com.kaylerrenslow.plugin.lang.header.psi;
 
 import com.intellij.psi.tree.IElementType;
+import com.kaylerrenslow.plugin.lang.header.HeaderLanguage;
 import com.kaylerrenslow.plugin.lang.sqf.SQFLanguage;
 
 /**
@@ -8,6 +9,6 @@ import com.kaylerrenslow.plugin.lang.sqf.SQFLanguage;
  */
 public class HeaderElementType extends IElementType{
 	public HeaderElementType(String debugName) {
-		super(debugName, SQFLanguage.INSTANCE);
+		super(debugName, HeaderLanguage.INSTANCE);
 	}
 }

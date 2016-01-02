@@ -35,7 +35,7 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 	@Nullable
 	@Override
 	public Icon getIcon() {
-		return PluginIcons.ICON_FILE;
+		return PluginIcons.ICON_HEADER;
 	}
 
 	@NotNull

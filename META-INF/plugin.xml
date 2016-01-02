@@ -21,10 +21,12 @@
 		<lang.parserDefinition language="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.psi.HeaderParserDefinition"/>
 		<lang.syntaxHighlighterFactory key="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderSyntaxHighlighterFactory"/>
 		<colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderColorSettingsPage"/>
+		<completion.contributor language="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.psi.helpers.HeaderCompletionContributor"/>
 
 		<!-- Other things-->
 		<moduleBuilder builderClass="com.kaylerrenslow.plugin.wizards.ArmaModuleBuilder" />
 		<moduleType implementationClass="com.kaylerrenslow.plugin.wizards.ArmaModuleType" id="arma.moduleType" />
+
 	</extensions>
 
 	<application-components></application-components>
@@ -34,7 +36,7 @@
 	<actions>
 		<group id="com.kaylerrenslow.plugin.dialog.actions.mainMenu.group" text="_Arma 3" description="Arma 3 Plugin Menu">
 			<add-to-group group-id="MainMenu" anchor="last" />
-			<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma 3 Plugin Properties" />
+			<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma Plugin Properties" />
 			<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.plugin.dialog.actions.mainMenu.Action_About" text="About" description="About the Plugin" />
 		</group>
 	</actions>

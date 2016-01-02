@@ -18,6 +18,7 @@ public class SQFFileType extends LanguageFileType{
 		super(SQFLanguage.INSTANCE);
 	}
 
+
 	@NotNull
 	@Override
 	public String getName() {
@@ -39,7 +40,7 @@ public class SQFFileType extends LanguageFileType{
 	@Nullable
 	@Override
 	public Icon getIcon() {
-		return PluginIcons.ICON_FILE;
+		return PluginIcons.ICON_SQF;
 	}
 
 

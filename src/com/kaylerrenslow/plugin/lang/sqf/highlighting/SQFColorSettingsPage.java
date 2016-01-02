@@ -37,7 +37,7 @@ public class SQFColorSettingsPage implements ColorSettingsPage{
 	@Nullable
 	@Override
 	public Icon getIcon() {
-		return PluginIcons.ICON_FILE;
+		return PluginIcons.ICON_SQF;
 	}
 
 	@NotNull

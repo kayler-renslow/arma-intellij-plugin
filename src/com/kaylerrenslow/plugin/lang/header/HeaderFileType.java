@@ -38,7 +38,7 @@ public class HeaderFileType extends LanguageFileType{
 	@Nullable
 	@Override
 	public Icon getIcon() {
-		return PluginIcons.ICON_FILE;
+		return PluginIcons.ICON_HEADER;
 	}
 
 
