@@ -1,17 +1,21 @@
 package com.kaylerrenslow.plugin.wizards;
 
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
+import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.SourcePathsBuilder;
+import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
+import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,7 +55,7 @@ public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 
 	@Override
 	public ModuleType getModuleType() {
-		return ModuleTypeManager.getInstance().findByID(ArmaModuleType.ID);
+		return ArmaModuleType.getInstance();
 	}
 
 	@Override

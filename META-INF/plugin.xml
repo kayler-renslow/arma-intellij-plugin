@@ -4,7 +4,9 @@
 	<name>Arma SQF Language Plugin</name>
 	<version>1.0.0</version>
 	<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
-	<description></description>
+	<description>
+		Plugin to offer smart editing of Arma games' mission files.
+	</description>
 
 	<change-notes></change-notes>
 
@@ -16,6 +18,8 @@
 		<lang.syntaxHighlighterFactory key="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFSyntaxHighlighterFactory"/>
 		<colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFColorSettingsPage"/>
 		<completion.contributor language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.SQFCompletionContributor"/>
+		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.SQFDocumentationProvider"/>
+		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.SQFCommenter"/>
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.header.HeaderFileTypeFactory"/>
@@ -23,6 +27,7 @@
 		<lang.syntaxHighlighterFactory key="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderSyntaxHighlighterFactory"/>
 		<colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderColorSettingsPage"/>
 		<completion.contributor language="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.psi.helpers.HeaderCompletionContributor"/>
+		<lang.commenter language="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.HeaderCommenter"/>
 
 		<!-- Other things-->
 		<moduleBuilder builderClass="com.kaylerrenslow.plugin.wizards.ArmaModuleBuilder" />

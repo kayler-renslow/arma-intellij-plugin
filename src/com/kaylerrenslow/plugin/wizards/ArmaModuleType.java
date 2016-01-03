@@ -1,7 +1,7 @@
 package com.kaylerrenslow.plugin.wizards;
 
-import com.intellij.ide.util.projectWizard.ModuleBuilder;
 import com.intellij.openapi.module.ModuleType;
+import com.intellij.openapi.module.ModuleTypeManager;
 import com.kaylerrenslow.plugin.Plugin;
 import com.kaylerrenslow.plugin.PluginIcons;
 import org.jetbrains.annotations.NotNull;
@@ -12,14 +12,16 @@ import javax.swing.*;
  * Created by Kayler on 01/01/2016.
  */
 public class ArmaModuleType extends ModuleType<ArmaModuleBuilder>{
-	public static final ModuleType INSTANCE = new ArmaModuleType();
-
 	public static final String ID = "arma.moduleType";
 	private static final String NAME = Plugin.resources.getString("plugin.module.arma.name");
 	private static final String DESCRIPTION = Plugin.resources.getString("plugin.module.arma.description");
 
 	public ArmaModuleType() {
 		super(ID);
+	}
+
+	public static ArmaModuleType getInstance(){
+		return (ArmaModuleType) ModuleTypeManager.getInstance().findByID(ID);
 	}
 
 

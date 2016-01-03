@@ -11,13 +11,14 @@ import com.kaylerrenslow.plugin.lang.sqf.psi.SQFTypes;
  */
 public class SQFCompletionContributor extends CompletionContributor{
 	public SQFCompletionContributor() {
+		SQFCompletionProvider prov = new SQFCompletionProvider();
 		extend(CompletionType.BASIC,
 				PlatformPatterns.psiElement(SQFTypes.IDENTIFIER).withLanguage(SQFLanguage.INSTANCE),
-				new IdentifierCompletionProv()
+				prov
 		);
 		extend(CompletionType.BASIC,
 				PlatformPatterns.psiElement(SQFTypes.LOCAL_VAR).withLanguage(SQFLanguage.INSTANCE),
-				new LocalVarCompletionProv()
+				prov
 		);
 	}
 
