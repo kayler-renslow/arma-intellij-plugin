@@ -25,7 +25,6 @@ class CompletionProv extends CompletionProvider<CompletionParameters>{
 
 	@Override
 	protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-		System.out.println(parameters.getPosition().getText());
 		result.addElement(LookupElementBuilder.create("duuuuuuude"));
 	}
 

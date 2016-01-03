@@ -15,6 +15,7 @@
 		<lang.parserDefinition language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFParserDefinition"/>
 		<lang.syntaxHighlighterFactory key="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFSyntaxHighlighterFactory"/>
 		<colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFColorSettingsPage"/>
+		<completion.contributor language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.SQFCompletionContributor"/>
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.header.HeaderFileTypeFactory"/>

@@ -39,83 +39,94 @@ statement ::= ( assignment
 
 assignment ::= variable EQ ( (exp | codeBlock | assignment) | (switchStatement | ifStatement ) )
 
-returnStatement ::= (commandExpOrValue | conditionalExp) SEMICOLON? (whitespace_comment_ | BAD_CHARACTER)*
+returnStatement ::= (commandExpOrValueExp | conditionalExp) SEMICOLON? (whitespace_comment_ | BAD_CHARACTER)*
 
 codeBlock ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement)? RBRACE
 
 
 exp ::= LPAREN exp RPAREN
-               | configExp //must come first since CONFIG is of type value
-               | mathExp //math must come before value because math contains values before operator
-               | conditionalExp
-               | commandExp //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
-               | valueExp
+	  | configExp //must come first since CONFIG is of type value
+	  | mathExp //math must come before value because math contains values before operator
+	  | conditionalExp
+	  | commandExp //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
+	  | valueExp
 
 
 /*conditionalExp*/
     condition ::= LPAREN condition RPAREN
-                         | mathExp //math must come before value because math contains values before operator
-                         | commandExp //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
-                         | valueExp
+				| mathExp //math must come before value because math contains values before operator
+				| commandExpCondition_
+				| valueExp
 
-    conditionStandalone ::= commandExp | variable | TRUE | FALSE
-    conditionalOp ::=  AMPAMP | AND | BARBAR | OR | EQEQ | NE | LT | GT | LE | GE
-    conditionalExpPart ::= ( condition conditionalOp condition)
-                                  | EXCL condition //must come after condition operator condition because ! would be preferred over != if it wasn't
-                                  | NOT condition
-                                  | ASSERT LPAREN conditionalExpPart RPAREN
-                                  | LPAREN conditionalExpPart RPAREN
-                                  | conditionStandalone
+	/*
+		can't use the regular commandExp because it will parse a conditionalExp and !isNull player && player == player will break.
+		!isNull -> conditionalExp
+		conditionalExp player && player - > conditionalExp conditionalExp (BREAKS HERE)
+
+		The first rule is required since the normal commandExp has exp and exp can allow parens
+		See -> exp ::= LPAREN exp RPAREN
+	*/
+	private commandExpCondition_ ::= (valueExp)? COMMAND LPAREN (configExp | mathExp | commandExpCondition_ | valueExp)? RPAREN
+								   | (valueExp)? COMMAND (configExp | mathExp | commandExpCondition_ | valueExp)?
+
+    private conditionStandalone_ ::= commandExpCondition_ | variable | TRUE | FALSE
+    private conditionalOp_ ::=  AMPAMP | AND | BARBAR | OR | EQEQ | NE | LT | GT | LE | GE
+    conditionalExpPart ::= ( condition conditionalOp_ condition)
+						 | EXCL condition //must come after condition operator condition because ! would be preferred over != if it wasn't
+						 | NOT condition
+						 | ASSERT LPAREN conditionalExpPart RPAREN
+						 | LPAREN conditionalExpPart RPAREN
+						 | conditionStandalone_
 
 
     conditionalExp ::= conditionalExpPart ((AND | AMPAMP | OR | BARBAR) conditionalExp)*
 
 /*commandExp*/
     commandExp ::= LPAREN commandExp RPAREN //for where exp is not used and just commandExp
-                          | (valueExp)? COMMAND codeBlock //must go first after LPAREN commandExp RPAREN. for some reason, if it is before (valueExp)? COMMAND (exp)?, [] spawn {...} breaks
-                          | (valueExp)? COMMAND (exp)?
+				 | (valueExp)? COMMAND codeBlock //must go first after LPAREN commandExp RPAREN. for some reason, if it is before (valueExp)? COMMAND (exp)?, [] spawn {...} breaks
+				 | (valueExp)? COMMAND (exp)?
 
 /*configExp*/
     configHolder ::= CONFIG | variable | STRING_LITERAL | commandExp
     configExp ::= configHolder GTGT configHolder (GTGT configHolder)*
-                         | configHolder FSLASH configHolder (FSLASH configHolder)*
+				| configHolder FSLASH configHolder (FSLASH configHolder)*
 
 /*mathExp*/
     mathOp ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
-    mathExp ::= commandExpOrValue mathOp mathRhs
+    mathExp ::= commandExpOrValueExp mathOp mathRhs
 
     mathRhs ::= LPAREN mathRhs RPAREN
-					   | (commandExpOrValue mathOp mathRhs)+
-                       | commandExpOrValue
+			  | (commandExpOrValueExp mathOp mathRhs)+
+			  | commandExpOrValueExp
 
 /*valueExp*/
-    valueExp ::= variable | literal_ | arrayVal | CONFIG | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
-    commandExpOrValue ::= commandExp | valueExp ; /*commandExp must go first since some commands match value for their pre-params ("arr select 1" -> arr is pre-param)*/
+    valueExp ::= LPAREN valueExp RPAREN | variable | literal_ | arrayVal | CONFIG | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
+    commandExpOrValueExp ::= commandExp | valueExp ; /*commandExp must go first since some commands match value for their pre-params ("arr select 1" -> arr is pre-param)*/
 
     arrayVal ::= PLUS? LBRACKET RBRACKET
-                        | PLUS? LBRACKET (exp | codeBlock) (COMMA (exp | codeBlock))* RBRACKET
+			   | PLUS? LBRACKET (exp | codeBlock) (COMMA (exp | codeBlock))* RBRACKET
 
 
 /*control structures and other things*/
     privateDeclaration ::= PRIVATE (STRING_LITERAL | LBRACKET (STRING_LITERAL (COMMA STRING_LITERAL)*) RBRACKET)
 
     scopeManager ::= GOTO COLON STRING_LITERAL
-                            | BREAK_TO STRING_LITERAL
-                            | exp? BREAK_OUT STRING_LITERAL
-                            | CONTINUE
-                            | BREAK
-                            | SCOPE_NAME STRING_LITERAL
+				   | BREAK_TO STRING_LITERAL
+				   | exp? BREAK_OUT STRING_LITERAL
+				   | CONTINUE
+				   | BREAK
+				   | SCOPE_NAME STRING_LITERAL
 
     controlStructure ::= ifStatement | switchStatement | loop | waitUntilStatement | withStatement | questStatement
     ifStatement ::= IF LPAREN conditionalExp RPAREN (
-                              THEN codeBlock (ELSE codeBlock)?
-                              | EXIT_WITH codeBlock
-                              | THROW valueExp
-                           )
+				    THEN codeBlock (ELSE codeBlock)?
+				  | EXIT_WITH codeBlock
+				  | THROW valueExp
+			   )
 
-    switchStatement ::= SWITCH (LPAREN commandExpOrValue RPAREN | commandExpOrValue) DO LBRACE (switchCase)* RBRACE
+    switchStatement ::= SWITCH (LPAREN commandExpOrValueExp RPAREN | commandExpOrValueExp) DO LBRACE (switchCase)* RBRACE
     switchCase ::= (CASE valueExp COLON codeBlock SEMICOLON)
-                          | (DEFAULT codeBlock SEMICOLON)
+				 | (DEFAULT codeBlock SEMICOLON)
 
     loop ::= whileLoop | forLoop
     whileLoop   ::= WHILE LBRACE conditionalExp RBRACE DO codeBlock
