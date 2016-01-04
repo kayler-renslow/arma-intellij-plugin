@@ -17,8 +17,9 @@
 // @formatter:off
 headerFile ::= item_*
 
-//TODO when $ is typed, look into stringtable.xml
+//TODO when $ is typed, look into stringtable.xml (try using annotator)
 //TODO add in \ lexer rule that is a waiting value just like in the properties custom language demo. This will work for any assignment
+//TODO maybe use annotator for SQF config retrieval (config >> "var"). check if the PsiFile is over HeaderFile so you can't annotate in any other language
 private item_ ::= COMMENT | statement | preprocessor | WHITE_SPACE | BAD_CHARACTER
 
 statement ::= (assignment | classDeclaration) SEMICOLON
@@ -35,10 +36,17 @@ basicAssignment ::= assignmentIdentifier EQ (math | value )
 arrayAssignment ::= IDENTIFIER BRACKET_PAIR EQ array
 
 
-math ::= LPAREN math RPAREN
-                | mathOperand (PLUS | MINUS | FSLASH) (math | mathOperand)
+private mathOperator_ ::= (PLUS | MINUS | FSLASH | ASTERISK)
 
-mathOperand ::= LPAREN mathOperand RPAREN | (number | IDENTIFIER)
+math ::= MINUS? LPAREN math RPAREN
+	   | mathOperand (mathRhs_)+
+
+private mathRhs_ ::= mathOperator_ mathRhsGroup_
+				   | mathOperator_ mathOperand mathRhs_?
+
+private mathRhsGroup_ ::= MINUS? LPAREN mathOperand (mathRhs_ | (mathOperator_ mathOperand))+ RPAREN
+
+mathOperand ::= (LPAREN mathOperand RPAREN) | (number | IDENTIFIER)
 classDeclaration ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (LBRACE (item_)* RBRACE)?
 
 //Preprocessor things

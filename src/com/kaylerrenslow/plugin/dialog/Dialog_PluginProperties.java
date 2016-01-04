@@ -74,7 +74,6 @@ public class Dialog_PluginProperties extends DialogWrapper implements DialogActi
 				cb.addItem(ppk.possibleVals[i]);
 			}
 
-			System.out.println(getClass() + " " + Plugin.pluginProps.getPluginProperty(ppk));
 			cb.setSelectedItem(Plugin.pluginProps.getPluginProperty(ppk));
 			cb.addActionListener(new ActionListenerWrapper<ComboBox, Plugin.UserPropertiesKey>(this, cb, ppk));
 

@@ -89,6 +89,7 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 <YYINITIAL> "+"   { return HeaderTypes.PLUS; }
 <YYINITIAL> "-"   { return HeaderTypes.MINUS; }
 <YYINITIAL> "/"   { return HeaderTypes.FSLASH; }
+<YYINITIAL> "*"   { return HeaderTypes.ASTERISK; }
 
 <YYINITIAL> "{"   { return HeaderTypes.LBRACE; }
 <YYINITIAL> "}"   { return HeaderTypes.RBRACE; }

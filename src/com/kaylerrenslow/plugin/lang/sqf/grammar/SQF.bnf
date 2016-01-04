@@ -92,12 +92,17 @@ exp ::= LPAREN exp RPAREN
 				| configHolder FSLASH configHolder (FSLASH configHolder)*
 
 /*mathExp*/
-    mathOp ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
-    mathExp ::= commandExpOrValueExp mathOp mathRhs
+	mathExp ::= MINUS? LPAREN mathExp RPAREN
+		   | mathOperand_ (mathRhs_)+
 
-    mathRhs ::= LPAREN mathRhs RPAREN
-			  | (commandExpOrValueExp mathOp mathRhs)+
-			  | commandExpOrValueExp
+    private mathOperator_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
+	private mathOperand_ ::= commandExpOrValueExp
+
+	private mathRhs_ ::= mathOperator_ mathRhsGroup_
+					   | mathOperator_ mathOperand_ mathRhs_?
+
+	private mathRhsGroup_ ::= MINUS? LPAREN mathOperand_ (mathRhs_ | (mathOperator_ mathOperand_))+ RPAREN
+
 
 /*valueExp*/
     valueExp ::= LPAREN valueExp RPAREN | variable | literal_ | arrayVal | CONFIG | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
