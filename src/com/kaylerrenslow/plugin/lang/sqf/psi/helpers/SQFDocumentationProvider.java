@@ -28,7 +28,7 @@ public class SQFDocumentationProvider implements DocumentationProvider{
 	public List<String> getUrlFor(PsiElement element, PsiElement originalElement) {
 		System.out.println(getClass() + " getURLFor");
 		List<String> lst = Collections.emptyList();
-		System.out.println(element.getNode().getElementType());
+		System.out.println(originalElement.getNode().getElementType());
 		if(element.getNode().getElementType() == SQFTypes.COMMAND){
 			lst.add(COMMAND_URL_PREFIX + element.getText());
 			return lst;

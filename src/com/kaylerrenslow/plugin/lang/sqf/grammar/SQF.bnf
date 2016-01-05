@@ -13,7 +13,7 @@
   tokenTypeClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFTokenType"
 }
 // @formatter:off
-sqfFile ::= item_* (returnStatement)?
+sqfFile ::= item_* (returnStatement_)?
 
 private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
 
@@ -39,24 +39,24 @@ statement ::= ( assignment
 
 assignment ::= variable EQ ( (exp | codeBlock | assignment) | (switchStatement | ifStatement ) )
 
-returnStatement ::= (commandExpOrValueExp | conditionalExp) SEMICOLON? (whitespace_comment_ | BAD_CHARACTER)*
+private returnStatement_ ::= exp SEMICOLON? (whitespace_comment_ | BAD_CHARACTER)*
 
-codeBlock ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement)? RBRACE
+codeBlock ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement_)? RBRACE
 
 
-exp ::= LPAREN exp RPAREN
-	  | configExp //must come first since CONFIG is of type value
+exp ::= configExp //must come first since CONFIG is of type value
 	  | mathExp //math must come before value because math contains values before operator
 	  | conditionalExp
 	  | commandExp //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
 	  | valueExp
+	  /*do NOT add LPAREN exp RPAREN*/
 
 
 /*conditionalExp*/
-    condition ::= LPAREN condition RPAREN
-				| mathExp //math must come before value because math contains values before operator
-				| commandExpCondition_
-				| valueExp
+    private conditionVal ::= LPAREN conditionVal RPAREN
+						   | mathExp //math must come before value because math contains values before operator
+						   | commandExpCondition_
+						   | valueExp
 
 	/*
 		can't use the regular commandExp because it will parse a conditionalExp and !isNull player && player == player will break.
@@ -66,47 +66,70 @@ exp ::= LPAREN exp RPAREN
 		The first rule is required since the normal commandExp has exp and exp can allow parens
 		See -> exp ::= LPAREN exp RPAREN
 	*/
-	private commandExpCondition_ ::= (valueExp)? COMMAND LPAREN (configExp | mathExp | commandExpCondition_ | valueExp)? RPAREN
+	private commandExpCondition_ ::= LPAREN commandExpCondition_ RPAREN
+								   | (valueExp)? COMMAND LPAREN (configExp | mathExp | commandExpCondition_ | valueExp)? RPAREN
 								   | (valueExp)? COMMAND (configExp | mathExp | commandExpCondition_ | valueExp)?
 
-    private conditionStandalone_ ::= commandExpCondition_ | variable | TRUE | FALSE
+	/*commandExpCondition_ should not be in conditionStandalone_ because a conditionalExp would override commandExp in a majority of cases.
+		In cases where conditionalExps are required (if statement for example, use conditionalExpReq
+
+		variables also can't be in here for similar reasons.
+	*/
+    private conditionStandalone_ ::= TRUE | FALSE
     private conditionalOp_ ::=  AMPAMP | AND | BARBAR | OR | EQEQ | NE | LT | GT | LE | GE
-    conditionalExpPart ::= ( condition conditionalOp_ condition)
-						 | EXCL condition //must come after condition operator condition because ! would be preferred over != if it wasn't
-						 | NOT condition
-						 | ASSERT LPAREN conditionalExpPart RPAREN
-						 | LPAREN conditionalExpPart RPAREN
+    conditionalPart ::= ( conditionVal conditionalOp_ conditionVal)
+						 | EXCL conditionVal //must come after condition operator condition because ! would be preferred over != if it wasn't
+						 | NOT conditionVal
+						 | ASSERT LPAREN conditionalPart RPAREN
+						 | LPAREN conditionalPart RPAREN
 						 | conditionStandalone_
 
 
-    conditionalExp ::= conditionalExpPart ((AND | AMPAMP | OR | BARBAR) conditionalExp)*
+    conditionalExp ::= LPAREN conditionalExp RPAREN
+    				 | conditionalPart ((AND | AMPAMP | OR | BARBAR) conditionalExp)*
+
+    conditionalExpReq ::= LPAREN conditionalExpReq RPAREN
+						| (conditionalExp | commandExpCondition_ | variable)
 
 /*commandExp*/
     commandExp ::= LPAREN commandExp RPAREN //for where exp is not used and just commandExp
-				 | (valueExp)? COMMAND codeBlock //must go first after LPAREN commandExp RPAREN. for some reason, if it is before (valueExp)? COMMAND (exp)?, [] spawn {...} breaks
+				 | (valueExp)? COMMAND codeBlock //must go first after LPAREN commandExp RPAREN. if it is not before (valueExp)? COMMAND (exp)?, [] spawn {...} breaks since exp isn't required
 				 | (valueExp)? COMMAND (exp)?
 
 /*configExp*/
-    configHolder ::= CONFIG | variable | STRING_LITERAL | commandExp
-    configExp ::= configHolder GTGT configHolder (GTGT configHolder)*
-				| configHolder FSLASH configHolder (FSLASH configHolder)*
+    private configHolder_ ::= CONFIG | variable | STRING_LITERAL | commandExp
+    configExp ::= LPAREN configExp RPAREN
+    			| configHolder_ GTGT configHolder_ (GTGT configHolder_)*
+				| configHolder_ FSLASH configHolder_ (FSLASH configHolder_)*
 
 /*mathExp*/
 	mathExp ::= MINUS? LPAREN mathExp RPAREN
-		   | mathOperand_ (mathRhs_)+
+			  | mathOperand_ (mathRhs_)+
 
     private mathOperator_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
-	private mathOperand_ ::= commandExpOrValueExp
+	private mathOperand_  ::= commandExpOrValueExp_
 
 	private mathRhs_ ::= mathOperator_ mathRhsGroup_
 					   | mathOperator_ mathOperand_ mathRhs_?
 
 	private mathRhsGroup_ ::= MINUS? LPAREN mathOperand_ (mathRhs_ | (mathOperator_ mathOperand_))+ RPAREN
 
+/*
+math ::= MINUS? LPAREN math RPAREN
+	   | mathOperand (mathRhs_)+
+
+private mathRhs_ ::= mathOperator_ mathRhsGroup_
+				   | mathOperator_ mathOperand mathRhs_?
+
+private mathRhsGroup_ ::= MINUS? LPAREN mathOperand (mathRhs_ | (mathOperator_ mathOperand))+ RPAREN
+
+mathOperand ::= (LPAREN mathOperand RPAREN) | (number | IDENTIFIER)
+*/
+
 
 /*valueExp*/
-    valueExp ::= LPAREN valueExp RPAREN | variable | literal_ | arrayVal | CONFIG | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
-    commandExpOrValueExp ::= commandExp | valueExp ; /*commandExp must go first since some commands match value for their pre-params ("arr select 1" -> arr is pre-param)*/
+    valueExp ::= LPAREN valueExp RPAREN /*this case is required*/ | variable | literal_ | arrayVal | CONFIG | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
+    private commandExpOrValueExp_ ::= commandExp | valueExp ; /*commandExp must go first since some commands match value for their pre-params ("arr select 1" -> arr is pre-param)*/
 
     arrayVal ::= PLUS? LBRACKET RBRACKET
 			   | PLUS? LBRACKET (exp | codeBlock) (COMMA (exp | codeBlock))* RBRACKET
@@ -122,25 +145,25 @@ exp ::= LPAREN exp RPAREN
 				   | BREAK
 				   | SCOPE_NAME STRING_LITERAL
 
-    controlStructure ::= ifStatement | switchStatement | loop | waitUntilStatement | withStatement | questStatement
-    ifStatement ::= IF LPAREN conditionalExp RPAREN (
+    controlStructure ::= ifStatement | switchStatement | loop_ | waitUntilStatement | withStatement | questStatement
+    ifStatement ::= IF LPAREN conditionalExpReq RPAREN (
 				    THEN codeBlock (ELSE codeBlock)?
 				  | EXIT_WITH codeBlock
 				  | THROW valueExp
 			   )
 
-    switchStatement ::= SWITCH (LPAREN commandExpOrValueExp RPAREN | commandExpOrValueExp) DO LBRACE (switchCase)* RBRACE
+    switchStatement ::= SWITCH (LPAREN commandExpOrValueExp_ RPAREN | commandExpOrValueExp_) DO LBRACE (switchCase)* RBRACE
     switchCase ::= (CASE valueExp COLON codeBlock SEMICOLON)
 				 | (DEFAULT codeBlock SEMICOLON)
 
-    loop ::= whileLoop | forLoop
-    whileLoop   ::= WHILE LBRACE conditionalExp RBRACE DO codeBlock
-    forLoop     ::= forLoopReg | forLoopFrom | forEachLoop
-    forLoopReg  ::= FOR LBRACKET codeBlock COMMA LBRACE exp RBRACE COMMA codeBlock RBRACKET DO codeBlock
+    private loop_ ::= whileLoop | forLoops_
+    whileLoop   ::= WHILE LBRACE conditionalExpReq RBRACE DO codeBlock
+    private forLoops_     ::= forLoop | forLoopFrom | forEachLoop
+    forLoop  ::= FOR LBRACKET codeBlock COMMA LBRACE exp RBRACE COMMA codeBlock RBRACKET DO codeBlock
     forLoopFrom ::= FOR STRING_LITERAL FROM exp TO exp (STEP exp)? DO codeBlock
     forEachLoop ::= codeBlock FOR_EACH exp
 
-    questStatement ::= QUEST conditionalExp COLON exp
+    questStatement ::= QUEST conditionalExpReq COLON exp
 
     tryCatch ::= TRY codeBlock CATCH codeBlock
 
