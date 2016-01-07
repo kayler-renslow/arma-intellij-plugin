@@ -24,7 +24,7 @@ private item_ ::= COMMENT | statement | preprocessor | WHITE_SPACE | BAD_CHARACT
 
 statement ::= (assignment | classDeclaration) SEMICOLON
 
-number ::= (MINUS)? NUMBER_LITERAL
+number ::= NUMBER_LITERAL
 value ::= STRING_LITERAL | number | CONSTANT | IDENTIFIER
 
 array ::= LBRACE RBRACE | LBRACE (mathExp | value)(COMMA (mathExp | value))* RBRACE
@@ -35,23 +35,17 @@ assignment ::= basicAssignment | arrayAssignment
 basicAssignment ::= assignmentIdentifier EQ (mathExp | value )
 arrayAssignment ::= IDENTIFIER BRACKET_PAIR EQ array
 
+mathExp ::= term_ ((PLUS | MINUS) term_)*
 
-mathExp ::= term_
-		  | mathExp PLUS term_
-		  | mathExp MINUS term_
+private term_ ::= factor_ ((ASTERISK | FSLASH) factor_)*
 
-
-private term_ ::= factor_
-		| term_ ASTERISK factor_
-		| term_ FSLASH factor_
-
-private factor_ ::= primary_
-		  | MINUS factor_
-		  | PLUS factor_
+private factor_ ::= PLUS factor_
+		 		  | MINUS factor_
+				  | primary_
 
 private primary_ ::= number
-		   | IDENTIFIER
-		   | LPAREN mathExp RPAREN
+				   | IDENTIFIER
+				   | LPAREN mathExp RPAREN
 
 /*
 math ::= MINUS? LPAREN math RPAREN

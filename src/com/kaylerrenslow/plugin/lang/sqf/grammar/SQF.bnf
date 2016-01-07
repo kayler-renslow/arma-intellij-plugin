@@ -94,7 +94,8 @@ exp ::= configExp //must come first since CONFIG is of type value
 /*commandExp*/
     commandExp ::= LPAREN commandExp RPAREN //for where exp is not used and just commandExp
 				 | (valueExp)? COMMAND codeBlock //must go first after LPAREN commandExp RPAREN. if it is not before (valueExp)? COMMAND (exp)?, [] spawn {...} breaks since exp isn't required
-				 | (valueExp)? COMMAND (exp)?
+				 | (valueExp)? COMMAND (exp)? //even though commands can be invoked with math expressions and configs as an argument, we do not use (exp)? COMMAND (exp)? because math expressions can add commands
+				 							  //1+1 command -> 1+commandExp -> 1 + 1 command
 
 /*configExp*/
     private configHolder_ ::= CONFIG | variable | STRING_LITERAL | commandExp
@@ -103,37 +104,27 @@ exp ::= configExp //must come first since CONFIG is of type value
 				| configHolder_ FSLASH configHolder_ (FSLASH configHolder_)*
 
 /*mathExp*/
-	mathExp ::= MINUS? LPAREN mathExp RPAREN
-			  | mathOperand_ (mathRhs_)+
+	mathExp ::= term_ ((PLUS | MINUS) term_)*
 
-    private mathOperator_ ::= PLUS | MINUS | ASTERISK | CARET | PERC | MOD | FSLASH
-	private mathOperand_  ::= commandExpOrValueExp_
+	private term_ ::= factor_ ((ASTERISK | FSLASH | MOD | PERC | CARET) factor_)*
 
-	private mathRhs_ ::= mathOperator_ mathRhsGroup_
-					   | mathOperator_ mathOperand_ mathRhs_?
+	private factor_ ::= PLUS factor_
+					  | MINUS factor_
+					  | primary_
 
-	private mathRhsGroup_ ::= MINUS? LPAREN mathOperand_ (mathRhs_ | (mathOperator_ mathOperand_))+ RPAREN
-
-/*
-math ::= MINUS? LPAREN math RPAREN
-	   | mathOperand (mathRhs_)+
-
-private mathRhs_ ::= mathOperator_ mathRhsGroup_
-				   | mathOperator_ mathOperand mathRhs_?
-
-private mathRhsGroup_ ::= MINUS? LPAREN mathOperand (mathRhs_ | (mathOperator_ mathOperand))+ RPAREN
-
-mathOperand ::= (LPAREN mathOperand RPAREN) | (number | IDENTIFIER)
-*/
+	private primary_ ::= commandExp
+					   | literal_
+					   | arrayVal
+					   | variable
+					   | LPAREN mathExp RPAREN
 
 
 /*valueExp*/
     valueExp ::= LPAREN valueExp RPAREN /*this case is required*/ | variable | literal_ | arrayVal | CONFIG | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
     private commandExpOrValueExp_ ::= commandExp | valueExp ; /*commandExp must go first since some commands match value for their pre-params ("arr select 1" -> arr is pre-param)*/
 
-    arrayVal ::= PLUS? LBRACKET RBRACKET
-			   | PLUS? LBRACKET (exp | codeBlock) (COMMA (exp | codeBlock))* RBRACKET
-
+    arrayVal ::= LBRACKET RBRACKET
+			   | LBRACKET (exp | codeBlock) (COMMA (exp | codeBlock))* RBRACKET
 
 /*control structures and other things*/
     privateDeclaration ::= PRIVATE (STRING_LITERAL | LBRACKET (STRING_LITERAL (COMMA STRING_LITERAL)*) RBRACKET)
