@@ -45,7 +45,7 @@ codeBlock ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement_)? RBRACE
 
 
 exp ::= configExp //must come first since CONFIG is of type value
-	  | mathExp //math must come before value because math contains values before operator
+	  | mathExp //math must come before value because math contains values before operator. Also, don't put commandExp before this
 	  | conditionalExp
 	  | commandExp //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
 	  | valueExp
