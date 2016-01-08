@@ -18,6 +18,7 @@ import com.intellij.psi.impl.source.tree.JavaDocElementType;
 %eof}
 
 IDENTIFIER = [:jletter:] [:jletterdigit:]*
+//NUM_IDENTIFIER = [:jletterdigit:]+
 
 LINE_TERMINATOR = \r | \n | \r\n
 INPUT_CHARACTER = [^\r\n]
@@ -42,6 +43,9 @@ DEC_LITERAL = ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 
 NUMBER_LITERAL = {INTEGER_LITERAL} | {DEC_LITERAL}
 
+HEX_LITERAL = 0 [xX] 0* {HEX_DIGIT} {1,8}
+HEX_DIGIT   = [0-9a-fA-F]
+
 ESCAPE_SEQUENCE = \\[^\r\n]
 
 STRING_PART = "\"" ~"\""
@@ -54,11 +58,12 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 <YYINITIAL> {IGNORE} { return HeaderTypes.WHITE_SPACE; }
 <YYINITIAL> {WHITE_SPACE}+ { return HeaderTypes.WHITE_SPACE; }
 
-
 <YYINITIAL> {COMMENT} { return HeaderTypes.COMMENT; }
 <YYINITIAL> {END_OF_LINE_COMMENT} { return HeaderTypes.COMMENT; }
 
+//<YYINITIAL> {NUM_IDENTIFIER} { return HeaderTypes.NUM_IDENTIFIER; }
 <YYINITIAL> {NUMBER_LITERAL} { return HeaderTypes.NUMBER_LITERAL; }
+<YYINITIAL> {HEX_LITERAL} { return HeaderTypes.HEX_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return HeaderTypes.STRING_LITERAL; }
 <YYINITIAL> {INCLUDE_VALUE_ANGBR} { return HeaderTypes.INCLUDE_VALUE_ANGBR; }
 

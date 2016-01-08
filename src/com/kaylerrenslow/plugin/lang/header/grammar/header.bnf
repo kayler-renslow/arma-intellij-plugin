@@ -24,16 +24,16 @@ private item_ ::= COMMENT | statement | preprocessor | WHITE_SPACE | BAD_CHARACT
 
 statement ::= (assignment | classDeclaration) SEMICOLON
 
-number ::= NUMBER_LITERAL
+number ::= NUMBER_LITERAL | HEX_LITERAL
 value ::= STRING_LITERAL | number | CONSTANT | IDENTIFIER
 
-array ::= LBRACE RBRACE | LBRACE (mathExp | value)(COMMA (mathExp | value))* RBRACE
+array ::= LBRACE RBRACE | LBRACE (mathExp | value | array)(COMMA (mathExp | value | array))* RBRACE
 
-assignmentIdentifier ::= IDENTIFIER
+assignmentIdentifier ::= IDENTIFIER /*| NUM_IDENTIFIER*/
 
 assignment ::= basicAssignment | arrayAssignment
 basicAssignment ::= assignmentIdentifier EQ (mathExp | value )
-arrayAssignment ::= IDENTIFIER BRACKET_PAIR EQ array
+arrayAssignment ::= assignmentIdentifier BRACKET_PAIR EQ array
 
 mathExp ::= term_ ((PLUS | MINUS) term_)*
 
@@ -47,17 +47,7 @@ private primary_ ::= number
 				   | IDENTIFIER
 				   | LPAREN mathExp RPAREN
 
-/*
-math ::= MINUS? LPAREN math RPAREN
-	   | mathOperand (mathRhs_)+
 
-private mathRhs_ ::= mathOperator_ mathRhsGroup_
-				   | mathOperator_ mathOperand mathRhs_?
-
-private mathRhsGroup_ ::= MINUS? LPAREN mathOperand (mathRhs_ | (mathOperator_ mathOperand))+ RPAREN
-
-*/
-//mathOperand ::= (LPAREN mathOperand RPAREN) | (number | IDENTIFIER)
 classDeclaration ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (LBRACE (item_)* RBRACE)?
 
 //Preprocessor things

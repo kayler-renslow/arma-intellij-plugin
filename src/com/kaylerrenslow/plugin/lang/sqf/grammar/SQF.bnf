@@ -45,19 +45,19 @@ codeBlock ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement_)? RBRACE
 
 
 exp ::= configExp //must come first since CONFIG is of type value
+	  | conditionalExp //comes before mathExp
 	  | mathExp //math must come before value because math contains values before operator. Also, don't put commandExp before this
-	  | conditionalExp
 	  | commandExp //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
 	  | valueExp
 	  /*do NOT add LPAREN exp RPAREN*/
 
 
 /*conditionalExp*/
-    private conditionVal ::= LPAREN conditionVal RPAREN
-						   | mathExp //math must come before value because math contains values before operator
-						   | commandExpCondition_
-						   | valueExp
+	private conditionBools_ ::= commandExpCondition_ | variable | TRUE | FALSE
 
+    private conditionComparable_ ::= mathExp //math must come before value because math contains values before operator
+								   | commandExpCondition_
+								   | valueExp
 	/*
 		can't use the regular commandExp because it will parse a conditionalExp and !isNull player && player == player will break.
 		!isNull -> conditionalExp
@@ -70,26 +70,29 @@ exp ::= configExp //must come first since CONFIG is of type value
 								   | (valueExp)? COMMAND LPAREN (configExp | mathExp | commandExpCondition_ | valueExp)? RPAREN
 								   | (valueExp)? COMMAND (configExp | mathExp | commandExpCondition_ | valueExp)?
 
-	/*commandExpCondition_ should not be in conditionStandalone_ because a conditionalExp would override commandExp in a majority of cases.
-		In cases where conditionalExps are required (if statement for example, use conditionalExpReq
+
+	/*commandExpCondition_ should not be alone in conditionalPart_ because a conditionalExp would override commandExp in a majority of cases.
+		In cases where conditionalExps are required (if statement for example), use conditionalExpReq
 
 		variables also can't be in here for similar reasons.
 	*/
-    private conditionStandalone_ ::= TRUE | FALSE
-    private conditionalOp_ ::=  AMPAMP | AND | BARBAR | OR | EQEQ | NE | LT | GT | LE | GE
-    conditionalPart ::= ( conditionVal conditionalOp_ conditionVal)
-						 | EXCL conditionVal //must come after condition operator condition because ! would be preferred over != if it wasn't
-						 | NOT conditionVal
-						 | ASSERT LPAREN conditionalPart RPAREN
-						 | LPAREN conditionalPart RPAREN
-						 | conditionStandalone_
+    private conditionCheck_ ::= ( conditionComparable_ (EQEQ | NE | LT | GT | LE | GE) conditionComparable_)
+							  | (conditionBools_ (AMPAMP | AND | BARBAR | OR) conditionBools_)
+							  | EXCL (conditionBools_ | conditionalExpGroup_) //must come after condition operator condition because ! would be preferred over != if it wasn't
+							  | NOT (conditionBools_ | conditionalExpGroup_)
+							  | ASSERT LPAREN conditionalExp RPAREN
+							  | LPAREN conditionCheck_ RPAREN
+							  | TRUE
+							  | FALSE
 
+    private conditionStandalone_ ::= commandExpCondition_ | variable
 
-    conditionalExp ::= LPAREN conditionalExp RPAREN
-    				 | conditionalPart ((AND | AMPAMP | OR | BARBAR) conditionalExp)*
+	private conditionalExpGroup_ ::= LPAREN conditionalExp RPAREN
+    conditionalExp ::= conditionalExpGroup_
+    				 | conditionCheck_ ((AND | AMPAMP | OR | BARBAR) (conditionalExp | conditionStandalone_))*
 
     conditionalExpReq ::= LPAREN conditionalExpReq RPAREN
-						| (conditionalExp | commandExpCondition_ | variable)
+						| (conditionalExp | conditionStandalone_)
 
 /*commandExp*/
     commandExp ::= LPAREN commandExp RPAREN //for where exp is not used and just commandExp
