@@ -53,10 +53,10 @@ exp ::= configExp //must come first since CONFIG is of type value
 
 
 /*conditionalExp*/
-	private conditionBools_ ::= commandExpCondition_ | variable | TRUE | FALSE
+	private conditionBools_ ::= commandExp_NoConditionExp | variable | TRUE | FALSE
 
     private conditionComparable_ ::= mathExp //math must come before value because math contains values before operator
-								   | commandExpCondition_
+								   | commandExp_NoConditionExp
 								   | valueExp
 	/*
 		can't use the regular commandExp because it will parse a conditionalExp and !isNull player && player == player will break.
@@ -66,9 +66,9 @@ exp ::= configExp //must come first since CONFIG is of type value
 		The first rule is required since the normal commandExp has exp and exp can allow parens
 		See -> exp ::= LPAREN exp RPAREN
 	*/
-	private commandExpCondition_ ::= LPAREN commandExpCondition_ RPAREN
-								   | (valueExp)? COMMAND LPAREN (configExp | mathExp | commandExpCondition_ | valueExp)? RPAREN
-								   | (valueExp)? COMMAND (configExp | mathExp | commandExpCondition_ | valueExp)?
+	commandExp_NoConditionExp ::= LPAREN commandExp_NoConditionExp RPAREN
+								   | (valueExp)? COMMAND LPAREN (configExp | mathExp | commandExp_NoConditionExp | valueExp)? RPAREN
+								   | (valueExp)? COMMAND (configExp | mathExp | commandExp_NoConditionExp | valueExp)?
 
 
 	/*commandExpCondition_ should not be alone in conditionalPart_ because a conditionalExp would override commandExp in a majority of cases.
@@ -85,20 +85,19 @@ exp ::= configExp //must come first since CONFIG is of type value
 							  | TRUE
 							  | FALSE
 
-    private conditionStandalone_ ::= commandExpCondition_ | variable
+    private conditionStandalone_ ::= commandExp_NoConditionExp | variable
 
 	private conditionalExpGroup_ ::= LPAREN conditionalExp RPAREN
-    conditionalExp ::= conditionalExpGroup_
-    				 | conditionCheck_ ((AND | AMPAMP | OR | BARBAR) (conditionalExp | conditionStandalone_))*
+    conditionalExp ::= conditionCheck_ ((AND | AMPAMP | OR | BARBAR) (conditionalExp | conditionStandalone_))*
+    				 | conditionalExpGroup_
 
-    conditionalExpReq ::= LPAREN conditionalExpReq RPAREN
-						| (conditionalExp | conditionStandalone_)
+    conditionalExpReq ::= (conditionalExp | conditionStandalone_) /*do not add LPAREN conditionalExpReq RPAREN*/
 
 /*commandExp*/
-    commandExp ::= LPAREN commandExp RPAREN //for where exp is not used and just commandExp
-				 | (valueExp)? COMMAND codeBlock //must go first after LPAREN commandExp RPAREN. if it is not before (valueExp)? COMMAND (exp)?, [] spawn {...} breaks since exp isn't required
+    commandExp ::= (valueExp)? COMMAND codeBlock //must go first after LPAREN commandExp RPAREN. if it is not before (valueExp)? COMMAND (exp)?, [] spawn {...} breaks since exp isn't required
 				 | (valueExp)? COMMAND (exp)? //even though commands can be invoked with math expressions and configs as an argument, we do not use (exp)? COMMAND (exp)? because math expressions can add commands
-				 							  //1+1 command -> 1+commandExp -> 1 + 1 command
+                   				              //1+1 command -> 1+commandExp -> 1 + 1 command
+				 | LPAREN commandExp RPAREN //for where exp is not used and just commandExp
 
 /*configExp*/
     private configHolder_ ::= CONFIG | variable | STRING_LITERAL | commandExp
@@ -115,7 +114,7 @@ exp ::= configExp //must come first since CONFIG is of type value
 					  | MINUS factor_
 					  | primary_
 
-	private primary_ ::= commandExp
+	private primary_ ::= commandExp_NoConditionExp
 					   | literal_
 					   | arrayVal
 					   | variable
