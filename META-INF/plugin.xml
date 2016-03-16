@@ -20,6 +20,7 @@
 		<completion.contributor language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.SQFCompletionContributor"/>
 		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.SQFDocumentationProvider"/>
 		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.SQFCommenter"/>
+		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.SQFAnnotator"/>
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.header.HeaderFileTypeFactory"/>
