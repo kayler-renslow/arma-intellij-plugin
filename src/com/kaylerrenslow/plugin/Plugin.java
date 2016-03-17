@@ -18,9 +18,8 @@ public class Plugin{
 
 	public static final PluginUserProperties pluginProps = new PluginUserProperties(APPDATA_FOLDER);
 
-	private static final FileReader reader = new FileReader();
-	public static final String SQF_COLOR_SETTINGS_PAGE_TEXT = reader.getText("/com/kaylerrenslow/plugin/lang/sqf/highlighting/sqfHighlightingDemo.sqf");
-	public static final String HEADER_COLOR_SETTINGS_PAGE_TEXT = reader.getText("/com/kaylerrenslow/plugin/lang/header/highlighting/headerHighlightingDemo.h");
+	public static final String SQF_COLOR_SETTINGS_PAGE_TEXT = FileReader.getInstance().getText("/com/kaylerrenslow/plugin/lang/sqf/highlighting/sqfHighlightingDemo.sqf");
+	public static final String HEADER_COLOR_SETTINGS_PAGE_TEXT = FileReader.getInstance().getText("/com/kaylerrenslow/plugin/lang/header/highlighting/headerHighlightingDemo.h");
 
 
 	private static final String t = "true";

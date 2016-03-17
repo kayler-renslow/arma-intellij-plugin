@@ -7,6 +7,14 @@ import java.io.BufferedInputStream;
  */
 public class FileReader{
 
+	private FileReader(){}
+
+	private static final FileReader INSTANCE = new FileReader();
+
+	public static FileReader getInstance(){
+		return INSTANCE;
+	}
+
 	public String getText(String path) {
 		BufferedInputStream bis = new BufferedInputStream(getClass().getResourceAsStream(path));
 		int size = 0;

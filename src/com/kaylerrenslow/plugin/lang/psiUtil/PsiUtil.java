@@ -2,6 +2,7 @@ package com.kaylerrenslow.plugin.lang.psiUtil;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 
 import java.util.LinkedList;
@@ -10,6 +11,11 @@ import java.util.LinkedList;
  * Created by Kayler on 01/02/2016.
  */
 public class PsiUtil{
+
+	public static boolean isOfElementType(PsiElement pe, IElementType et){
+		return pe.getNode().getElementType().equals(IElementType.find(et.getIndex()));
+	}
+
 	public static LinkedList<PsiElement> findElements(PsiFile file, IElementType toFind, PsiElement cursor){
 		LinkedList<PsiElement> list = new LinkedList<>();
 		PsiElementFinder finder = new PsiElementFinder(list, toFind, cursor);

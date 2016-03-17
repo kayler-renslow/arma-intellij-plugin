@@ -18,7 +18,7 @@ public class SQFAnnotator implements Annotator{
 			@Override
 			public void visitIfStatement(@NotNull SQFIfStatement o) {
 				super.visitIfStatement(o);
-				System.out.println("IFFF");
+//				System.out.println("IFFF");
 			}
 		});
 	}

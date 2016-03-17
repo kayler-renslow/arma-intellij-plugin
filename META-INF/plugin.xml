@@ -18,7 +18,7 @@
 		<lang.syntaxHighlighterFactory key="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFSyntaxHighlighterFactory"/>
 		<colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFColorSettingsPage"/>
 		<completion.contributor language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.SQFCompletionContributor"/>
-		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.SQFDocumentationProvider"/>
+		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.doc.SQFDocumentationProvider"/>
 		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.SQFCommenter"/>
 		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.SQFAnnotator"/>
 

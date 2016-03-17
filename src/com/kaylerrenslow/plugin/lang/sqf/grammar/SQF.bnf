@@ -66,12 +66,17 @@ mult_expression ::= value ASTERISK mult_expression
 				  | value CARET mult_expression
 				  | value
 
-value ::= command_call
-		| terminal_
-		| LPAREN expression RPAREN
+value ::= (PLUS | MINUS)? (
+			command_call
+			| terminal_
+			| LPAREN expression RPAREN
+		  )
 
 private terminal_ ::= STRING_LITERAL
-					| terminal_sign_
+					| identifier_
+					| INTEGER_LITERAL
+					| array_val
+					| DEC_LITERAL
 					| TRUE
 					| FALSE
 					| CONFIG
@@ -79,8 +84,6 @@ private terminal_ ::= STRING_LITERAL
 					| NIL
 					| NAMESPACE
 					| LPAREN terminal_ RPAREN //necessary for command_call for prefix argument
-
-private terminal_sign_ ::= (PLUS | MINUS)? (identifier_ | DEC_LITERAL | INTEGER_LITERAL | array_val)
 
 array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
@@ -106,16 +109,16 @@ code_block ::= LBRACE sqfContent_ RBRACE
 				   | THROW value
 			      )
 
-    switch_statement ::= SWITCH (LPAREN bool_expression RPAREN | value) DO LBRACE (switch_case)* RBRACE
-    switch_case ::= (CASE terminal_ COLON code_block SEMICOLON)
+    switch_statement ::= SWITCH (LPAREN bool_expression RPAREN | bool_expression) DO LBRACE (switch_case)* RBRACE
+    switch_case ::= (CASE value COLON code_block SEMICOLON)
 				  | (DEFAULT code_block SEMICOLON)
 
     private loop_ ::= loop_while | for_loops_
     loop_while    ::= WHILE LBRACE bool_expression RBRACE DO code_block
     private for_loops_ ::= loop_for | loop_for_from | loop_for_each
-    loop_for  ::= FOR LBRACKET code_block COMMA LBRACE terminal_ RBRACE COMMA code_block RBRACKET DO code_block
-    loop_for_from ::= FOR STRING_LITERAL FROM terminal_ TO terminal_ (STEP terminal_)? DO code_block
-    loop_for_each ::= code_block FOR_EACH terminal_
+    loop_for  ::= FOR LBRACKET code_block COMMA LBRACE expression RBRACE COMMA code_block RBRACKET DO code_block
+    loop_for_from ::= FOR STRING_LITERAL FROM expression TO expression (STEP expression)? DO code_block
+    loop_for_each ::= code_block FOR_EACH expression
 
     quest_statement ::= QUEST bool_expression COLON exp
 

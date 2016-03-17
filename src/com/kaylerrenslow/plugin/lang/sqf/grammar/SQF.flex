@@ -133,6 +133,9 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "activateAddons" { return SQFTypes.COMMAND; }
 <YYINITIAL> "activatedAddons" { return SQFTypes.COMMAND; }
 <YYINITIAL> "activateKey" { return SQFTypes.COMMAND; }
+<YYINITIAL> "add3DENConnection" { return SQFTypes.COMMAND; }
+<YYINITIAL> "add3DENEventHandler" { return SQFTypes.COMMAND; }
+<YYINITIAL> "add3DENLayer" { return SQFTypes.COMMAND; }
 <YYINITIAL> "addAction" { return SQFTypes.COMMAND; }
 <YYINITIAL> "addBackpack" { return SQFTypes.COMMAND; }
 <YYINITIAL> "addBackpackCargo" { return SQFTypes.COMMAND; }
@@ -201,8 +204,10 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "airportSide" { return SQFTypes.COMMAND; }
 <YYINITIAL> "AISFinishHeal" { return SQFTypes.COMMAND; }
 <YYINITIAL> "alive" { return SQFTypes.COMMAND; }
+<YYINITIAL> "all3DENEntities" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allControls" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allCurators" { return SQFTypes.COMMAND; }
+<YYINITIAL> "allCutLayers" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allDead" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allDeadMen" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allDisplays" { return SQFTypes.COMMAND; }
@@ -210,6 +215,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "allMapMarkers" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allMines" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allMissionObjects" { return SQFTypes.COMMAND; }
+<YYINITIAL> "allow3DMode" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allowCrewInImmobile" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allowCuratorLogicIgnoreAreas" { return SQFTypes.COMMAND; }
 <YYINITIAL> "allowDamage" { return SQFTypes.COMMAND; }
@@ -230,6 +236,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "animationPhase" { return SQFTypes.COMMAND; }
 <YYINITIAL> "animationState" { return SQFTypes.COMMAND; }
 <YYINITIAL> "append" { return SQFTypes.COMMAND; }
+<YYINITIAL> "apply" { return SQFTypes.COMMAND; }
 <YYINITIAL> "armoryPoints" { return SQFTypes.COMMAND; }
 <YYINITIAL> "arrayIntersect" { return SQFTypes.COMMAND; }
 <YYINITIAL> "asin" { return SQFTypes.COMMAND; }
@@ -255,6 +262,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "assignTeam" { return SQFTypes.COMMAND; }
 <YYINITIAL> "assignToAirport" { return SQFTypes.COMMAND; }
 <YYINITIAL> "atan" { return SQFTypes.COMMAND; }
+<YYINITIAL> "atan2" { return SQFTypes.COMMAND; }
 <YYINITIAL> "atg" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ATLToASL" { return SQFTypes.COMMAND; }
 <YYINITIAL> "attachedObject" { return SQFTypes.COMMAND; }
@@ -333,6 +341,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "cbChecked" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cbSetChecked" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ceil" { return SQFTypes.COMMAND; }
+<YYINITIAL> "channelEnabled" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cheatsEnabled" { return SQFTypes.COMMAND; }
 <YYINITIAL> "checkAIFeature" { return SQFTypes.COMMAND; }
 <YYINITIAL> "civilian" { return SQFTypes.COMMAND; }
@@ -352,10 +361,12 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "clearWeaponCargo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "clearWeaponCargoGlobal" { return SQFTypes.COMMAND; }
 <YYINITIAL> "clearWeaponPool" { return SQFTypes.COMMAND; }
+<YYINITIAL> "clientOwner" { return SQFTypes.COMMAND; }
 <YYINITIAL> "closeDialog" { return SQFTypes.COMMAND; }
 <YYINITIAL> "closeDisplay" { return SQFTypes.COMMAND; }
 <YYINITIAL> "closeOverlay" { return SQFTypes.COMMAND; }
 <YYINITIAL> "collapseObjectTree" { return SQFTypes.COMMAND; }
+<YYINITIAL> "collect3DENHistory" { return SQFTypes.COMMAND; }
 <YYINITIAL> "combatMode" { return SQFTypes.COMMAND; }
 <YYINITIAL> "commandArtilleryFire" { return SQFTypes.COMMAND; }
 <YYINITIAL> "commandChat" { return SQFTypes.COMMAND; }
@@ -393,6 +404,8 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "countSide" { return SQFTypes.COMMAND; }
 <YYINITIAL> "countType" { return SQFTypes.COMMAND; }
 <YYINITIAL> "countUnknown" { return SQFTypes.COMMAND; }
+<YYINITIAL> "create3DENComposition" { return SQFTypes.COMMAND; }
+<YYINITIAL> "create3DENEntity" { return SQFTypes.COMMAND; }
 <YYINITIAL> "createAgent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "createCenter" { return SQFTypes.COMMAND; }
 <YYINITIAL> "createDialog" { return SQFTypes.COMMAND; }
@@ -464,7 +477,25 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "ctrlSetFade" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlSetFocus" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlSetFont" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH1" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH1B" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH2" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH2B" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH3" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH3B" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH4" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH4B" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH5" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH5B" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH6" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontH6B" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlSetFontHeight" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontHeightH1" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontHeightH2" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontHeightH3" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontHeightH4" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontHeightH5" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlSetFontHeightH6" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlSetFontP" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlSetFontPB" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlSetForegroundColor" { return SQFTypes.COMMAND; }
@@ -499,6 +530,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "curatorRegisteredObjects" { return SQFTypes.COMMAND; }
 <YYINITIAL> "curatorSelected" { return SQFTypes.COMMAND; }
 <YYINITIAL> "curatorWaypointCost" { return SQFTypes.COMMAND; }
+<YYINITIAL> "current3DENOperation" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentChannel" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentCommand" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentMagazine" { return SQFTypes.COMMAND; }
@@ -515,6 +547,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "currentWeaponMode" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentWeaponTurret" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentZeroing" { return SQFTypes.COMMAND; }
+<YYINITIAL> "cursorObject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cursorTarget" { return SQFTypes.COMMAND; }
 <YYINITIAL> "customChat" { return SQFTypes.COMMAND; }
 <YYINITIAL> "customRadio" { return SQFTypes.COMMAND; }
@@ -531,6 +564,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "debugFSM" { return SQFTypes.COMMAND; }
 <YYINITIAL> "debugLog" { return SQFTypes.COMMAND; }
 <YYINITIAL> "deg" { return SQFTypes.COMMAND; }
+<YYINITIAL> "delete3DENEntities" { return SQFTypes.COMMAND; }
 <YYINITIAL> "deleteAt" { return SQFTypes.COMMAND; }
 <YYINITIAL> "deleteCenter" { return SQFTypes.COMMAND; }
 <YYINITIAL> "deleteCollection" { return SQFTypes.COMMAND; }
@@ -582,13 +616,16 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "disableUserInput" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displayAddEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displayCtrl" { return SQFTypes.COMMAND; }
+<YYINITIAL> "displayParent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displayRemoveAllEventHandlers" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displayRemoveEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displaySetEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "dissolveTeam" { return SQFTypes.COMMAND; }
 <YYINITIAL> "distance" { return SQFTypes.COMMAND; }
+<YYINITIAL> "distance2D" { return SQFTypes.COMMAND; }
 <YYINITIAL> "distanceSqr" { return SQFTypes.COMMAND; }
 <YYINITIAL> "distributionRegion" { return SQFTypes.COMMAND; }
+<YYINITIAL> "do3DENAction" { return SQFTypes.COMMAND; }
 <YYINITIAL> "doArtilleryFire" { return SQFTypes.COMMAND; }
 <YYINITIAL> "doFire" { return SQFTypes.COMMAND; }
 <YYINITIAL> "doFollow" { return SQFTypes.COMMAND; }
@@ -602,14 +639,18 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "drawArrow" { return SQFTypes.COMMAND; }
 <YYINITIAL> "drawEllipse" { return SQFTypes.COMMAND; }
 <YYINITIAL> "drawIcon" { return SQFTypes.COMMAND; }
+<YYINITIAL> "drawIcon3D" { return SQFTypes.COMMAND; }
 <YYINITIAL> "drawLine" { return SQFTypes.COMMAND; }
+<YYINITIAL> "drawLine3D" { return SQFTypes.COMMAND; }
 <YYINITIAL> "drawLink" { return SQFTypes.COMMAND; }
 <YYINITIAL> "drawLocation" { return SQFTypes.COMMAND; }
+<YYINITIAL> "drawPolygon" { return SQFTypes.COMMAND; }
 <YYINITIAL> "drawRectangle" { return SQFTypes.COMMAND; }
 <YYINITIAL> "driver" { return SQFTypes.COMMAND; }
 <YYINITIAL> "drop" { return SQFTypes.COMMAND; }
 <YYINITIAL> "east" { return SQFTypes.COMMAND; }
 <YYINITIAL> "echo" { return SQFTypes.COMMAND; }
+<YYINITIAL> "edit3DENMissionAttributes" { return SQFTypes.COMMAND; }
 <YYINITIAL> "editObject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "editorSetEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "effectiveCommander" { return SQFTypes.COMMAND; }
@@ -663,6 +704,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "exit" { return SQFTypes.COMMAND; }
 <YYINITIAL> "exp" { return SQFTypes.COMMAND; }
 <YYINITIAL> "expectedDestination" { return SQFTypes.COMMAND; }
+<YYINITIAL> "exportJIPMessages" { return SQFTypes.COMMAND; }
 <YYINITIAL> "eyeDirection" { return SQFTypes.COMMAND; }
 <YYINITIAL> "eyePos" { return SQFTypes.COMMAND; }
 <YYINITIAL> "face" { return SQFTypes.COMMAND; }
@@ -721,6 +763,19 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "fullCrew" { return SQFTypes.COMMAND; }
 <YYINITIAL> "gearSlotAmmoCount" { return SQFTypes.COMMAND; }
 <YYINITIAL> "gearSlotData" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENActionState" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENAttribute" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENCamera" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENConnections" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENEntity" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENEntityID" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENGrid" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENIconsVisible" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENLayerEntities" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENLinesVisible" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENMissionAttribute" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENMouseOver" { return SQFTypes.COMMAND; }
+<YYINITIAL> "get3DENSelected" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getAllHitPointsDamage" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getAmmoCargo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getAnimAimPrecision" { return SQFTypes.COMMAND; }
@@ -737,6 +792,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "getCargoIndex" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getCenterOfMass" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getClientState" { return SQFTypes.COMMAND; }
+<YYINITIAL> "getClientStateNumber" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getConnectedUAV" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getDammage" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getDescription" { return SQFTypes.COMMAND; }
@@ -768,6 +824,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "getMissionConfig" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getMissionConfigValue" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getModelInfo" { return SQFTypes.COMMAND; }
+<YYINITIAL> "getMousePosition" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getNumber" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getObjectArgument" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getObjectChildren" { return SQFTypes.COMMAND; }
@@ -780,6 +837,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "getOxygenRemaining" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getPersonUsedDLCs" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getPlayerChannel" { return SQFTypes.COMMAND; }
+<YYINITIAL> "getPlayerScores" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getPlayerUID" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getPos" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getPosASL" { return SQFTypes.COMMAND; }
@@ -861,10 +919,13 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "inGameUISetEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "inheritsFrom" { return SQFTypes.COMMAND; }
 <YYINITIAL> "initAmbientLife" { return SQFTypes.COMMAND; }
+<YYINITIAL> "inPolygon" { return SQFTypes.COMMAND; }
 <YYINITIAL> "inputAction" { return SQFTypes.COMMAND; }
 <YYINITIAL> "inRangeOfArtillery" { return SQFTypes.COMMAND; }
 <YYINITIAL> "insertEditorObject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "intersect" { return SQFTypes.COMMAND; }
+<YYINITIAL> "is3DEN" { return SQFTypes.COMMAND; }
+<YYINITIAL> "is3DENMultiplayer" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isAbleToBreathe" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isAgent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isArray" { return SQFTypes.COMMAND; }
@@ -885,6 +946,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "isEqualTypeAny" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isEqualTypeArray" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isEqualTypeParams" { return SQFTypes.COMMAND; }
+<YYINITIAL> "isFilePatchingEnabled" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isFlashlightOn" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isFlatEmpty" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isForcedWalk" { return SQFTypes.COMMAND; }
@@ -910,6 +972,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "isPlayer" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isRealTime" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isServer" { return SQFTypes.COMMAND; }
+<YYINITIAL> "isShowing3DIcons" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isSprintAllowed" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isStaminaEnabled" { return SQFTypes.COMMAND; }
 <YYINITIAL> "isSteamMission" { return SQFTypes.COMMAND; }
@@ -1040,10 +1103,13 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "lockedCargo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lockedDriver" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lockedTurret" { return SQFTypes.COMMAND; }
+<YYINITIAL> "lockIdentity" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lockTurret" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lockWP" { return SQFTypes.COMMAND; }
 <YYINITIAL> "log" { return SQFTypes.COMMAND; }
 <YYINITIAL> "logEntities" { return SQFTypes.COMMAND; }
+<YYINITIAL> "logNetwork" { return SQFTypes.COMMAND; }
+<YYINITIAL> "logNetworkTerminate" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lookAt" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lookAtPos" { return SQFTypes.COMMAND; }
 <YYINITIAL> "magazineCargo" { return SQFTypes.COMMAND; }
@@ -1081,11 +1147,13 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "mineDetectedBy" { return SQFTypes.COMMAND; }
 <YYINITIAL> "missionName" { return SQFTypes.COMMAND; }
 <YYINITIAL> "missionStart" { return SQFTypes.COMMAND; }
+<YYINITIAL> "missionVersion" { return SQFTypes.COMMAND; }
 <YYINITIAL> "modelToWorld" { return SQFTypes.COMMAND; }
 <YYINITIAL> "modelToWorldVisual" { return SQFTypes.COMMAND; }
 <YYINITIAL> "moonIntensity" { return SQFTypes.COMMAND; }
 <YYINITIAL> "morale" { return SQFTypes.COMMAND; }
 <YYINITIAL> "move" { return SQFTypes.COMMAND; }
+<YYINITIAL> "move3DENCamera" { return SQFTypes.COMMAND; }
 <YYINITIAL> "moveInAny" { return SQFTypes.COMMAND; }
 <YYINITIAL> "moveInCargo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "moveInCommander" { return SQFTypes.COMMAND; }
@@ -1108,6 +1176,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "nearestLocationWithDubbing" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nearestObject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nearestObjects" { return SQFTypes.COMMAND; }
+<YYINITIAL> "nearestTerrainObjects" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nearObjects" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nearObjectsReady" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nearRoads" { return SQFTypes.COMMAND; }
@@ -1115,7 +1184,6 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "nearTargets" { return SQFTypes.COMMAND; }
 <YYINITIAL> "needReload" { return SQFTypes.COMMAND; }
 <YYINITIAL> "netId" { return SQFTypes.COMMAND; }
-<YYINITIAL> "netObjNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "newOverlay" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nextMenuItemIndex" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nextWeatherChange" { return SQFTypes.COMMAND; }
@@ -1174,6 +1242,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "playMusic" { return SQFTypes.COMMAND; }
 <YYINITIAL> "playScriptedMission" { return SQFTypes.COMMAND; }
 <YYINITIAL> "playSound" { return SQFTypes.COMMAND; }
+<YYINITIAL> "playSound3D" { return SQFTypes.COMMAND; }
 <YYINITIAL> "position" { return SQFTypes.COMMAND; }
 <YYINITIAL> "positionCameraToWorld" { return SQFTypes.COMMAND; }
 <YYINITIAL> "posScreenToWorld" { return SQFTypes.COMMAND; }
@@ -1209,6 +1278,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "publicVariableClient" { return SQFTypes.COMMAND; }
 <YYINITIAL> "publicVariableServer" { return SQFTypes.COMMAND; }
 <YYINITIAL> "pushBack" { return SQFTypes.COMMAND; }
+<YYINITIAL> "pushBackUnique" { return SQFTypes.COMMAND; }
 <YYINITIAL> "putWeaponPool" { return SQFTypes.COMMAND; }
 <YYINITIAL> "queryItemsPool" { return SQFTypes.COMMAND; }
 <YYINITIAL> "queryMagazinePool" { return SQFTypes.COMMAND; }
@@ -1234,7 +1304,11 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "remoteControl" { return SQFTypes.COMMAND; }
 <YYINITIAL> "remoteExec" { return SQFTypes.COMMAND; }
 <YYINITIAL> "remoteExecCall" { return SQFTypes.COMMAND; }
+<YYINITIAL> "remove3DENConnection" { return SQFTypes.COMMAND; }
+<YYINITIAL> "remove3DENEventHandler" { return SQFTypes.COMMAND; }
+<YYINITIAL> "remove3DENLayer" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeAction" { return SQFTypes.COMMAND; }
+<YYINITIAL> "removeAll3DENEventHandlers" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeAllActions" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeAllAssignedItems" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeAllContainers" { return SQFTypes.COMMAND; }
@@ -1300,6 +1374,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "revealMine" { return SQFTypes.COMMAND; }
 <YYINITIAL> "reverse" { return SQFTypes.COMMAND; }
 <YYINITIAL> "reversedMouseY" { return SQFTypes.COMMAND; }
+<YYINITIAL> "roadAt" { return SQFTypes.COMMAND; }
 <YYINITIAL> "roadsConnectedTo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "roleDescription" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ropeAttachedObjects" { return SQFTypes.COMMAND; }
@@ -1308,6 +1383,8 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "ropeAttachTo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ropeCreate" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ropeCut" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ropeDestroy" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ropeDetach" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ropeEndPosition" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ropeLength" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ropes" { return SQFTypes.COMMAND; }
@@ -1331,6 +1408,8 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "saveVar" { return SQFTypes.COMMAND; }
 <YYINITIAL> "savingEnabled" { return SQFTypes.COMMAND; }
 <YYINITIAL> "say" { return SQFTypes.COMMAND; }
+<YYINITIAL> "say2D" { return SQFTypes.COMMAND; }
+<YYINITIAL> "say3D" { return SQFTypes.COMMAND; }
 <YYINITIAL> "score" { return SQFTypes.COMMAND; }
 <YYINITIAL> "scoreSide" { return SQFTypes.COMMAND; }
 <YYINITIAL> "screenToWorld" { return SQFTypes.COMMAND; }
@@ -1363,6 +1442,14 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "serverName" { return SQFTypes.COMMAND; }
 <YYINITIAL> "serverTime" { return SQFTypes.COMMAND; }
 <YYINITIAL> "set" { return SQFTypes.COMMAND; }
+<YYINITIAL> "set3DENAttribute" { return SQFTypes.COMMAND; }
+<YYINITIAL> "set3DENAttributes" { return SQFTypes.COMMAND; }
+<YYINITIAL> "set3DENGrid" { return SQFTypes.COMMAND; }
+<YYINITIAL> "set3DENIconsVisible" { return SQFTypes.COMMAND; }
+<YYINITIAL> "set3DENLayer" { return SQFTypes.COMMAND; }
+<YYINITIAL> "set3DENLinesVisible" { return SQFTypes.COMMAND; }
+<YYINITIAL> "set3DENMissionAttributes" { return SQFTypes.COMMAND; }
+<YYINITIAL> "set3DENObjectType" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setAccTime" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setAirportSide" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setAmmo" { return SQFTypes.COMMAND; }
@@ -1497,6 +1584,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "setPlayerRespawnTime" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setPos" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setPosASL" { return SQFTypes.COMMAND; }
+<YYINITIAL> "setPosASL2" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setPosASLW" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setPosATL" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setPosition" { return SQFTypes.COMMAND; }
@@ -1587,6 +1675,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "setWindForce" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setWindStr" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setWPPos" { return SQFTypes.COMMAND; }
+<YYINITIAL> "show3DIcons" { return SQFTypes.COMMAND; }
 <YYINITIAL> "showChat" { return SQFTypes.COMMAND; }
 <YYINITIAL> "showCinemaBorder" { return SQFTypes.COMMAND; }
 <YYINITIAL> "showCommandingMenu" { return SQFTypes.COMMAND; }
@@ -1617,7 +1706,9 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "showWatch" { return SQFTypes.COMMAND; }
 <YYINITIAL> "showWaypoint" { return SQFTypes.COMMAND; }
 <YYINITIAL> "side" { return SQFTypes.COMMAND; }
+<YYINITIAL> "sideAmbientLife" { return SQFTypes.COMMAND; }
 <YYINITIAL> "sideChat" { return SQFTypes.COMMAND; }
+<YYINITIAL> "sideEmpty" { return SQFTypes.COMMAND; }
 <YYINITIAL> "sideEnemy" { return SQFTypes.COMMAND; }
 <YYINITIAL> "sideFriendly" { return SQFTypes.COMMAND; }
 <YYINITIAL> "sideLogic" { return SQFTypes.COMMAND; }
@@ -1690,12 +1781,10 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "taskDescription" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskDestination" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskHint" { return SQFTypes.COMMAND; }
-<YYINITIAL> "taskNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskParent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskResult" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskState" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teamMember" { return SQFTypes.COMMAND; }
-<YYINITIAL> "teamMemberNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teamName" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teams" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teamSwitch" { return SQFTypes.COMMAND; }
@@ -1746,6 +1835,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "tvSetData" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSetPicture" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSetPictureColor" { return SQFTypes.COMMAND; }
+<YYINITIAL> "tvSetText" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSetTooltip" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSetValue" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSort" { return SQFTypes.COMMAND; }
@@ -1861,6 +1951,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "worldToModel" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldToModelVisual" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldToScreen" { return SQFTypes.COMMAND; }
+
 
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }
 <YYINITIAL> {IDENTIFIER} { return SQFTypes.IDENTIFIER; }
