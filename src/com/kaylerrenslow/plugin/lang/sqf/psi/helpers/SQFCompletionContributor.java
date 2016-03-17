@@ -16,10 +16,10 @@ public class SQFCompletionContributor extends CompletionContributor{
 				PlatformPatterns.psiElement(SQFTypes.IDENTIFIER).withLanguage(SQFLanguage.INSTANCE),
 				prov
 		);
-		extend(CompletionType.BASIC,
-				PlatformPatterns.psiElement(SQFTypes.LOCAL_VAR).withLanguage(SQFLanguage.INSTANCE),
-				prov
-		);
+//		extend(CompletionType.BASIC,
+//				PlatformPatterns.psiElement(SQFTypes.LOCAL_VAR).withLanguage(SQFLanguage.INSTANCE),
+//				prov
+//		);
 	}
 
 }

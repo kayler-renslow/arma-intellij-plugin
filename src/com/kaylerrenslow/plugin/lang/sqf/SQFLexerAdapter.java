@@ -11,4 +11,5 @@ public class SQFLexerAdapter extends FlexAdapter{
 	public SQFLexerAdapter() {
 		super(new SQFLexer((Reader) null));
 	}
+
 }

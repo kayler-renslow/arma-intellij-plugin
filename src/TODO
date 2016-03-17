@@ -1,0 +1,5 @@
+in annotator, recolor identifiers that start with _ to local var color (actually no?)
+
+SQF problems
+	t=+1;
+	t=-1;

@@ -24,8 +24,8 @@ public class SQFCompletionProvider extends com.intellij.codeInsight.completion.C
 		PsiElement e = null;
 //		ASTNode a = null;
 
-		LinkedList<PsiElement> elements = PsiUtil.findElements(parameters.getOriginalFile(), SQFTypes.VARIABLE, cursor);
-		elements.addAll(PsiUtil.findElements(parameters.getOriginalFile(), SQFTypes.LOCAL_VAR, cursor));
+		LinkedList<PsiElement> elements = PsiUtil.findElements(parameters.getOriginalFile(), SQFTypes.IDENTIFIER, cursor);
+//		elements.addAll(PsiUtil.findElements(parameters.getOriginalFile(), SQFTypes.LOCAL_VAR, cursor));
 		Iterator<PsiElement> iter = elements.iterator();
 
 		while(iter.hasNext()){

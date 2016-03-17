@@ -1862,7 +1862,6 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "worldToModelVisual" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldToScreen" { return SQFTypes.COMMAND; }
 
-
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }
 <YYINITIAL> {IDENTIFIER} { return SQFTypes.IDENTIFIER; }
 

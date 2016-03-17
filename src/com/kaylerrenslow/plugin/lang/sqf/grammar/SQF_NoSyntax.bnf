@@ -19,7 +19,6 @@ sqfFile ::= token_*
 
 private token_ ::= WHITE_SPACE
         /*identifiers*/
-        | LOCAL_VAR
         | IDENTIFIER
 
         /*comments*/

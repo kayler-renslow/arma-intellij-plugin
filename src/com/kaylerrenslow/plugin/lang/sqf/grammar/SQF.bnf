@@ -13,153 +13,114 @@
   tokenTypeClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFTokenType"
 }
 // @formatter:off
-sqfFile ::= item_* (returnStatement_)?
+sqfFile ::= sqfContent_
+
+private sqfContent_ ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)*
 
 private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
-
 private whitespace_comment_ ::= WHITE_SPACE | comment_
-
-variable ::= LOCAL_VAR | IDENTIFIER | LANG_CONSTANT | LPAREN variable RPAREN
-
 private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
-
-private literal_ ::= STRING_LITERAL | (MINUS | PLUS)? INTEGER_LITERAL | (MINUS | PLUS)? DEC_LITERAL
-
-//TODO allow copy of arrays: _test=+[0,1]
-//TODO support #define
-
+private identifier_ ::= IDENTIFIER | LOCAL_VAR | LANG_CONSTANT
 
 statement ::= ( assignment
-			| commandExp
-			| privateDeclaration
-			| controlStructure
-			| scopeManager
-			| tryCatch
-		 ) SEMICOLON
+				| command_call
+				| private_decl
+				| scope_manager
+				| control_struct
+				| try_catch
+			  ) SEMICOLON
 
-assignment ::= variable EQ ( (exp | codeBlock | assignment) | (switchStatement | ifStatement ) )
+return_statement ::= expression SEMICOLON?
 
-private returnStatement_ ::= exp SEMICOLON? (whitespace_comment_ | BAD_CHARACTER)*
+assignment ::= identifier_ EQ (assignment | expression | switch_statement | if_statement | code_block)
 
-codeBlock ::= LBRACE RBRACE | LBRACE (item_)* (returnStatement_)? RBRACE
+expression ::= config_expression | add_expression | bool_expression
 
+config_expression ::= value ((GTGT | FSLASH) expression)+
 
-exp ::= configExp //must come first since CONFIG is of type value
-	  | conditionalExp //comes before mathExp
-	  | mathExp //math must come before value because math contains values before operator. Also, don't put commandExp before this
-	  | commandExp //command must come before value because commands sometimes require values prior to the command itself. For example:: [] spawn {}
-	  | valueExp
-	  /*do NOT add LPAREN exp RPAREN*/
+bool_expression ::= bool_group_expression
+				  | bool_comp_expression
+				  | value
+				  | LPAREN bool_expression RPAREN
 
+bool_comp_expression ::= add_expression EQEQ bool_expression //==
+				  | add_expression NE bool_expression //!=
+				  | add_expression LT add_expression // <
+				  | add_expression GT add_expression // >
+				  | add_expression LE add_expression // <=
+				  | add_expression GE add_expression // >=
+				  | EXCL bool_expression //!
+				  | NOT bool_expression //not
+				  | ASSERT LPAREN bool_expression RPAREN
 
-/*conditionalExp*/
-	private conditionBools_ ::= commandExp_NoConditionExp | variable | TRUE | FALSE
+bool_group_expression ::= bool_comp_expression ((AND | AMPAMP | OR | BARBAR) bool_comp_expression)+
 
-    private conditionComparable_ ::= mathExp //math must come before value because math contains values before operator
-								   | commandExp_NoConditionExp
-								   | valueExp
-	/*
-		can't use the regular commandExp because it will parse a conditionalExp and !isNull player && player == player will break.
-		!isNull -> conditionalExp
-		conditionalExp player && player - > conditionalExp conditionalExp (BREAKS HERE)
+add_expression ::= mult_expression PLUS add_expression
+				 | mult_expression MINUS add_expression
+				 | mult_expression
 
-		The first rule is required since the normal commandExp has exp and exp can allow parens
-		See -> exp ::= LPAREN exp RPAREN
-	*/
-	commandExp_NoConditionExp ::= LPAREN commandExp_NoConditionExp RPAREN
-								   | (valueExp)? COMMAND LPAREN (configExp | mathExp | commandExp_NoConditionExp | valueExp)? RPAREN
-								   | (valueExp)? COMMAND (configExp | mathExp | commandExp_NoConditionExp | valueExp)?
+mult_expression ::= value ASTERISK mult_expression
+				  | value FSLASH mult_expression
+				  | value PERC mult_expression
+				  | value MOD mult_expression
+				  | value CARET mult_expression
+				  | value
 
+value ::= command_call
+		| terminal_
+		| LPAREN expression RPAREN
 
-	/*commandExpCondition_ should not be alone in conditionalPart_ because a conditionalExp would override commandExp in a majority of cases.
-		In cases where conditionalExps are required (if statement for example), use conditionalExpReq
+private terminal_ ::= STRING_LITERAL
+					| terminal_sign_
+					| TRUE
+					| FALSE
+					| CONFIG
+					| TYPE_NULL
+					| NIL
+					| NAMESPACE
+					| LPAREN terminal_ RPAREN //necessary for command_call for prefix argument
 
-		variables also can't be in here for similar reasons.
-	*/
-    private conditionCheck_ ::= ( conditionComparable_ (EQEQ | NE | LT | GT | LE | GE) conditionComparable_)
-							  | (conditionBools_ (AMPAMP | AND | BARBAR | OR) conditionBools_)
-							  | EXCL (conditionBools_ | conditionalExpGroup_) //must come after condition operator condition because ! would be preferred over != if it wasn't
-							  | NOT (conditionBools_ | conditionalExpGroup_)
-							  | ASSERT LPAREN conditionalExp RPAREN
-							  | LPAREN conditionCheck_ RPAREN
-							  | TRUE
-							  | FALSE
+private terminal_sign_ ::= (PLUS | MINUS)? (identifier_ | DEC_LITERAL | INTEGER_LITERAL | array_val)
 
-    private conditionStandalone_ ::= commandExp_NoConditionExp | variable
+array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
-	private conditionalExpGroup_ ::= LPAREN conditionalExp RPAREN
-    conditionalExp ::= conditionCheck_ ((AND | AMPAMP | OR | BARBAR) (conditionalExp | conditionStandalone_))*
-    				 | conditionalExpGroup_
+command_call ::= (terminal_)? COMMAND code_block
+			   | (terminal_)? COMMAND (value)?
 
-    conditionalExpReq ::= (conditionalExp | conditionStandalone_) /*do not add LPAREN conditionalExpReq RPAREN*/
-
-/*commandExp*/
-    commandExp ::= (valueExp)? COMMAND codeBlock //must go first after LPAREN commandExp RPAREN. if it is not before (valueExp)? COMMAND (exp)?, [] spawn {...} breaks since exp isn't required
-				 | (valueExp)? COMMAND (exp)? //even though commands can be invoked with math expressions and configs as an argument, we do not use (exp)? COMMAND (exp)? because math expressions can add commands
-                   				              //1+1 command -> 1+commandExp -> 1 + 1 command
-				 | LPAREN commandExp RPAREN //for where exp is not used and just commandExp
-
-/*configExp*/
-    private configHolder_ ::= CONFIG | variable | STRING_LITERAL | commandExp
-    configExp ::= LPAREN configExp RPAREN
-    			| configHolder_ GTGT configHolder_ (GTGT configHolder_)*
-				| configHolder_ FSLASH configHolder_ (FSLASH configHolder_)*
-
-/*mathExp*/
-	mathExp ::= term_ ((PLUS | MINUS) term_)*
-
-	private term_ ::= factor_ ((ASTERISK | FSLASH | MOD | PERC | CARET) factor_)*
-
-	private factor_ ::= PLUS factor_
-					  | MINUS factor_
-					  | primary_
-
-	private primary_ ::= commandExp_NoConditionExp
-					   | literal_
-					   | arrayVal
-					   | variable
-					   | LPAREN mathExp RPAREN
-
-
-/*valueExp*/
-    valueExp ::= LPAREN valueExp RPAREN /*this case is required*/ | variable | literal_ | arrayVal | CONFIG | TYPE_NULL | NIL | TRUE | FALSE | NAMESPACE
-    private commandExpOrValueExp_ ::= commandExp | valueExp ; /*commandExp must go first since some commands match value for their pre-params ("arr select 1" -> arr is pre-param)*/
-
-    arrayVal ::= LBRACKET RBRACKET
-			   | LBRACKET (exp | codeBlock) (COMMA (exp | codeBlock))* RBRACKET
+code_block ::= LBRACE sqfContent_ RBRACE
 
 /*control structures and other things*/
-    privateDeclaration ::= PRIVATE (STRING_LITERAL | LBRACKET (STRING_LITERAL (COMMA STRING_LITERAL)*) RBRACKET)
+    private_decl ::= PRIVATE (STRING_LITERAL | LBRACKET (STRING_LITERAL (COMMA STRING_LITERAL)*) RBRACKET)
 
-    scopeManager ::= GOTO COLON STRING_LITERAL
-				   | BREAK_TO STRING_LITERAL
-				   | exp? BREAK_OUT STRING_LITERAL
-				   | CONTINUE
-				   | BREAK
-				   | SCOPE_NAME STRING_LITERAL
+    scope_manager ::= GOTO COLON STRING_LITERAL
+				    | BREAK_TO STRING_LITERAL
+				    | expression? BREAK_OUT STRING_LITERAL
+				    | CONTINUE
+				    | BREAK
+				    | SCOPE_NAME STRING_LITERAL
 
-    controlStructure ::= ifStatement | switchStatement | loop_ | waitUntilStatement | withStatement | questStatement
-    ifStatement ::= IF LPAREN conditionalExpReq RPAREN (
-				    THEN codeBlock (ELSE codeBlock)?
-				  | EXIT_WITH codeBlock
-				  | THROW valueExp
-			   )
+    control_struct ::= if_statement | switch_statement | loop_ | wait_until_statement | with_statement | quest_statement
+    if_statement ::= IF LPAREN bool_expression RPAREN (
+				     THEN code_block (ELSE code_block)?
+				   | EXIT_WITH code_block
+				   | THROW value
+			      )
 
-    switchStatement ::= SWITCH (LPAREN commandExpOrValueExp_ RPAREN | commandExpOrValueExp_) DO LBRACE (switchCase)* RBRACE
-    switchCase ::= (CASE valueExp COLON codeBlock SEMICOLON)
-				 | (DEFAULT codeBlock SEMICOLON)
+    switch_statement ::= SWITCH (LPAREN bool_expression RPAREN | value) DO LBRACE (switch_case)* RBRACE
+    switch_case ::= (CASE terminal_ COLON code_block SEMICOLON)
+				  | (DEFAULT code_block SEMICOLON)
 
-    private loop_ ::= whileLoop | forLoops_
-    whileLoop   ::= WHILE LBRACE conditionalExpReq RBRACE DO codeBlock
-    private forLoops_     ::= forLoop | forLoopFrom | forEachLoop
-    forLoop  ::= FOR LBRACKET codeBlock COMMA LBRACE exp RBRACE COMMA codeBlock RBRACKET DO codeBlock
-    forLoopFrom ::= FOR STRING_LITERAL FROM exp TO exp (STEP exp)? DO codeBlock
-    forEachLoop ::= codeBlock FOR_EACH exp
+    private loop_ ::= loop_while | for_loops_
+    loop_while    ::= WHILE LBRACE bool_expression RBRACE DO code_block
+    private for_loops_ ::= loop_for | loop_for_from | loop_for_each
+    loop_for  ::= FOR LBRACKET code_block COMMA LBRACE terminal_ RBRACE COMMA code_block RBRACKET DO code_block
+    loop_for_from ::= FOR STRING_LITERAL FROM terminal_ TO terminal_ (STEP terminal_)? DO code_block
+    loop_for_each ::= code_block FOR_EACH terminal_
 
-    questStatement ::= QUEST conditionalExpReq COLON exp
+    quest_statement ::= QUEST bool_expression COLON exp
 
-    tryCatch ::= TRY codeBlock CATCH codeBlock
+    try_catch ::= TRY code_block CATCH code_block
 
-    waitUntilStatement ::= WAIT_UNTIL codeBlock
+    wait_until_statement ::= WAIT_UNTIL code_block
 
-    withStatement ::= WITH NAMESPACE DO codeBlock
+    with_statement ::= WITH NAMESPACE DO code_block
