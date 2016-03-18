@@ -1,4 +1,4 @@
-src/com/kaylerrenslow/plugin/lang/sqf/SQFLexer.java
-src/com/kaylerrenslow/plugin/lang/sqf/commands-doc
+src/com/kaylerrenslow/a3plugin/lang/sqf/SQFLexer.java
+src/com/kaylerrenslow/a3plugin/lang/sqf/commands-doc
 .gitignore
-src/com/kaylerrenslow/plugin/lang/header/HeaderLexer.java
+src/com/kaylerrenslow/a3plugin/lang/header/HeaderLexer.java

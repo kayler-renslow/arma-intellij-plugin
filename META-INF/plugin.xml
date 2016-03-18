@@ -13,26 +13,29 @@
 	<idea-version since-build="131"/>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- SQF Language -->
-		<fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.sqf.SQFFileTypeFactory"/>
-		<lang.parserDefinition language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.SQFParserDefinition"/>
-		<lang.syntaxHighlighterFactory key="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFSyntaxHighlighterFactory"/>
-		<colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.sqf.highlighting.SQFColorSettingsPage"/>
-		<completion.contributor language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.SQFCompletionContributor"/>
-		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.psi.helpers.doc.SQFDocumentationProvider"/>
-		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.SQFCommenter"/>
-		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.plugin.lang.sqf.SQFAnnotator"/>
+		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.sqf.SQFFileTypeFactory"/>
+		<lang.parserDefinition language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition"/>
+		<lang.syntaxHighlighterFactory key="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighterFactory"/>
+		<colorSettingsPage implementation="com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFColorSettingsPage"/>
+		<completion.contributor language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFCompletionContributor"/>
+		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.doc.SQFDocumentationProvider"/>
+		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.SQFCommenter"/>
+		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.SQFAnnotator"/>
 
 		<!-- Header Language -->
-		<fileTypeFactory implementation="com.kaylerrenslow.plugin.lang.header.HeaderFileTypeFactory"/>
-		<lang.parserDefinition language="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.psi.HeaderParserDefinition"/>
-		<lang.syntaxHighlighterFactory key="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderSyntaxHighlighterFactory"/>
-		<colorSettingsPage implementation="com.kaylerrenslow.plugin.lang.header.highlighting.HeaderColorSettingsPage"/>
-		<completion.contributor language="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.psi.helpers.HeaderCompletionContributor"/>
-		<lang.commenter language="Arma.Header" implementationClass="com.kaylerrenslow.plugin.lang.header.HeaderCommenter"/>
+		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>
+		<lang.parserDefinition language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition"/>
+		<lang.syntaxHighlighterFactory key="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderSyntaxHighlighterFactory"/>
+		<colorSettingsPage implementation="com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderColorSettingsPage"/>
+		<completion.contributor language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.psi.helpers.HeaderCompletionContributor"/>
+		<lang.commenter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.HeaderCommenter"/>
+		<lang.formatter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.codeStyle.formatting.HeaderFormattingBuilder"/>
+		<codeStyleSettingsProvider  implementation="com.kaylerrenslow.a3plugin.lang.header.codeStyle.HeaderCodeStyleSettingsProvider"/>
+		<langCodeStyleSettingsProvider implementation="com.kaylerrenslow.a3plugin.lang.header.codeStyle.HeaderLanguageCodeStyleSettingsProvider"/>
 
 		<!-- Other things-->
-		<moduleBuilder builderClass="com.kaylerrenslow.plugin.wizards.ArmaModuleBuilder" />
-		<moduleType implementationClass="com.kaylerrenslow.plugin.wizards.ArmaModuleType" id="arma.moduleType" />
+		<moduleBuilder builderClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleBuilder" />
+		<moduleType implementationClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleType" id="arma.moduleType" />
 
 	</extensions>
 
@@ -43,8 +46,10 @@
 	<actions>
 		<group id="com.kaylerrenslow.plugin.dialog.actions.mainMenu.group" text="_Arma 3" description="Arma 3 Plugin Menu">
 			<add-to-group group-id="MainMenu" anchor="last" />
-			<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma Plugin Properties" />
-			<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.plugin.dialog.actions.mainMenu.Action_About" text="About" description="About the Plugin" />
+			<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma Plugin Properties" />
+			<action id="a3plugin.action.mm.wiki_scripting" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowScriptingWiki" text="Arma 3 Wiki for Scripting Commands" description="View the Wiki page for Arma 3 scripting commands" />
+			<action id="a3plugin.action.mm.wiki_home" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowWikiHomepage" text="Arma 3 Wiki Homepage" description="View the Wiki home page for Arma 3" />
+			<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_About" text="About" description="About the Plugin" />
 		</group>
 	</actions>
 
