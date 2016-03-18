@@ -1,2 +1,3 @@
->documentation now works for any command
->for PsiUtil class, added method to check if a PsiElement is of an IElementType
+>updated commands.list
+>updated no syntax checking sqf parser
+>updated how documentation is shown for commands

@@ -18,6 +18,5 @@ public class SQFStatic{
 	public static final String FILE_EXTENSION = Plugin.resources.getString("lang.sqf.fileExtension");
 	public static final String FILE_EXTENSION_DEFAULT = Plugin.resources.getString("lang.sqf.fileExtensionDefault");
 
-
-	public static final List<String> LIST_COMMANDS = TextFileListToList.getListFromFile(Util.convertURLToFile(ResourceGetter.instance.getResource("/com/kaylerrenslow/plugin/lang/sqf/commands.list")), new ArrayList<>());
+	public static final List<String> LIST_COMMANDS = TextFileListToList.getListFromFile(Util.convertURLToFile(ResourceGetter.instance.getResource(Plugin.resources.getString("lang.sqf.commandsListFile"))), new ArrayList<>());
 }

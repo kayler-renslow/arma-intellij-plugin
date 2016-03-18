@@ -13,6 +13,12 @@ import java.util.LinkedList;
 public class PsiUtil{
 
 	public static boolean isOfElementType(PsiElement pe, IElementType et){
+		if(pe == null){
+			return false;
+		}
+		if(pe.getNode() == null){
+			return false;
+		}
 		return pe.getNode().getElementType().equals(IElementType.find(et.getIndex()));
 	}
 

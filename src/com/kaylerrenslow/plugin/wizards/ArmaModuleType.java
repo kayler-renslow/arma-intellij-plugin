@@ -45,11 +45,11 @@ public class ArmaModuleType extends ModuleType<ArmaModuleBuilder>{
 
 	@Override
 	public Icon getBigIcon() {
-		return PluginIcons.ICON_FILE;
+		return PluginIcons.ICON_ARMA3_FILE;
 	}
 
 	@Override
 	public Icon getNodeIcon(@Deprecated boolean isOpened) {
-		return PluginIcons.ICON_FILE;
+		return PluginIcons.ICON_ARMA3_FILE;
 	}
 }

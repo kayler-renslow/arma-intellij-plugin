@@ -1,0 +1,6 @@
+SQF problems
+	waitUntil {life_ticket_paid or (isNull (findDisplay 2600))};
+
+	if (((count _this)>1) && (typeName (_this select 1)=="SCALAR")) then {
+		_s=_this select 1;
+	};
