@@ -25,9 +25,7 @@ INPUT_CHARACTER = [^\r\n]
 
 WHITE_SPACE = {LINE_TERMINATOR} | [ \t\f]
 
-COMMENT = {TRADITIONAL_COMMENT} | {END_OF_LINE_COMMENT}
-
-TRADITIONAL_COMMENT = "/*" ~"*/" | "/*" "*"+ "/"
+TRADITIONAL_COMMENT = "/**/" | "/*" ~"*/" | "/*" "*"+ "/"
 END_OF_LINE_COMMENT = "//" {INPUT_CHARACTER}* {LINE_TERMINATOR}?
 
 DIGIT = [0-9]
@@ -45,7 +43,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 
 <YYINITIAL> {WHITE_SPACE}+ { return SQFTypes.WHITE_SPACE; }
 
-<YYINITIAL> {COMMENT} { return SQFTypes.COMMENT; }
+<YYINITIAL> {TRADITIONAL_COMMENT} { return SQFTypes.COMMENT; }
 <YYINITIAL> {END_OF_LINE_COMMENT} { return SQFTypes.COMMENT; }
 
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }

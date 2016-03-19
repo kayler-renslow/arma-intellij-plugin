@@ -1,10 +1,12 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.doc;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.lang.documentation.DocumentationProviderEx;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.psiUtil.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
@@ -33,7 +35,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 	@Nullable
 	@Override
 	public List<String> getUrlFor(PsiElement element, PsiElement originalElement) {
-		List<String> lst = new ArrayList<>();
+		List<String> lst = new ArrayList<>(); ///test
 		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND)){
 			lst.add(getCommandUrl(element.getText()));
 			return lst;
@@ -47,6 +49,19 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND)){
 			return generateCommandDoc(element.getText());
 		}
+		if (PsiUtil.isOfElementType(element, SQFTypes.COMMENT)){
+			return element.getNode().getText().replaceAll("\n", "<br>");
+		}
+		if (element instanceof PsiFile){
+			ASTNode potentialDoc = element.getNode().getFirstChildNode();
+			if (PsiUtil.isOfElementType(potentialDoc, TokenType.WHITE_SPACE)){
+				potentialDoc = potentialDoc.getTreeNext();
+			}
+			if(PsiUtil.isOfElementType(potentialDoc, SQFTypes.COMMENT)){
+				return potentialDoc.getText().replaceAll("\n", "<br>");
+			}
+			return null;
+		}
 		return null;
 	}
 
@@ -56,13 +71,19 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND)){
 			return element;
 		}
+		if (element instanceof PsiFile){
+			return element;
+		}
+
 		return null;
 	}
 
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLink(PsiManager psiManager, String link, PsiElement context) {
-		return context;
+		//		StringBuilder sb = new StringBuilder();
+		//		DocumentationManagerUtil.createHyperlink(sb, "refText", "label", true); this is for creating links between psi elements
+		return null;
 	}
 
 	@Override
@@ -71,22 +92,81 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		if (PsiUtil.isOfElementType(contextElement, SQFTypes.COMMAND)){
 			return contextElement;
 		}
+
+		if (Plugin.pluginProps.getPluginProperty(Plugin.UserPropertiesKey.SQF_SYNTAX_CHECK).equalsIgnoreCase("false")){
+			if (PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)){
+				ArrayList<ASTNode> localVars = PsiUtil.findElements(file, SQFTypes.LOCAL_VAR, null);
+
+				for (ASTNode node : localVars){
+					if (node.getText().equals(contextElement.getNode().getText())){
+						ASTNode n = node;
+						boolean foundAssignmentOperator = false;
+						while(n != null && !PsiUtil.isOfElementType(n, SQFTypes.SEMICOLON)){
+							n = n.getTreeNext();
+							if(PsiUtil.isOfElementType(n, SQFTypes.EQ)){
+								foundAssignmentOperator = true;
+							}
+						}
+						if(n == null || !foundAssignmentOperator){ //can only get inline comments from assignments
+							continue;
+						}
+						PsiElement comment = getInlineComment(editor, n.getTreeNext(), node);
+						if (comment != null){
+							return comment;
+						}
+					}
+
+				}
+			}
+
+			return null;
+		}
+
+		if (PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)){
+			ArrayList<ASTNode> localVars = PsiUtil.findElements(file, SQFTypes.LOCAL_VAR, null);
+
+			ASTNode n;
+			for (ASTNode node : localVars){
+				if (node.getText().equals(contextElement.getNode().getText())){
+					n = node.getTreeParent();
+					if (!PsiUtil.isOfElementType(n, SQFTypes.ASSIGNMENT)){
+						continue;
+					}
+					n = n.getTreeParent();
+					if (!PsiUtil.isOfElementType(n, SQFTypes.STATEMENT)){
+						continue;
+					}
+					PsiElement comment = getInlineComment(editor, n.getTreeNext(), node);
+					if (comment != null){
+						return comment;
+					}
+				}
+
+			}
+		}
 		return null;
 	}
 
-	@Override
 	@Nullable
-	public Image getLocalImageForElement(@NotNull PsiElement element, @NotNull String imageSpec) {
+	private PsiElement getInlineComment(@NotNull Editor editor, ASTNode potentialCommentNode, ASTNode node) {
+		if (PsiUtil.isOfElementType(potentialCommentNode, TokenType.WHITE_SPACE)){
+			potentialCommentNode = potentialCommentNode.getTreeNext();
+		}
+		if (PsiUtil.isOfElementType(potentialCommentNode, SQFTypes.COMMENT)){
+			if (editor.getDocument().getLineNumber(node.getStartOffset()) != editor.getDocument().getLineNumber(potentialCommentNode.getStartOffset())){ //comment not on same line
+				return null;
+			}
+			return potentialCommentNode.getPsi();
+		}
 		return null;
 	}
+
 
 	private String generateCommandDoc(String commandName) {
-		String commandURL = getCommandUrl(commandName);
-		String doc = "";
+		String doc = String.format(COMMAND_DOC_EXTERNAL_LINK_NOTIFICATION, getCommandUrl(commandName));
 		try{
-			doc = String.format(COMMAND_DOC_EXTERNAL_LINK_NOTIFICATION, commandURL) + FileReader.getInstance().getText(SQFStatic.COMMANDS_DOC_FILE_DIR + commandName);
-
-		}catch(Exception e){
+			doc += FileReader.getText(SQFStatic.COMMANDS_DOC_FILE_DIR + commandName);
+		}catch (Exception e){
 			e.printStackTrace();
 		}
 		return doc;

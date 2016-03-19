@@ -1,8 +1,4 @@
->renamed plugin in src dir to a3plugin. that is going to create a big diff log
->updated commands.list
->updated no syntax checking sqf parser
->updated how documentation is shown for commands
->moved some thing out of plugin.properties because they didn't make sense to be in there
->added links to arma wiki in main menu
->removed commands.list. command names are now fetched from file names in the commands-doc directory to reduce redundancy
->beginnings of Header language formatter and code style page
+>typing _ as first char will find all local vars and only local vars. when _ is not first char, it looks for everything but local vars
+>modified PsiUtil.findElements to traverse AST tree instead of Psi tree
+>SQF: can get inline comment for local variable in doc view (for both non syntax mode and syntax mode)
+>SQF: can show PsiFile documentation (the first non whitespace ASTNode child of PsiFile that is a comment)

@@ -30,6 +30,7 @@ public class HeaderBlock extends AbstractBlock{
 
 			Block b = new HeaderBlock(childNode, Wrap.createWrap(WrapType.NONE, false), Alignment.createAlignment(), spacingBuilder);
 			blocks.add(b);
+			childNode = childNode.getTreeNext();
 		}
 
 		return blocks;

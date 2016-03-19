@@ -3,7 +3,9 @@ package com.kaylerrenslow.a3plugin.util;
 import java.io.BufferedInputStream;
 
 /**
- * Created by Kayler on 12/31/2015.
+ * @author Kayler
+ * Reads files.<br>
+ * Created on 12/31/2015.
  */
 public class FileReader{
 
@@ -11,12 +13,13 @@ public class FileReader{
 
 	private static final FileReader INSTANCE = new FileReader();
 
-	public static FileReader getInstance(){
-		return INSTANCE;
-	}
 
-	public String getText(String path) {
-		BufferedInputStream bis = new BufferedInputStream(getClass().getResourceAsStream(path));
+	/**Reads an entire file from the build path and returns it as a String.<br>
+	 * @param path build path to file
+	 * @return String with all content inside
+	 */
+	public static String getText(String path) {
+		BufferedInputStream bis = new BufferedInputStream(INSTANCE.getClass().getResourceAsStream(path));
 		int size = 0;
 		int in;
 		byte[] data;
@@ -27,7 +30,7 @@ public class FileReader{
 			}
 			bis.close();
 			data = new byte[size];
-			bis = new BufferedInputStream(getClass().getResourceAsStream(path));
+			bis = new BufferedInputStream(INSTANCE.getClass().getResourceAsStream(path));
 
 			for(int i = 0; i < data.length; i++){
 				data[i] = (byte)bis.read();
@@ -35,7 +38,7 @@ public class FileReader{
 			s = new String(data);
 
 		}catch (Exception e){
-			s = getClass() + ">> error occurred retrieving file " + path;
+			s = INSTANCE.getClass() + ">> error occurred retrieving file " + path;
 		}
 		return s.replaceAll("\r\n","\n"); //required or Intellij will flip out
 	}

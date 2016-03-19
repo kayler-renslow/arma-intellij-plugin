@@ -1,1 +1,1 @@
->fix formatting issues in code tags for command documentation. typeName has code tag
+>add @see functionality for documentation that will create a link to a psi element (including psi files)

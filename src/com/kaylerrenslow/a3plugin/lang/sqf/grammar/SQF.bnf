@@ -22,6 +22,7 @@ private whitespace_comment_ ::= WHITE_SPACE | comment_
 private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
 private identifier_ ::= IDENTIFIER | LOCAL_VAR | LANG_CONSTANT
 
+
 statement ::= ( assignment
 				| command_call
 				| private_decl
