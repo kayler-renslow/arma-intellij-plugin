@@ -1,4 +1,4 @@
 >add @see functionality for documentation that will create a link to a psi element (including psi files)
 >SQF find usages provider
 >for BIS functions, download the documentation online and store it
->we should be doing all of the PsiNamedElement things in Statements, right?
+>we should be doing all of the PsiNamedElement things in Statements, righ

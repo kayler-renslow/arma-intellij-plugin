@@ -1,3 +1,2 @@
->added paired brace matcher for SQF and Header languages
->added folding builder for SQF and Header languages
->removed no-syntax grammars for header and sqf because they were getting annoying to work on
+>SQF grammar works most of the time now, but suuuper slow when editing. I'm just going to make the expressions not check syntax
+>for SQF and Header, made the error analysis report the lexer token value rather than the lexer token name

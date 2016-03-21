@@ -13,6 +13,13 @@
   tokenTypeClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTokenType"
 
   psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiImplUtil"
+
+  name("command_call")="command"
+  name("return_statement")="return statement"
+  name("try_catch")="try-catch block"
+  name("config_expression")="config expression"
+  name("bool_expression")="bool expression"
+
 }
 // @formatter:off
 sqfFile ::= sqfContent_
@@ -33,30 +40,39 @@ statement ::= ( assignment
 				| try_catch
 			  ) SEMICOLON
 
-return_statement ::= expression SEMICOLON?
+return_statement ::= (config_expression | bool_expression | add_expression) SEMICOLON?
 
 assignment ::= variable EQ (assignment | expression | switch_statement | if_statement | code_block)
 
 expression ::= config_expression | add_expression | bool_expression
 
-config_expression ::= value ((GTGT | FSLASH) expression)+
+//expression2_ ::= expression  {extends="expression"}
+
+config_expression ::= value ((GTGT | FSLASH) config_expression)+
 
 bool_expression ::= bool_group_expression
-				  | bool_comp_expression
-				  | value
-				  | LPAREN bool_expression RPAREN
 
-bool_comp_expression ::= add_expression EQEQ bool_expression //==
-				  | add_expression NE bool_expression //!=
-				  | add_expression LT add_expression // <
-				  | add_expression GT add_expression // >
-				  | add_expression LE add_expression // <=
-				  | add_expression GE add_expression // >=
-				  | EXCL bool_expression //!
-				  | NOT bool_expression //not
-				  | ASSERT LPAREN bool_expression RPAREN
+bool_group_expression ::= bool_comp_expression ((AND | AMPAMP | OR | BARBAR) bool_expression)*
 
-bool_group_expression ::= bool_comp_expression ((AND | AMPAMP | OR | BARBAR) bool_comp_expression)+
+bool_comp_expression ::= (EXCL | NOT) (bool_term)
+					   | ASSERT LPAREN bool_expression RPAREN
+					   | bool_test_expression
+
+bool_test_expression ::= add_expression EQEQ add_expression //==
+					   | add_expression NE add_expression //!=
+					   | add_expression LT add_expression // <
+					   | add_expression GT add_expression // >
+					   | add_expression LE add_expression // <=
+					   | add_expression GE add_expression // >=
+					   | bool_term
+
+bool_term ::= command_call
+			| variable
+			| TRUE
+			| FALSE
+			| LPAREN (bool_expression) RPAREN
+
+//private bool_expression_paren ::=
 
 add_expression ::= mult_expression PLUS add_expression
 				 | mult_expression MINUS add_expression
@@ -73,7 +89,12 @@ value ::= (PLUS | MINUS)? (
 			command_call
 			| terminal_
 			| LPAREN expression RPAREN
-		  )
+		   )
+
+private command_call_pre_argument ::= (PLUS | MINUS)? (
+										terminal_
+										| LPAREN expression RPAREN
+									   )
 
 private terminal_ ::= STRING_LITERAL
 					| variable
@@ -90,8 +111,8 @@ private terminal_ ::= STRING_LITERAL
 
 array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
-command_call ::= (terminal_)? COMMAND code_block
-			   | (terminal_)? COMMAND (value)? //{mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFNamedElementImpl" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFNamedElement" methods=[getCommandName]}
+command_call ::= (command_call_pre_argument)? COMMAND code_block
+			   | (command_call_pre_argument)? COMMAND (value)? //{mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFNamedElementImpl" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFNamedElement" methods=[getCommandName]}
 
 code_block ::= LBRACE sqfContent_ RBRACE
 
@@ -119,7 +140,7 @@ code_block ::= LBRACE sqfContent_ RBRACE
     private loop_ ::= loop_while | for_loops_
     loop_while    ::= WHILE LBRACE bool_expression RBRACE DO code_block
     private for_loops_ ::= loop_for | loop_for_from | loop_for_each
-    loop_for  ::= FOR LBRACKET code_block COMMA LBRACE expression RBRACE COMMA code_block RBRACKET DO code_block
+    loop_for  ::= FOR LBRACKET code_block COMMA LBRACE bool_expression RBRACE COMMA code_block RBRACKET DO code_block
     loop_for_from ::= FOR STRING_LITERAL FROM expression TO expression (STEP expression)? DO code_block
     loop_for_each ::= code_block FOR_EACH expression
 

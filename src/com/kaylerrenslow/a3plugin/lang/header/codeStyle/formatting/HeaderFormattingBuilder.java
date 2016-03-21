@@ -40,7 +40,7 @@ public class HeaderFormattingBuilder implements FormattingModelBuilder{
 	@Nullable
 	@Override
 	public TextRange getRangeAffectingIndent(PsiFile file, int offset, ASTNode elementAtOffset) {
-		System.out.println(elementAtOffset.getElementType());
+		System.out.println("HeaderFormattingBuilder.getRangeAffectingIndent " + elementAtOffset.getElementType());
 		return null;
 	}
 }
