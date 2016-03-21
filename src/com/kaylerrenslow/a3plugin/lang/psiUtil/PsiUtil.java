@@ -25,7 +25,7 @@ public class PsiUtil{
 		if (node == null){
 			return false;
 		}
-		return node.getElementType().equals(IElementType.find(et.getIndex()));
+		return node.getElementType() == et;
 	}
 
 	/**

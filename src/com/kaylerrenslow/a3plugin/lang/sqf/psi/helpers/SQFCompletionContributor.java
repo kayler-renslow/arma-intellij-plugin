@@ -7,13 +7,15 @@ import com.kaylerrenslow.a3plugin.lang.sqf.SQFLanguage;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 
 /**
- * Created by Kayler on 01/02/2016.
+ * @author Kayler
+ * Provides auto completion for SQF related editing
+ * Created on 01/02/2016.
  */
 public class SQFCompletionContributor extends CompletionContributor{
 	public SQFCompletionContributor() {
 		SQFCompletionProvider prov = new SQFCompletionProvider();
 		extend(CompletionType.BASIC,
-				PlatformPatterns.psiElement(SQFTypes.IDENTIFIER).withLanguage(SQFLanguage.INSTANCE),
+				PlatformPatterns.psiElement(SQFTypes.GLOBAL_VAR).withLanguage(SQFLanguage.INSTANCE),
 				prov
 		);
 		extend(CompletionType.BASIC,

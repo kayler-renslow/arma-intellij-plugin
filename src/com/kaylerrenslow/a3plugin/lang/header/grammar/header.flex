@@ -27,9 +27,7 @@ IGNORE = (" \\\n" | " \\\r\n" | " \\\r") [ \t\f]*
 
 WHITE_SPACE = [ \t\f] | {LINE_TERMINATOR}
 
-COMMENT = {TRADITIONAL_COMMENT} | {END_OF_LINE_COMMENT}
-
-TRADITIONAL_COMMENT = "/*" ~"*/" | "/*" "*"+ "/"
+BLOCK_COMMENT = "/*" ~"*/" | "/*" "*"+ "/"
 END_OF_LINE_COMMENT = "//" {INPUT_CHARACTER}* {LINE_TERMINATOR}?
 
 
@@ -58,7 +56,7 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 <YYINITIAL> {IGNORE} { return HeaderTypes.WHITE_SPACE; }
 <YYINITIAL> {WHITE_SPACE}+ { return HeaderTypes.WHITE_SPACE; }
 
-<YYINITIAL> {COMMENT} { return HeaderTypes.COMMENT; }
+<YYINITIAL> {BLOCK_COMMENT} { return HeaderTypes.BLOCK_COMMENT; }
 <YYINITIAL> {END_OF_LINE_COMMENT} { return HeaderTypes.COMMENT; }
 
 //<YYINITIAL> {NUM_IDENTIFIER} { return HeaderTypes.NUM_IDENTIFIER; }

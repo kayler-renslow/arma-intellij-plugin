@@ -8,9 +8,9 @@ class TestClass {
     string = "hallo from the other siiide";
     math = 1 + 1 + (42 - 2);
 
-    class NestedClass {
+    class NestedClass : extendClass{
         array[] = {var, 1, 1e1, ""};
-        math = 1 + 69;
+        math = 1 + 69 * 1;
     };
 };
 

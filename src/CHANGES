@@ -1,4 +1,3 @@
->typing _ as first char will find all local vars and only local vars. when _ is not first char, it looks for everything but local vars
->modified PsiUtil.findElements to traverse AST tree instead of Psi tree
->SQF: can get inline comment for local variable in doc view (for both non syntax mode and syntax mode)
->SQF: can show PsiFile documentation (the first non whitespace ASTNode child of PsiFile that is a comment)
+>added paired brace matcher for SQF and Header languages
+>added folding builder for SQF and Header languages
+>removed no-syntax grammars for header and sqf because they were getting annoying to work on

@@ -20,35 +20,44 @@ headerFile ::= item_*
 //TODO when $ is typed, look into stringtable.xml (try using annotator)
 //TODO add in \ lexer rule that is a waiting value just like in the properties custom language demo. This will work for any assignment
 //TODO maybe use annotator for SQF config retrieval (config >> "var"). check if the PsiFile is over HeaderFile so you can't annotate in any other language
-private item_ ::= COMMENT | statement | preprocessor | WHITE_SPACE | BAD_CHARACTER
+private item_ ::= COMMENT | BLOCK_COMMENT | statement | preprocessor | WHITE_SPACE | BAD_CHARACTER
 
-statement ::= (assignment | classDeclaration) SEMICOLON
+statement ::= (assignment | class_declaration) SEMICOLON
 
 number ::= NUMBER_LITERAL | HEX_LITERAL
 value ::= STRING_LITERAL | number | CONSTANT | IDENTIFIER
 
-array ::= LBRACE RBRACE | LBRACE (mathExp | value | array)(COMMA (mathExp | value | array))* RBRACE
+array ::= LBRACE RBRACE | LBRACE (expression | value | array)(COMMA (expression | value | array))* RBRACE
 
-assignmentIdentifier ::= IDENTIFIER /*| NUM_IDENTIFIER*/
+assignment_identifier ::= IDENTIFIER /*| NUM_IDENTIFIER*/
 
-assignment ::= basicAssignment | arrayAssignment
-basicAssignment ::= assignmentIdentifier EQ (mathExp | value )
-arrayAssignment ::= assignmentIdentifier BRACKET_PAIR EQ array
+assignment ::= basic_assignment | array_assignment
+basic_assignment ::= assignment_identifier EQ (expression | value )
+array_assignment ::= assignment_identifier BRACKET_PAIR EQ array
 
-mathExp ::= term_ ((PLUS | MINUS) term_)*
+expression ::= add_expression
 
-private term_ ::= factor_ ((ASTERISK | FSLASH) factor_)*
+add_expression ::= mult_expression PLUS add_expression
+				 | mult_expression MINUS add_expression
+				 | mult_expression
 
-private factor_ ::= PLUS factor_
-		 		  | MINUS factor_
-				  | primary_
+mult_expression ::= term ASTERISK mult_expression
+				  | term FSLASH mult_expression
+				  | term PERC mult_expression
+				  | term MOD mult_expression
+				  | term CARET mult_expression
+				  | term
 
-private primary_ ::= number
-				   | IDENTIFIER
-				   | LPAREN mathExp RPAREN
+term ::= (PLUS | MINUS)? (
+			number
+            | IDENTIFIER
+			| LPAREN expression RPAREN
+		  )
 
 
-classDeclaration ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (LBRACE (item_)* RBRACE)?
+class_declaration ::= CLASS IDENTIFIER (COLON IDENTIFIER)? class_content?
+
+class_content ::= LBRACE (item_)* RBRACE
 
 //Preprocessor things
 preprocessor ::= pre_include //| pre_define_//TODO

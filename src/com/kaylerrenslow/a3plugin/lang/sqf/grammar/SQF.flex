@@ -18,14 +18,14 @@ import com.intellij.psi.impl.source.tree.JavaDocElementType;
 %eof}
 
 LOCAL_VAR = [_][:jletterdigit:]*
-IDENTIFIER = [:jletter:] [:jletterdigit:]*
+GLOBAL_VAR = [:jletter:] [:jletterdigit:]*
 
 LINE_TERMINATOR = \r|\n|\r\n
 INPUT_CHARACTER = [^\r\n]
 
 WHITE_SPACE = {LINE_TERMINATOR} | [ \t\f]
 
-TRADITIONAL_COMMENT = "/**/" | "/*" ~"*/" | "/*" "*"+ "/"
+BLOCK_COMMENT = "/**/" | "/*" ~"*/" | "/*" "*"+ "/"
 END_OF_LINE_COMMENT = "//" {INPUT_CHARACTER}* {LINE_TERMINATOR}?
 
 DIGIT = [0-9]
@@ -43,7 +43,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 
 <YYINITIAL> {WHITE_SPACE}+ { return SQFTypes.WHITE_SPACE; }
 
-<YYINITIAL> {TRADITIONAL_COMMENT} { return SQFTypes.COMMENT; }
+<YYINITIAL> {BLOCK_COMMENT} { return SQFTypes.BLOCK_COMMENT; }
 <YYINITIAL> {END_OF_LINE_COMMENT} { return SQFTypes.COMMENT; }
 
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }
@@ -91,10 +91,10 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "exitWith" { return SQFTypes.EXIT_WITH; }
 
 
-<YYINITIAL> "this" { return SQFTypes.LANG_CONSTANT; }
-<YYINITIAL> "_this" { return SQFTypes.LANG_CONSTANT; }
-<YYINITIAL> "_x" { return SQFTypes.LANG_CONSTANT; }
-<YYINITIAL> "_exception" { return SQFTypes.LANG_CONSTANT; }
+<YYINITIAL> "this" { return SQFTypes.LANG_VAR; }
+<YYINITIAL> "_this" { return SQFTypes.LANG_VAR; }
+<YYINITIAL> "_x" { return SQFTypes.LANG_VAR; }
+<YYINITIAL> "_exception" { return SQFTypes.LANG_VAR; }
 
 <YYINITIAL> "with" { return SQFTypes.WITH; }
 <YYINITIAL> "parsingNamespace" { return SQFTypes.NAMESPACE; }
@@ -1952,7 +1952,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 
 
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }
-<YYINITIAL> {IDENTIFIER} { return SQFTypes.IDENTIFIER; }
+<YYINITIAL> {GLOBAL_VAR} { return SQFTypes.GLOBAL_VAR; }
 
 <YYINITIAL> "==" { return SQFTypes.EQEQ; }
 <YYINITIAL> "!=" { return SQFTypes.NE; }

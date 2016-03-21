@@ -2,7 +2,9 @@ package com.kaylerrenslow.a3plugin.lang.header.codeStyle.formatting;
 
 import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
+import com.kaylerrenslow.a3plugin.lang.psiUtil.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,13 +29,19 @@ public class HeaderBlock extends AbstractBlock{
 
 		ASTNode childNode = this.myNode.getFirstChildNode();
 		while(childNode != null){
-
-			Block b = new HeaderBlock(childNode, Wrap.createWrap(WrapType.NONE, false), Alignment.createAlignment(), spacingBuilder);
-			blocks.add(b);
+			if(!PsiUtil.isOfElementType(childNode, TokenType.WHITE_SPACE)){
+				Block b = new HeaderBlock(childNode, Wrap.createWrap(WrapType.NONE, false), Alignment.createAlignment(), spacingBuilder);
+				blocks.add(b);
+			}
 			childNode = childNode.getTreeNext();
 		}
 
 		return blocks;
+	}
+
+	@Override
+	public Indent getIndent() {
+		return super.getIndent();
 	}
 
 	@Nullable

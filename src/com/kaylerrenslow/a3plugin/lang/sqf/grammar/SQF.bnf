@@ -11,6 +11,8 @@
   elementTypeHolderClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes"
   elementTypeClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFElementType"
   tokenTypeClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTokenType"
+
+  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiImplUtil"
 }
 // @formatter:off
 sqfFile ::= sqfContent_
@@ -19,8 +21,8 @@ private sqfContent_ ::= item_* return_statement? (whitespace_comment_ | BAD_CHAR
 
 private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
 private whitespace_comment_ ::= WHITE_SPACE | comment_
-private comment_ ::= COMMENT | COMMENT_KEYWORD STRING_LITERAL
-private identifier_ ::= IDENTIFIER | LOCAL_VAR | LANG_CONSTANT
+private comment_ ::= COMMENT | BLOCK_COMMENT | COMMENT_KEYWORD STRING_LITERAL
+variable ::= (GLOBAL_VAR | LOCAL_VAR) | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFNamedElementImpl" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFNamedElement" methods=[]}
 
 
 statement ::= ( assignment
@@ -33,7 +35,7 @@ statement ::= ( assignment
 
 return_statement ::= expression SEMICOLON?
 
-assignment ::= identifier_ EQ (assignment | expression | switch_statement | if_statement | code_block)
+assignment ::= variable EQ (assignment | expression | switch_statement | if_statement | code_block)
 
 expression ::= config_expression | add_expression | bool_expression
 
@@ -74,7 +76,7 @@ value ::= (PLUS | MINUS)? (
 		  )
 
 private terminal_ ::= STRING_LITERAL
-					| identifier_
+					| variable
 					| INTEGER_LITERAL
 					| array_val
 					| DEC_LITERAL
@@ -89,7 +91,7 @@ private terminal_ ::= STRING_LITERAL
 array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
 command_call ::= (terminal_)? COMMAND code_block
-			   | (terminal_)? COMMAND (value)?
+			   | (terminal_)? COMMAND (value)? //{mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFNamedElementImpl" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFNamedElement" methods=[getCommandName]}
 
 code_block ::= LBRACE sqfContent_ RBRACE
 

@@ -10,4 +10,6 @@ public class HeaderCodeStyleSettings extends CustomCodeStyleSettings{
 	public HeaderCodeStyleSettings(CodeStyleSettings settings) {
 		super("HeaderCodeStyleSettings", settings);
 	}
+
+
 }

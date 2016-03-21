@@ -19,8 +19,13 @@
 		<colorSettingsPage implementation="com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFColorSettingsPage"/>
 		<completion.contributor language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFCompletionContributor"/>
 		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.doc.SQFDocumentationProvider"/>
-		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.SQFCommenter"/>
-		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.SQFAnnotator"/>
+		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFCommenter"/>
+		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFAnnotator"/>
+		<lang.findUsagesProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFFindUsagesProvider"/>
+		<!--<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFReferenceContributor"/>-->
+		<lang.refactoringSupport language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFRefactoringSupportProvider"/>
+		<lang.braceMatcher language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFBraceMatcher" />
+		<lang.foldingBuilder language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFFoldingBuilder" />
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>
@@ -28,10 +33,12 @@
 		<lang.syntaxHighlighterFactory key="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderSyntaxHighlighterFactory"/>
 		<colorSettingsPage implementation="com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderColorSettingsPage"/>
 		<completion.contributor language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.psi.helpers.HeaderCompletionContributor"/>
-		<lang.commenter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.HeaderCommenter"/>
+		<lang.commenter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderCommenter"/>
 		<lang.formatter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.codeStyle.formatting.HeaderFormattingBuilder"/>
 		<codeStyleSettingsProvider  implementation="com.kaylerrenslow.a3plugin.lang.header.codeStyle.HeaderCodeStyleSettingsProvider"/>
 		<langCodeStyleSettingsProvider implementation="com.kaylerrenslow.a3plugin.lang.header.codeStyle.HeaderLanguageCodeStyleSettingsProvider"/>
+		<lang.braceMatcher language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderBraceMatcher" />
+		<lang.foldingBuilder language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderFoldingBuilder" />
 
 		<!-- Other things-->
 		<moduleBuilder builderClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleBuilder" />

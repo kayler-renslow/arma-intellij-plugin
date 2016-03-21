@@ -16,7 +16,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- * Created by Kayler on 01/02/2016.
+ * @author Kayler
+ * Does the backend work for SQF auto completion operations
+ * Created on 01/02/2016.
  */
 public class SQFCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters>{
 
@@ -30,7 +32,7 @@ public class SQFCompletionProvider extends com.intellij.codeInsight.completion.C
 		if(lookForLocalVars){
 			elements.addAll(PsiUtil.findElements(parameters.getOriginalFile(), SQFTypes.LOCAL_VAR, cursor.getNode()));
 		}else{
-			elements.addAll(PsiUtil.findElements(parameters.getOriginalFile(), SQFTypes.IDENTIFIER, cursor.getNode()));
+			elements.addAll(PsiUtil.findElements(parameters.getOriginalFile(), SQFTypes.GLOBAL_VAR, cursor.getNode()));
 		}
 
 

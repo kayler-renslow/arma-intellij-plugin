@@ -22,9 +22,7 @@ public class Plugin{
 	private static final String f = "false";
 
 	public enum UserPropertiesKey{
-		VERSION("version", "Version of the instance of when this file was created. (Please don't change this.)", resources.getString("plugin.version"), null),
-		SQF_SYNTAX_CHECK("SQF_syntax_check", "Set SQF_syntax_check to true to use the parser that checks syntax for SQF files.\nSet SQF_syntax_check to false to disable the syntax checking.", t, f),
-		HEADER_SYNTAX_CHECK("Header_syntax_check", "Set Header_syntax_check to true to use the parser that checks syntax for .h, .hpp, .hh, .ext, and .sqm files.\nSet to false to disable syntax checking.", t, f);
+		VERSION("version", "Version of the instance of when this file was created. (Please don't change this.)", resources.getString("plugin.version"), null);
 
 		public final String[] possibleVals;
 		public final String keyName;

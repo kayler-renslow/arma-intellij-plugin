@@ -11,12 +11,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLexerAdapter;
 import com.kaylerrenslow.a3plugin.lang.header.parser.HeaderParser;
-import com.kaylerrenslow.a3plugin.lang.header.parser.HeaderParser_NoSyntax;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -24,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class HeaderParserDefinition implements ParserDefinition{
 	public static final TokenSet WHITE_SPACES = TokenSet.create(HeaderTypes.WHITE_SPACE);
-	public static final TokenSet COMMENTS = TokenSet.create(HeaderTypes.COMMENT);
+	public static final TokenSet COMMENTS = TokenSet.create(HeaderTypes.COMMENT, HeaderTypes.BLOCK_COMMENT);
 	public static final IFileElementType FILE = new IFileElementType(Language.<HeaderLanguage>findInstance(HeaderLanguage.class));
 
 	@NotNull
@@ -35,10 +32,6 @@ public class HeaderParserDefinition implements ParserDefinition{
 
 	@Override
 	public PsiParser createParser(Project project) {
-		String syntax = Plugin.pluginProps.getPluginProperty(Plugin.UserPropertiesKey.HEADER_SYNTAX_CHECK);
-		if(syntax.equalsIgnoreCase("false")){
-			return new HeaderParser_NoSyntax();
-		}
 		return new HeaderParser();
 	}
 

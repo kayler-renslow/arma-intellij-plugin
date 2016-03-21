@@ -15,12 +15,13 @@ import com.kaylerrenslow.a3plugin.util.FileReader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Kayler on 01/03/2016.
+ * @author Kayler
+ * Provides documentation for SQF PsiElements
+ * Created on 01/03/2016.
  */
 public class SQFDocumentationProvider extends DocumentationProviderEx{
 	private static final String COMMAND_URL_PREFIX = Plugin.resources.getString("plugin.doc.sqf.command_URL_prefix");
@@ -93,42 +94,13 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 			return contextElement;
 		}
 
-		if (Plugin.pluginProps.getPluginProperty(Plugin.UserPropertiesKey.SQF_SYNTAX_CHECK).equalsIgnoreCase("false")){
-			if (PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)){
-				ArrayList<ASTNode> localVars = PsiUtil.findElements(file, SQFTypes.LOCAL_VAR, null);
-
-				for (ASTNode node : localVars){
-					if (node.getText().equals(contextElement.getNode().getText())){
-						ASTNode n = node;
-						boolean foundAssignmentOperator = false;
-						while(n != null && !PsiUtil.isOfElementType(n, SQFTypes.SEMICOLON)){
-							n = n.getTreeNext();
-							if(PsiUtil.isOfElementType(n, SQFTypes.EQ)){
-								foundAssignmentOperator = true;
-							}
-						}
-						if(n == null || !foundAssignmentOperator){ //can only get inline comments from assignments
-							continue;
-						}
-						PsiElement comment = getInlineComment(editor, n.getTreeNext(), node);
-						if (comment != null){
-							return comment;
-						}
-					}
-
-				}
-			}
-
-			return null;
-		}
-
 		if (PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)){
 			ArrayList<ASTNode> localVars = PsiUtil.findElements(file, SQFTypes.LOCAL_VAR, null);
 
 			ASTNode n;
 			for (ASTNode node : localVars){
 				if (node.getText().equals(contextElement.getNode().getText())){
-					n = node.getTreeParent();
+					n = node.getTreeParent().getTreeParent(); //go to SQFVariable, then to Assignment
 					if (!PsiUtil.isOfElementType(n, SQFTypes.ASSIGNMENT)){
 						continue;
 					}

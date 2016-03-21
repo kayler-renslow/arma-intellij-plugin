@@ -63,7 +63,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 			SQFTypes.BREAK, SQFTypes.BREAK_TO, SQFTypes.BREAK_OUT, SQFTypes.CONTINUE, SQFTypes.FOR, SQFTypes.TO, SQFTypes.STEP, SQFTypes.FOR_EACH, SQFTypes.FROM, SQFTypes.WHILE, SQFTypes.GOTO, SQFTypes.ASSERT, SQFTypes.IF,
 			SQFTypes.THEN, SQFTypes.ELSE, SQFTypes.SWITCH, SQFTypes.CASE, SQFTypes.DEFAULT, SQFTypes.DO, SQFTypes.WAIT_UNTIL, SQFTypes.EXIT_WITH, };
 
-	private static final IElementType[] CONSTANTS = {SQFTypes.LANG_CONSTANT, SQFTypes.NAMESPACE, SQFTypes.CONFIG};
+	private static final IElementType[] CONSTANTS = {SQFTypes.LANG_VAR, SQFTypes.NAMESPACE, SQFTypes.CONFIG};
 
 	private static final IElementType[] COMMANDS = {SQFTypes.COMMAND};
 
@@ -102,7 +102,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(SQFTypes.LOCAL_VAR)){
 			return LOCAL_VAR_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.IDENTIFIER)){
+		if(tokenType.equals(SQFTypes.GLOBAL_VAR)){
 			return GLOBAL_VAR_KEYS;
 		}
 		for(IElementType e: COMMANDS){

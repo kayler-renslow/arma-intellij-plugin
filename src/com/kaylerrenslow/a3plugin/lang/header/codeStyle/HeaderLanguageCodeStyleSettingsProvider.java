@@ -8,7 +8,8 @@ import com.kaylerrenslow.a3plugin.lang.header.HeaderStatic;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 03/18/2016.
+ * @author Kayler
+ * Created on 03/18/2016.
  */
 public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSettingsProvider{
 	@NotNull
@@ -19,18 +20,29 @@ public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSe
 
 	@Override
 	public void customizeSettings(@NotNull CodeStyleSettingsCustomizable consumer, @NotNull SettingsType settingsType) {
-		switch (settingsType){
+		switch (settingsType) {
 			case BLANK_LINES_SETTINGS:
-
+				consumer.showStandardOptions("KEEP_BLANK_LINES_BEFORE_RBRACE", "KEEP_BLANK_LINES_IN_CODE");
 				break;
 			case COMMENTER_SETTINGS:
-					break;
+				consumer.showAllStandardOptions();
+				break;
 			case INDENT_SETTINGS:
-					break;
+				consumer.showAllStandardOptions();
+				break;
 			case LANGUAGE_SPECIFIC:
-					break;
+				consumer.showAllStandardOptions();
+				break;
 			case SPACING_SETTINGS:
-					break;
+				consumer.showStandardOptions("SPACE_AROUND_ADDITIVE_OPERATORS", "SPACE_AROUND_ASSIGNMENT_OPERATORS", "SPACE_AROUND_MULTIPLICATIVE_OPERATORS", "SPACE_AFTER_SEMICOLON", "SPACE_AFTER_COMMA", "SPACE_BEFORE_COMMA");
+
+				consumer.showStandardOptions("SPACE_BEFORE_COLON", "SPACE_AFTER_COLON");
+				consumer.moveStandardOption("SPACE_BEFORE_COLON", "Other");
+				consumer.moveStandardOption("SPACE_AFTER_COLON", "Other");
+				break;
+			case WRAPPING_AND_BRACES_SETTINGS:
+				consumer.showStandardOptions("KEEP_LINE_BREAKS", "RIGHT_MARGIN", "CLASS_BRACE_STYLE", "ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION", "ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE", "ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE");
+				break;
 		}
 	}
 

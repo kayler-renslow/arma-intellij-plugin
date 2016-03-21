@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.header;
+package com.kaylerrenslow.a3plugin.lang.sqf.editor;
 
 import com.intellij.lang.Commenter;
 import org.jetbrains.annotations.Nullable;
@@ -6,7 +6,7 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by Kayler on 01/03/2016.
  */
-public class HeaderCommenter implements Commenter{
+public class SQFCommenter implements Commenter{
 	@Nullable
 	@Override
 	public String getLineCommentPrefix() {
