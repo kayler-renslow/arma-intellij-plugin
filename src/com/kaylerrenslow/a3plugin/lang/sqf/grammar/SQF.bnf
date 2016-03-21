@@ -38,63 +38,46 @@ statement ::= ( assignment
 				| scope_manager
 				| control_struct
 				| try_catch
+				| expression
 			  ) SEMICOLON
 
-return_statement ::= (config_expression | bool_expression | add_expression) SEMICOLON?
+return_statement ::= expression SEMICOLON?
 
 assignment ::= variable EQ (assignment | expression | switch_statement | if_statement | code_block)
 
-expression ::= config_expression | add_expression | bool_expression
+expression ::=  (COMMAND | terminal_ | operator_ | expression_paren_)+
 
-//expression2_ ::= expression  {extends="expression"}
+private expression_paren_ ::= LPAREN expression RPAREN
 
-config_expression ::= value ((GTGT | FSLASH) config_expression)+
+private operator_ ::= PLUS
+					| MINUS
 
-bool_expression ::= bool_group_expression
+					| ASTERISK
+					| FSLASH
+					| PERC
+					| MOD
+					| CARET
 
-bool_group_expression ::= bool_comp_expression ((AND | AMPAMP | OR | BARBAR) bool_expression)*
+					| AND
+					| AMPAMP
+					| OR
+					| BARBAR
 
-bool_comp_expression ::= (EXCL | NOT) (bool_term)
-					   | ASSERT LPAREN bool_expression RPAREN
-					   | bool_test_expression
+					| EXCL
+					| NOT
+					| EQEQ
+					| NE
+					| LT
+					| GT
+					| LE
+					| GE
 
-bool_test_expression ::= add_expression EQEQ add_expression //==
-					   | add_expression NE add_expression //!=
-					   | add_expression LT add_expression // <
-					   | add_expression GT add_expression // >
-					   | add_expression LE add_expression // <=
-					   | add_expression GE add_expression // >=
-					   | bool_term
+					| GTGT
 
-bool_term ::= command_call
-			| variable
-			| TRUE
-			| FALSE
-			| LPAREN (bool_expression) RPAREN
+					| code_block
 
-//private bool_expression_paren ::=
+					| ASSERT LPAREN expression RPAREN
 
-add_expression ::= mult_expression PLUS add_expression
-				 | mult_expression MINUS add_expression
-				 | mult_expression
-
-mult_expression ::= value ASTERISK mult_expression
-				  | value FSLASH mult_expression
-				  | value PERC mult_expression
-				  | value MOD mult_expression
-				  | value CARET mult_expression
-				  | value
-
-value ::= (PLUS | MINUS)? (
-			command_call
-			| terminal_
-			| LPAREN expression RPAREN
-		   )
-
-private command_call_pre_argument ::= (PLUS | MINUS)? (
-										terminal_
-										| LPAREN expression RPAREN
-									   )
 
 private terminal_ ::= STRING_LITERAL
 					| variable
@@ -107,12 +90,11 @@ private terminal_ ::= STRING_LITERAL
 					| TYPE_NULL
 					| NIL
 					| NAMESPACE
-					| LPAREN terminal_ RPAREN //necessary for command_call for prefix argument
+					| LPAREN terminal_ RPAREN
 
 array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
-command_call ::= (command_call_pre_argument)? COMMAND code_block
-			   | (command_call_pre_argument)? COMMAND (value)? //{mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFNamedElementImpl" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFNamedElement" methods=[getCommandName]}
+command_call ::= (terminal_)? COMMAND code_block
 
 code_block ::= LBRACE sqfContent_ RBRACE
 
@@ -127,24 +109,24 @@ code_block ::= LBRACE sqfContent_ RBRACE
 				    | SCOPE_NAME STRING_LITERAL
 
     control_struct ::= if_statement | switch_statement | loop_ | wait_until_statement | with_statement | quest_statement
-    if_statement ::= IF LPAREN bool_expression RPAREN (
+    if_statement ::= IF LPAREN expression RPAREN (
 				     THEN code_block (ELSE code_block)?
 				   | EXIT_WITH code_block
 				   | THROW value
 			      )
 
-    switch_statement ::= SWITCH (LPAREN bool_expression RPAREN | bool_expression) DO LBRACE (switch_case)* RBRACE
-    switch_case ::= (CASE value COLON code_block SEMICOLON)
+    switch_statement ::= SWITCH (LPAREN expression RPAREN | expression) DO LBRACE (switch_case)* RBRACE
+    switch_case ::= (CASE expression COLON code_block SEMICOLON)
 				  | (DEFAULT code_block SEMICOLON)
 
     private loop_ ::= loop_while | for_loops_
-    loop_while    ::= WHILE LBRACE bool_expression RBRACE DO code_block
+    loop_while    ::= WHILE LBRACE expression RBRACE DO code_block
     private for_loops_ ::= loop_for | loop_for_from | loop_for_each
-    loop_for  ::= FOR LBRACKET code_block COMMA LBRACE bool_expression RBRACE COMMA code_block RBRACKET DO code_block
+    loop_for  ::= FOR LBRACKET code_block COMMA LBRACE expression RBRACE COMMA code_block RBRACKET DO code_block
     loop_for_from ::= FOR STRING_LITERAL FROM expression TO expression (STEP expression)? DO code_block
     loop_for_each ::= code_block FOR_EACH expression
 
-    quest_statement ::= QUEST bool_expression COLON exp
+    quest_statement ::= QUEST expression COLON exp
 
     try_catch ::= TRY code_block CATCH code_block
 
