@@ -15,6 +15,28 @@ import java.util.List;
 public class PsiUtil{
 
 	/**
+	 * Checks if IElementType of both nodes are the same. Returns false if either are null.
+	 *
+	 * @param node1 ASTNode
+	 * @param node2 ASTNode
+	 * @return true if node1's element type is node2's element type, false otherwise
+	 */
+	public static boolean isSameElementType(ASTNode node1, ASTNode node2) {
+		return node1 != null && node2 != null && node1.getElementType() == node1.getElementType();
+	}
+
+	/**
+	 * Checks if IElementType of both elements are the same. Returns false if either are null.
+	 *
+	 * @param psiElement1 PsiElement
+	 * @param psiElement2 PsiElement
+	 * @return true if psiElement's element type is node2's element type, false otherwise
+	 */
+	public static boolean isSameElementType(PsiElement psiElement1, PsiElement psiElement2) {
+		return isSameElementType(psiElement1.getNode(), psiElement2.getNode());
+	}
+
+	/**
 	 * Checks if the given ASTNode is of IElementType et
 	 *
 	 * @param node ASTNode (if null, returns false)
@@ -66,9 +88,9 @@ public class PsiUtil{
 	 */
 	public static ASTNode findFirstElement(ASTNode node, IElementType type, String content) {
 		if (isOfElementType(node, type)){
-			if(content != null && node.getText().equals(content)){
+			if (content != null && node.getText().equals(content)){
 				return node;
-			}else if(content != null){
+			}else if (content != null){
 				return null;
 			}
 			return node;

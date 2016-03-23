@@ -22,7 +22,7 @@
 		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFCommenter"/>
 		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFAnnotator"/>
 		<lang.findUsagesProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFFindUsagesProvider"/>
-		<!--<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFReferenceContributor"/>-->
+		<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFReferenceContributor"/>
 		<lang.refactoringSupport language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFRefactoringSupportProvider"/>
 		<lang.braceMatcher language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFBraceMatcher" />
 		<lang.foldingBuilder language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFFoldingBuilder" />

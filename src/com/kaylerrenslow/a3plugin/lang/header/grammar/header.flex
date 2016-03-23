@@ -69,7 +69,7 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 <YYINITIAL> "class" { return HeaderTypes.CLASS; }
 
 <YYINITIAL> "#include"  { return HeaderTypes.PREPROCESS_INCLUDE; }
-/*
+
 <YYINITIAL> "#define"  { return HeaderTypes.PREPROCESS_DEFINE; }
 <YYINITIAL> "#undef"  { return HeaderTypes.PREPROCESS_UNDEF; }
 <YYINITIAL> "#ifdef"  { return HeaderTypes.PREPROCESS_IF_DEF; }
@@ -82,7 +82,7 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 <YYINITIAL> "__EVAL"  { return HeaderTypes.PREPROCESS_EVAL; }
 <YYINITIAL> "__LINE__"  { return HeaderTypes.PREPROCESS_LINE; }
 <YYINITIAL> "__FILE__"  { return HeaderTypes.PREPROCESS_FILE; }
-*/
+
 <YYINITIAL> {IDENTIFIER} { return HeaderTypes.IDENTIFIER; }
 
 //<YYINITIAL> "\\" { return HeaderTypes.BSLASH; }

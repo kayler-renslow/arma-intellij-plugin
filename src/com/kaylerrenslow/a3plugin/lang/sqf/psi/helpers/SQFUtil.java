@@ -4,8 +4,10 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
@@ -29,7 +31,7 @@ public class SQFUtil{
 	 * @param findVar variable text to look for
 	 * @return list
 	 */
-	public static List<SQFVariable> findVariables(Project project, String findVar){
+	public static List<SQFVariable> findGlobalVariables(Project project, String findVar){
 		List<SQFVariable> result = new ArrayList<>();
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, GlobalSearchScope.allScope(project));
 		for(VirtualFile virtualFile : files){
@@ -42,6 +44,10 @@ public class SQFUtil{
 				continue;
 			}
 			for(SQFVariable var : vars){
+				IElementType type = var.getVariableType();
+				if(type != SQFTypes.GLOBAL_VAR){
+					continue;
+				}
 				if(findVar == null){
 					result.add(var);
 				}else{
@@ -58,8 +64,8 @@ public class SQFUtil{
 	 * @param project project
 	 * @return list
 	 */
-	public static List<SQFVariable> findVariables(Project project){
-		return findVariables(project, null);
+	public static List<SQFVariable> findGlobalVariables(Project project){
+		return findGlobalVariables(project, null);
 	}
 
 	public static SQFVariable createVariable(Project project, String text){

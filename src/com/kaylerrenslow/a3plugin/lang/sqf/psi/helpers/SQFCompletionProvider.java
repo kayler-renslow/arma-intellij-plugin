@@ -5,7 +5,9 @@ import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiNamedElement;
 import com.intellij.util.ProcessingContext;
+import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
@@ -35,11 +37,15 @@ public class SQFCompletionProvider extends com.intellij.codeInsight.completion.C
 
 
 		for(ASTNode node : elements){
-			result.addElement(LookupElementBuilder.create(node.getText()));
+			if(node.getPsi() instanceof PsiNamedElement){
+				result.addElement(LookupElementBuilder.create((PsiNamedElement)node.getPsi()).withIcon(PluginIcons.ICON_SQF_VARIABLE));
+			}else{
+				result.addElement(LookupElementBuilder.create(node.getText()).withIcon(PluginIcons.ICON_SQF_VARIABLE));
+			}
 		}
 		if(!lookForLocalVars){
 			for(int i = 0; i < SQFStatic.LIST_COMMANDS.size(); i++){
-				result.addElement(LookupElementBuilder.create(SQFStatic.LIST_COMMANDS.get(i)));
+				result.addElement(LookupElementBuilder.create(SQFStatic.LIST_COMMANDS.get(i)).withIcon(PluginIcons.ICON_SQF_COMMAND));
 			}
 		}
 	}

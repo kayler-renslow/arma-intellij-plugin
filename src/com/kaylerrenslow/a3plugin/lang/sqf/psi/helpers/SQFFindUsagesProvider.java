@@ -7,7 +7,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFLexerAdapter;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFAssignment;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
@@ -32,14 +31,17 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@Nullable
 	@Override
 	public String getHelpId(@NotNull PsiElement psiElement) {
-		return null;
+		if(psiElement instanceof SQFVariable){
+			return "Value read";
+		}
+		return "find usages provider help id. WHAT. DOES. THIS. do.";
 	}
 
 	@NotNull
 	@Override
 	public String getType(@NotNull PsiElement element) {
-		if(element instanceof SQFAssignment){
-			return "Assignment";
+		if(element instanceof SQFVariable){
+			return "Variable";
 		}
 		return "unknown type";
 	}
@@ -50,14 +52,14 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 		if(element instanceof SQFVariable){
 			return element.getNode().getText();
 		}
-		return "";
+		return "s";
 	}
 
 	@NotNull
 	@Override
 	public String getNodeText(@NotNull PsiElement element, boolean useFullName) {
+		System.out.println("SQFFindUsagesProvider.getNodeText " + element.getText());
 		if(element instanceof SQFVariable){
-			System.out.println("SQFFindUsagesProvider.getNodeText");
 			return element.getText();
 		}
 		return "";

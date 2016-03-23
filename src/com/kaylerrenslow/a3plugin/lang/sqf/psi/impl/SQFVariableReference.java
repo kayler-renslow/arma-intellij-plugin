@@ -1,28 +1,28 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi;
+package com.kaylerrenslow.a3plugin.lang.sqf.psi.impl;
 
-import com.intellij.codeInsight.lookup.LookupElement;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariableNamedElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
 
 /**
  * Created by Kayler on 03/20/2016.
  */
-public class SQFReference /*extends PsiReferenceBase<PsiElement> */implements PsiReference/* implements PsiPolyVariantReference use this interface for command calling on files*/{
+public class SQFVariableReference /*extends PsiReferenceBase<PsiElement> */implements PsiReference/* implements PsiPolyVariantReference use this interface for command calling on files*/{
 
 	private final String variable;
 	private final PsiNamedElement myElement;
+	private final IElementType myVariableElementType;
 
-	public SQFReference(PsiNamedElement element) {
+	public SQFVariableReference(PsiNamedElement element, IElementType myVariableElementType) {
 		variable = element.getText();
 		this.myElement = element;
+		this.myVariableElementType = myVariableElementType;
 	}
 
 	@Override
@@ -59,12 +59,19 @@ public class SQFReference /*extends PsiReferenceBase<PsiElement> */implements Ps
 
 	@Override
 	public boolean isReferenceTo(PsiElement element) {
-		if(!(element instanceof SQFNamedElement)){
+		if(!(element instanceof SQFVariableNamedElement)){
 			return false;
 		}
-		SQFNamedElement other = (SQFNamedElement) element;
+		if(myVariableElementType == SQFTypes.LANG_VAR){
+			return false;
+		}
+		SQFVariableNamedElement other = (SQFVariableNamedElement) element;
 		PsiElement selfResolve = resolve();
-		return other.getName().equals(getCanonicalText()) && selfResolve != other;
+		boolean referenceTo =other.getName().equals(getCanonicalText()) && selfResolve != other;
+		if(myVariableElementType == SQFTypes.LOCAL_VAR){
+			return referenceTo && other.getContainingFile() == selfResolve.getContainingFile();
+		}
+		return referenceTo;
 	}
 
 	@NotNull
@@ -80,7 +87,7 @@ public class SQFReference /*extends PsiReferenceBase<PsiElement> */implements Ps
 
 	@Override
 	public String toString() {
-		return "SQFReference{" +
+		return "SQFVariableReference{" +
 				"variable='" + variable + '\'' +
 				'}';
 	}

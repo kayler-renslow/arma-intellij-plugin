@@ -26,7 +26,7 @@ private sqfContent_ ::= item_* return_statement? (whitespace_comment_ | BAD_CHAR
 private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
 private whitespace_comment_ ::= WHITE_SPACE | comment_
 private comment_ ::= COMMENT | BLOCK_COMMENT | COMMENT_KEYWORD STRING_LITERAL
-variable ::= (GLOBAL_VAR | LOCAL_VAR) | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFNamedElementImpl" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFNamedElement" methods=[]}
+variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFVariableNamedElementImpl" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariableNamedElement" methods=[]}
 
 
 statement ::= ( assignment
@@ -94,7 +94,8 @@ array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 code_block ::= LBRACE sqfContent_ RBRACE
 
 /*control structures and other things*/
-    private_decl ::= PRIVATE (STRING_LITERAL | LBRACKET (STRING_LITERAL (COMMA STRING_LITERAL)*) RBRACKET)
+    private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET)
+	private_decl_var ::= STRING_LITERAL
 
 
     scope_manager ::= GOTO COLON STRING_LITERAL
