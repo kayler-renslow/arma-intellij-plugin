@@ -8,7 +8,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.lang.psiUtil.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.util.FileReader;
@@ -50,15 +50,15 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND)){
 			return generateCommandDoc(element.getText());
 		}
-		if (PsiUtil.isOfElementType(element, SQFTypes.COMMENT)){
+		if (PsiUtil.isOfElementType(element, SQFTypes.COMMENT) || PsiUtil.isOfElementType(element, SQFTypes.BLOCK_COMMENT)){
 			return element.getNode().getText().replaceAll("\n", "<br>");
 		}
 		if (element instanceof PsiFile){
 			ASTNode potentialDoc = element.getNode().getFirstChildNode();
-			if (PsiUtil.isOfElementType(potentialDoc, TokenType.WHITE_SPACE)){
+			if (!PsiUtil.isOfElementType(potentialDoc, SQFTypes.COMMENT) && !PsiUtil.isOfElementType(potentialDoc, SQFTypes.BLOCK_COMMENT)){
 				potentialDoc = potentialDoc.getTreeNext();
 			}
-			if(PsiUtil.isOfElementType(potentialDoc, SQFTypes.COMMENT)){
+			if(PsiUtil.isOfElementType(potentialDoc, SQFTypes.COMMENT) || PsiUtil.isOfElementType(potentialDoc, SQFTypes.BLOCK_COMMENT)){
 				return potentialDoc.getText().replaceAll("\n", "<br>");
 			}
 			return null;

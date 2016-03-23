@@ -8,8 +8,10 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFFile;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 
 import java.util.ArrayList;
@@ -62,7 +64,7 @@ public class SQFUtil{
 
 	public static SQFVariable createVariable(Project project, String text){
 		SQFFile file = createFile(project, text);
-		return (SQFVariable) file.getFirstChild();
+		return (SQFVariable) PsiUtil.findElements(file, SQFTypes.VARIABLE, null).get(0).getPsi();
 	}
 
 	public static SQFFile createFile(Project project, String text){

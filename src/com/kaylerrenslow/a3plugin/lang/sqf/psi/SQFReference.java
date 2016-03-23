@@ -3,10 +3,10 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
-import com.kaylerrenslow.a3plugin.lang.psiUtil.PsiUtil;
+import com.intellij.util.IncorrectOperationException;
+import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,30 +15,73 @@ import java.util.ArrayList;
 /**
  * Created by Kayler on 03/20/2016.
  */
-public class SQFReference extends PsiReferenceBase<PsiElement> implements PsiReference/* implements PsiPolyVariantReference use this interface for command calling on files*/{
+public class SQFReference /*extends PsiReferenceBase<PsiElement> */implements PsiReference/* implements PsiPolyVariantReference use this interface for command calling on files*/{
 
-	private String variable;
+	private final String variable;
+	private final PsiNamedElement myElement;
 
-	public SQFReference(PsiElement element, TextRange rangeInElement) {
-		super(element, rangeInElement);
+	public SQFReference(PsiNamedElement element) {
 		variable = element.getText();
+		this.myElement = element;
+	}
+
+	@Override
+	public PsiElement getElement() {
+		return myElement;
+	}
+
+	@Override
+	public TextRange getRangeInElement() {
+		return TextRange.allOf(this.variable);
 	}
 
 	@Nullable
 	@Override
 	public PsiElement resolve() {
-		ArrayList<ASTNode> elements = PsiUtil.findElements(myElement.getContainingFile(), SQFTypes.VARIABLE, null);
-		return elements.size() > 0 ? elements.get(0).getPsi() : null;
+		return this.myElement;
+	}
+
+	@NotNull
+	@Override
+	public String getCanonicalText() {
+		return myElement.getName();
+	}
+
+	@Override
+	public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+		return myElement.setName(newElementName);
+	}
+
+	@Override
+	public PsiElement bindToElement(@NotNull PsiElement element) throws IncorrectOperationException {
+		return null;
+	}
+
+	@Override
+	public boolean isReferenceTo(PsiElement element) {
+		if(!(element instanceof SQFNamedElement)){
+			return false;
+		}
+		SQFNamedElement other = (SQFNamedElement) element;
+		PsiElement selfResolve = resolve();
+		return other.getName().equals(getCanonicalText()) && selfResolve != other;
 	}
 
 	@NotNull
 	@Override
 	public Object[] getVariants() {
-		ArrayList<LookupElement> variants = new ArrayList<>();
-		ArrayList<ASTNode> elements = PsiUtil.findElements(myElement.getContainingFile(), SQFTypes.VARIABLE, null);
-		for(ASTNode node : elements){
-			variants.add(LookupElementBuilder.create(node.getPsi()));
-		}
-		return variants.toArray();
+		return new Object[0];
+	}
+
+	@Override
+	public boolean isSoft() {
+		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "SQFReference{" +
+				"variable='" + variable + '\'' +
+				'}';
 	}
 }

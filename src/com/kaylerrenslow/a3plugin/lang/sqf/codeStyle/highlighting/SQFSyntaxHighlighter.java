@@ -90,7 +90,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(SQFTypes.COMMA)){
 			return COMMA_KEYS;
 		}
-		if (tokenType.equals(SQFTypes.COMMENT)){
+		if (tokenType.equals(SQFTypes.COMMENT) || tokenType.equals(SQFTypes.BLOCK_COMMENT)){
 			return COMMENT_KEYS;
 		}
 		if(tokenType.equals(SQFTypes.STRING_LITERAL)){

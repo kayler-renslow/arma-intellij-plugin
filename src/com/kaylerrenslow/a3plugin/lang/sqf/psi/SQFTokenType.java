@@ -58,6 +58,7 @@ public class SQFTokenType extends IElementType{
 		debugNameLookup.put("COMMAND", "Command");
 		debugNameLookup.put("LOCAL_VAR", "Identifier");
 		debugNameLookup.put("GLOBAL_VAR", "Identifier");
+		debugNameLookup.put("DQOUTE", "\"");
 		debugNameLookup.put("EQEQ", "==");
 		debugNameLookup.put("NE", "!=");
 		debugNameLookup.put("GTGT", ">>");

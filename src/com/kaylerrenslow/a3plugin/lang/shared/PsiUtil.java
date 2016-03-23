@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.psiUtil;
+package com.kaylerrenslow.a3plugin.lang.shared;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
@@ -22,10 +22,7 @@ public class PsiUtil{
 	 * @return true if node is of type et, false otherwise
 	 */
 	public static boolean isOfElementType(ASTNode node, IElementType et) {
-		if (node == null){
-			return false;
-		}
-		return node.getElementType() == et;
+		return node != null && node.getElementType() == et;
 	}
 
 	/**
@@ -36,10 +33,51 @@ public class PsiUtil{
 	 * @return true if pe is of type et, false otherwise
 	 */
 	public static boolean isOfElementType(PsiElement pe, IElementType et) {
-		if (pe == null){
-			return false;
+		return pe != null && isOfElementType(pe.getNode(), et);
+	}
+
+	/**
+	 * Traverses the entire AST tree of the given PsiFile and returns the first ASTNode that matches IElementType type
+	 *
+	 * @param file    PsiFile to traverse
+	 * @param type    IElement the type to find in the AST tree
+	 * @param content text to match inside the node, or null if doesn't matter
+	 * @return ASTNode that is the first of type, or null if none was found
+	 */
+	public static ASTNode findFirstElement(PsiFile file, IElementType type, String content) {
+		ASTNode[] children = file.getNode().getChildren(null);
+		ASTNode ret;
+		for (ASTNode child : children){
+			ret = findFirstElement(child, type, content);
+			if (ret != null){
+				return ret;
+			}
 		}
-		return isOfElementType(pe.getNode(), et);
+		return null;
+	}
+
+	/**
+	 * Traverses the entire AST tree of the given ASTNode and returns the first ASTNode that matches IElementType type
+	 *
+	 * @param node    ASTNode to traverse
+	 * @param type    IElement the type to find in the AST tree
+	 * @param content text to match inside the node, or null if doesn't matter
+	 * @return ASTNode that is the first of type, or null if none was found
+	 */
+	public static ASTNode findFirstElement(ASTNode node, IElementType type, String content) {
+		if (isOfElementType(node, type)){
+			if(content != null && node.getText().equals(content)){
+				return node;
+			}else if(content != null){
+				return null;
+			}
+			return node;
+		}
+		ASTNode[] children = node.getChildren(null);
+		for (ASTNode child : children){
+			findFirstElement(child, type, content);
+		}
+		return null;
 	}
 
 	/**
@@ -48,7 +86,7 @@ public class PsiUtil{
 	 * @param file   PsiFile to traverse
 	 * @param toFind IElement the type to find in the AST tree
 	 * @param cursor the node that is already discovered since the user's mouse is over it (can be null)
-	 * @returns ArrayList containing all ASTNodes that mach the IElementType toFind
+	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
 	 */
 	public static ArrayList<ASTNode> findElements(PsiFile file, IElementType toFind, ASTNode cursor) {
 		ArrayList<ASTNode> list = new ArrayList<>();

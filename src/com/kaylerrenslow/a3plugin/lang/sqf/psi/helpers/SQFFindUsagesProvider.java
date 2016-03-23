@@ -8,7 +8,6 @@ import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFLexerAdapter;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFAssignment;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFCommandCall;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
@@ -27,7 +26,6 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 
 	@Override
 	public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-		System.out.println(psiElement.getText() + " canFindUsagesFor");
 		return psiElement instanceof PsiNamedElement;
 	}
 
@@ -40,9 +38,6 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@NotNull
 	@Override
 	public String getType(@NotNull PsiElement element) {
-		if(element instanceof SQFCommandCall){
-			return "Command Call";
-		}
 		if(element instanceof SQFAssignment){
 			return "Assignment";
 		}

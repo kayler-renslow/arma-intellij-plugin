@@ -14,11 +14,8 @@
 
   psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiImplUtil"
 
-  name("command_call")="command"
   name("return_statement")="return statement"
   name("try_catch")="try-catch block"
-  name("config_expression")="config expression"
-  name("bool_expression")="bool expression"
 
 }
 // @formatter:off
@@ -33,7 +30,6 @@ variable ::= (GLOBAL_VAR | LOCAL_VAR) | LANG_VAR {mixin="com.kaylerrenslow.a3plu
 
 
 statement ::= ( assignment
-				| command_call
 				| private_decl
 				| scope_manager
 				| control_struct
@@ -94,12 +90,12 @@ private terminal_ ::= STRING_LITERAL
 
 array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
-command_call ::= (terminal_)? COMMAND code_block
 
 code_block ::= LBRACE sqfContent_ RBRACE
 
 /*control structures and other things*/
     private_decl ::= PRIVATE (STRING_LITERAL | LBRACKET (STRING_LITERAL (COMMA STRING_LITERAL)*) RBRACKET)
+
 
     scope_manager ::= GOTO COLON STRING_LITERAL
 				    | BREAK_TO STRING_LITERAL

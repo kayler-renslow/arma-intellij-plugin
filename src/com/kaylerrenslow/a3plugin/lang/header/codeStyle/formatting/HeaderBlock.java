@@ -4,7 +4,7 @@ import com.intellij.formatting.*;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.formatter.common.AbstractBlock;
-import com.kaylerrenslow.a3plugin.lang.psiUtil.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
