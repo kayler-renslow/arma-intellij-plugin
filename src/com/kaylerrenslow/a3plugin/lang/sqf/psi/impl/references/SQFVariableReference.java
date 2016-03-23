@@ -1,19 +1,18 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.impl;
+package com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariableNamedElement;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Created by Kayler on 03/20/2016.
  */
-public class SQFVariableReference /*extends PsiReferenceBase<PsiElement> */implements PsiReference/* implements PsiPolyVariantReference use this interface for command calling on files*/{
+public class SQFVariableReference implements PsiReference{
 
 	private final String variable;
 	private final PsiNamedElement myElement;
@@ -32,12 +31,14 @@ public class SQFVariableReference /*extends PsiReferenceBase<PsiElement> */imple
 
 	@Override
 	public TextRange getRangeInElement() {
-		return TextRange.allOf(this.variable);
+		return TextRange.allOf(this.getCanonicalText());
 	}
+
 
 	@Nullable
 	@Override
 	public PsiElement resolve() {
+//		System.out.println("SQFVariableReference.resolve");
 		return this.myElement;
 	}
 

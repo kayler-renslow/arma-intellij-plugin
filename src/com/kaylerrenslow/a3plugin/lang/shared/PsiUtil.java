@@ -102,33 +102,47 @@ public class PsiUtil{
 		return null;
 	}
 
+
 	/**
-	 * Traverses the entire AST tree of the given PsiFile and adds all ASTNodes that match the type of toFind to a list
+	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
 	 *
-	 * @param file   PsiFile to traverse
+	 * @param element   PsiElement to traverse
 	 * @param toFind IElement the type to find in the AST tree
 	 * @param cursor the node that is already discovered since the user's mouse is over it (can be null)
 	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
 	 */
-	public static ArrayList<ASTNode> findElements(PsiFile file, IElementType toFind, ASTNode cursor) {
-		ArrayList<ASTNode> list = new ArrayList<>();
-		traverseFile(list, file, toFind, cursor);
+	public static ArrayList<ASTNode> findChildElements(PsiElement element, IElementType toFind, ASTNode cursor) {
+		return findChildElements(element, toFind, cursor, null);
+	}
 
+	/**
+	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list and the ASTNode's text equals textContent
+	 *
+	 * @param element   PsiElement to traverse
+	 * @param toFind IElement the type to find in the AST tree
+	 * @param cursor the node that is already discovered since the user's mouse is over it (can be null)
+	 * @param textContent text to look for in ASTNode (null if doesn't matter)
+	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
+	 */
+	public static ArrayList<ASTNode> findChildElements(PsiElement element, IElementType toFind, ASTNode cursor, String textContent) {
+		ArrayList<ASTNode> list = new ArrayList<>();
+		traverseElement(list, element, toFind, cursor, textContent);
 		return list;
 	}
 
 	/**
-	 * Traverses the entire AST tree of the given PsiFile and adds all ASTNodes that match the type of toFind to a list
+	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
 	 *
 	 * @param list   list to add each ASTNode to that matches toFind's type
-	 * @param file   PsiFile to traverse
+	 * @param element   PsiElement to traverse
 	 * @param toFind IElement the type to find in the AST tree
 	 * @param cursor the node that is already discovered since the user's mouse is over it (can be null)
+	 * @param textContent text to look for in ASTNode (null if doesn't matter)
 	 */
-	private static void traverseFile(ArrayList<ASTNode> list, PsiFile file, IElementType toFind, ASTNode cursor) {
-		ASTNode[] children = file.getNode().getChildren(null);
+	private static void traverseElement(ArrayList<ASTNode> list, PsiElement element, IElementType toFind, ASTNode cursor, String textContent) {
+		ASTNode[] children = element.getNode().getChildren(null);
 		for (ASTNode node : children){
-			traverseASTNode(list, toFind, cursor, node);
+			traverseASTNode(list, toFind, cursor, node, textContent);
 		}
 	}
 
@@ -139,12 +153,17 @@ public class PsiUtil{
 	 * @param toFind            element type to find
 	 * @param cursor            the ASTNode that has the mouse over it (can be null)
 	 * @param discoveredElement previously discovered ASTNode
+	 * @param textContent text to look for in ASTNode (null if doesn't matter)
 	 */
-	private static void traverseASTNode(ArrayList<ASTNode> list, IElementType toFind, ASTNode cursor, ASTNode discoveredElement) {
-		elementDiscovered(list, toFind, cursor, discoveredElement);
+	private static void traverseASTNode(ArrayList<ASTNode> list, IElementType toFind, ASTNode cursor, ASTNode discoveredElement, String textContent) {
+		if(textContent == null){
+			elementDiscovered(list, toFind, cursor, discoveredElement);
+		}else if(discoveredElement.getText().equals(textContent)){
+			elementDiscovered(list, toFind, cursor, discoveredElement);
+		}
 		ASTNode[] children = discoveredElement.getChildren(null);
 		for (ASTNode node : children){
-			traverseASTNode(list, toFind, cursor, node);
+			traverseASTNode(list, toFind, cursor, node, textContent);
 		}
 	}
 

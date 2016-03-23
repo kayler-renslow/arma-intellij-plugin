@@ -2,9 +2,9 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
@@ -12,9 +12,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFFile;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,8 +21,19 @@ import java.util.List;
 /**
  * Created by Kayler on 03/20/2016.
  */
-public class SQFUtil{
+public class SQFPsiUtil{
 
+	/** Gets the current scope of the psi element
+	 * @param element element to get scope of
+	 * @return scope
+	 */
+	public static SQFScope getCurrentScope(PsiElement element){
+		PsiElement parent = element;
+		while(parent != null && !PsiUtil.isOfElementType(parent, SQFTypes.SCOPE)){
+			parent = parent.getParent();
+		}
+		return (SQFScope) parent;
+	}
 
 	/** Adds all SQFVariables in the entire project that is equal to findVar into a list and returns it
 	 * @param project project
@@ -68,9 +77,14 @@ public class SQFUtil{
 		return findGlobalVariables(project, null);
 	}
 
+	public static SQFPrivateDeclVar createPrivateDeclVar(Project project, String text){
+		SQFFile file = createFile(project, text);
+		return (SQFPrivateDeclVar) PsiUtil.findChildElements(file, SQFTypes.PRIVATE_DECL_VAR, null).get(0).getPsi();
+	}
+
 	public static SQFVariable createVariable(Project project, String text){
 		SQFFile file = createFile(project, text);
-		return (SQFVariable) PsiUtil.findElements(file, SQFTypes.VARIABLE, null).get(0).getPsi();
+		return (SQFVariable) PsiUtil.findChildElements(file, SQFTypes.VARIABLE, null).get(0).getPsi();
 	}
 
 	public static SQFFile createFile(Project project, String text){

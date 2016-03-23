@@ -30,9 +30,9 @@ public class SQFCompletionProvider extends com.intellij.codeInsight.completion.C
 
 		ArrayList<ASTNode> elements = new ArrayList<>();
 		if(lookForLocalVars){
-			elements.addAll(PsiUtil.findElements(parameters.getOriginalFile(), SQFTypes.LOCAL_VAR, cursor.getNode()));
+			elements.addAll(PsiUtil.findChildElements(parameters.getOriginalFile(), SQFTypes.LOCAL_VAR, cursor.getNode()));
 		}else{
-			elements.addAll(PsiUtil.findElements(parameters.getOriginalFile(), SQFTypes.GLOBAL_VAR, cursor.getNode()));
+			elements.addAll(PsiUtil.findChildElements(parameters.getOriginalFile(), SQFTypes.GLOBAL_VAR, cursor.getNode()));
 		}
 
 

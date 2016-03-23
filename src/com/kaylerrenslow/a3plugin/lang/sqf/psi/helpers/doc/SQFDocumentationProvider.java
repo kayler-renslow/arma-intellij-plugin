@@ -95,7 +95,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		}
 
 		if (PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)){
-			ArrayList<ASTNode> localVars = PsiUtil.findElements(file, SQFTypes.LOCAL_VAR, null);
+			ArrayList<ASTNode> localVars = PsiUtil.findChildElements(file, SQFTypes.LOCAL_VAR, null);
 
 			ASTNode n;
 			for (ASTNode node : localVars){

@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.impl;
+package com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
@@ -12,10 +12,10 @@ import com.intellij.util.ArrayUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariableNamedElement;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references.SQFVariableReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,10 +25,10 @@ import javax.swing.*;
 /**
  * Created by Kayler on 03/19/2016.
  */
-public class SQFVariableNamedElementImpl extends ASTWrapperPsiElement implements SQFVariableNamedElement{
+public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implements SQFVariableNamedElement{
 	private final IElementType myVariableElementType;
 
-	public SQFVariableNamedElementImpl(@NotNull ASTNode node) {
+	public SQFVariableNamedElementMixin(@NotNull ASTNode node) {
 		super(node);
 		this.myVariableElementType = this.getNode().getFirstChildNode().getElementType();
 	}
@@ -101,7 +101,7 @@ public class SQFVariableNamedElementImpl extends ASTWrapperPsiElement implements
 	@Override
 	public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
 		ASTNode me = this.getNode();
-		SQFVariable var = SQFUtil.createVariable(this.getProject(), name);
+		SQFVariable var = SQFPsiUtil.createVariable(this.getProject(), name);
 		me.getTreeParent().replaceChild(me, var.getNode());
 		return var;
 	}

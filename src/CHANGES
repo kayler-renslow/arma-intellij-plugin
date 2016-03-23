@@ -1,3 +1,1 @@
->gave auto completetion for variables and commands icons
->Got SQF global variables to find all instances of the variable when doing "find usages"
->for SQF variables in private decl, vars that are already declared private in current scope and annotated
+for SQF, in private decl, each variable points to the other references of that same name. renaming also works, but one way. can only rename the variable and not the variable in the private decl

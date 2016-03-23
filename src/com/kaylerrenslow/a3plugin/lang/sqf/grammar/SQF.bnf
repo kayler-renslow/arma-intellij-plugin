@@ -19,14 +19,14 @@
 
 }
 // @formatter:off
-sqfFile ::= sqfContent_
+sqfFile ::= scope
 
-private sqfContent_ ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)*
+scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)*
 
 private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
 private whitespace_comment_ ::= WHITE_SPACE | comment_
 private comment_ ::= COMMENT | BLOCK_COMMENT | COMMENT_KEYWORD STRING_LITERAL
-variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFVariableNamedElementImpl" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariableNamedElement" methods=[]}
+variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[]}
 
 
 statement ::= ( assignment
@@ -41,7 +41,7 @@ return_statement ::= expression SEMICOLON?
 
 assignment ::= variable EQ (assignment | expression | switch_statement | if_statement | code_block)
 
-expression ::=  (COMMAND | terminal_ | operator_ | expression_paren_)+
+expression ::=  (COMMAND | macro | terminal_ | operator_ | expression_paren_)+
 
 private expression_paren_ ::= LPAREN expression RPAREN
 
@@ -88,14 +88,16 @@ private terminal_ ::= STRING_LITERAL
 					| NAMESPACE
 					| LPAREN terminal_ RPAREN
 
+macro ::= variable LPAREN expression (COMMA expression)* RPAREN
+
 array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
 
-code_block ::= LBRACE sqfContent_ RBRACE
+code_block ::= LBRACE scope RBRACE
 
 /*control structures and other things*/
     private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET)
-	private_decl_var ::= STRING_LITERAL
+	private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin"}
 
 
     scope_manager ::= GOTO COLON STRING_LITERAL
