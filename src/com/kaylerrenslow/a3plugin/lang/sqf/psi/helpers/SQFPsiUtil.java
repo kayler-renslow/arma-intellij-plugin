@@ -1,5 +1,6 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
@@ -23,13 +24,45 @@ import java.util.List;
  */
 public class SQFPsiUtil{
 
+	/** Gets the current scope of the variable. This is determined by where a private declaration with its name is scoped.
+	 * @param var element to get scope of
+	 * @return scope
+	 */
+	public static SQFScope getCurrentScopeForVariable(SQFVariable var){
+		SQFScope scope = getCurrentScope(var);
+		List<SQFVariableAsString> varsForScope = getPrivateVarsForScope(scope);
+
+		while(scope != null){
+			if(scope instanceof SQFFileScope){
+				break;
+			}
+			for (SQFVariableAsString varInScope : varsForScope){
+				if (varInScope.getVarName().equals(var.getVarName())){
+					return scope;
+				}
+			}
+			scope = getCurrentScope(scope.getParent());
+			varsForScope = getPrivateVarsForScope(scope);
+		}
+		return scope;
+	}
+
+	public static List<SQFVariableAsString> getPrivateVarsForScope(SQFScope scope){
+		List<ASTNode> list = PsiUtil.findChildElements(scope, SQFTypes.VARIABLE_AS_STRING, null);
+		List<SQFVariableAsString> ret = new ArrayList<>();
+		for(int i = 0; i < list.size(); i++){
+			ret.add((SQFVariableAsString)list.get(i).getPsi());
+		}
+		return ret;
+	}
+
 	/** Gets the current scope of the psi element
 	 * @param element element to get scope of
 	 * @return scope
 	 */
 	public static SQFScope getCurrentScope(PsiElement element){
 		PsiElement parent = element;
-		while(parent != null && !PsiUtil.isOfElementType(parent, SQFTypes.SCOPE)){
+		while(parent != null && !(parent instanceof SQFScope)){
 			parent = parent.getParent();
 		}
 		return (SQFScope) parent;
@@ -77,9 +110,9 @@ public class SQFPsiUtil{
 		return findGlobalVariables(project, null);
 	}
 
-	public static SQFPrivateDeclVar createPrivateDeclVar(Project project, String text){
+	public static SQFVariableAsString createVariableAsStringElement(Project project, String text){
 		SQFFile file = createFile(project, text);
-		return (SQFPrivateDeclVar) PsiUtil.findChildElements(file, SQFTypes.PRIVATE_DECL_VAR, null).get(0).getPsi();
+		return (SQFVariableAsString) PsiUtil.findChildElements(file, SQFTypes.VARIABLE_AS_STRING, null).get(0).getPsi();
 	}
 
 	public static SQFVariable createVariable(Project project, String text){

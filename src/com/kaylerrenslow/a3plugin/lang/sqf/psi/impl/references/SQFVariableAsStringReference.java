@@ -3,10 +3,12 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDeclVar;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariableAsString;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFRefactorableReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,12 +16,12 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by Kayler on 03/22/2016.
  */
-public class SQFPrivateDeclVarReference implements PsiReference{
+public class SQFVariableAsStringReference implements SQFRefactorableReference{
 
 	private PsiElement myElement, target;
 	private TextRange range;
 
-	public SQFPrivateDeclVarReference(SQFVariableNamedElement target, SQFPrivateDeclVar var) {
+	public SQFVariableAsStringReference(SQFVariableNamedElement target, SQFVariableAsString var) {
 		this.myElement = var;
 		this.range = TextRange.from(0, target.getTextLength());
 		this.target = target;
@@ -50,7 +52,7 @@ public class SQFPrivateDeclVarReference implements PsiReference{
 	@Override
 	public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
 		ASTNode parent = myElement.getParent().getNode();
-		PsiElement newElement = SQFPsiUtil.createPrivateDeclVar(myElement.getProject(), "\"" + newElementName + "\"");
+		PsiElement newElement = SQFPsiUtil.createVariableAsStringElement(myElement.getProject(), "\"" + newElementName + "\"");
 		parent.replaceChild(myElement.getNode(), newElement.getNode());
 		return newElement;
 	}
@@ -66,7 +68,9 @@ public class SQFPrivateDeclVarReference implements PsiReference{
 			return false;
 		}
 		SQFVariableNamedElement other = (SQFVariableNamedElement) element;
-		return other.getName().equals(getCanonicalText());
+		SQFScope myScope = SQFPsiUtil.getCurrentScope(this.myElement);
+		SQFScope otherScope = SQFPsiUtil.getCurrentScopeForVariable((SQFVariable) element);
+		return myScope == otherScope && other.getName().equals(getCanonicalText());
 	}
 
 	@NotNull
@@ -82,7 +86,7 @@ public class SQFPrivateDeclVarReference implements PsiReference{
 
 	@Override
 	public String toString() {
-		return "SQFPrivateDeclVarReference{" +
+		return "SQFVariableAsStringReference{" +
 				"var name=" + myElement.getText() + '}';
 	}
 }

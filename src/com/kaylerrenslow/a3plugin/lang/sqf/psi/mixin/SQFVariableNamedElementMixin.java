@@ -106,4 +106,8 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 		return var;
 	}
 
+	@Override
+	public String getVarName() {
+		return this.getName();
+	}
 }

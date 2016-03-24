@@ -4,15 +4,13 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.PsiReferenceBase;
 import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDeclVar;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariableAsString;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references.SQFPrivateDeclVarReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references.SQFVariableAsStringReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,12 +20,12 @@ import java.util.ArrayList;
 /**
  * Created by Kayler on 03/23/2016.
  */
-public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement{
+public class SQFVariableAsStringMixin extends ASTWrapperPsiElement implements SQFVariableBase{
 
 	private TextRange range;
 	private String varName;
 
-	public SQFPrivateDeclVarMixin(@NotNull ASTNode node) {
+	public SQFVariableAsStringMixin(@NotNull ASTNode node) {
 		super(node);
 		this.range = TextRange.from(node.getStartOffset() + 1, node.getTextLength() - 1);
 		this.varName = super.getText().substring(1, this.getTextLength() - 1);
@@ -42,7 +40,6 @@ public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement{
 	public TextRange getTextRange() {
 		return range;
 	}
-
 
 	@Override
 	public ItemPresentation getPresentation() {
@@ -71,7 +68,7 @@ public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement{
 
 	@Override
 	public PsiReference getReference() {
-		return new SQFPrivateDeclVarReference((SQFVariableNamedElement) getReferences()[0].getElement(), (SQFPrivateDeclVar) this);
+		return new SQFVariableAsStringReference((SQFVariableNamedElement) getReferences()[0].getElement(), (SQFVariableAsString) this);
 	}
 
 	@NotNull
@@ -83,5 +80,10 @@ public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement{
 			references[i] = nodes.get(i).getPsi().getReference();
 		}
 		return references;
+	}
+
+	@Override
+	public String getVarName(){
+		return this.varName;
 	}
 }

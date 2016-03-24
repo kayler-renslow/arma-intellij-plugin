@@ -16,11 +16,13 @@
 
   name("return_statement")="return statement"
   name("try_catch")="try-catch block"
+  name("macro_call")="macro call"
 
 }
 // @formatter:off
-sqfFile ::= scope
+sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
 
+file_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* {extends("file_scope")=scope}
 scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)*
 
 private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
@@ -32,7 +34,7 @@ variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugi
 statement ::= ( assignment
 				| private_decl
 				| scope_manager
-				| control_struct
+				| control_struct_
 				| try_catch
 				| expression
 			  ) SEMICOLON
@@ -41,38 +43,35 @@ return_statement ::= expression SEMICOLON?
 
 assignment ::= variable EQ (assignment | expression | switch_statement | if_statement | code_block)
 
-expression ::=  (COMMAND | macro | terminal_ | operator_ | expression_paren_)+
+expression::= exp_operand_ exp_operator_ expression | exp_operand_
+private exp_operand_ ::= (PLUS | MINUS | NOT | EXCL)? (macro_call | terminal_ COMMAND exp_operand_? | COMMAND exp_operand_ | COMMAND | terminal_)
+			 | code_block
+			 | ASSERT LPAREN expression RPAREN
 
-private expression_paren_ ::= LPAREN expression RPAREN
+private exp_operator_ ::= PLUS
+			  | MINUS
 
-private operator_ ::= PLUS
-					| MINUS
+			  | ASTERISK
+			  | FSLASH
+			  | PERC
+			  | MOD
+			  | CARET
 
-					| ASTERISK
-					| FSLASH
-					| PERC
-					| MOD
-					| CARET
+			  | AND
+			  | AMPAMP
+			  | OR
+			  | BARBAR
 
-					| AND
-					| AMPAMP
-					| OR
-					| BARBAR
+			  | EXCL
+			  | NOT
+			  | EQEQ
+			  | NE
+			  | LT
+			  | GT
+			  | LE
+			  | GE
 
-					| EXCL
-					| NOT
-					| EQEQ
-					| NE
-					| LT
-					| GT
-					| LE
-					| GE
-
-					| GTGT
-
-					| code_block
-
-					| ASSERT LPAREN expression RPAREN
+			  | GTGT
 
 
 private terminal_ ::= STRING_LITERAL
@@ -86,9 +85,10 @@ private terminal_ ::= STRING_LITERAL
 					| TYPE_NULL
 					| NIL
 					| NAMESPACE
-					| LPAREN terminal_ RPAREN
+					| LPAREN expression RPAREN
 
-macro ::= variable LPAREN expression (COMMA expression)* RPAREN
+
+macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 
 array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
@@ -96,8 +96,8 @@ array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 code_block ::= LBRACE scope RBRACE
 
 /*control structures and other things*/
-    private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET)
-	private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin"}
+    private_decl ::= PRIVATE ( variable_as_string | LBRACKET (variable_as_string (COMMA variable_as_string)*) RBRACKET)
+	variable_as_string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableAsStringMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableElement"}
 
 
     scope_manager ::= GOTO COLON STRING_LITERAL
@@ -107,7 +107,7 @@ code_block ::= LBRACE scope RBRACE
 				    | BREAK
 				    | SCOPE_NAME STRING_LITERAL
 
-    control_struct ::= if_statement | switch_statement | loop_ | wait_until_statement | with_statement | quest_statement
+    private control_struct_ ::= if_statement | switch_statement | loop_ | wait_until_statement | with_statement | quest_statement
     if_statement ::= IF LPAREN expression RPAREN (
 				     THEN code_block (ELSE code_block)?
 				   | EXIT_WITH code_block
@@ -122,7 +122,7 @@ code_block ::= LBRACE scope RBRACE
     loop_while    ::= WHILE LBRACE expression RBRACE DO code_block
     private for_loops_ ::= loop_for | loop_for_from | loop_for_each
     loop_for  ::= FOR LBRACKET code_block COMMA LBRACE expression RBRACE COMMA code_block RBRACKET DO code_block
-    loop_for_from ::= FOR STRING_LITERAL FROM expression TO expression (STEP expression)? DO code_block
+    loop_for_from ::= FOR variable_as_string FROM expression TO expression (STEP expression)? DO code_block
     loop_for_each ::= code_block FOR_EACH expression
 
     quest_statement ::= QUEST expression COLON exp

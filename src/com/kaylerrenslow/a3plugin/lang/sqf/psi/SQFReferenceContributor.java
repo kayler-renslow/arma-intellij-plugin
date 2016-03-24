@@ -6,7 +6,7 @@ import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references.SQFPrivateDeclVarReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references.SQFVariableAsStringReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,16 +26,24 @@ public class SQFReferenceContributor extends PsiReferenceContributor{
 				if (!(element instanceof SQFVariableNamedElement)){
 					return new PsiReference[0];
 				}
+
 				SQFVariableNamedElement var = (SQFVariableNamedElement) element;
 
 				if (var.getVariableType() == SQFTypes.LOCAL_VAR){
-					ArrayList<ASTNode> nodes = PsiUtil.findChildElements(SQFPsiUtil.getCurrentScope(element), SQFTypes.PRIVATE_DECL_VAR, null, "\"" + var.getText() + "\"");
-//					System.out.println("SQFReferenceContributor.getReferencesByElement " + nodes.size());
-					PsiReference[] references = new PsiReference[nodes.size()];
-					ASTNode node;
+					SQFScope varScope = SQFPsiUtil.getCurrentScopeForVariable((SQFVariable) var);
+					ArrayList<ASTNode> nodes = PsiUtil.findChildElements(SQFPsiUtil.getCurrentScope(element), SQFTypes.VARIABLE_AS_STRING, null, "\"" + var.getText() + "\"");
+					ArrayList<PsiElement> referencesList = new ArrayList<>();
 					for (int i = 0; i < nodes.size(); i++){
-						node = nodes.get(i);
-						references[i] = new SQFPrivateDeclVarReference(var, (SQFPrivateDeclVar)node.getPsi());
+						if(varScope == SQFPsiUtil.getCurrentScope(nodes.get(i).getPsi())){
+							referencesList.add(nodes.get(i).getPsi());
+						}
+					}
+
+					PsiReference[] references = new PsiReference[referencesList.size()];
+					PsiElement ele;
+					for (int i = 0; i < referencesList.size(); i++){
+						ele = referencesList.get(i);
+						references[i] = new SQFVariableAsStringReference(var, (SQFVariableAsString)ele);
 					}
 					return references;
 				}

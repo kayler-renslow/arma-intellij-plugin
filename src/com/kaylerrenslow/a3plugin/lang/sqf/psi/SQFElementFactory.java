@@ -5,5 +5,5 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi;
  */
 public class SQFElementFactory{
 
-//	public static SQFVariable
+//	public static SQFVariableBase
 }

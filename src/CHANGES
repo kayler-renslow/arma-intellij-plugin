@@ -1,1 +1,2 @@
-for SQF, in private decl, each variable points to the other references of that same name. renaming also works, but one way. can only rename the variable and not the variable in the private decl
+SQF
+	local variables will only reference each other if their scope matches

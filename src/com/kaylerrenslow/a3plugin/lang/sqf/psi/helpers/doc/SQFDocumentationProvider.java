@@ -100,7 +100,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 			ASTNode n;
 			for (ASTNode node : localVars){
 				if (node.getText().equals(contextElement.getNode().getText())){
-					n = node.getTreeParent().getTreeParent(); //go to SQFVariable, then to Assignment
+					n = node.getTreeParent().getTreeParent(); //go to SQFVariableBase, then to Assignment
 					if (!PsiUtil.isOfElementType(n, SQFTypes.ASSIGNMENT)){
 						continue;
 					}

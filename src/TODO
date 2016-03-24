@@ -3,46 +3,4 @@
 
 >for SQF, find each local variable in current scope and annotate them if not declared private
 
-//will this work?
-expression::= LPAREN expression RPAREN | exp_operand exp_operator expression | exp_operand
-exp_operand::= (PLUS | MINUS)? (macro | COMMAND exp_operand | COMMAND | terminal_)
-			 | code_block
-			 | ASSERT LPAREN expression RPAREN
 
-exp_operator::= PLUS
-			  | MINUS
-
-			  | ASTERISK
-			  | FSLASH
-			  | PERC
-			  | MOD
-			  | CARET
-
-			  | AND
-			  | AMPAMP
-			  | OR
-			  | BARBAR
-
-			  | EXCL
-			  | NOT
-			  | EQEQ
-			  | NE
-			  | LT
-			  | GT
-			  | LE
-			  | GE
-
-			  | GTGT
-
-
-private terminal_ ::= STRING_LITERAL
-					| variable
-					| INTEGER_LITERAL
-					| array_val
-					| DEC_LITERAL
-					| TRUE
-					| FALSE
-					| CONFIG
-					| TYPE_NULL
-					| NIL
-					| NAMESPACE
