@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers;
+package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
@@ -30,9 +30,9 @@ public class SQFCompletionProvider extends com.intellij.codeInsight.completion.C
 
 		ArrayList<ASTNode> elements = new ArrayList<>();
 		if(lookForLocalVars){
-			elements.addAll(PsiUtil.findChildElements(parameters.getOriginalFile(), SQFTypes.LOCAL_VAR, cursor.getNode()));
+			elements.addAll(PsiUtil.findDescendantElements(parameters.getOriginalFile(), SQFTypes.LOCAL_VAR, cursor.getNode()));
 		}else{
-			elements.addAll(PsiUtil.findChildElements(parameters.getOriginalFile(), SQFTypes.GLOBAL_VAR, cursor.getNode()));
+			elements.addAll(PsiUtil.findDescendantElements(parameters.getOriginalFile(), SQFTypes.GLOBAL_VAR, cursor.getNode()));
 		}
 
 

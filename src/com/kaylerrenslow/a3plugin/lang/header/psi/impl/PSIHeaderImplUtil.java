@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.header.psi.helpers;
+package com.kaylerrenslow.a3plugin.lang.header.psi.impl;
 
 /**
  * Created by Kayler on 01/01/2016.

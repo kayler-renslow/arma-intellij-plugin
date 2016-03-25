@@ -1,10 +1,11 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers;
+package com.kaylerrenslow.a3plugin.lang.sqf.contributors;
 
 import com.intellij.codeInsight.completion.CompletionContributor;
 import com.intellij.codeInsight.completion.CompletionType;
 import com.intellij.patterns.PlatformPatterns;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFLanguage;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFCompletionProvider;
 
 /**
  * @author Kayler

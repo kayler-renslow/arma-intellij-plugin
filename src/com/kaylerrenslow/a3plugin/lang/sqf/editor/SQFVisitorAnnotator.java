@@ -6,7 +6,7 @@ import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.util.TextRange;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDecl;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariableAsString;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDeclVar;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -29,8 +29,8 @@ public class SQFVisitorAnnotator extends com.kaylerrenslow.a3plugin.lang.sqf.psi
 	@Override
 	public void visitPrivateDecl(@NotNull SQFPrivateDecl o) {
 		super.visitPrivateDecl(o);
-		List<SQFVariableAsString> varList = o.getVariableAsStringList();
-		Iterator<SQFVariableAsString> iter = varList.iterator();
+		List<SQFPrivateDeclVar> varList = o.getPrivateDeclVarList();
+		Iterator<SQFPrivateDeclVar> iter = varList.iterator();
 		ArrayList<String> vars = new ArrayList<>();
 		int matchedIndex;
 		ASTNode n1, n2;

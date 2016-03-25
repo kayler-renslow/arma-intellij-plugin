@@ -1,14 +1,14 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references;
+package com.kaylerrenslow.a3plugin.lang.sqf.psi.references;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariableAsString;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDeclVar;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFRefactorableReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFRefactorableReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,12 +16,12 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by Kayler on 03/22/2016.
  */
-public class SQFVariableAsStringReference implements SQFRefactorableReference{
+public class SQFPrivateDeclVarReference implements SQFRefactorableReference{
 
 	private PsiElement myElement, target;
 	private TextRange range;
 
-	public SQFVariableAsStringReference(SQFVariableNamedElement target, SQFVariableAsString var) {
+	public SQFPrivateDeclVarReference(SQFVariableNamedElement target, SQFPrivateDeclVar var) {
 		this.myElement = var;
 		this.range = TextRange.from(0, target.getTextLength());
 		this.target = target;
@@ -52,7 +52,7 @@ public class SQFVariableAsStringReference implements SQFRefactorableReference{
 	@Override
 	public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
 		ASTNode parent = myElement.getParent().getNode();
-		PsiElement newElement = SQFPsiUtil.createVariableAsStringElement(myElement.getProject(), "\"" + newElementName + "\"");
+		PsiElement newElement = SQFPsiUtil.createPrivateDeclVarElement(myElement.getProject(), "\"" + newElementName + "\"");
 		parent.replaceChild(myElement.getNode(), newElement.getNode());
 		return newElement;
 	}
@@ -86,7 +86,7 @@ public class SQFVariableAsStringReference implements SQFRefactorableReference{
 
 	@Override
 	public String toString() {
-		return "SQFVariableAsStringReference{" +
+		return "SQFPrivateDeclVarReference{" +
 				"var name=" + myElement.getText() + '}';
 	}
 }

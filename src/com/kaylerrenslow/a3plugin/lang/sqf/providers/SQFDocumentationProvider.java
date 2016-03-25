@@ -1,16 +1,17 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.doc;
+package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.documentation.DocumentationProviderEx;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.TokenType;
+import com.intellij.psi.*;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFAssignment;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFStatement;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import com.kaylerrenslow.a3plugin.util.FileReader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -94,41 +95,32 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 			return contextElement;
 		}
 
-		if (PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)){
-			ArrayList<ASTNode> localVars = PsiUtil.findChildElements(file, SQFTypes.LOCAL_VAR, null);
 
-			ASTNode n;
-			for (ASTNode node : localVars){
-				if (node.getText().equals(contextElement.getNode().getText())){
-					n = node.getTreeParent().getTreeParent(); //go to SQFVariableBase, then to Assignment
-					if (!PsiUtil.isOfElementType(n, SQFTypes.ASSIGNMENT)){
-						continue;
-					}
-					n = n.getTreeParent();
-					if (!PsiUtil.isOfElementType(n, SQFTypes.STATEMENT)){
-						continue;
-					}
-					PsiElement comment = getInlineComment(editor, n.getTreeNext(), node);
+		if(PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)){ //this code works, but only when the selected statement has the comment
+			SQFVariable var = (SQFVariable)(contextElement.getParent());
+			PsiReference[] references = var.getReferences();
+			for(PsiReference reference : references){
+				if(reference.getElement().getParent() instanceof SQFAssignment){
+					SQFStatement statement = (SQFStatement) reference.getElement().getParent().getParent();
+					PsiElement comment = getInlineComment(editor, statement.getNode());
 					if (comment != null){
 						return comment;
 					}
 				}
-
 			}
 		}
+
 		return null;
 	}
 
 	@Nullable
-	private PsiElement getInlineComment(@NotNull Editor editor, ASTNode potentialCommentNode, ASTNode node) {
-		if (PsiUtil.isOfElementType(potentialCommentNode, TokenType.WHITE_SPACE)){
-			potentialCommentNode = potentialCommentNode.getTreeNext();
-		}
-		if (PsiUtil.isOfElementType(potentialCommentNode, SQFTypes.COMMENT)){
-			if (editor.getDocument().getLineNumber(node.getStartOffset()) != editor.getDocument().getLineNumber(potentialCommentNode.getStartOffset())){ //comment not on same line
+	private PsiElement getInlineComment(@NotNull Editor editor, ASTNode statementNode) {
+		ASTNode commentNode = PsiUtil.getNextSiblingNotWhitespace(statementNode);
+		if (PsiUtil.isOfElementType(commentNode, SQFTypes.COMMENT) || PsiUtil.isOfElementType(commentNode, SQFTypes.BLOCK_COMMENT)){
+			if (editor.getDocument().getLineNumber(statementNode.getStartOffset()) != editor.getDocument().getLineNumber(commentNode.getStartOffset())){ //comment not on same line
 				return null;
 			}
-			return potentialCommentNode.getPsi();
+			return commentNode.getPsi();
 		}
 		return null;
 	}

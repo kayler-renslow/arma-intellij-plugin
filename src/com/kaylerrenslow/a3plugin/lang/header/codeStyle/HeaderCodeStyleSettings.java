@@ -11,5 +11,4 @@ public class HeaderCodeStyleSettings extends CustomCodeStyleSettings{
 		super("HeaderCodeStyleSettings", settings);
 	}
 
-
 }

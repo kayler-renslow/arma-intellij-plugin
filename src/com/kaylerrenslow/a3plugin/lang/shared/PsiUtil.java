@@ -3,6 +3,7 @@ package com.kaylerrenslow.a3plugin.lang.shared;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 
 import java.util.ArrayList;
@@ -13,6 +14,61 @@ import java.util.List;
  *         Created on 01/02/2016.
  */
 public class PsiUtil{
+
+	public static ASTNode getNextSiblingNotWhitespace(ASTNode node){
+		ASTNode sibling = node.getTreeNext();
+		while(sibling != null){
+			if(sibling.getElementType() == TokenType.WHITE_SPACE){
+				sibling = sibling.getTreeNext();
+			}else{
+				break;
+			}
+		}
+		return sibling;
+	}
+
+	public static ASTNode getPrevSiblingNotWhitespace(ASTNode node){
+		ASTNode sibling = node.getTreePrev();
+		while(sibling != null){
+			if(sibling.getElementType() == TokenType.WHITE_SPACE){
+				sibling = sibling.getTreePrev();
+			}else{
+				break;
+			}
+		}
+		return sibling;
+	}
+
+	/** Checks if the given node is a descendant of the given IElementType.<br>
+	 *  If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
+	 * @param node node to check if has a ancestor of IElementType type
+	 * @param type IElementType to check
+	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
+	 * @return true if node has ancestor of IElementType type and ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
+	 */
+	public static boolean isDescendantOf(ASTNode node, IElementType type, String textContent){
+		return getAncestorWithType(node, type, textContent) != null;
+	}
+
+	/** Checks if the given node is an ancestor of the given IElementType. If it is, this method will return that ancestor. Otherwise, it will return null.<br>
+	 *  If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
+	 * @param node node to check if has a parent of IElementType type
+	 * @param type IElementType to check
+	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
+	 * @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
+	 */
+	public static ASTNode getAncestorWithType(ASTNode node, IElementType type, String textContent){
+		ASTNode parent = node.getTreeParent();
+		boolean isChild = false;
+		while(parent != null && !isChild){
+			parent = parent.getTreeParent();
+			if(parent == null){
+				break;
+			}
+			isChild = parent.getElementType() == type && (textContent == null || parent.getText().equals(textContent));
+		}
+		return parent;
+	}
 
 	/**
 	 * Checks if IElementType of both nodes are the same. Returns false if either are null.
@@ -111,8 +167,8 @@ public class PsiUtil{
 	 * @param cursor the node that is already discovered since the user's mouse is over it (can be null)
 	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
 	 */
-	public static ArrayList<ASTNode> findChildElements(PsiElement element, IElementType toFind, ASTNode cursor) {
-		return findChildElements(element, toFind, cursor, null);
+	public static ArrayList<ASTNode> findDescendantElements(PsiElement element, IElementType toFind, ASTNode cursor) {
+		return findDescendantElements(element, toFind, cursor, null);
 	}
 
 	/**
@@ -124,7 +180,7 @@ public class PsiUtil{
 	 * @param textContent text to look for in ASTNode (null if doesn't matter)
 	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
 	 */
-	public static ArrayList<ASTNode> findChildElements(PsiElement element, IElementType toFind, ASTNode cursor, String textContent) {
+	public static ArrayList<ASTNode> findDescendantElements(PsiElement element, IElementType toFind, ASTNode cursor, String textContent) {
 		ArrayList<ASTNode> list = new ArrayList<>();
 		traverseElement(list, element, toFind, cursor, textContent);
 		return list;

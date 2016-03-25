@@ -10,5 +10,12 @@ import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
 public class HeaderCodeStyleMainPanel extends TabbedLanguageCodeStylePanel{
 	public HeaderCodeStyleMainPanel(CodeStyleSettings currentSettings, CodeStyleSettings settings) {
 		super(HeaderLanguage.INSTANCE, currentSettings, settings);
+		this.addIndentOptionsTab(settings);
+	}
+
+
+	@Override
+	protected void addWrappingAndBracesTab(CodeStyleSettings settings) {
+		super.addWrappingAndBracesTab(settings);
 	}
 }

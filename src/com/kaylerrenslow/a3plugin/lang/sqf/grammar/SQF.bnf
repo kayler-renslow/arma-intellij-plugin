@@ -12,22 +12,27 @@
   elementTypeClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFElementType"
   tokenTypeClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTokenType"
 
-  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiImplUtil"
+  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiImplUtilForGrammar"
 
-  name("return_statement")="return statement"
+  name("return_statement")="Return Statement"
   name("try_catch")="try-catch block"
-  name("macro_call")="macro call"
+  name("macro_call")="Macro Call"
+  name("assignment")="Assignment"
+  name("if_statement")="If Statement"
+  name("expression")="Expression"
+  name("terminal_")="Terminal"
+  name("exp_operand_")="Terminal"
 
 }
 // @formatter:off
 sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
 
-file_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* {extends("file_scope")=scope}
-scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)*
+file_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* {extends("file_scope")=local_scope}
+local_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope"}
 
 private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
 private whitespace_comment_ ::= WHITE_SPACE | comment_
-private comment_ ::= COMMENT | BLOCK_COMMENT | COMMENT_KEYWORD STRING_LITERAL
+private comment_ ::= COMMENT | BLOCK_COMMENT | COMMENT_KEYWORD string
 variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[]}
 
 
@@ -41,7 +46,7 @@ statement ::= ( assignment
 
 return_statement ::= expression SEMICOLON?
 
-assignment ::= variable EQ (assignment | expression | switch_statement | if_statement | code_block)
+assignment ::= variable EQ (assignment | expression | switch_statement | if_statement | code_block) {methods=[getAssigningVariable]}
 
 expression::= exp_operand_ exp_operator_ expression | exp_operand_
 private exp_operand_ ::= (PLUS | MINUS | NOT | EXCL)? (macro_call | terminal_ COMMAND exp_operand_? | COMMAND exp_operand_ | COMMAND | terminal_)
@@ -74,7 +79,7 @@ private exp_operator_ ::= PLUS
 			  | GTGT
 
 
-private terminal_ ::= STRING_LITERAL
+private terminal_ ::= string
 					| variable
 					| INTEGER_LITERAL
 					| array_val
@@ -87,25 +92,26 @@ private terminal_ ::= STRING_LITERAL
 					| NAMESPACE
 					| LPAREN expression RPAREN
 
+string ::= STRING_LITERAL
 
 macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 
 array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
 
-code_block ::= LBRACE scope RBRACE
+code_block ::= LBRACE local_scope RBRACE
 
 /*control structures and other things*/
-    private_decl ::= PRIVATE ( variable_as_string | LBRACKET (variable_as_string (COMMA variable_as_string)*) RBRACKET)
-	variable_as_string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableAsStringMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableElement"}
+    private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET)
+	private_decl_var ::= string {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableElement"}
 
 
-    scope_manager ::= GOTO COLON STRING_LITERAL
-				    | BREAK_TO STRING_LITERAL
-				    | expression? BREAK_OUT STRING_LITERAL
+    scope_manager ::= GOTO COLON string
+				    | BREAK_TO string
+				    | expression? BREAK_OUT string
 				    | CONTINUE
 				    | BREAK
-				    | SCOPE_NAME STRING_LITERAL
+				    | SCOPE_NAME string
 
     private control_struct_ ::= if_statement | switch_statement | loop_ | wait_until_statement | with_statement | quest_statement
     if_statement ::= IF LPAREN expression RPAREN (
@@ -122,7 +128,7 @@ code_block ::= LBRACE scope RBRACE
     loop_while    ::= WHILE LBRACE expression RBRACE DO code_block
     private for_loops_ ::= loop_for | loop_for_from | loop_for_each
     loop_for  ::= FOR LBRACKET code_block COMMA LBRACE expression RBRACE COMMA code_block RBRACKET DO code_block
-    loop_for_from ::= FOR variable_as_string FROM expression TO expression (STEP expression)? DO code_block
+    loop_for_from ::= FOR string FROM expression TO expression (STEP expression)? DO code_block
     loop_for_each ::= code_block FOR_EACH expression
 
     quest_statement ::= QUEST expression COLON exp

@@ -1,9 +1,11 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi;
+package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 
 import com.intellij.lang.refactoring.RefactoringSupportProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFRefactorableReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFRefactorableReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

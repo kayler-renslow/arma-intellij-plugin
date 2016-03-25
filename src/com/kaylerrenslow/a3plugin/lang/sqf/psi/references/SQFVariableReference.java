@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references;
+package com.kaylerrenslow.a3plugin.lang.sqf.psi.references;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -8,8 +8,8 @@ import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.SQFRefactorableReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFRefactorableReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -53,6 +53,9 @@ public class SQFVariableReference implements SQFRefactorableReference{
 
 	@Override
 	public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+		if(myVariableElementType == SQFTypes.LANG_VAR){
+			throw new IncorrectOperationException("This variable can not be renamed.");
+		}
 		return myElement.setName(newElementName);
 	}
 
@@ -66,18 +69,15 @@ public class SQFVariableReference implements SQFRefactorableReference{
 		if (!(element instanceof SQFVariableNamedElement)){
 			return false;
 		}
-		if (myVariableElementType == SQFTypes.LANG_VAR){
-			return false;
-		}
 		SQFVariableNamedElement other = (SQFVariableNamedElement) element;
-		SQFVariable meAsVariable = (SQFVariable)resolve();
+		PsiElement selfResolve = resolve();
 
 		boolean referenceTo = other.getName().equals(getCanonicalText()) && resolve() != other;
 
-		if (myVariableElementType == SQFTypes.LOCAL_VAR){
-			SQFScope myScope = SQFPsiUtil.getCurrentScopeForVariable(meAsVariable);
+		if (myVariableElementType != SQFTypes.GLOBAL_VAR){
+			SQFScope myScope = SQFPsiUtil.getCurrentScopeForVariable((SQFVariable) selfResolve);
 			SQFScope otherScope = SQFPsiUtil.getCurrentScopeForVariable((SQFVariable) element);
-			referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == resolve().getContainingFile();
+			referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == selfResolve.getContainingFile();
 			return referenceTo;
 		}
 		return referenceTo;

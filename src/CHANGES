@@ -1,2 +1,11 @@
+plugin
+	moved files around in packages. I'm done doing that now.
+
+shared between languages
+	got usage type's to work for when finding usages
+
 SQF
-	local variables will only reference each other if their scope matches
+	lang var's will now reference each other as long as they are in the same scope. they are not rename-able though
+
+Header
+	got Header file formatting started with good progress

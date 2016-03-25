@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers;
+package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 
 import com.intellij.lang.cacheBuilder.DefaultWordsScanner;
 import com.intellij.lang.cacheBuilder.WordsScanner;
@@ -34,7 +34,7 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 		if(psiElement instanceof SQFVariable){
 			return "Value read";
 		}
-		return "find usages provider help id. WHAT. DOES. THIS. do.";
+		return getClass().getName() + " getHelpId";
 	}
 
 	@NotNull
@@ -52,16 +52,15 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 		if(element instanceof SQFVariable){
 			return element.getNode().getText();
 		}
-		return "s";
+		return getClass().getName() + " getDescriptiveName";
 	}
 
 	@NotNull
 	@Override
 	public String getNodeText(@NotNull PsiElement element, boolean useFullName) {
-		System.out.println("SQFFindUsagesProvider.getNodeText " + element.getText());
 		if(element instanceof SQFVariable){
 			return element.getText();
 		}
-		return "";
+		return getClass().getName() + " getNodeText";
 	}
 }

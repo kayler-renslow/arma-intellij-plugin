@@ -12,7 +12,7 @@
   elementTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderElementType"
   tokenTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTokenType"
 
-  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.helpers.PSIHeaderImplUtil"
+  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.impl.PSIHeaderImplUtil"
 }
 // @formatter:off
 headerFile ::= item_*
@@ -35,29 +35,29 @@ assignment ::= basic_assignment | array_assignment
 basic_assignment ::= assignment_identifier EQ (expression | value )
 array_assignment ::= assignment_identifier BRACKET_PAIR EQ array
 
-expression ::= add_expression
+expression ::= add_expression_
 
-add_expression ::= mult_expression PLUS add_expression
-				 | mult_expression MINUS add_expression
-				 | mult_expression
+private add_expression_ ::= mult_expression_ PLUS add_expression_
+				 | mult_expression_ MINUS add_expression_
+				 | mult_expression_
 
-mult_expression ::= term ASTERISK mult_expression
-				  | term FSLASH mult_expression
-				  | term PERC mult_expression
-				  | term MOD mult_expression
-				  | term CARET mult_expression
-				  | term
+private mult_expression_ ::= term_ ASTERISK mult_expression_
+				  | term_ FSLASH mult_expression_
+				  | term_ PERC mult_expression_
+				  | term_ MOD mult_expression_
+				  | term_ CARET mult_expression_
+				  | term_
 
-term ::= (PLUS | MINUS)? (
+private term_ ::= (PLUS | MINUS)? (
 			number
             | IDENTIFIER
 			| LPAREN expression RPAREN
 		  )
 
 
-class_declaration ::= CLASS IDENTIFIER (COLON IDENTIFIER)? class_content?
+class_declaration ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (LBRACE class_content RBRACE)?
 
-class_content ::= LBRACE (item_)* RBRACE
+class_content ::= item_*
 
 //Preprocessor things
 preprocessor ::= pre_include //| pre_define_//TODO

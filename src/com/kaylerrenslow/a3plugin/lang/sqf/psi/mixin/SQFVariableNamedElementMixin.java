@@ -12,10 +12,10 @@ import com.intellij.util.ArrayUtil;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.references.SQFVariableReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers.SQFPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -66,19 +66,16 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 	@NotNull
 	@Override
 	public PsiReference[] getReferences() {
-		if(PsiUtil.isOfElementType(this, SQFTypes.LANG_VAR)){
-			return new PsiReference[0];
+		if(myVariableElementType == SQFTypes.LANG_VAR){
+			return new PsiReference[]{getReference()};
 		}
-		PsiReference[] references = ReferenceProvidersRegistry.getReferencesFromProviders(this);
+		PsiReference[] references= ReferenceProvidersRegistry.getReferencesFromProviders(this);
 		return ArrayUtil.prepend(getReference(), references);
 	}
 
 
 	@Override
 	public PsiReference getReference() {
-		if(myVariableElementType == SQFTypes.LANG_VAR){
-			return null;
-		}
 		return new SQFVariableReference(this, myVariableElementType);
 	}
 
@@ -100,6 +97,9 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 
 	@Override
 	public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
+		if(myVariableElementType == SQFTypes.LANG_VAR){
+			throw new IncorrectOperationException("This variable can not be renamed.");
+		}
 		ASTNode me = this.getNode();
 		SQFVariable var = SQFPsiUtil.createVariable(this.getProject(), name);
 		me.getTreeParent().replaceChild(me, var.getNode());

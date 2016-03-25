@@ -11,6 +11,12 @@ class TestClass {
     class NestedClass : extendClass{
         array[] = {var, 1, 1e1, ""};
         math = 1 + 69 * 1;
+        /*Another block comment*/
     };
+
+    thingy = 0; /*hi*/
+    class NoBodyClass;
+
+    class NoBodyClass2;
 };
 

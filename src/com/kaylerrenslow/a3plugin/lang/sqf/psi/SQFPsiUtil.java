@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.helpers;
+package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
@@ -9,11 +9,11 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,13 +30,23 @@ public class SQFPsiUtil{
 	 */
 	public static SQFScope getCurrentScopeForVariable(SQFVariable var){
 		SQFScope scope = getCurrentScope(var);
-		List<SQFVariableAsString> varsForScope = getPrivateVarsForScope(scope);
+		if(var.getVariableType() == SQFTypes.LANG_VAR){
+			if(var.getVarName().equals("_this")){
+				return getFileScope((SQFFile) var.getContainingFile());
+			}
+			return scope;
+		}
+		if(var.getVariableType() == SQFTypes.GLOBAL_VAR){
+			return getFileScope((SQFFile) var.getContainingFile());
+		}
+
+		List<SQFPrivateDeclVar> varsForScope = getPrivateVarsForScope(scope);
 
 		while(scope != null){
 			if(scope instanceof SQFFileScope){
 				break;
 			}
-			for (SQFVariableAsString varInScope : varsForScope){
+			for (SQFPrivateDeclVar varInScope : varsForScope){
 				if (varInScope.getVarName().equals(var.getVarName())){
 					return scope;
 				}
@@ -47,16 +57,20 @@ public class SQFPsiUtil{
 		return scope;
 	}
 
-	public static List<SQFVariableAsString> getPrivateVarsForScope(SQFScope scope){
-		List<ASTNode> list = PsiUtil.findChildElements(scope, SQFTypes.VARIABLE_AS_STRING, null);
-		List<SQFVariableAsString> ret = new ArrayList<>();
+	public static SQFFileScope getFileScope(SQFFile containingFile) {
+		return (SQFFileScope)containingFile.getNode().getChildren(TokenSet.create(SQFTypes.FILE_SCOPE))[0].getPsi();
+	}
+
+	public static List<SQFPrivateDeclVar> getPrivateVarsForScope(SQFScope scope){
+		List<ASTNode> list = PsiUtil.findDescendantElements(scope, SQFTypes.PRIVATE_DECL_VAR, null);
+		List<SQFPrivateDeclVar> ret = new ArrayList<>();
 		for(int i = 0; i < list.size(); i++){
-			ret.add((SQFVariableAsString)list.get(i).getPsi());
+			ret.add((SQFPrivateDeclVar)list.get(i).getPsi());
 		}
 		return ret;
 	}
 
-	/** Gets the current scope of the psi element
+	/** Gets the current scope of the psi element. Scope is determined by what code block element is in, or if not in a code block then the file's file scope is returned
 	 * @param element element to get scope of
 	 * @return scope
 	 */
@@ -110,14 +124,14 @@ public class SQFPsiUtil{
 		return findGlobalVariables(project, null);
 	}
 
-	public static SQFVariableAsString createVariableAsStringElement(Project project, String text){
+	public static SQFPrivateDeclVar createPrivateDeclVarElement(Project project, String text){
 		SQFFile file = createFile(project, text);
-		return (SQFVariableAsString) PsiUtil.findChildElements(file, SQFTypes.VARIABLE_AS_STRING, null).get(0).getPsi();
+		return (SQFPrivateDeclVar) PsiUtil.findDescendantElements(file, SQFTypes.PRIVATE_DECL_VAR, null).get(0).getPsi();
 	}
 
 	public static SQFVariable createVariable(Project project, String text){
 		SQFFile file = createFile(project, text);
-		return (SQFVariable) PsiUtil.findChildElements(file, SQFTypes.VARIABLE, null).get(0).getPsi();
+		return (SQFVariable) PsiUtil.findDescendantElements(file, SQFTypes.VARIABLE, null).get(0).getPsi();
 	}
 
 	public static SQFFile createFile(Project project, String text){

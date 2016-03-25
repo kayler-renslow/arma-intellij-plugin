@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.psi.impl;
+package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
 import com.intellij.psi.PsiReference;
 

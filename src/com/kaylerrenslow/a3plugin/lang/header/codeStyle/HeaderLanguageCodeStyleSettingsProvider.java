@@ -1,21 +1,34 @@
 package com.kaylerrenslow.a3plugin.lang.header.codeStyle;
 
+import com.intellij.application.options.IndentOptionsEditor;
 import com.intellij.lang.Language;
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable;
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider;
+import com.intellij.util.containers.ArrayListSet;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderStatic;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Set;
 
 /**
  * @author Kayler
  * Created on 03/18/2016.
  */
 public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSettingsProvider{
+
 	@NotNull
 	@Override
 	public Language getLanguage() {
 		return HeaderLanguage.INSTANCE;
+	}
+
+
+	@Nullable
+	@Override
+	public IndentOptionsEditor getIndentOptionsEditor() {
+		return new IndentOptionsEditor();
 	}
 
 	@Override
@@ -28,7 +41,7 @@ public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSe
 				consumer.showAllStandardOptions();
 				break;
 			case INDENT_SETTINGS:
-				consumer.showAllStandardOptions();
+//				consumer.showStandardOptions();
 				break;
 			case LANGUAGE_SPECIFIC:
 				consumer.showAllStandardOptions();
