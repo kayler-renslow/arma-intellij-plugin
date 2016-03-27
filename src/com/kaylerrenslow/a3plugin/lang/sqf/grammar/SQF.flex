@@ -25,9 +25,6 @@ INPUT_CHARACTER = [^\r\n]
 
 WHITE_SPACE = {LINE_TERMINATOR} | [ \t\f]
 
-BLOCK_COMMENT = "/**/" | "/*" ~"*/" | "/*" "*"+ "/"
-END_OF_LINE_COMMENT = "//" {INPUT_CHARACTER}* {LINE_TERMINATOR}?
-
 DIGIT = [0-9]
 DIGITS = {DIGIT}+
 
@@ -39,12 +36,16 @@ DEC_LITERAL = ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 ESCAPE_SEQUENCE = \\[^\r\n]
 
 STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
+
+BLOCK_COMMENT = "/*" ~"*/"
+INLINE_COMMENT = "//" {INPUT_CHARACTER}*
+
 %%
 
 <YYINITIAL> {WHITE_SPACE}+ { return SQFTypes.WHITE_SPACE; }
 
 <YYINITIAL> {BLOCK_COMMENT} { return SQFTypes.BLOCK_COMMENT; }
-<YYINITIAL> {END_OF_LINE_COMMENT} { return SQFTypes.COMMENT; }
+<YYINITIAL> {INLINE_COMMENT} { return SQFTypes.INLINE_COMMENT; }
 
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
@@ -112,8 +113,6 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "try" { return SQFTypes.TRY; }
 <YYINITIAL> "catch" { return SQFTypes.CATCH; }
 <YYINITIAL> "throw" { return SQFTypes.THROW; }
-
-<YYINITIAL> "comment" { return SQFTypes.COMMENT_KEYWORD; }
 
 <YYINITIAL> "configFile" { return SQFTypes.CONFIG; }
 <YYINITIAL> "campaignConfigFile" { return SQFTypes.CONFIG; }
@@ -379,6 +378,7 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 <YYINITIAL> "commandStop" { return SQFTypes.COMMAND; }
 <YYINITIAL> "commandTarget" { return SQFTypes.COMMAND; }
 <YYINITIAL> "commandWatch" { return SQFTypes.COMMAND; }
+<YYINITIAL> "comment" { return SQFTypes.COMMAND; }
 <YYINITIAL> "commitOverlay" { return SQFTypes.COMMAND; }
 <YYINITIAL> "compile" { return SQFTypes.COMMAND; }
 <YYINITIAL> "compileFinal" { return SQFTypes.COMMAND; }

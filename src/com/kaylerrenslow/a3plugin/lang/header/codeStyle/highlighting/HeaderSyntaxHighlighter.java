@@ -82,7 +82,7 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(HeaderTypes.COMMA)){
 			return COMMA_KEYS;
 		}
-		if (tokenType.equals(HeaderTypes.COMMENT) || tokenType.equals(HeaderTypes.BLOCK_COMMENT) ){
+		if (tokenType.equals(HeaderTypes.INLINE_COMMENT) || tokenType.equals(HeaderTypes.BLOCK_COMMENT) ){
 			return COMMENT_KEYS;
 		}
 		if(tokenType.equals(HeaderTypes.STRING_LITERAL)){

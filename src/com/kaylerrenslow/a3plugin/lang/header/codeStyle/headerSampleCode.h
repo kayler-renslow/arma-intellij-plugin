@@ -3,20 +3,21 @@
 
 /*Block comment*/
 class TestClass {
-    indentifier = anotherIdentifer;
-    array[] = {}; //inline comment
-    string = "hallo from the other siiide";
-    math = 1 + 1 + (42 - 2);
+	indentifier = anotherIdentifer;
+	array[] = {}; //inline comment
+	string = "hallo from the other siiide";
+	math = 1 + 1 + (42 - 2);
 
-    class NestedClass : extendClass{
-        array[] = {var, 1, 1e1, ""};
-        math = 1 + 69 * 1;
-        /*Another block comment*/
-    };
+	class NestedClass : extendClass{
+		/*Another block comment*/
+		array[] = {var, 1, 1e1, ""};
+		math = 1 + 69 * 1;
+		/*Another block comment*/
+	};
 
-    thingy = 0; /*hi*/
-    class NoBodyClass;
+	thingy = 0; /*hi*/
+	class NoBodyClass;
 
-    class NoBodyClass2;
+	class NoBodyClass2;
 };
 

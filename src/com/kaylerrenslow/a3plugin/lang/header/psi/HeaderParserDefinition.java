@@ -21,7 +21,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class HeaderParserDefinition implements ParserDefinition{
 	public static final TokenSet WHITE_SPACES = TokenSet.create(HeaderTypes.WHITE_SPACE);
-	public static final TokenSet COMMENTS = TokenSet.create(HeaderTypes.COMMENT, HeaderTypes.BLOCK_COMMENT);
+	public static final TokenSet COMMENTS = TokenSet.create(HeaderTypes.INLINE_COMMENT, HeaderTypes.BLOCK_COMMENT);
 	public static final IFileElementType FILE = new IFileElementType(Language.<HeaderLanguage>findInstance(HeaderLanguage.class));
 
 	@NotNull

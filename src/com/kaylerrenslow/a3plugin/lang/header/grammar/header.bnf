@@ -15,25 +15,26 @@
   psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.impl.PSIHeaderImplUtil"
 }
 // @formatter:off
-headerFile ::= item_*
+headerFile ::= file_entry*
 
 //TODO when $ is typed, look into stringtable.xml (try using annotator)
 //TODO add in \ lexer rule that is a waiting value just like in the properties custom language demo. This will work for any assignment
 //TODO maybe use annotator for SQF config retrieval (config >> "var"). check if the PsiFile is over HeaderFile so you can't annotate in any other language
-private item_ ::= COMMENT | BLOCK_COMMENT | statement | preprocessor | WHITE_SPACE | BAD_CHARACTER
+file_entry ::= INLINE_COMMENT | BLOCK_COMMENT | statement_ | preprocessor_group | WHITE_SPACE | BAD_CHARACTER
 
-statement ::= (assignment | class_declaration) SEMICOLON
+private statement_ ::= (assignment | class_declaration) SEMICOLON
 
-number ::= NUMBER_LITERAL | HEX_LITERAL
-value ::= STRING_LITERAL | number | CONSTANT | IDENTIFIER
+private number_ ::= NUMBER_LITERAL | HEX_LITERAL
+private value_ ::= STRING_LITERAL | number_ | IDENTIFIER
 
-array ::= LBRACE RBRACE | LBRACE (expression | value | array)(COMMA (expression | value | array))* RBRACE
+array ::= LBRACE array_content_? RBRACE
+private array_content_ ::= (expression | value_ | array)(COMMA (expression | value_ | array))*
 
 assignment_identifier ::= IDENTIFIER /*| NUM_IDENTIFIER*/
 
 assignment ::= basic_assignment | array_assignment
-basic_assignment ::= assignment_identifier EQ (expression | value )
-array_assignment ::= assignment_identifier BRACKET_PAIR EQ array
+basic_assignment ::= assignment_identifier EQ (expression | value_ ) {extends("basic_assignment")=assignment}
+array_assignment ::= assignment_identifier BRACKET_PAIR EQ array {extends("array_assignment")=assignment}
 
 expression ::= add_expression_
 
@@ -49,17 +50,18 @@ private mult_expression_ ::= term_ ASTERISK mult_expression_
 				  | term_
 
 private term_ ::= (PLUS | MINUS)? (
-			number
+			number_
             | IDENTIFIER
 			| LPAREN expression RPAREN
 		  )
 
 
-class_declaration ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (LBRACE class_content RBRACE)?
+class_declaration ::= CLASS IDENTIFIER (COLON IDENTIFIER)? (class_content)?
 
-class_content ::= item_*
+class_content ::= LBRACE file_entry* RBRACE
 
 //Preprocessor things
+preprocessor_group ::= preprocessor+
 preprocessor ::= pre_include //| pre_define_//TODO
 
 pre_include ::= PREPROCESS_INCLUDE (STRING_LITERAL | INCLUDE_VALUE_ANGBR) //TODO does include or other preprocessor commands allow multilines? (https://community.bistudio.com/wiki/PreProcessor_Commands#Multi-line

@@ -1,5 +1,7 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
+import com.intellij.psi.PsiComment;
+
 /**
  * @author Kayler
  *         Created on 03/19/2016.

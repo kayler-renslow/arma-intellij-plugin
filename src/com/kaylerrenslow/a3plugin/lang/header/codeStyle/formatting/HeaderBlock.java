@@ -8,9 +8,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.formatter.common.AbstractBlock;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassContent;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassDeclaration;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
+import com.kaylerrenslow.a3plugin.lang.header.psi.*;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.formatting.CodeStyleUtil;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +26,6 @@ public class HeaderBlock extends AbstractBlock{
 
 	private final Indent myIndent;
 	private final Alignment myAlignment;
-	private final Wrap myWrap;
 
 	private final SpacingBuilder spacingBuilder;
 
@@ -46,9 +43,8 @@ public class HeaderBlock extends AbstractBlock{
 		this.spacingBuilder = spacingBuilder;
 		this.settings = settings;
 		this.myIndent = indent;
-		this.myAlignment = alignment;
-		this.myWrap = wrap;
 		this.myElement = node.getPsi();
+		this.myAlignment = alignment;
 		this.allowChildrenToIndent = allowChildrenToIndent;
 		this.tabSize = settings.getTabSize(HeaderFileType.INSTANCE);
 	}
@@ -59,49 +55,71 @@ public class HeaderBlock extends AbstractBlock{
 
 		ASTNode childNode = this.myNode.getFirstChildNode();
 
-		Indent childIndent = Indent.getNoneIndent();
+		Indent childIndent = null;
 		Wrap childWrap = null;
 
 		boolean allowGrandChildrenToIndent = true;
-		while(childNode != null){
-			boolean childIndentSet = false;
-			if(PsiUtil.isOfElementType(childNode, TokenType.WHITE_SPACE)){
+		while (childNode != null){
+			if (PsiUtil.isOfElementType(childNode, TokenType.WHITE_SPACE)){
 				childNode = childNode.getTreeNext();
 				continue;
 			}
 
-			if (myElement instanceof HeaderClassDeclaration){
-				if(PsiUtil.isOfElementType(childNode, HeaderTypes.LBRACE)){
-					if(CodeStyleUtil.ClassBraceStyle.endOfLine(settings)){
+			if (myElement instanceof HeaderClassContent){
+				if (PsiUtil.isOfElementType(childNode, HeaderTypes.LBRACE)){
+					if (CodeStyleUtil.ClassBraceStyle.endOfLine(settings)){
 						childWrap = null;
-					}else if(CodeStyleUtil.ClassBraceStyle.nextLine(settings)){
+					}else if (CodeStyleUtil.ClassBraceStyle.nextLine(settings)){
 						childWrap = Wrap.createWrap(WrapType.ALWAYS, true);
-						childIndentSet = true;
 						childIndent = Indent.getNoneIndent();
-					}else if(CodeStyleUtil.ClassBraceStyle.nextLineIfWrapped(settings)){
+					}else if (CodeStyleUtil.ClassBraceStyle.nextLineIfWrapped(settings)){
 						childWrap = Wrap.createWrap(WrapType.NORMAL, true);
-						childIndentSet = true;
 						childIndent = Indent.getNoneIndent();
-					}else if(CodeStyleUtil.ClassBraceStyle.nextLineShifted(settings)){
+					}else if (CodeStyleUtil.ClassBraceStyle.nextLineShifted(settings)){
 						childWrap = Wrap.createWrap(WrapType.ALWAYS, true);
-						childIndent = Indent.getSpaceIndent(tabSize);
+						childIndent = Indent.getNormalIndent();
 						allowGrandChildrenToIndent = false;
-					}else if(CodeStyleUtil.ClassBraceStyle.nextLineEachShifted(settings)){
+					}else if (CodeStyleUtil.ClassBraceStyle.nextLineEachShifted(settings)){
 						childWrap = Wrap.createWrap(WrapType.ALWAYS, true);
-						childIndentSet = true;
-						childIndent = Indent.getSpaceIndent(tabSize);
+						childIndent = Indent.getNormalIndent();
+					}
+				}else if(PsiUtil.isOfElementType(childNode, HeaderTypes.RBRACE)){
+					if (CodeStyleUtil.ClassBraceStyle.endOfLine(settings) || CodeStyleUtil.ClassBraceStyle.nextLine(settings)){
+						childWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+						childIndent = Indent.getNoneIndent();
+					}else if (CodeStyleUtil.ClassBraceStyle.nextLineIfWrapped(settings)){
+						childWrap = Wrap.createWrap(WrapType.NORMAL, true);
+						childIndent = Indent.getNoneIndent();
+					}else if (CodeStyleUtil.ClassBraceStyle.nextLineShifted(settings)){
+						childWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+						childIndent = Indent.getNormalIndent();
+						allowGrandChildrenToIndent = false;
+					}else if (CodeStyleUtil.ClassBraceStyle.nextLineEachShifted(settings)){
+						childWrap = Wrap.createWrap(WrapType.ALWAYS, true);
+						childIndent = Indent.getNormalIndent();
 					}
 				}
 			}
-			if(myElement instanceof HeaderClassContent){
-				if(!childIndentSet && this.allowChildrenToIndent){ //{ is on next line
-					childIndent = Indent.getSpaceIndent(tabSize);
+			if (myElement instanceof HeaderClassContent){
+				if (childIndent == null && this.allowChildrenToIndent){
+					if (CodeStyleUtil.ClassBraceStyle.nextLineEachShifted(settings)){
+						childIndent = Indent.getSpaceIndent(tabSize * 2);
+					}else{
+						childIndent = Indent.getNormalIndent();
+					}
 				}
+			}
+			if(childIndent == null){
+				childIndent = Indent.getNoneIndent();
+			}
+			if (childNode.getPsi() instanceof HeaderBasicAssignment || childNode.getPsi() instanceof HeaderExpression){
+				childWrap = Wrap.createWrap(WrapType.NONE, true);
 			}
 
 			Block b = new HeaderBlock(childNode, childWrap, this.myAlignment, childIndent, allowGrandChildrenToIndent, this.settings, this.spacingBuilder);
 			blocks.add(b);
 			childNode = childNode.getTreeNext();
+			childIndent = null;
 		}
 
 		return blocks;
@@ -109,6 +127,12 @@ public class HeaderBlock extends AbstractBlock{
 
 	@Override
 	public Indent getIndent() {
+		return myIndent;
+	}
+
+	@Nullable
+	@Override
+	protected Indent getChildIndent() {
 		return myIndent;
 	}
 
@@ -122,4 +146,5 @@ public class HeaderBlock extends AbstractBlock{
 	public boolean isLeaf() {
 		return this.myNode.getFirstChildNode() == null;
 	}
+
 }

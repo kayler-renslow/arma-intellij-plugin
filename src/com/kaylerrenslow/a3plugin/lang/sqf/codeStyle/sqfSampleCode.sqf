@@ -26,4 +26,6 @@ disableSerialization; //disable the serialization
         case 42: { hint "meaning of life is good"; };
         default { hint "meaning of life is wrong"; };
     };
+
+    <commentNote>//NOTE this is a comment note.</commentNote>
 };

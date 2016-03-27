@@ -1,15 +1,21 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting;
 
+import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
+import com.intellij.openapi.editor.colors.ColorKey;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.editor.colors.impl.DefaultColorsScheme;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.ui.JBColor;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFLexerAdapter;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 
@@ -23,6 +29,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey LOCAL_VAR = createTextAttributesKey("A3_SQF_LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
 
 	public static final TextAttributesKey CONSTANT = createTextAttributesKey("A3_SQF_CONSTANT", DefaultLanguageHighlighterColors.CONSTANT);
+	public static final TextAttributesKey MAGIC_VAR = createTextAttributesKey("A3_SQF_MAGIC_VARIABLE");
 	public static final TextAttributesKey KEYWORD = createTextAttributesKey("A3_SQF_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
 	public static final TextAttributesKey COMMAND = createTextAttributesKey("A3_SQF_COMMAND", DefaultLanguageHighlighterColors.METADATA);
 	public static final TextAttributesKey OPERATOR = createTextAttributesKey("A3_SQF_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
@@ -35,11 +42,14 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey PAREN = createTextAttributesKey("A3_SQF_PARENTHESES", DefaultLanguageHighlighterColors.PARENTHESES);
 	public static final TextAttributesKey COMMA = createTextAttributesKey("A3_SQF_COMMA", DefaultLanguageHighlighterColors.COMMA);
 
+	public static final TextAttributesKey COMMENT_NOTE = createTextAttributesKey("A3_SQF_COMMENT_NOTE");
+
 	private static final TextAttributesKey[] OPERATOR_KEYS = new TextAttributesKey[]{OPERATOR};
 	private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
 	private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
 
 	private static final TextAttributesKey[] CONSTANT_KEYS = new TextAttributesKey[]{CONSTANT};
+	private static final TextAttributesKey[] MAGIC_VAR_KEYS = new TextAttributesKey[]{MAGIC_VAR};
 
 	private static final TextAttributesKey[] COMMAND_KEYS = new TextAttributesKey[]{COMMAND};
 	private static final TextAttributesKey[] GLOBAL_VAR_KEYS = new TextAttributesKey[]{GLOBAL_VAR};
@@ -63,10 +73,9 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 			SQFTypes.BREAK, SQFTypes.BREAK_TO, SQFTypes.BREAK_OUT, SQFTypes.CONTINUE, SQFTypes.FOR, SQFTypes.TO, SQFTypes.STEP, SQFTypes.FOR_EACH, SQFTypes.FROM, SQFTypes.WHILE, SQFTypes.GOTO, SQFTypes.ASSERT, SQFTypes.IF,
 			SQFTypes.THEN, SQFTypes.ELSE, SQFTypes.SWITCH, SQFTypes.CASE, SQFTypes.DEFAULT, SQFTypes.DO, SQFTypes.WAIT_UNTIL, SQFTypes.EXIT_WITH, };
 
-	private static final IElementType[] CONSTANTS = {SQFTypes.LANG_VAR, SQFTypes.NAMESPACE, SQFTypes.CONFIG};
+	private static final IElementType[] CONSTANTS = {SQFTypes.NAMESPACE, SQFTypes.CONFIG};
 
 	private static final IElementType[] COMMANDS = {SQFTypes.COMMAND};
-
 
 	@NotNull
 	@Override
@@ -90,7 +99,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(SQFTypes.COMMA)){
 			return COMMA_KEYS;
 		}
-		if (tokenType.equals(SQFTypes.COMMENT) || tokenType.equals(SQFTypes.BLOCK_COMMENT)){
+		if (tokenType.equals(SQFTypes.INLINE_COMMENT) || tokenType.equals(SQFTypes.BLOCK_COMMENT)){
 			return COMMENT_KEYS;
 		}
 		if(tokenType.equals(SQFTypes.STRING_LITERAL)){
@@ -104,6 +113,9 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		}
 		if(tokenType.equals(SQFTypes.GLOBAL_VAR)){
 			return GLOBAL_VAR_KEYS;
+		}
+		if(tokenType.equals(SQFTypes.LANG_VAR)){
+			return MAGIC_VAR_KEYS;
 		}
 		for(IElementType e: COMMANDS){
 			if(tokenType.equals(e)){

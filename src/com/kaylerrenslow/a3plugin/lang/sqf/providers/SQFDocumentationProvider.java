@@ -7,11 +7,7 @@ import com.intellij.psi.*;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFAssignment;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFStatement;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.util.FileReader;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,16 +47,18 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND)){
 			return generateCommandDoc(element.getText());
 		}
-		if (PsiUtil.isOfElementType(element, SQFTypes.COMMENT) || PsiUtil.isOfElementType(element, SQFTypes.BLOCK_COMMENT)){
-			return element.getNode().getText().replaceAll("\n", "<br>");
+		if (PsiUtil.isOfElementType(element, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(element, SQFTypes.BLOCK_COMMENT)){
+			PsiComment comment = (PsiComment)element;
+			return SQFPsiUtil.getCommentContent(comment).replaceAll("\n", "<br>");
 		}
 		if (element instanceof PsiFile){
-			ASTNode potentialDoc = element.getNode().getFirstChildNode();
-			if (!PsiUtil.isOfElementType(potentialDoc, SQFTypes.COMMENT) && !PsiUtil.isOfElementType(potentialDoc, SQFTypes.BLOCK_COMMENT)){
-				potentialDoc = potentialDoc.getTreeNext();
+			ASTNode potentialDocNode = element.getNode().getFirstChildNode();
+			if (!PsiUtil.isOfElementType(potentialDocNode, SQFTypes.INLINE_COMMENT) && !PsiUtil.isOfElementType(potentialDocNode, SQFTypes.BLOCK_COMMENT)){
+				potentialDocNode = potentialDocNode.getTreeNext();
 			}
-			if(PsiUtil.isOfElementType(potentialDoc, SQFTypes.COMMENT) || PsiUtil.isOfElementType(potentialDoc, SQFTypes.BLOCK_COMMENT)){
-				return potentialDoc.getText().replaceAll("\n", "<br>");
+			if(PsiUtil.isOfElementType(potentialDocNode, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(potentialDocNode, SQFTypes.BLOCK_COMMENT)){
+				PsiComment comment = (PsiComment)potentialDocNode.getPsi();
+				return SQFPsiUtil.getCommentContent(comment).replaceAll("\n", "<br>");
 			}
 			return null;
 		}
@@ -95,7 +93,6 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 			return contextElement;
 		}
 
-
 		if(PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)){ //this code works, but only when the selected statement has the comment
 			SQFVariable var = (SQFVariable)(contextElement.getParent());
 			PsiReference[] references = var.getReferences();
@@ -116,7 +113,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 	@Nullable
 	private PsiElement getInlineComment(@NotNull Editor editor, ASTNode statementNode) {
 		ASTNode commentNode = PsiUtil.getNextSiblingNotWhitespace(statementNode);
-		if (PsiUtil.isOfElementType(commentNode, SQFTypes.COMMENT) || PsiUtil.isOfElementType(commentNode, SQFTypes.BLOCK_COMMENT)){
+		if (PsiUtil.isOfElementType(commentNode, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(commentNode, SQFTypes.BLOCK_COMMENT)){
 			if (editor.getDocument().getLineNumber(statementNode.getStartOffset()) != editor.getDocument().getLineNumber(commentNode.getStartOffset())){ //comment not on same line
 				return null;
 			}

@@ -70,6 +70,6 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 	@NotNull
 	@Override
 	public String getDisplayName() {
-		return HeaderStatic.NAME;
+		return HeaderStatic.NAME_FOR_DISPLAY;
 	}
 }

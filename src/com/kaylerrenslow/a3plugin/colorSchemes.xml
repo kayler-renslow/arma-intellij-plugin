@@ -1,0 +1,20 @@
+<?xml version='1.0'?>
+<list>
+	<!-- Shared -->
+
+	<!-- SQF -->
+	<option name="A3_SQF_COMMENT_NOTE">
+		<value>
+			<option name="FOREGROUND" value="0F9795"/>
+			<option name="FONT_TYPE" value="2"/>
+		</value>
+	</option>
+	<option name="A3_SQF_MAGIC_VARIABLE">
+		<value>
+			<option name="FOREGROUND" value="009702"/>
+			<option name="FONT_TYPE" value="2"/>
+		</value>
+	</option>
+
+	<!-- Header -->
+</list>

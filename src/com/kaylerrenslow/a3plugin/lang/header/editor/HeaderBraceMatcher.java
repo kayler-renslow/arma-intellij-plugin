@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
+import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,8 +28,6 @@ public class HeaderBraceMatcher implements PairedBraceMatcher{
 
 	@Override
 	public int getCodeConstructStart(PsiFile file, int openingBraceOffset) { //TODO
-		PsiElement element = file.findElementAt(openingBraceOffset);
-		if(element == null || element instanceof PsiFile) return openingBraceOffset;
 		return openingBraceOffset;
 	}
 }

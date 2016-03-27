@@ -44,6 +44,8 @@
 
 		<!-- Shared for Languages -->
 		<usageTypeProvider implementation="com.kaylerrenslow.a3plugin.lang.shared.ArmaUsageTypeProvider"/>
+		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/a3plugin/colorSchemes.xml" />
+		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/a3plugin/colorSchemes.xml" />
 
 		<!-- Other things-->
 		<moduleBuilder builderClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleBuilder" />

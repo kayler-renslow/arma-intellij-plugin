@@ -8,6 +8,7 @@ import com.kaylerrenslow.a3plugin.util.FileReader;
  */
 public class HeaderStatic{
 	public static final String NAME = Plugin.resources.getString("lang.header.name");
+	public static final String NAME_FOR_DISPLAY = Plugin.resources.getString("lang.header.name_for_display");
 	public static final String DESCRIPTION = Plugin.resources.getString("lang.header.description");
 	public static final String FILE_EXTENSION = Plugin.resources.getString("lang.header.file_extension");
 	public static final String FILE_EXTENSION_DEFAULT = Plugin.resources.getString("lang.header.file_extension_default");

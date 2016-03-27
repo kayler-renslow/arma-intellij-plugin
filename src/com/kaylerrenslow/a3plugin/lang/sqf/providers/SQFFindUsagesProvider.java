@@ -20,7 +20,7 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@Nullable
 	@Override
 	public WordsScanner getWordsScanner() {
-		return new DefaultWordsScanner(new SQFLexerAdapter(), TokenSet.create(SQFTypes.GLOBAL_VAR, SQFTypes.LOCAL_VAR, SQFTypes.VARIABLE), TokenSet.create(SQFTypes.COMMENT), TokenSet.create(SQFTypes.DEC_LITERAL, SQFTypes.INTEGER_LITERAL));
+		return new DefaultWordsScanner(new SQFLexerAdapter(), TokenSet.create(SQFTypes.GLOBAL_VAR, SQFTypes.LOCAL_VAR, SQFTypes.VARIABLE), TokenSet.create(SQFTypes.INLINE_COMMENT), TokenSet.create(SQFTypes.DEC_LITERAL, SQFTypes.INTEGER_LITERAL));
 	}
 
 	@Override

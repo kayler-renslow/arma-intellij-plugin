@@ -3,6 +3,7 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
@@ -137,6 +138,16 @@ public class SQFPsiUtil{
 	public static SQFFile createFile(Project project, String text){
 		String fileName = "sqfDummy.sqf";
 		return (SQFFile) PsiFileFactory.getInstance(project).createFileFromText(fileName, SQFFileType.INSTANCE, text);
+	}
+
+	public static String getCommentContent(PsiComment comment){
+		if(comment.getNode().getElementType() == SQFTypes.INLINE_COMMENT){
+			if(comment.getText().length() <= 2){
+				return  "";
+			}
+			return comment.getText().substring(2).trim();
+		}
+		return comment.getText().substring(2, comment.getTextLength() - 2).trim();
 	}
 
 }

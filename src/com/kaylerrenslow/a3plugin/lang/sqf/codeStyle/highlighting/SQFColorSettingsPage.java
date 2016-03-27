@@ -1,6 +1,7 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting;
 
 import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.editor.colors.impl.DefaultColorsScheme;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
@@ -11,15 +12,22 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
  * Created by Kayler on 11/01/2015.
  */
 public class SQFColorSettingsPage implements ColorSettingsPage{
+	private static final Map<String, TextAttributesKey> map = new HashMap<>();
+	static {
+		map.put("commentNote", SQFSyntaxHighlighter.COMMENT_NOTE);
+	}
+
 	private static final AttributesDescriptor[] ATTR_DESCRIPTORS = new AttributesDescriptor[]{
 			new AttributesDescriptor("Global Variable", SQFSyntaxHighlighter.GLOBAL_VAR),
 			new AttributesDescriptor("Local Variable", SQFSyntaxHighlighter.LOCAL_VAR),
+			new AttributesDescriptor("Magic Variable", SQFSyntaxHighlighter.MAGIC_VAR),
 			new AttributesDescriptor("Command", SQFSyntaxHighlighter.COMMAND),
 			new AttributesDescriptor("Comment", SQFSyntaxHighlighter.COMMENT),
 			new AttributesDescriptor("Constant", SQFSyntaxHighlighter.CONSTANT),
@@ -27,10 +35,11 @@ public class SQFColorSettingsPage implements ColorSettingsPage{
 			new AttributesDescriptor("String", SQFSyntaxHighlighter.STRING),
 			new AttributesDescriptor("Number", SQFSyntaxHighlighter.NUM),
 			new AttributesDescriptor("Operator", SQFSyntaxHighlighter.OPERATOR),
-			new AttributesDescriptor("Parenthesis", SQFSyntaxHighlighter.PAREN),
-			new AttributesDescriptor("Brace", SQFSyntaxHighlighter.BRACE),
-			new AttributesDescriptor("Bracket", SQFSyntaxHighlighter.BRACKET),
+			new AttributesDescriptor("Parentheses", SQFSyntaxHighlighter.PAREN),
+			new AttributesDescriptor("Braces", SQFSyntaxHighlighter.BRACE),
+			new AttributesDescriptor("Brackets", SQFSyntaxHighlighter.BRACKET),
 			new AttributesDescriptor("Comma", SQFSyntaxHighlighter.COMMA),
+			new AttributesDescriptor("Comment Note", SQFSyntaxHighlighter.COMMENT_NOTE)
 	};
 
 	@Nullable
@@ -54,7 +63,7 @@ public class SQFColorSettingsPage implements ColorSettingsPage{
 	@Nullable
 	@Override
 	public Map<String, TextAttributesKey> getAdditionalHighlightingTagToDescriptorMap() {
-		return null;
+		return map;
 	}
 
 	@NotNull
@@ -72,7 +81,7 @@ public class SQFColorSettingsPage implements ColorSettingsPage{
 	@NotNull
 	@Override
 	public String getDisplayName() {
-		return SQFStatic.NAME;
+		return SQFStatic.NAME_FOR_DISPLAY;
 	}
 
 }

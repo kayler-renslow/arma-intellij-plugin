@@ -1,11 +1,14 @@
 plugin
-	moved files around in packages. I'm done doing that now.
+	none
 
 shared between languages
-	got usage type's to work for when finding usages
+	added colorSchemes.xml to customize colors for certain text attributes
 
 SQF
-	lang var's will now reference each other as long as they are in the same scope. they are not rename-able though
+	made util method for getting text out of comment
+	putting NOTE in comment will make the comment text blue
+	changed color of lang constants
 
 Header
-	got Header file formatting started with good progress
+	made progress on HeaderBlock class
+	added preprocessor group to hide all includes and such in folding builder

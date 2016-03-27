@@ -1,12 +1,17 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.editor;
 
+import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lang.ASTNode;
+import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.HighlightSeverity;
+import com.intellij.openapi.editor.colors.TextAttributesKey;
+import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiComment;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDecl;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDeclVar;
+import com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighter;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -27,9 +32,21 @@ public class SQFVisitorAnnotator extends com.kaylerrenslow.a3plugin.lang.sqf.psi
 	}
 
 	@Override
-	public void visitPrivateDecl(@NotNull SQFPrivateDecl o) {
-		super.visitPrivateDecl(o);
-		List<SQFPrivateDeclVar> varList = o.getPrivateDeclVarList();
+	public void visitComment(PsiComment comment) {
+		super.visitComment(comment);
+		String commentContent = SQFPsiUtil.getCommentContent(comment);
+		if(commentContent.toLowerCase().startsWith("note")){
+			Annotation a= annotator.createAnnotation(HighlightSeverity.INFORMATION, TextRange.from(comment.getTextOffset() + 2, comment.getTextLength() - 2), commentContent);
+			a.setTextAttributes(TextAttributesKey.find("A3_SQF_COMMENT_NOTE"));
+
+		}
+	}
+
+
+	@Override
+	public void visitPrivateDecl(@NotNull SQFPrivateDecl privateDecl) {
+		super.visitPrivateDecl(privateDecl);
+		List<SQFPrivateDeclVar> varList = privateDecl.getPrivateDeclVarList();
 		Iterator<SQFPrivateDeclVar> iter = varList.iterator();
 		ArrayList<String> vars = new ArrayList<>();
 		int matchedIndex;

@@ -53,7 +53,6 @@ public class SQFTokenType extends IElementType{
 		debugNameLookup.put("TRY", "try");
 		debugNameLookup.put("CATCH", "catch");
 		debugNameLookup.put("THROW", "throw");
-		debugNameLookup.put("COMMENT_KEYWORD", "comment");
 		debugNameLookup.put("CONFIG", "Config File");
 		debugNameLookup.put("COMMAND", "Command");
 		debugNameLookup.put("LOCAL_VAR", "Identifier");

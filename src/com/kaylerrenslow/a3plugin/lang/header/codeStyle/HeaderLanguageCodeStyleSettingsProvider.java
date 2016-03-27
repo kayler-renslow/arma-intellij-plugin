@@ -24,7 +24,6 @@ public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSe
 		return HeaderLanguage.INSTANCE;
 	}
 
-
 	@Nullable
 	@Override
 	public IndentOptionsEditor getIndentOptionsEditor() {
@@ -48,13 +47,14 @@ public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSe
 				break;
 			case SPACING_SETTINGS:
 				consumer.showStandardOptions("SPACE_AROUND_ADDITIVE_OPERATORS", "SPACE_AROUND_ASSIGNMENT_OPERATORS", "SPACE_AROUND_MULTIPLICATIVE_OPERATORS", "SPACE_AFTER_SEMICOLON", "SPACE_AFTER_COMMA", "SPACE_BEFORE_COMMA");
+				consumer.showStandardOptions("SPACE_WITHIN_ARRAY_INITIALIZER_BRACES", "SPACE_BEFORE_CLASS_LBRACE");
 
 				consumer.showStandardOptions("SPACE_BEFORE_COLON", "SPACE_AFTER_COLON");
 				consumer.moveStandardOption("SPACE_BEFORE_COLON", "Other");
 				consumer.moveStandardOption("SPACE_AFTER_COLON", "Other");
 				break;
 			case WRAPPING_AND_BRACES_SETTINGS:
-				consumer.showStandardOptions("KEEP_LINE_BREAKS", "RIGHT_MARGIN", "CLASS_BRACE_STYLE", "ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION", "ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE", "ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE");
+				consumer.showStandardOptions("WRAPPING_COMMENTS","KEEP_LINE_BREAKS", "CLASS_BRACE_STYLE", "ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION", "WRAPPING_ARRAY_INITIALIZER", "ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE", "ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE");
 				break;
 		}
 	}

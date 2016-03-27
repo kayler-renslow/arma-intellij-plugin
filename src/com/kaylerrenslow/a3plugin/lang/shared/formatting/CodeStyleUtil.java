@@ -27,5 +27,10 @@ public class CodeStyleUtil{
 		public static boolean nextLineEachShifted(CodeStyleSettings settings){
 			return settings.CLASS_BRACE_STYLE == CodeStyleSettings.NEXT_LINE_SHIFTED2;
 		}
+
+		public static void setClassBraceStyle(CodeStyleSettings settings, int setting){
+			settings.CLASS_BRACE_STYLE = setting;
+		}
+
 	}
 }

@@ -27,8 +27,8 @@ IGNORE = (" \\\n" | " \\\r\n" | " \\\r") [ \t\f]*
 
 WHITE_SPACE = [ \t\f] | {LINE_TERMINATOR}
 
-BLOCK_COMMENT = "/*" ~"*/" | "/*" "*"+ "/"
-END_OF_LINE_COMMENT = "//" {INPUT_CHARACTER}* {LINE_TERMINATOR}?
+BLOCK_COMMENT = "/*" ~"*/"
+INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 
 
 DIGIT = [0-9]
@@ -57,7 +57,7 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 <YYINITIAL> {WHITE_SPACE}+ { return HeaderTypes.WHITE_SPACE; }
 
 <YYINITIAL> {BLOCK_COMMENT} { return HeaderTypes.BLOCK_COMMENT; }
-<YYINITIAL> {END_OF_LINE_COMMENT} { return HeaderTypes.COMMENT; }
+<YYINITIAL> {INLINE_COMMENT} { return HeaderTypes.INLINE_COMMENT; }
 
 //<YYINITIAL> {NUM_IDENTIFIER} { return HeaderTypes.NUM_IDENTIFIER; }
 <YYINITIAL> {NUMBER_LITERAL} { return HeaderTypes.NUMBER_LITERAL; }
@@ -70,18 +70,18 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 
 <YYINITIAL> "#include"  { return HeaderTypes.PREPROCESS_INCLUDE; }
 
-<YYINITIAL> "#define"  { return HeaderTypes.PREPROCESS_DEFINE; }
-<YYINITIAL> "#undef"  { return HeaderTypes.PREPROCESS_UNDEF; }
-<YYINITIAL> "#ifdef"  { return HeaderTypes.PREPROCESS_IF_DEF; }
-<YYINITIAL> "#ifndef"  { return HeaderTypes.PREPROCESS_IF_N_DEF; }
-<YYINITIAL> "#else"  { return HeaderTypes.PREPROCESS_ELSE; }
-<YYINITIAL> "#endif"  { return HeaderTypes.PREPROCESS_END_IF; }
-<YYINITIAL> "#hash"  { return HeaderTypes.PREPROCESS_HASH; }
-<YYINITIAL> "##"  { return HeaderTypes.PREPROCESS_HASH_HASH; }
-<YYINITIAL> "__EXEC"  { return HeaderTypes.PREPROCESS_EXEC; }
-<YYINITIAL> "__EVAL"  { return HeaderTypes.PREPROCESS_EVAL; }
-<YYINITIAL> "__LINE__"  { return HeaderTypes.PREPROCESS_LINE; }
-<YYINITIAL> "__FILE__"  { return HeaderTypes.PREPROCESS_FILE; }
+//<YYINITIAL> "#define"  { return HeaderTypes.PREPROCESS_DEFINE; }
+//<YYINITIAL> "#undef"  { return HeaderTypes.PREPROCESS_UNDEF; }
+//<YYINITIAL> "#ifdef"  { return HeaderTypes.PREPROCESS_IF_DEF; }
+//<YYINITIAL> "#ifndef"  { return HeaderTypes.PREPROCESS_IF_N_DEF; }
+//<YYINITIAL> "#else"  { return HeaderTypes.PREPROCESS_ELSE; }
+//<YYINITIAL> "#endif"  { return HeaderTypes.PREPROCESS_END_IF; }
+//<YYINITIAL> "#hash"  { return HeaderTypes.PREPROCESS_HASH; }
+//<YYINITIAL> "##"  { return HeaderTypes.PREPROCESS_HASH_HASH; }
+//<YYINITIAL> "__EXEC"  { return HeaderTypes.PREPROCESS_EXEC; }
+//<YYINITIAL> "__EVAL"  { return HeaderTypes.PREPROCESS_EVAL; }
+//<YYINITIAL> "__LINE__"  { return HeaderTypes.PREPROCESS_LINE; }
+//<YYINITIAL> "__FILE__"  { return HeaderTypes.PREPROCESS_FILE; }
 
 <YYINITIAL> {IDENTIFIER} { return HeaderTypes.IDENTIFIER; }
 
