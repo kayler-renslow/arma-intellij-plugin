@@ -33,7 +33,7 @@ public class SQFTokenType extends IElementType{
 		debugNameLookup.put("WHILE", "while");
 		debugNameLookup.put("GOTO", "goto");
 		debugNameLookup.put("ASSERT", "assert");
-		debugNameLookup.put("STEP", "step");
+		debugNameLookup.put("STEP", "wizardStep");
 		debugNameLookup.put("IF", "if");
 		debugNameLookup.put("THEN", "then");
 		debugNameLookup.put("ELSE", "else");

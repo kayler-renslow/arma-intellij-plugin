@@ -40,7 +40,7 @@ public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSe
 				consumer.showAllStandardOptions();
 				break;
 			case INDENT_SETTINGS:
-//				consumer.showStandardOptions();
+				consumer.showStandardOptions();
 				break;
 			case LANGUAGE_SPECIFIC:
 				consumer.showAllStandardOptions();
@@ -54,7 +54,7 @@ public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSe
 				consumer.moveStandardOption("SPACE_AFTER_COLON", "Other");
 				break;
 			case WRAPPING_AND_BRACES_SETTINGS:
-				consumer.showStandardOptions("WRAPPING_COMMENTS","KEEP_LINE_BREAKS", "CLASS_BRACE_STYLE", "ALIGN_MULTILINE_ARRAY_INITIALIZER_EXPRESSION", "WRAPPING_ARRAY_INITIALIZER", "ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE", "ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE");
+				consumer.showStandardOptions("WRAPPING_COMMENTS","KEEP_LINE_BREAKS", "CLASS_BRACE_STYLE", "ARRAY_INITIALIZER_WRAP", "ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE", "ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE");
 				break;
 		}
 	}

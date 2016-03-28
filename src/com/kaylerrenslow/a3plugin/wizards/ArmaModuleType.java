@@ -1,7 +1,10 @@
 package com.kaylerrenslow.a3plugin.wizards;
 
+import com.intellij.ide.util.projectWizard.ModuleWizardStep;
+import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.module.ModuleTypeManager;
+import com.intellij.openapi.roots.ui.configuration.ModulesProvider;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.PluginIcons;
 import org.jetbrains.annotations.NotNull;
@@ -13,8 +16,7 @@ import javax.swing.*;
  */
 public class ArmaModuleType extends ModuleType<ArmaModuleBuilder>{
 	public static final String ID = "arma.moduleType";
-	private static final String NAME = Plugin.resources.getString("plugin.module.arma.name");
-	private static final String DESCRIPTION = Plugin.resources.getString("plugin.module.arma.description");
+	private static final String NAME = Plugin.resources.getString("plugin.module.name");
 
 	public ArmaModuleType() {
 		super(ID);
@@ -24,6 +26,12 @@ public class ArmaModuleType extends ModuleType<ArmaModuleBuilder>{
 		return (ArmaModuleType) ModuleTypeManager.getInstance().findByID(ID);
 	}
 
+	@NotNull
+	@Override
+	public ModuleWizardStep[] createWizardSteps(@NotNull WizardContext wizardContext, @NotNull ArmaModuleBuilder moduleBuilder, @NotNull ModulesProvider modulesProvider) {
+		ModuleWizardStep[] steps = {};
+		return steps;
+	}
 
 	@NotNull
 	@Override
@@ -40,7 +48,7 @@ public class ArmaModuleType extends ModuleType<ArmaModuleBuilder>{
 	@NotNull
 	@Override
 	public String getDescription() {
-		return DESCRIPTION;
+		return "";
 	}
 
 	@Override

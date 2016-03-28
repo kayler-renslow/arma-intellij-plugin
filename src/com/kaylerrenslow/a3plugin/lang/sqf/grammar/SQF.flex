@@ -79,7 +79,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "while" { return SQFTypes.WHILE; }
 <YYINITIAL> "goto" { return SQFTypes.GOTO; }
 <YYINITIAL> "assert" { return SQFTypes.ASSERT; }
-<YYINITIAL> "step" { return SQFTypes.STEP; }
+<YYINITIAL> "wizardStep" { return SQFTypes.STEP; }
 
 <YYINITIAL> "if" { return SQFTypes.IF; }
 <YYINITIAL> "then" { return SQFTypes.THEN; }

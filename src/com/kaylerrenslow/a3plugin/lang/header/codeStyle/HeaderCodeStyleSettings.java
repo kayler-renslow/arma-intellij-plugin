@@ -23,9 +23,7 @@ public class HeaderCodeStyleSettings extends CustomCodeStyleSettings{
 		settings.SPACE_BEFORE_COLON = true;
 		settings.SPACE_AFTER_COLON = true;
 		settings.SPACE_BEFORE_CLASS_LBRACE = true;
-		settings.BLOCK_COMMENT_AT_FIRST_COLUMN = false;
-		settings.LINE_COMMENT_AT_FIRST_COLUMN = false;
-		settings.KEEP_LINE_BREAKS = false;
+		settings.KEEP_LINE_BREAKS = true;
 	}
 
 }

@@ -1,7 +1,10 @@
 package com.kaylerrenslow.a3plugin.wizards;
 
 import com.intellij.ide.util.projectWizard.ModuleBuilder;
+import com.intellij.ide.util.projectWizard.ModuleWizardStep;
 import com.intellij.ide.util.projectWizard.SourcePathsBuilder;
+import com.intellij.ide.util.projectWizard.WizardContext;
+import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.project.Project;
@@ -11,6 +14,8 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.util.io.FileUtil;
 import com.intellij.openapi.vfs.LocalFileSystem;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.kaylerrenslow.a3plugin.wizards.steps.ArmaWizardStepMain;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,6 +28,7 @@ public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 
 	private Project project;
 	private List<Pair<String, String>> sourcePaths;
+
 
 	@Override
 	public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
@@ -42,6 +48,12 @@ public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 				}
 			}
 		}
+	}
+
+	@Nullable
+	@Override
+	public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
+		return new ArmaWizardStepMain(context, parentDisposable);
 	}
 
 	private void setProject(Project p){

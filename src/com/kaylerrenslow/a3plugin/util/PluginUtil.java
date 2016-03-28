@@ -6,7 +6,7 @@ import java.net.URL;
 /**
  * Created by Kayler on 01/02/2016.
  */
-public class Util{
+public class PluginUtil{
 
 	public static File convertURLToFile(URL url){
 		File f;

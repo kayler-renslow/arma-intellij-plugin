@@ -10,9 +10,8 @@ class TestClass {
 
 	class NestedClass : extendClass{
 		/*Another block comment*/
-		array[] = {var, 1, 1e1, ""};
+		array[] = {var, 1, 1e1, "", 42, 43};
 		math = 1 + 69 * 1;
-		/*Another block comment*/
 	};
 
 	thingy = 0; /*hi*/

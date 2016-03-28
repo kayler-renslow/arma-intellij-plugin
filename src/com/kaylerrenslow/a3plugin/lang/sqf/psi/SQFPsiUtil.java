@@ -25,6 +25,24 @@ import java.util.List;
  */
 public class SQFPsiUtil{
 
+	/** Checks if the given PsiElement is a BIS function (is of type SQFTypes.VARIABLE or SQFTypes.GLOBAL_VAR and text starts with BIS_fnc, false otherwise).
+	 * @param element element
+	 * @return true if the given PsiElement is a BIS function, false otherwise
+	 */
+	public static boolean isBisFunction(PsiElement element){
+		if(PsiUtil.isOfElementType(element, SQFTypes.VARIABLE)){
+			if(((SQFVariable)element).getVarName().startsWith("BIS_fnc")){
+				return true;
+			}
+		}
+		if(PsiUtil.isOfElementType(element, SQFTypes.GLOBAL_VAR)){
+			if(element.getText().startsWith("BIS_fnc")){
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/** Gets the current scope of the variable. This is determined by where a private declaration with its name is scoped.
 	 * @param var element to get scope of
 	 * @return scope
@@ -136,7 +154,7 @@ public class SQFPsiUtil{
 	}
 
 	public static SQFFile createFile(Project project, String text){
-		String fileName = "sqfDummy.sqf";
+		String fileName = "fake_sqf_file.sqf";
 		return (SQFFile) PsiFileFactory.getInstance(project).createFileFromText(fileName, SQFFileType.INSTANCE, text);
 	}
 
@@ -150,4 +168,8 @@ public class SQFPsiUtil{
 		return comment.getText().substring(2, comment.getTextLength() - 2).trim();
 	}
 
+	public static PsiElement createElement(Project project, String text, IElementType type) {
+		SQFFile file = createFile(project, text);
+		return PsiUtil.findDescendantElements(file, type, null).get(0).getPsi();
+	}
 }

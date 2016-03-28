@@ -37,9 +37,10 @@ public class HeaderFormattingBuilder implements FormattingModelBuilder{
 				.before(HeaderTypes.COLON).spaceIf(commonSettings.SPACE_BEFORE_COLON)
 				.after(HeaderTypes.COLON).spaceIf(commonSettings.SPACE_AFTER_COLON)
 				.withinPairInside(HeaderTypes.LBRACE, HeaderTypes.RBRACE, HeaderTypes.ARRAY).spaceIf(commonSettings.SPACE_WITHIN_ARRAY_INITIALIZER_BRACES)
-				.beforeInside(HeaderTypes.LBRACE, HeaderTypes.CLASS_DECLARATION).spaceIf(commonSettings.SPACE_BEFORE_CLASS_LBRACE)
-				.before(HeaderTypes.INLINE_COMMENT).none()
-				.before(HeaderTypes.BLOCK_COMMENT).none()
+				.betweenInside(HeaderTypes.CLASS_STUB, HeaderTypes.CLASS_CONTENT, HeaderTypes.CLASS_DECLARATION).spaceIf(commonSettings.SPACE_BEFORE_CLASS_LBRACE)
+				.beforeInside(HeaderTypes.LBRACE, HeaderTypes.CLASS_CONTENT).spaceIf(commonSettings.SPACE_BEFORE_CLASS_LBRACE)
+				.before(HeaderTypes.INLINE_COMMENT).spaceIf(true)
+				.before(HeaderTypes.BLOCK_COMMENT).spaceIf(true)
 				;
 		//@formatter:on
 	}

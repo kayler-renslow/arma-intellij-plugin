@@ -50,7 +50,6 @@
 		<!-- Other things-->
 		<moduleBuilder builderClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleBuilder" />
 		<moduleType implementationClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleType" id="arma.moduleType" />
-
 	</extensions>
 
 	<application-components></application-components>
@@ -58,7 +57,7 @@
 	<project-components></project-components>
 
 	<actions>
-		<group id="com.kaylerrenslow.plugin.dialog.actions.mainMenu.group" text="_Arma 3" description="Arma 3 Plugin Menu">
+		<group id="com.kaylerrenslow.plugin.dialog.actions.mainMenu.group" text="_Arma Plugin" description="Arma Plugin Menu">
 			<add-to-group group-id="MainMenu" anchor="last" />
 			<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma Plugin Properties" />
 			<action id="a3plugin.action.mm.wiki_scripting" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowScriptingWiki" text="Arma 3 Wiki for Scripting Commands" description="View the Wiki page for Arma 3 scripting commands" />

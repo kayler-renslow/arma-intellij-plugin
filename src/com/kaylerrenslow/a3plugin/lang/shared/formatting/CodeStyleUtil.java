@@ -31,6 +31,32 @@ public class CodeStyleUtil{
 		public static void setClassBraceStyle(CodeStyleSettings settings, int setting){
 			settings.CLASS_BRACE_STYLE = setting;
 		}
+	}
+
+	public static class ArrayInitializerStyle{
+		public static boolean doNotWrap(CodeStyleSettings settings){
+			return settings.ARRAY_INITIALIZER_WRAP == CodeStyleSettings.DO_NOT_WRAP;
+		}
+
+		public static boolean wrapIfLong(CodeStyleSettings settings){
+			return settings.ARRAY_INITIALIZER_WRAP == CodeStyleSettings.WRAP_AS_NEEDED;
+		}
+
+		public static boolean chopDownIfLong(CodeStyleSettings settings){
+			return settings.ARRAY_INITIALIZER_WRAP == CodeStyleSettings.WRAP_AS_NEEDED;
+		}
+
+		public static boolean alwaysWrap(CodeStyleSettings settings){
+			return settings.ARRAY_INITIALIZER_WRAP == CodeStyleSettings.WRAP_ALWAYS;
+		}
+
+		public static boolean newLineAfterLBrace(CodeStyleSettings settings){
+			return settings.ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE;
+		}
+
+		public static boolean newLineAfterRBrace(CodeStyleSettings settings){
+			return settings.ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE;
+		}
 
 	}
 }

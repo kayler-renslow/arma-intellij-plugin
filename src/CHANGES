@@ -1,14 +1,11 @@
 plugin
-	none
+	updates to the module creation
 
 shared between languages
-	added colorSchemes.xml to customize colors for certain text attributes
+	none
 
 SQF
-	made util method for getting text out of comment
-	putting NOTE in comment will make the comment text blue
-	changed color of lang constants
+	PsiElement linking now works for commands and functions.
 
 Header
-	made progress on HeaderBlock class
-	added preprocessor group to hide all includes and such in folding builder
+	HeaderBlock is done I think. Got array formatting to work

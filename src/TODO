@@ -26,3 +26,5 @@ variables declared private in a high scope will still find variables in a lower 
 
 
 for headerblock, have option for spaces before braces anywhere
+
+for header, add annotator and check if array has a trailing comma. if it does, mark it as error (exampleWithTrailingComma={item1, item2,})
