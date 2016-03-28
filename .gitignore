@@ -1,4 +1,4 @@
-/src/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc
+/src/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/*/
 src/com/kaylerrenslow/a3plugin/lang/sqf/SQFLexer.java
-.gitignore
+
 src/com/kaylerrenslow/a3plugin/lang/header/HeaderLexer.java
