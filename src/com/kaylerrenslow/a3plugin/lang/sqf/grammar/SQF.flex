@@ -37,7 +37,7 @@ ESCAPE_SEQUENCE = \\[^\r\n]
 
 STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 
-BLOCK_COMMENT = "/*" ~"*/"
+BLOCK_COMMENT = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 
 %%

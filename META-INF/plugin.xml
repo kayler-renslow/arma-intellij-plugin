@@ -1,7 +1,6 @@
-
 <idea-plugin version="2">
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
-	<name>Arma SQF Language Plugin</name>
+	<name>Arma Intellij Plugin</name>
 	<version>1.0.0</version>
 	<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
 	<description>
@@ -28,6 +27,8 @@
 		<lang.foldingBuilder language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFFoldingBuilder" />
 		<elementDescriptionProvider implementation="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDescriptionProvider" />
 		<usageGroupingRuleProvider implementation="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFUsageGroupingProvider" />
+		<defaultLiveTemplatesProvider implementation="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFDefaultLiveTemplatesProvider" />
+		<liveTemplateContext implementation="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFLiveTemplateContext" />
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>

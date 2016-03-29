@@ -1,5 +1,4 @@
 >add @see functionality for documentation that will create a link to a psi element (including psi files)
->for BIS functions, download the documentation online and store it
 
 >for SQF, find each local variable in current scope and annotate them if not declared private
 
@@ -23,8 +22,5 @@ variables declared private in a high scope will still find variables in a lower 
 		t //will be found by private1
 	}
 
-
-
-for headerblock, have option for spaces before braces anywhere
-
-for header, add annotator and check if array has a trailing comma. if it does, mark it as error (exampleWithTrailingComma={item1, item2,})
+To fill the completion list for named element references, the IDE calls PsiReference.getVariants() (use this instead of getReferences)
+	http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/code_completion.html

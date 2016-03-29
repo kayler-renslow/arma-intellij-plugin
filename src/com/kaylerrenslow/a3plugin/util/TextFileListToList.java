@@ -14,7 +14,7 @@ public class TextFileListToList{
 	 *     <pre>
 	 *     #comment that is ignored
 	 *     line that will be added
-	 *     this line will be added include comment #comment
+	 *     this line will be added including comment #comment
 	 *     </pre>
 	 *     </p>
 	 * @param f File to read

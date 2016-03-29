@@ -23,8 +23,8 @@ import java.util.List;
 public class SQFDocumentationProvider extends DocumentationProviderEx{
 	private static final String BIS_WIKI_URL_PREFIX = Plugin.resources.getString("plugin.doc.sqf.wiki_URL_prefix");
 	private static final String EXTERNAL_LINK_NOTIFICATION = Plugin.resources.getString("plugin.doc.sqf.wiki_doc_external_link_notification_string_format");
-	private static final String LINK_PREFIX_COMMAND = "command:";
-	private static final String LINK_PREFIX_BIS_FUNCTION = "bis-function:";
+	public static final String DOC_LINK_PREFIX_BIS_FUNCTION = "bis-function:";
+	public static final String DOC_LINK_PREFIX_COMMAND = "command:";
 
 	@Nullable
 	@Override
@@ -86,11 +86,11 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLink(PsiManager psiManager, String link, PsiElement context) {
-		if (link.startsWith(LINK_PREFIX_COMMAND)){
-			return SQFPsiUtil.createElement(context.getProject(), link.substring(LINK_PREFIX_COMMAND.length()), SQFTypes.COMMAND);
+		if (link.startsWith(DOC_LINK_PREFIX_COMMAND)){
+			return SQFPsiUtil.createElement(context.getProject(), link.substring(DOC_LINK_PREFIX_COMMAND.length()), SQFTypes.COMMAND);
 		}
-		if(link.startsWith(LINK_PREFIX_BIS_FUNCTION)){
-			return SQFPsiUtil.createElement(context.getProject(), link.substring(LINK_PREFIX_BIS_FUNCTION.length()), SQFTypes.GLOBAL_VAR);
+		if(link.startsWith(DOC_LINK_PREFIX_BIS_FUNCTION)){
+			return SQFPsiUtil.createElement(context.getProject(), link.substring(DOC_LINK_PREFIX_BIS_FUNCTION.length()), SQFTypes.GLOBAL_VAR);
 		}
 		return null;
 	}

@@ -36,8 +36,8 @@ public class SQFVisitorAnnotator extends com.kaylerrenslow.a3plugin.lang.sqf.psi
 		super.visitComment(comment);
 		String commentContent = SQFPsiUtil.getCommentContent(comment);
 		if(commentContent.toLowerCase().startsWith("note")){
-			Annotation a= annotator.createAnnotation(HighlightSeverity.INFORMATION, TextRange.from(comment.getTextOffset() + 2, comment.getTextLength() - 2), commentContent);
-			a.setTextAttributes(TextAttributesKey.find("A3_SQF_COMMENT_NOTE"));
+			Annotation a= annotator.createAnnotation(HighlightSeverity.INFORMATION, TextRange.from(comment.getTextOffset() + 2, commentContent.length()), commentContent);
+			a.setTextAttributes(SQFSyntaxHighlighter.COMMENT_NOTE);
 
 		}
 	}

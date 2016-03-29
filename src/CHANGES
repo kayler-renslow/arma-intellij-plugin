@@ -1,11 +1,13 @@
 plugin
-	updates to the module creation
+	moved header's and SQF's String name out of plugin.properties to make the xml not show zillions (ok, exageration - ~14) of errors
 
 shared between languages
 	none
 
 SQF
-	PsiElement linking now works for commands and functions.
+	made completion provider give documentation for commands and BIS_ functions
+	created icon for SQF functions that are defined in CFGFunctions
+	added auto completion things like hintfln (creates a hint command with current file and linenumber inserted) and hintfo (hint format[""])
 
 Header
-	HeaderBlock is done I think. Got array formatting to work
+	none

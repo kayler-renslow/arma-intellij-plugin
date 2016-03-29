@@ -108,6 +108,3 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 <YYINITIAL> ";"   { return HeaderTypes.SEMICOLON; }
 
 <YYINITIAL> . { return HeaderTypes.BAD_CHARACTER; }
-
-
-
