@@ -3,7 +3,8 @@ package com.kaylerrenslow.a3plugin.lang.shared.formatting;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 
 /**
- * Created by Kayler on 03/25/2016.
+ * @author Kayler
+ * Created on 03/25/2016.
  */
 public class CodeStyleUtil{
 

@@ -10,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Kayler on 12/28/2015.
+ * @author Kayler
+ * Created on 12/28/2015.
  */
 public class SQFStatic{
 	public static final String NAME = "Arma.SQF";

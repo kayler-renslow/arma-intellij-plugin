@@ -21,7 +21,9 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Created by Kayler on 03/20/2016.
+ * @author Kayler
+ * Psi utilities for SQF
+ * Created on 03/20/2016.
  */
 public class SQFPsiUtil{
 

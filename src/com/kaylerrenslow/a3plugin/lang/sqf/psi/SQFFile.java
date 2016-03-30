@@ -10,7 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 /**
- * Created by Kayler on 10/31/2015.
+ * @author Kayler
+ * PsiFile for SQF language
+ * Created on 10/31/2015.
  */
 public class SQFFile extends PsiFileBase{
 	public SQFFile(FileViewProvider viewProvider) {

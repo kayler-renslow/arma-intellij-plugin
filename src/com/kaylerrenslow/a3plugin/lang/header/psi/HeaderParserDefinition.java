@@ -17,7 +17,9 @@ import com.kaylerrenslow.a3plugin.lang.header.parser.HeaderParser;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 10/31/2015.
+ * @author Kayler
+ * ParserDefinition implementation for Header language. This is in charge of creating the Header language's PSI parser and JFlex lexer.
+ * Created on 10/31/2015.
  */
 public class HeaderParserDefinition implements ParserDefinition{
 	public static final TokenSet WHITE_SPACES = TokenSet.create(HeaderTypes.WHITE_SPACE);

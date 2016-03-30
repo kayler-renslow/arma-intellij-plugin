@@ -20,7 +20,9 @@ import java.awt.*;
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 
 /**
- * Created by Kayler on 11/01/2015.
+ * @author Kayler
+ * SyntaxHighlighter extension point for SQF language
+ * Created on 11/01/2015.
  */
 public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey COMMENT = createTextAttributesKey("A3_SQF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);

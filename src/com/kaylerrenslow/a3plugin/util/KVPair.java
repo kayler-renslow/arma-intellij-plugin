@@ -1,7 +1,8 @@
 package com.kaylerrenslow.a3plugin.util;
 
 /**
- * Created by Kayler on 12/30/2015.
+ * @author Kayler
+ * Created on 12/30/2015.
  */
 public class KVPair<K, V>{
 	public K key;

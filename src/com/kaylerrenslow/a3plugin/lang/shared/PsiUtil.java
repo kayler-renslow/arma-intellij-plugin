@@ -13,56 +13,72 @@ import java.util.List;
  * @author Kayler
  *         Created on 01/02/2016.
  */
-public class PsiUtil{
+public class PsiUtil {
 
-	public static ASTNode getNextSiblingNotWhitespace(ASTNode node){
+	/**
+	 * Gets the closest next sibling, that is non-whitespace, relative to node
+	 *
+	 * @param node node to find sibling of
+	 * @return non-whitespace sibling, or null if none was found
+	 */
+	public static ASTNode getNextSiblingNotWhitespace(ASTNode node) {
 		ASTNode sibling = node.getTreeNext();
-		while(sibling != null){
-			if(sibling.getElementType() == TokenType.WHITE_SPACE){
+		while (sibling != null) {
+			if (sibling.getElementType() == TokenType.WHITE_SPACE) {
 				sibling = sibling.getTreeNext();
-			}else{
+			} else {
 				break;
 			}
 		}
 		return sibling;
 	}
 
-	public static ASTNode getPrevSiblingNotWhitespace(ASTNode node){
+	/**
+	 * Gets the closest previous sibling, that is non-whitespace, relative to node
+	 *
+	 * @param node node to find sibling of
+	 * @return non-whitespace sibling, or null if none was found
+	 */
+	public static ASTNode getPrevSiblingNotWhitespace(ASTNode node) {
 		ASTNode sibling = node.getTreePrev();
-		while(sibling != null){
-			if(sibling.getElementType() == TokenType.WHITE_SPACE){
+		while (sibling != null) {
+			if (sibling.getElementType() == TokenType.WHITE_SPACE) {
 				sibling = sibling.getTreePrev();
-			}else{
+			} else {
 				break;
 			}
 		}
 		return sibling;
 	}
 
-	/** Checks if the given node is a descendant of the given IElementType.<br>
-	 *  If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
-	 * @param node node to check if has a ancestor of IElementType type
-	 * @param type IElementType to check
+	/**
+	 * Checks if the given node is a descendant of the given IElementType.<br>
+	 * If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
+	 *
+	 * @param node        node to check if has a ancestor of IElementType type
+	 * @param type        IElementType to check
 	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
 	 * @return true if node has ancestor of IElementType type and ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
 	 */
-	public static boolean isDescendantOf(ASTNode node, IElementType type, String textContent){
+	public static boolean isDescendantOf(ASTNode node, IElementType type, String textContent) {
 		return getAncestorWithType(node, type, textContent) != null;
 	}
 
-	/** Checks if the given node is an ancestor of the given IElementType. If it is, this method will return that ancestor. Otherwise, it will return null.<br>
-	 *  If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
-	 * @param node node to check if has a parent of IElementType type
-	 * @param type IElementType to check
+	/**
+	 * Checks if the given node is an ancestor of the given IElementType. If it is, this method will return that ancestor. Otherwise, it will return null.<br>
+	 * If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
+	 *
+	 * @param node        node to check if has a parent of IElementType type
+	 * @param type        IElementType to check
 	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
 	 * @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
 	 */
-	public static ASTNode getAncestorWithType(ASTNode node, IElementType type, String textContent){
+	public static ASTNode getAncestorWithType(ASTNode node, IElementType type, String textContent) {
 		ASTNode parent = node.getTreeParent();
 		boolean isChild = false;
-		while(parent != null && !isChild){
+		while (parent != null && !isChild) {
 			parent = parent.getTreeParent();
-			if(parent == null){
+			if (parent == null) {
 				break;
 			}
 			isChild = parent.getElementType() == type && (textContent == null || parent.getText().equals(textContent));
@@ -125,9 +141,9 @@ public class PsiUtil{
 	public static ASTNode findFirstElement(PsiFile file, IElementType type, String content) {
 		ASTNode[] children = file.getNode().getChildren(null);
 		ASTNode ret;
-		for (ASTNode child : children){
+		for (ASTNode child : children) {
 			ret = findFirstElement(child, type, content);
-			if (ret != null){
+			if (ret != null) {
 				return ret;
 			}
 		}
@@ -143,16 +159,16 @@ public class PsiUtil{
 	 * @return ASTNode that is the first of type, or null if none was found
 	 */
 	public static ASTNode findFirstElement(ASTNode node, IElementType type, String content) {
-		if (isOfElementType(node, type)){
-			if (content != null && node.getText().equals(content)){
+		if (isOfElementType(node, type)) {
+			if (content != null && node.getText().equals(content)) {
 				return node;
-			}else if (content != null){
+			} else if (content != null) {
 				return null;
 			}
 			return node;
 		}
 		ASTNode[] children = node.getChildren(null);
-		for (ASTNode child : children){
+		for (ASTNode child : children) {
 			findFirstElement(child, type, content);
 		}
 		return null;
@@ -162,9 +178,9 @@ public class PsiUtil{
 	/**
 	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
 	 *
-	 * @param element   PsiElement to traverse
-	 * @param toFind IElement the type to find in the AST tree
-	 * @param cursor the node that is already discovered since the user's mouse is over it (can be null)
+	 * @param element PsiElement to traverse
+	 * @param toFind  IElement the type to find in the AST tree
+	 * @param cursor  the node that is already discovered since the user's mouse is over it (can be null)
 	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
 	 */
 	public static ArrayList<ASTNode> findDescendantElements(PsiElement element, IElementType toFind, ASTNode cursor) {
@@ -174,9 +190,9 @@ public class PsiUtil{
 	/**
 	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list and the ASTNode's text equals textContent
 	 *
-	 * @param element   PsiElement to traverse
-	 * @param toFind IElement the type to find in the AST tree
-	 * @param cursor the node that is already discovered since the user's mouse is over it (can be null)
+	 * @param element     PsiElement to traverse
+	 * @param toFind      IElement the type to find in the AST tree
+	 * @param cursor      the node that is already discovered since the user's mouse is over it (can be null)
 	 * @param textContent text to look for in ASTNode (null if doesn't matter)
 	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
 	 */
@@ -189,15 +205,15 @@ public class PsiUtil{
 	/**
 	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
 	 *
-	 * @param list   list to add each ASTNode to that matches toFind's type
-	 * @param element   PsiElement to traverse
-	 * @param toFind IElement the type to find in the AST tree
-	 * @param cursor the node that is already discovered since the user's mouse is over it (can be null)
+	 * @param list        list to add each ASTNode to that matches toFind's type
+	 * @param element     PsiElement to traverse
+	 * @param toFind      IElement the type to find in the AST tree
+	 * @param cursor      the node that is already discovered since the user's mouse is over it (can be null)
 	 * @param textContent text to look for in ASTNode (null if doesn't matter)
 	 */
 	private static void traverseElement(ArrayList<ASTNode> list, PsiElement element, IElementType toFind, ASTNode cursor, String textContent) {
 		ASTNode[] children = element.getNode().getChildren(null);
-		for (ASTNode node : children){
+		for (ASTNode node : children) {
 			traverseASTNode(list, toFind, cursor, node, textContent);
 		}
 	}
@@ -209,31 +225,31 @@ public class PsiUtil{
 	 * @param toFind            element type to find
 	 * @param cursor            the ASTNode that has the mouse over it (can be null)
 	 * @param discoveredElement previously discovered ASTNode
-	 * @param textContent text to look for in ASTNode (null if doesn't matter)
+	 * @param textContent       text to look for in ASTNode (null if doesn't matter)
 	 */
 	private static void traverseASTNode(ArrayList<ASTNode> list, IElementType toFind, ASTNode cursor, ASTNode discoveredElement, String textContent) {
-		if(textContent == null){
+		if (textContent == null) {
 			elementDiscovered(list, toFind, cursor, discoveredElement);
-		}else if(discoveredElement.getText().equals(textContent)){
+		} else if (discoveredElement.getText().equals(textContent)) {
 			elementDiscovered(list, toFind, cursor, discoveredElement);
 		}
 		ASTNode[] children = discoveredElement.getChildren(null);
-		for (ASTNode node : children){
+		for (ASTNode node : children) {
 			traverseASTNode(list, toFind, cursor, node, textContent);
 		}
 	}
 
 	private static void elementDiscovered(ArrayList<ASTNode> elements, IElementType toFind, ASTNode cursor, ASTNode discoveredElement) {
-		if (PsiUtil.isOfElementType(discoveredElement, toFind)){
+		if (PsiUtil.isOfElementType(discoveredElement, toFind)) {
 			addToList(elements, discoveredElement, cursor);
 		}
 	}
 
 	private static void addToList(List<ASTNode> list, ASTNode n, ASTNode cursor) {
-		if (n == null){
+		if (n == null) {
 			return;
 		}
-		if (n == cursor){
+		if (n == cursor) {
 			return;
 		}
 		list.add(n);

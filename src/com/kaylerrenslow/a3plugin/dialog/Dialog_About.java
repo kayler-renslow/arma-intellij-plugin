@@ -7,7 +7,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 /**
- * Created by Kayler on 12/30/2015.
+ * @author Kayler
+ * Dialog for About the plugin
+ * Created on 12/30/2015.
  */
 public class Dialog_About extends DialogWrapper{
 	private static final String TITLE = "About the Arma 3 Plugin";

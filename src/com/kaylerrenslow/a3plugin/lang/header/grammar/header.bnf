@@ -12,7 +12,7 @@
   elementTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderElementType"
   tokenTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTokenType"
 
-  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.impl.PSIHeaderImplUtil"
+  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.impl.PSIHeaderUtilForGrammar"
 }
 // @formatter:off
 headerFile ::= file_entry*

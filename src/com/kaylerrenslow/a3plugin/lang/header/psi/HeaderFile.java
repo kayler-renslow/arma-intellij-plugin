@@ -10,7 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 /**
- * Created by Kayler on 10/31/2015.
+ * @author Kayler
+ * PsiFile extension point for Header language.
+ * Created on 10/31/2015.
  */
 public class HeaderFile extends PsiFileBase{
 	public HeaderFile(FileViewProvider viewProvider) {
@@ -22,13 +24,6 @@ public class HeaderFile extends PsiFileBase{
 	public FileType getFileType(){
 		return HeaderFileType.INSTANCE;
 	}
-
-	/*
-	@Override
-	public String toString(){
-		return "SQF File";
-	}
-	*/
 
 	@Override
 	public Icon getIcon(int flags) {

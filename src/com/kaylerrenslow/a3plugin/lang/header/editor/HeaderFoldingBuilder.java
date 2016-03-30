@@ -14,9 +14,13 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- * Created by Kayler on 03/20/2016.
+ * @author Kayler
+ *         FoldingBuilder implementation for Header language. Folding builder is what detects can be folded.
+ *         For example, if a class declaration has a left brace on line 1 and right brace on line 50, it is eligible for code folding.
+ *         Code folding is replacing all text within those braces visually with ... for example.
+ *         Created on 03/20/2016.
  */
-public class HeaderFoldingBuilder implements FoldingBuilder{
+public class HeaderFoldingBuilder implements FoldingBuilder {
 	@NotNull
 	@Override
 	public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
@@ -27,10 +31,10 @@ public class HeaderFoldingBuilder implements FoldingBuilder{
 
 	private void collectFoldingDescriptors(ASTNode node, Document document, ArrayList<FoldingDescriptor> descriptors) {
 		IElementType type = node.getElementType();
-		if ((type == HeaderTypes.ARRAY || type == HeaderTypes.CLASS_CONTENT || type == HeaderTypes.BLOCK_COMMENT || type == HeaderTypes.PREPROCESSOR_GROUP) && spansMultipleLines(node, document)){
+		if ((type == HeaderTypes.ARRAY || type == HeaderTypes.CLASS_CONTENT || type == HeaderTypes.BLOCK_COMMENT || type == HeaderTypes.PREPROCESSOR_GROUP) && spansMultipleLines(node, document)) {
 			descriptors.add(new FoldingDescriptor(node, TextRange.from(node.getStartOffset(), node.getTextLength())));
 		}
-		for (ASTNode child : node.getChildren(null)){
+		for (ASTNode child : node.getChildren(null)) {
 			collectFoldingDescriptors(child, document, descriptors);
 		}
 	}
@@ -44,13 +48,13 @@ public class HeaderFoldingBuilder implements FoldingBuilder{
 	@Override
 	public String getPlaceholderText(@NotNull ASTNode node) {
 		IElementType type = node.getElementType();
-		if(type == HeaderTypes.ARRAY || type == HeaderTypes.CLASS_CONTENT ){
+		if (type == HeaderTypes.ARRAY || type == HeaderTypes.CLASS_CONTENT) {
 			return "{...}";
 		}
-		if(type == HeaderTypes.BLOCK_COMMENT){
+		if (type == HeaderTypes.BLOCK_COMMENT) {
 			return "/*...*/";
 		}
-		if(type== HeaderTypes.PREPROCESSOR_GROUP){
+		if (type == HeaderTypes.PREPROCESSOR_GROUP) {
 			return "#...";
 		}
 		return "...";
@@ -58,9 +62,9 @@ public class HeaderFoldingBuilder implements FoldingBuilder{
 
 	@Override
 	public boolean isCollapsedByDefault(@NotNull ASTNode node) {
-		if(node.getPsi() instanceof HeaderPreprocessorGroup){
-			HeaderPreprocessorGroup g = (HeaderPreprocessorGroup)node.getPsi();
-			if(g.getPreprocessorList().size() > 1){
+		if (node.getPsi() instanceof HeaderPreprocessorGroup) {
+			HeaderPreprocessorGroup g = (HeaderPreprocessorGroup) node.getPsi();
+			if (g.getPreprocessorList().size() > 1) {
 				return true;
 			}
 		}

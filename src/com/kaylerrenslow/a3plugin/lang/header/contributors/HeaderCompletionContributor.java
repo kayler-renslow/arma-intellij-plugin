@@ -9,7 +9,9 @@ import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 01/01/2016.
+ * @author Kayler
+ * CompletionContributor implementation for Header language
+ * Created on 01/01/2016.
  */
 public class HeaderCompletionContributor extends CompletionContributor {
 	public HeaderCompletionContributor() {

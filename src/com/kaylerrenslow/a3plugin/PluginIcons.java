@@ -6,11 +6,10 @@ import com.kaylerrenslow.a3plugin.util.ResourceGetter;
 import javax.swing.*;
 
 /**
- * Created by Kayler on 01/01/2016.
+ * @author Kayler
+ * Created on 01/01/2016.
  */
 public class PluginIcons{
-	//http://www.jetbrains.org/intellij/sdk/docs/reference_guide/work_with_icons_and_images.html
-
 
 	public static final Icon ICON_ARMA3_FILE = IconLoader.getIcon("/com/kaylerrenslow/a3plugin/icons/plugin.png");
 

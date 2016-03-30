@@ -1,12 +1,12 @@
 package com.kaylerrenslow.a3plugin;
 
-import com.kaylerrenslow.a3plugin.util.FileReader;
 import com.kaylerrenslow.a3plugin.util.ResourceBundle;
 
 import java.io.File;
 
 /**
- * Created by Kayler on 12/27/2015.
+ * @author Kayler
+ * Created on 12/27/2015.
  */
 public class Plugin{
 

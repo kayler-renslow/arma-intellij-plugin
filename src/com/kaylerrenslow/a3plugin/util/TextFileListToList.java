@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- * Created by Kayler on 01/02/2016.
+ * @author Kayler
+ * Created on 01/02/2016.
  */
 public class TextFileListToList{
 

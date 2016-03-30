@@ -1,5 +1,6 @@
 package com.kaylerrenslow.a3plugin.dialog;
 
+import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.util.ResourceGetter;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -19,24 +20,23 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 
 /**
- * Created by Kayler on 03/29/2016.
+ * @author Kayler
+ *         This is a JavaFX VBox panel that contains the all Color Picker controls and canvas.
+ *         Created on 03/29/2016.
  */
 public class ColorPickerPanel extends VBox {
-	private static final String ROOT = "/com/kaylerrenslow/a3plugin/img/";
+	private final String ROOT = "/com/kaylerrenslow/a3plugin/img/";
 
-	private static final String[] imagePaths = {ROOT + "img1.png", ROOT + "img2.png", ROOT + "img3.png"};
-	private static final String IMAGE_1 = "Image 1";
-	private static final String IMAGE_2 = "Image 2";
-	private static final String IMAGE_3 = "Image 3";
+	private final String[] imagePaths = {ROOT + "img1.png", ROOT + "img2.png", ROOT + "img3.png"};
 
-	private static final Font font = new Font(20);
+	private final Font font = new Font(20);
 
-	private static final DecimalFormat df = new DecimalFormat("#.###");
+	private final DecimalFormat df = new DecimalFormat("#.###");
 
-	private static final int CANVAS_WIDTH = 800;
-	private static final int CANVAS_HEIGHT = 450;
+	private final int CANVAS_WIDTH = 800;
+	private final int CANVAS_HEIGHT = 450;
 
-	private static final String CANVAS_FOREGROUND_TEXT = "Hallo from the other side.";
+	private final String CANVAS_FOREGROUND_TEXT = Plugin.resources.getString("plugin.color_picker.foreground_text");
 	private final double CANVAS_TEXT_WIDTH = com.sun.javafx.tk.Toolkit.getToolkit().getFontLoader().computeStringWidth(CANVAS_FOREGROUND_TEXT, font);
 	private final double CANVAS_TEXT_HEIGHT = font.getSize();
 
@@ -46,22 +46,23 @@ public class ColorPickerPanel extends VBox {
 	private final int CANVAS_BACKGROUND_X_POS = (CANVAS_WIDTH - CANVAS_BACKGROUND_WIDTH) / 2;
 	private final int CANVAS_BACKGROUND_Y_POS = (CANVAS_HEIGHT - CANVAS_BACKGROUND_HEIGHT) / 2;
 	private final int CANVAS_FOREGROUND_X_POS = CANVAS_BACKGROUND_X_POS + (int) (CANVAS_BACKGROUND_WIDTH - CANVAS_TEXT_WIDTH) / 2;
-	private final int CANVAS_FOREGROUND_Y_POS = CANVAS_BACKGROUND_Y_POS + (int) (CANVAS_BACKGROUND_HEIGHT - CANVAS_TEXT_HEIGHT) / 2;
+	private final int CANVAS_FOREGROUND_Y_POS = CANVAS_BACKGROUND_Y_POS + (int) (CANVAS_BACKGROUND_HEIGHT - CANVAS_TEXT_HEIGHT) / 2 + (int)CANVAS_TEXT_HEIGHT;
 
-	private static final Color DEFAULT_FOREGROUND = new Color(1, 1, 1, 1);
-	private static final Color DEFAULT_BACKGROUND = new Color(0, 0, 0, 0.7);
+	private final Color DEFAULT_FOREGROUND = new Color(1, 1, 1, 1);
+	private final Color DEFAULT_BACKGROUND = new Color(0, 0, 0, 0.7);
 
-	private ColorPicker pickerForeground = new ColorPicker();
-	private ColorPicker pickerBackground = new ColorPicker();
-	private Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+	private final ColorPicker pickerForeground = new ColorPicker();
+	private final ColorPicker pickerBackground = new ColorPicker();
+	private final Canvas canvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
 
-	private double[] armaColorForeground = {DEFAULT_FOREGROUND.getRed(), DEFAULT_FOREGROUND.getGreen(), DEFAULT_FOREGROUND.getBlue(), DEFAULT_FOREGROUND.getOpacity()};
-	private double[] armaColorBackground = {DEFAULT_BACKGROUND.getRed(), DEFAULT_BACKGROUND.getGreen(), DEFAULT_BACKGROUND.getBlue(), DEFAULT_BACKGROUND.getOpacity()};
+	private final double[] armaColorForeground = {DEFAULT_FOREGROUND.getRed(), DEFAULT_FOREGROUND.getGreen(), DEFAULT_FOREGROUND.getBlue(), DEFAULT_FOREGROUND.getOpacity()};
+	private final double[] armaColorBackground = {DEFAULT_BACKGROUND.getRed(), DEFAULT_BACKGROUND.getGreen(), DEFAULT_BACKGROUND.getBlue(), DEFAULT_BACKGROUND.getOpacity()};
 
-	private TextField tfForeground = new TextField();
-	private TextField tfBackground = new TextField();
+	private final TextField tfForeground = new TextField();
+	private final TextField tfBackground = new TextField();
 
-	private HBox controls = new HBox();
+	private final HBox controls = new HBox();
+	private final HBox controls2 = new HBox();
 
 	private Image currentImage;
 
@@ -86,17 +87,19 @@ public class ColorPickerPanel extends VBox {
 		canvas.getGraphicsContext2D().setFont(font);
 
 		ComboBox<CanvasImage> cb = new ComboBox<>();
-		cb.getItems().addAll(new CanvasImage(IMAGE_1, imagePaths[0]), new CanvasImage(IMAGE_2, imagePaths[1]), new CanvasImage(IMAGE_3, imagePaths[2]));
+		cb.getItems().addAll(new CanvasImage("Image 1", imagePaths[0]), new CanvasImage("Image 2", imagePaths[1]), new CanvasImage("Image 3", imagePaths[2]));
 		cb.getSelectionModel().selectedItemProperty().addListener(new CanvasImageComboBoxAction(cb));
 		cb.getSelectionModel().select(0);
 
 		Label lblforeground = new Label("Foreground:");
 		Label lblbackground = new Label("Background:");
 
-		controls.getChildren().addAll(lblforeground, pickerForeground, tfForeground, lblbackground, pickerBackground, tfBackground, cb);
+		controls.getChildren().addAll(lblforeground, pickerForeground, tfForeground, lblbackground, pickerBackground, tfBackground);
 
 		final Insets margin_15right = new Insets(0, 15, 0, 0);
 		final Insets margin_5right = new Insets(0, 5, 0, 0);
+		final Insets margin_15bottom = new Insets(0, 0, 15, 0);
+
 		HBox.setMargin(lblforeground, margin_5right);
 		HBox.setMargin(pickerForeground, margin_15right);
 		HBox.setMargin(tfForeground, margin_15right);
@@ -104,29 +107,32 @@ public class ColorPickerPanel extends VBox {
 		HBox.setMargin(pickerBackground, margin_15right);
 		HBox.setMargin(tfBackground, margin_15right);
 
-		Button updateFromTf = new Button("Set color from Text Fields");
+		Button updateFromTf = new Button(Plugin.resources.getString("plugin.color_picker.update_from_tf"));
 		updateFromTf.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				double[] bg = arrayFromText(tfBackground);
 				double[] fg = arrayFromText(tfForeground);
-				if(bg != null){
+				if (bg != null) {
 					pickerBackground.setValue(Color.color(bg[0], bg[1], bg[2], bg[3]));
 				}
-				if(fg != null){
+				if (fg != null) {
 					pickerForeground.setValue(Color.color(fg[0], fg[1], fg[2], fg[3]));
 				}
 			}
 		});
 
+		controls2.getChildren().addAll(updateFromTf, cb);
+		HBox.setMargin(updateFromTf, margin_15right);
 
-		VBox.setMargin(controls, new Insets(0, 0, 15, 0));
-		VBox.setMargin(updateFromTf, new Insets(15, 0, 0, 0));
 
-		this.getChildren().addAll(controls, canvas, updateFromTf);
+		VBox.setMargin(controls, margin_15bottom);
+		VBox.setMargin(controls2, margin_15bottom);
+
+		this.getChildren().addAll(controls, controls2, canvas);
 	}
 
-	private static void loadArmaColorValue(Color c, double[] arr) {
+	private void loadArmaColorValue(Color c, double[] arr) {
 		arr[0] = truncate(c.getRed());
 		arr[1] = truncate(c.getGreen());
 		arr[2] = truncate(c.getBlue());
@@ -139,9 +145,8 @@ public class ColorPickerPanel extends VBox {
 
 			double[] d = new double[4];
 			for (int i = 0; i < d.length; i++) {
-				System.out.println(split[i]);
 				d[i] = Double.parseDouble(split[i].trim());
-				if(d[i] < 0 || d[i] > 1){
+				if (d[i] < 0 || d[i] > 1) {
 					throw new Exception(); //to set the error color below
 				}
 			}
@@ -153,7 +158,7 @@ public class ColorPickerPanel extends VBox {
 		}
 	}
 
-	private static double truncate(double d) {
+	private double truncate(double d) {
 		return Double.parseDouble(df.format(d));
 	}
 
@@ -205,6 +210,7 @@ public class ColorPickerPanel extends VBox {
 
 	private void setTextFieldText(TextField tf, double[] arr) {
 		tf.setText(Arrays.toString(arr));
+		tf.setStyle("");
 	}
 
 	private void updateForegroundTextField(Color color) {

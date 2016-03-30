@@ -11,9 +11,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 03/20/2016.
+ * @author Kayler
+ *         PairedBraceMatcher implementation for Header language. This class takes care of figuring out what tokens to automatically close when typing. For example, if { is pressed, } will be inserted automatically
+ *         Created on 03/20/2016.
  */
-public class HeaderBraceMatcher implements PairedBraceMatcher{
+public class HeaderBraceMatcher implements PairedBraceMatcher {
 	private final BracePair[] pairs = new BracePair[]{new BracePair(HeaderTypes.LPAREN, HeaderTypes.RPAREN, false), new BracePair(HeaderTypes.LBRACE, HeaderTypes.RBRACE, true)};
 
 	@Override

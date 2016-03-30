@@ -4,7 +4,7 @@ import java.io.File;
 import java.net.URL;
 
 /**
- * Created by Kayler on 01/02/2016.
+ * Created on 01/02/2016.
  */
 public class PluginUtil{
 

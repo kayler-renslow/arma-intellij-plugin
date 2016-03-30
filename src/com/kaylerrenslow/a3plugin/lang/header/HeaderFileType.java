@@ -8,7 +8,9 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 /**
- * Created by Kayler on 10/31/2015.
+ * @author Kayler
+ * LanguageFileType extension point for Header language. This data is viewable through the window: File -> Settings -> Editor -> File Types
+ * Created on 10/31/2015.
  */
 public class HeaderFileType extends LanguageFileType{
 	public static final HeaderFileType INSTANCE = new HeaderFileType();

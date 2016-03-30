@@ -1,17 +1,16 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.editor;
 
-import com.intellij.ide.highlighter.custom.CustomHighlighterColors;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.HighlightSeverity;
-import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.markup.GutterIconRenderer;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiComment;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighter;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDecl;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDeclVar;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -19,7 +18,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by Kayler on 03/16/2016.
+ * @author Kayler
+ * AST visistor implementation for annotating with SQFAnnotator
+ * Created on 03/16/2016.
  */
 public class SQFVisitorAnnotator extends com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVisitor{
 

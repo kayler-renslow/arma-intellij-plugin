@@ -5,7 +5,9 @@ import com.intellij.lexer.FlexAdapter;
 import java.io.Reader;
 
 /**
- * Created by Kayler on 10/31/2015.
+ * @author Kayler
+ * Creates a new SQF JFlex lexer
+ * Created on 10/31/2015.
  */
 public class SQFLexerAdapter extends FlexAdapter{
 	public SQFLexerAdapter() {

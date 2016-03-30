@@ -3,7 +3,9 @@ package com.kaylerrenslow.a3plugin.lang.sqf;
 import com.intellij.lang.Language;
 
 /**
- * Created by Kayler on 10/31/2015.
+ * @author Kayler
+ * Language extension point for SQF language
+ * Created on 10/31/2015.
  */
 public class SQFLanguage extends Language{
     public static final SQFLanguage INSTANCE = new SQFLanguage();

@@ -6,7 +6,8 @@ import java.io.PrintWriter;
 import java.util.Properties;
 
 /**
- * Created by Kayler on 12/30/2015.
+ * @author Kayler
+ * Created on 12/30/2015.
  */
 public class PluginUserProperties{
 	private static final String PROPERTIES_FILE = "plugin.properties";

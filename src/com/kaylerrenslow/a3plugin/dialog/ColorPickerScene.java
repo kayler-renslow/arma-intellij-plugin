@@ -3,7 +3,9 @@ package com.kaylerrenslow.a3plugin.dialog;
 import javafx.scene.Scene;
 
 /**
- * Created by Kayler on 03/29/2016.
+ * @author Kayler
+ * This is simply a JavaFX Scene with the ColorPicker panel placed inside
+ * Created on 03/29/2016.
  */
 public class ColorPickerScene extends Scene{
 

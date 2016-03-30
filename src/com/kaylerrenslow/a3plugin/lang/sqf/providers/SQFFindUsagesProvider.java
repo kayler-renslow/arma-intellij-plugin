@@ -14,6 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kayler
+ * Finds usages provider implementation for SQF language
  * Created on 03/19/2016.
  */
 public class SQFFindUsagesProvider implements FindUsagesProvider{

@@ -16,7 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by Kayler on 11/01/2015.
+ * @author Kayler
+ * ColorSettingsPage implementation for SQF language
+ * Created on 11/01/2015.
  */
 public class SQFColorSettingsPage implements ColorSettingsPage{
 	private static final Map<String, TextAttributesKey> map = new HashMap<>();

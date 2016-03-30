@@ -17,7 +17,9 @@ import com.kaylerrenslow.a3plugin.lang.sqf.parser.SQFParser;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 10/31/2015.
+ * @author Kayler
+ * Creates JFlex lexer and Psi parser for SQF language
+ * Created on 10/31/2015.
  */
 public class SQFParserDefinition implements ParserDefinition{
 	public static final TokenSet WHITE_SPACES = TokenSet.create(SQFTypes.WHITE_SPACE);

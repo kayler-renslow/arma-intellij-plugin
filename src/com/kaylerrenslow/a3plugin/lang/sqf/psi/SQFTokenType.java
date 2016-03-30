@@ -6,7 +6,9 @@ import com.kaylerrenslow.a3plugin.lang.sqf.SQFLanguage;
 import java.util.Hashtable;
 
 /**
- * Created by Kayler on 10/31/2015.
+ * @author Kayler
+ * TokenType extension point for SQF language
+ * Created on 10/31/2015.
  */
 public class SQFTokenType extends IElementType{
 

@@ -7,7 +7,9 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 03/20/2016.
+ * @author Kayler
+ * Registers, to Intellij, which references provider implementations are for SQF language
+ * Created on 03/20/2016.
  */
 public class SQFReferenceContributor extends PsiReferenceContributor{
 	@Override

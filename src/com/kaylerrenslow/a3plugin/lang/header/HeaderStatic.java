@@ -4,7 +4,8 @@ import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.util.FileReader;
 
 /**
- * Created by Kayler on 12/28/2015.
+ * @author Kayler
+ * Created on 12/28/2015.
  */
 public class HeaderStatic{
 	public static final String NAME = "Arma.Header";

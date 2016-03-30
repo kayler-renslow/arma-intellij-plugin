@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kayler
+ * FormattingModelBuilder implementation for Header language
  * Created on 03/18/2016.
  */
 public class HeaderFormattingBuilder implements FormattingModelBuilder{

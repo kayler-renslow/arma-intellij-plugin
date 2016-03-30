@@ -10,7 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 03/20/2016.
+ * @author Kayler
+ * RefactoringSupportProvider extension point for SQF language. This decides what can be refactored *IN-LINE* and what can't
+ * Created on 03/20/2016.
  */
 public class SQFRefactoringSupportProvider extends RefactoringSupportProvider{
 

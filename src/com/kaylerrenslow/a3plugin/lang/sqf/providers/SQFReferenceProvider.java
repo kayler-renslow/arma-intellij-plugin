@@ -16,7 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Kayler on 03/23/2016.
+ * @author Kayler
+ * PsiReferenceProvider extension point for SQF language. This provides PSIReferences for given PsiElements, if applicable to them
+ * Created on 03/23/2016.
  */
 public class SQFReferenceProvider extends PsiReferenceProvider{
 
@@ -25,7 +27,7 @@ public class SQFReferenceProvider extends PsiReferenceProvider{
 	@Override
 	public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
 		if (!(element instanceof SQFVariableNamedElement)){
-			return new PsiReference[0];
+			return new PsiReference[0]; //can't be referenced
 		}
 
 		SQFVariableNamedElement var = (SQFVariableNamedElement) element;

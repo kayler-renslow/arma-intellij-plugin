@@ -13,7 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 
 /**
- * Created by Kayler on 03/28/2016.
+ * @author Kayler
+ * CompletionElementWithTextReplace extension points for SQF language.
+ * Created on 03/28/2016.
  */
 public class SQFCompletionElementTextReplace{
 	/**

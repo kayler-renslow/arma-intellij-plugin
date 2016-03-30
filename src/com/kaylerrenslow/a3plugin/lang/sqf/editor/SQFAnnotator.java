@@ -6,7 +6,9 @@ import com.intellij.psi.PsiElement;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 03/15/2016.
+ * @author Kayler
+ * Annotator implementation for SQF language
+ * Created on 03/15/2016.
  */
 public class SQFAnnotator implements Annotator{
 

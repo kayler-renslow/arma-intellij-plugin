@@ -14,7 +14,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- * Created by Kayler on 03/20/2016.
+ * @author Kayler
+ * FoldingBuilder implementation for SQF language
+ * Created on 03/20/2016.
  */
 public class SQFFoldingBuilder implements FoldingBuilder{
 	@NotNull

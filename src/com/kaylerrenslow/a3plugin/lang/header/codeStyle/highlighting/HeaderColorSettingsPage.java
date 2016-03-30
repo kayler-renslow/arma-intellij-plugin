@@ -14,7 +14,9 @@ import javax.swing.*;
 import java.util.Map;
 
 /**
- * Created by Kayler on 11/01/2015.
+ * @author Kayler
+ * ColorSettingsPage implementation for Header language
+ * Created on 11/01/2015.
  */
 public class HeaderColorSettingsPage implements ColorSettingsPage{
 	private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{

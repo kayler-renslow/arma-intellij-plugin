@@ -1,9 +1,8 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
-import com.intellij.psi.PsiComment;
-
 /**
  * @author Kayler
+ * SQF grammar util class.
  *         Created on 03/19/2016.
  */
 public class SQFPsiImplUtilForGrammar{

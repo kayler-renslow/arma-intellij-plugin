@@ -1,5 +1,6 @@
 plugin
-	created color picker for converting hex into arma color
+	documentation to classes that have none
+	updated look of color picker UI
 
 shared between languages
 	none

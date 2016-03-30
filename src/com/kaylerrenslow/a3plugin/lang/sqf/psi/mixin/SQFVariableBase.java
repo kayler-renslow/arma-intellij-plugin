@@ -1,8 +1,13 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin;
 
 /**
- * Created by Kayler on 03/23/2016.
+ * @author Kayler
+ * Created on 03/23/2016.
  */
 public interface SQFVariableBase{
+
+	/**
+	 * Get the variable name
+	 */
 	String getVarName();
 }

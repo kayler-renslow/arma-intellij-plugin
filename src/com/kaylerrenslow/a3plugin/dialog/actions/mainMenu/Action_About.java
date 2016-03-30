@@ -5,9 +5,11 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.kaylerrenslow.a3plugin.dialog.Dialog_About;
 
 /**
- * Created by Kayler on 12/27/2015.
+ * @author Kayler
+ *         This action is called when the About menu button is pressed uner Arma Plugin
+ *         Created on 12/27/2015.
  */
-public class Action_About extends AnAction{
+public class Action_About extends AnAction {
 	public Action_About() {
 		super();
 	}

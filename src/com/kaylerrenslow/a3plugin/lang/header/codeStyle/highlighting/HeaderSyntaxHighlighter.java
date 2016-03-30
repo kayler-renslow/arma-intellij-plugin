@@ -15,7 +15,9 @@ import org.jetbrains.annotations.NotNull;
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 
 /**
- * Created by Kayler on 11/01/2015.
+ * @author Kayler
+ * SyntaxHighlighter for Header language
+ * Created on 11/01/2015.
  */
 public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey COMMENT = createTextAttributesKey("A3_HEADER_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);

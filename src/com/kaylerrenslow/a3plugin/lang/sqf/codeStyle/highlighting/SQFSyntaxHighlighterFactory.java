@@ -7,7 +7,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 11/01/2015.
+ * @author Kayler
+ * SyntaxHighlighterFactory extension point for SQF language
+ * Created on 11/01/2015.
  */
 public class SQFSyntaxHighlighterFactory extends SyntaxHighlighterFactory{
 

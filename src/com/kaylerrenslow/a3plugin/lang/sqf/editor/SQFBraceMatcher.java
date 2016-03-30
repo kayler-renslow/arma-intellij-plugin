@@ -1,6 +1,5 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.editor;
 
-import com.intellij.codeInsight.hint.DeclarationRangeUtil;
 import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;
 import com.intellij.psi.PsiElement;
@@ -11,7 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 03/20/2016.
+ * @author Kayler
+ * Brace matching implementation for SQF language. When certain token is created by user, this will match the closing token. (Example, typing { will result in } being inserted automatically)
+ * Created on 03/20/2016.
  */
 public class SQFBraceMatcher implements PairedBraceMatcher{
 

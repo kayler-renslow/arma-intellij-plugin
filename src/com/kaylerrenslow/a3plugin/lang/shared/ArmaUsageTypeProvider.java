@@ -10,7 +10,9 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 03/23/2016.
+ * @author Kayler
+ * When find usages is called by user, each type of usage is classified as something like 'assignment' or 'function call'. This class handles the naming of found usages.
+ * Created on 03/23/2016.
  */
 public class ArmaUsageTypeProvider implements UsageTypeProvider{
 
@@ -72,6 +74,7 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider{
 			return TYPE_RETURN_STATEMENT;
 		}
 
+		/*Fall back to basic usage types to show the usages are still in Header files or SQF files*/
 		node = PsiUtil.getAncestorWithType(variable.getNode(), SQFTypes.ARRAY_VAL, null);
 		if (node != null){
 			if (nodeIsFunctionParameter(node)){
@@ -81,7 +84,8 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider{
 		if (nodeIsFunctionParameter(variable.getNode())){
 			return TYPE_FUNCTION_PARAMETER;
 		}
-		return null;
+
+		return null; //let intellij decide the name
 	}
 
 	private boolean nodeIsAssignmentVariable(SQFAssignment assignment, SQFVariable checkVar) {

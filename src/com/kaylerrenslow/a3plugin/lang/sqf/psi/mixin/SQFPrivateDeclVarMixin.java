@@ -18,7 +18,9 @@ import javax.swing.*;
 import java.util.ArrayList;
 
 /**
- * Created by Kayler on 03/23/2016.
+ * @author Kayler
+ * PsiElement mixin for SQF grammar file. This mixin is meant for PrivateDeclVar PsiElements. (variables in strings next to private keyword)
+ * Created on 03/23/2016.
  */
 public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement implements SQFVariableBase{
 

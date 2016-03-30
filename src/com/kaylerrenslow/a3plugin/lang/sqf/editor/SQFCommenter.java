@@ -4,7 +4,9 @@ import com.intellij.lang.Commenter;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 01/03/2016.
+ * @author Kayler
+ * Commenter implementation for SQF language
+ * Created on 01/03/2016.
  */
 public class SQFCommenter implements Commenter{
 	@Nullable

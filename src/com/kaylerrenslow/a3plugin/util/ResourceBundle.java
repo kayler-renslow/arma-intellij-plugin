@@ -3,7 +3,7 @@ package com.kaylerrenslow.a3plugin.util;
 import java.util.Properties;
 
 /**
- * Created by Kayler on 01/01/2016.
+ * Created on 01/01/2016.
  */
 public class ResourceBundle{
 	private Properties props = new Properties();

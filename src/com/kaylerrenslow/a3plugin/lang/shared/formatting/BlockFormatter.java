@@ -7,7 +7,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 
 /**
- * Created by Kayler on 03/27/2016.
+ * @author Kayler
+ * Created on 03/27/2016.
  */
 public abstract class BlockFormatter{
 	public Wrap childWrap;

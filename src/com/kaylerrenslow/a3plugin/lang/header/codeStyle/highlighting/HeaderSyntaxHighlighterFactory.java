@@ -7,7 +7,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 11/01/2015.
+ * @author Kayler
+ * SyntaxHighlighterFactory implementation for Header language
+ * Created on 11/01/2015.
  */
 public class HeaderSyntaxHighlighterFactory extends SyntaxHighlighterFactory{
 

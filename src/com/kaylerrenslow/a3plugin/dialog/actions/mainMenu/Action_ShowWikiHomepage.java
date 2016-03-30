@@ -6,7 +6,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.kaylerrenslow.a3plugin.Plugin;
 
 /**
- * Created by Kayler on 03/18/2016.
+ * @author Kayler
+ * This action is called when show wiki homepage button is pressed under Arma Plugin
+ * Created on 03/18/2016.
  */
 public class Action_ShowWikiHomepage extends AnAction{
 	@Override

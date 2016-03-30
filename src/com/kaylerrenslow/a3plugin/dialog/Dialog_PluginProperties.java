@@ -17,7 +17,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- * Created by Kayler on 12/30/2015.
+ * @author Kayler
+ * Dialog for Plugin Properties
+ * Created on 12/30/2015.
  */
 public class Dialog_PluginProperties extends DialogWrapper implements DialogActionResponder<ComboBox, Plugin.UserPropertiesKey>{
 	private static final String TITLE = "Configure Arma 3 Plugin Properties";

@@ -14,7 +14,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 03/22/2016.
+ * @author Kayler
+ * PsiReference for SQF language's PrivateDeclVar PsiElements
+ * Created on 03/22/2016.
  */
 public class SQFPrivateDeclVarReference implements SQFRefactorableReference{
 

@@ -8,7 +8,8 @@ import com.intellij.usages.rules.UsageGroupingRuleProvider;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 03/23/2016.
+ * @author Kayler
+ * Created on 03/23/2016.
  */
 public class SQFUsageGroupingProvider implements UsageGroupingRuleProvider{
 	@NotNull

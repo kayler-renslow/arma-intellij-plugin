@@ -10,7 +10,10 @@ import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 03/28/2016.
+ * @author Kayler
+ * This class is responsible for creating Auto completion lookup elements while providing a base implementation for text replacing once the lookup element is selected.
+ * Example use case is where user types 'elif'. When user presses enter, handleInsert is invoked and the text 'elif' is replaced with replaceString (defined in the constructor's parameters)
+ * Created on 03/28/2016.
  */
 public abstract class CompletionElementWithTextReplace implements CompletionElement{
 
