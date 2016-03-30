@@ -1,13 +1,11 @@
 plugin
-	moved header's and SQF's String name out of plugin.properties to make the xml not show zillions (ok, exageration - ~14) of errors
+	created color picker for converting hex into arma color
 
 shared between languages
 	none
 
 SQF
-	made completion provider give documentation for commands and BIS_ functions
-	created icon for SQF functions that are defined in CFGFunctions
-	added auto completion things like hintfln (creates a hint command with current file and linenumber inserted) and hintfo (hint format[""])
+	none
 
 Header
 	none

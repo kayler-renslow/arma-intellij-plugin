@@ -27,8 +27,6 @@
 		<lang.foldingBuilder language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFFoldingBuilder" />
 		<elementDescriptionProvider implementation="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDescriptionProvider" />
 		<usageGroupingRuleProvider implementation="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFUsageGroupingProvider" />
-		<defaultLiveTemplatesProvider implementation="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFDefaultLiveTemplatesProvider" />
-		<liveTemplateContext implementation="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFLiveTemplateContext" />
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>
@@ -63,6 +61,7 @@
 			<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma Plugin Properties" />
 			<action id="a3plugin.action.mm.wiki_scripting" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowScriptingWiki" text="Arma 3 Wiki for Scripting Commands" description="View the Wiki page for Arma 3 scripting commands" />
 			<action id="a3plugin.action.mm.wiki_home" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowWikiHomepage" text="Arma 3 Wiki Homepage" description="View the Wiki home page for Arma 3" />
+			<action id="a3plugin.action.mm.color_picker" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowArmaColorPicker" text="Arma Color Picker" description="Arma Color Picker" />
 			<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_About" text="About" description="About the Plugin" />
 		</group>
 	</actions>
