@@ -1,6 +1,5 @@
 plugin
-	documentation to classes that have none
-	updated look of color picker UI
+	none
 
 shared between languages
 	none
@@ -9,4 +8,4 @@ SQF
 	none
 
 Header
-	util methods for finding functions defined in description.ext
+	GETTING THE ENTRY FOR FUNCTIONS IN A CONFIG WORKS :D

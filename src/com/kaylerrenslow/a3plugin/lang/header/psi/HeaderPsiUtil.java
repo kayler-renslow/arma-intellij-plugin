@@ -1,20 +1,26 @@
 package com.kaylerrenslow.a3plugin.lang.header.psi;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.header.ConfigClassNotDefinedException;
 import com.kaylerrenslow.a3plugin.lang.header.FunctionNotDefinedInConfigException;
+import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
 import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.util.Attribute;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Kayler
@@ -64,36 +70,40 @@ public class HeaderPsiUtil {
 		return matchedClasses;
 	}
 
-	private static void getClassDeclarationsWithEntriesEqual(PsiElement start, @Nullable String className, Attribute[] attributes, boolean traverseIncludes, ArrayList<HeaderClassDeclaration> matchedClasses) {
+	private static void getClassDeclarationsWithEntriesEqual(PsiElement start, @Nullable String className, @Nullable Attribute[] attributes, boolean traverseIncludes, ArrayList<HeaderClassDeclaration> matchedClasses) {
 		ArrayList<PsiElement> fileEntries = PsiUtil.findDescendantElementsOfInstance(start, HeaderFileEntry.class, null);
-
 		HeaderClassDeclaration classDecl;
 		HeaderPreInclude include;
 		for (PsiElement element : fileEntries) {
 			if (element instanceof HeaderClassDeclaration) {
 				classDecl = (HeaderClassDeclaration) element;
 				if (className == null || classDecl.getClassName().equals(className)) {
-					if (classDecl.hasAttributes(attributes, traverseIncludes)) {
+					if (attributes == null || classDecl.hasAttributes(attributes, traverseIncludes)) {
 						matchedClasses.add(classDecl);
 					}
 
 				}
-			} else if (traverseIncludes && element instanceof HeaderPreInclude) {
-				include = (HeaderPreInclude) element;
-				HeaderFile f = include.getHeaderFileFromInclude();
-				if (f != null) {
-					getClassDeclarationsWithEntriesEqual(f, className, attributes, true, matchedClasses);
+			} else if (traverseIncludes && element instanceof HeaderPreprocessorGroup) {
+				HeaderPreprocessorGroup group = (HeaderPreprocessorGroup)element;
+				List<HeaderPreprocessor> preprocessors = group.getPreprocessorList();
+				for(HeaderPreprocessor preprocessor : preprocessors){
+					if(preprocessor instanceof HeaderPreInclude){
+						include = (HeaderPreInclude) preprocessor;
+						HeaderFile f = include.getHeaderFileFromInclude();
+						if (f != null) {
+							getClassDeclarationsWithEntriesEqual(f, className, attributes, true, matchedClasses);
+						}
+					}
 				}
 			}
 		}
 	}
 
 
-
 	/**
 	 * Traverses the PsiElement startElement to find the config class with its name=className
 	 *
-	 * @param startElement          where to start searching for a class declaration with the class declaration's name=className
+	 * @param startElement     where to start searching for a class declaration with the class declaration's name=className
 	 * @param className        class name to search for
 	 * @param traverseIncludes true if it should traverse the include statements inside the config file, false if it should search only the given config file
 	 * @return HeaderClassDeclaration
@@ -101,7 +111,7 @@ public class HeaderPsiUtil {
 	 */
 	@NotNull
 	public static HeaderClassDeclaration getClassDeclaration(PsiElement startElement, @NotNull String className, boolean traverseIncludes) throws ConfigClassNotDefinedException {
-		ArrayList<HeaderClassDeclaration> decls = getClassDeclarationsWithEntriesEqual(startElement, className, new Attribute[0], traverseIncludes);
+		ArrayList<HeaderClassDeclaration> decls = getClassDeclarationsWithEntriesEqual(startElement, className, null, traverseIncludes);
 
 		if (decls.size() == 0) {
 			throw new ConfigClassNotDefinedException(className);
@@ -139,65 +149,66 @@ public class HeaderPsiUtil {
 		}
 	}
 
-	/** Creates a new HeaderConfigFunction instance for the given functionName
-	 * @param project project
+	/**
+	 * Creates a new HeaderConfigFunction instance for the given functionName
+	 *
+	 * @param psiFile HeaderFile instance to retrieve the description.ext for
 	 * @param functionName full function name (example: tag_fnc_functionClassName )
 	 * @return new HeaderConfigFunction instance for the given function name
-	 * @throws ConfigClassNotDefinedException when CfgFunctions is not defined in description.ext
-	 * @throws FileNotFoundException when there is no description.ext
+	 * @throws ConfigClassNotDefinedException      when CfgFunctions is not defined in description.ext
+	 * @throws FileNotFoundException               when there is no description.ext
 	 * @throws FunctionNotDefinedInConfigException when the function isn't defined anywhere in CfgFunctions in description.ext
 	 */
-	public static HeaderConfigFunction getFunctionFromCfgFunctions(Project project, String functionName) throws ConfigClassNotDefinedException, FileNotFoundException, FunctionNotDefinedInConfigException {
-		HeaderClassDeclaration cfgFuncs = getCfgFunctions(project);
+	public static HeaderConfigFunction getFunctionFromCfgFunctions(PsiFile psiFile, String functionName) throws ConfigClassNotDefinedException, FileNotFoundException, FunctionNotDefinedInConfigException {
+		HeaderClassDeclaration cfgFuncs = getCfgFunctions(psiFile);
 		int fnc = functionName.indexOf("_fnc_");
 		String tagName = functionName.substring(0, fnc);
 		String functionClassName = functionName.substring(fnc + 5);
 
 		Attribute[] tagsAsAttributes = {new Attribute("tag", tagName)};
-		ArrayList<HeaderClassDeclaration> classDeclarationMatched = new ArrayList<>();
-		classDeclarationMatched= (getClassDeclarationsWithEntriesEqual(cfgFuncs, functionName, tagsAsAttributes, true));
+		ArrayList<HeaderClassDeclaration> classDeclarationMatched = (getClassDeclarationsWithEntriesEqual(cfgFuncs, null, tagsAsAttributes, true));
 
 		HeaderClassDeclaration classWithTag;
-		if(classDeclarationMatched.size() == 0){
-			try{
+		if (classDeclarationMatched.size() == 0) {
+			try {
 				classWithTag = getClassDeclaration(cfgFuncs, tagName, true);
-			}catch (ConfigClassNotDefinedException e){
+			} catch (ConfigClassNotDefinedException e) {
 				e.printStackTrace();
 				throw new FunctionNotDefinedInConfigException(functionName);
 			}
-		}else{
+		} else {
 			classWithTag = classDeclarationMatched.get(0);
 		}
 
 		/*At this point, classWithTag has to be defined. There was either a match from getClassDeclaration, getClassDeclarationsWithEntriesEqual, or an exception occurred prior to this point*/
 		HeaderClassDeclaration functionClass;
-		try{
+		try {
 			functionClass = getClassDeclaration(classWithTag, functionClassName, true);
-		}catch (ConfigClassNotDefinedException e){
+		} catch (ConfigClassNotDefinedException e) {
 			e.printStackTrace();
 			throw new IllegalStateException("something REAAALY broke here");
 		}
 		String containingDirectoryPath = null;
 		HeaderAssignment potentialFilePath = (HeaderAssignment) PsiUtil.findFirstDescendantElement(functionClass, HeaderBasicAssignment.class);
-		if(potentialFilePath != null){ //file path is inside function's class declaration body. Example: functionClassName{file='somePath'};
+		if (potentialFilePath != null) { //file path is inside function's class declaration body. Example: functionClassName{file='somePath'};
 			containingDirectoryPath = potentialFilePath.getAssigningValue();
-		}else{
+		} else {
 			//file path is determined by parent class
 			HeaderClassDeclaration containingClassForFunctionClass = getContainingClass(functionClass);
-			if(containingClassForFunctionClass != null){
+			if (containingClassForFunctionClass != null) {
 				Attribute[] attributes = containingClassForFunctionClass.getAttributes(true);
 				boolean filePathDefined = false;
-				for(Attribute attribute : attributes){
-					if(attribute.name.equals("file")){
+				for (Attribute attribute : attributes) {
+					if (attribute.name.equals("file")) {
 						containingDirectoryPath = attribute.value;
 						filePathDefined = true;
 						break;
 					}
 				}
-				if(!filePathDefined){
-					containingDirectoryPath = "functions/"+containingClassForFunctionClass.getClassName();
+				if (!filePathDefined) {
+					containingDirectoryPath = "functions/" + containingClassForFunctionClass.getClassName();
 				}
-			}else{
+			} else {
 				throw new FunctionNotDefinedInConfigException(functionName);
 			}
 		}
@@ -206,32 +217,36 @@ public class HeaderPsiUtil {
 	}
 
 
-	/** Get's the class declaration to CfgFunctions inside description.ext
-	 * @param project project
+	/**
+	 * Get's the class declaration to CfgFunctions inside description.ext
+	 *
+	 * @param psiFile HeaderFile instance to retrieve the description.ext for
 	 * @return class declaration
-	 * @throws FileNotFoundException when description.ext doesn't exist
+	 * @throws FileNotFoundException          when description.ext doesn't exist
 	 * @throws ConfigClassNotDefinedException where CfgFunctions isn't defined inside description.ext
 	 */
-	public static HeaderClassDeclaration getCfgFunctions(Project project) throws FileNotFoundException, ConfigClassNotDefinedException {
-		VirtualFile descriptionExt = getDescriptionExt(project);
-		HeaderFile headerFile = (HeaderFile) PsiManager.getInstance(project).findFile(descriptionExt);
-		return getClassDeclaration(headerFile, "CfgFunctions", true);
+	public static HeaderClassDeclaration getCfgFunctions(PsiFile psiFile) throws FileNotFoundException, ConfigClassNotDefinedException {
+		VirtualFile descriptionExt = getDescriptionExt(psiFile);
+		HeaderFile file = (HeaderFile) PsiManager.getInstance(psiFile.getProject()).findFile(descriptionExt);
+		return getClassDeclaration(file, "CfgFunctions", true);
 	}
 
-	/** Get a VirtualFile instance that points to the mission's description.ext
-	 * @param project project
-	 * @return virutal file
+	/**
+	 * Get a VirtualFile instance that points to the mission's description.ext
+	 *
+	 * @param psiFile HeaderFile instance to retrieve the description.ext for
+	 * @return virtual file
 	 * @throws FileNotFoundException when description.ext doesn't exist
 	 */
-	public static VirtualFile getDescriptionExt(Project project) throws FileNotFoundException {
-		VirtualFile file = project.getProjectFile().findChild("description.ext");
-		if (file == null) {
-			file = project.getProjectFile().findChild("Description.ext");
+	public static VirtualFile getDescriptionExt(PsiFile psiFile) throws FileNotFoundException {
+		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, HeaderFileType.INSTANCE, PluginUtil.getModuleSearchScope(psiFile));
+		for (VirtualFile file : files) {
+			if (file.getName().equalsIgnoreCase("description.ext")) {
+				return file;
+			}
 		}
-		if (file == null) {
-			throw new FileNotFoundException("Description.ext doesn't exist");
-		}
-		return file;
+		throw new FileNotFoundException("Description.ext doesn't exist");
+
 	}
 
 

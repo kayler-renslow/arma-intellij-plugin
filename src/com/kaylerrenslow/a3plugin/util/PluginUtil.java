@@ -1,5 +1,11 @@
 package com.kaylerrenslow.a3plugin.util;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.search.GlobalSearchScope;
+
 import java.io.File;
 import java.net.URL;
 
@@ -18,6 +24,16 @@ public class PluginUtil{
 			return null;
 		}
 		return f;
+	}
+
+	public static GlobalSearchScope getModuleSearchScope(PsiFile file){
+		return GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(getModuleForPsiFile(file));
+	}
+
+	public static Module getModuleForPsiFile(PsiFile file){
+		final ProjectFileIndex index = ProjectRootManager.getInstance(file.getProject()).getFileIndex();
+		final Module module = index.getModuleForFile(file.getVirtualFile());
+		return module;
 	}
 
 }

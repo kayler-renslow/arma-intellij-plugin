@@ -6,7 +6,11 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.HighlightSeverity;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiComment;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiErrorElement;
+import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.a3plugin.Plugin;
+import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighter;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDecl;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDeclVar;
@@ -30,6 +34,25 @@ public class SQFVisitorAnnotator extends com.kaylerrenslow.a3plugin.lang.sqf.psi
 
 	public SQFVisitorAnnotator(AnnotationHolder annotator) {
 		this.annotator = annotator;
+	}
+
+
+//	@Override
+//	public void visitPsiElement(@NotNull PsiElement o) {
+//		System.out.println(o.getClass());
+//		if(o instanceof PsiErrorElement){
+//			System.out.println(((PsiErrorElement) o).getErrorDescription());
+//			PsiErrorElement errorElement = (PsiErrorElement)o;
+//			Annotation a = annotator.createErrorAnnotation(errorElement.getContainingFile(), errorElement.getErrorDescription());
+//			a.setFileLevelAnnotation(true);
+//		}
+//		super.visitPsiElement(o);
+//	}
+
+
+	@Override
+	public void visitElement(PsiElement element) {
+		super.visitElement(element);
 	}
 
 	@Override

@@ -2,7 +2,6 @@ package com.kaylerrenslow.a3plugin.lang.shared;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.Nullable;
@@ -184,7 +183,7 @@ public class PsiUtil {
 			if(cursor != null && child == cursor){
 				continue;
 			}
-			if(type.isInstance(rootElement)){
+			if(type.isAssignableFrom(rootElement.getClass())){
 				list.add(child);
 			}
 			findDescdantElementsOfInstance(child, type, cursor, list);

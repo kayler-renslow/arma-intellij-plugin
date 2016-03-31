@@ -3,14 +3,19 @@ package com.kaylerrenslow.a3plugin.lang.header.psi.impl;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.util.indexing.FileBasedIndex;
+import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
 import com.kaylerrenslow.a3plugin.lang.header.psi.*;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.util.Attribute;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -42,23 +47,27 @@ public class HeaderPsiUtilForGrammar {
 	}
 
 	public static String getAssigningValue(HeaderAssignment assignment){
-		return assignment.getText().substring(assignment.getText().indexOf('=') + 1).trim();
+		String s =assignment.getText().substring(assignment.getText().indexOf('=') + 1).trim();
+		if(s.charAt(0) == '\"' || s.charAt(0) == '\''){
+			return s.substring(1,s.length() - 1);
+		}
+		return s;
 	}
 
 	public static boolean hasAttributes(HeaderClassDeclaration classDeclaration, Attribute[] attributes, boolean traverseIncludes) {
 		Attribute[] classAttributes = classDeclaration.getAttributes(traverseIncludes);
+		int matched = 0;
 		for(int i = 0; i < classAttributes.length; i++){
-			boolean matched = true;
 			for(int j = 0; j < attributes.length; j++){
-				if(!attributes[j].equals(classAttributes[i])){
-					matched = false;
+				if(attributes[j].equals(classAttributes[i])){
+					matched++;
 				}
 			}
-			if(!matched){
-				return false;
-			}
 		}
-		return attributes.length == 0;
+		if(matched == attributes.length){
+			return true;
+		}
+		return false;
 	}
 
 	public static Attribute[] getAttributes(HeaderClassDeclaration decl, boolean traverseIncludes) {
@@ -99,11 +108,13 @@ public class HeaderPsiUtilForGrammar {
 	 */
 	@Nullable
 	public static HeaderFile getHeaderFileFromInclude(HeaderPreInclude include) {
-		Project p = include.getProject();
-		VirtualFile f = p.getProjectFile().findFileByRelativePath(include.getPathString());
-		if (f == null) {
-			return null;
+		Project project = include.getProject();
+		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, HeaderFileType.INSTANCE, PluginUtil.getModuleSearchScope(include.getContainingFile()));
+		for (VirtualFile file : files) {
+			if(file.getPath().contains(include.getPathString())){
+				return (HeaderFile) PsiManager.getInstance(project).findFile(file);
+			}
 		}
-		return (HeaderFile) PsiManager.getInstance(p).findFile(f);
+		return null;
 	}
 }

@@ -16,8 +16,9 @@ public class Attribute {
 
 	@Override
 	public String toString() {
-		return "name=" + name + ", value=" + value;
+		return "attribute=" + name + ", value=" + value;
 	}
+
 
 	@Override
 	public boolean equals(Object o){

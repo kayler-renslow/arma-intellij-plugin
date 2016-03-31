@@ -5,6 +5,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
@@ -81,6 +83,15 @@ public class SQFVariableReference implements SQFRefactorableReference{
 			SQFScope otherScope = SQFPsiUtil.getCurrentScopeForVariable((SQFVariable) element);
 			referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == selfResolve.getContainingFile();
 			return referenceTo;
+		}
+		if(myVariableElementType == SQFTypes.GLOBAL_VAR){
+			try{
+				HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(element.getContainingFile(), myElement.getName());
+				System.out.println(function.getCallableName());
+				System.out.println(function.getContainingDirectoryPath());
+			}catch (Exception e){
+				e.printStackTrace();
+			}
 		}
 		return referenceTo;
 	}

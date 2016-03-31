@@ -29,7 +29,6 @@ public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 	private Project project;
 	private List<Pair<String, String>> sourcePaths;
 
-
 	@Override
 	public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
 		setProject(rootModel.getProject());
