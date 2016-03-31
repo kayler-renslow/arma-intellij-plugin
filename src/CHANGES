@@ -9,4 +9,4 @@ SQF
 	none
 
 Header
-	none
+	util methods for finding functions defined in description.ext

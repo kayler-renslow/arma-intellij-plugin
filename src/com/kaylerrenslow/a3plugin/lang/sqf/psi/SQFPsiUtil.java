@@ -15,6 +15,7 @@ import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
+import com.sun.istack.internal.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -108,7 +109,7 @@ public class SQFPsiUtil{
 	 * @param findVar variable text to look for
 	 * @return list
 	 */
-	public static List<SQFVariable> findGlobalVariables(Project project, String findVar){
+	public static List<SQFVariable> findGlobalVariables(Project project, @Nullable String findVar){
 		List<SQFVariable> result = new ArrayList<>();
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, GlobalSearchScope.allScope(project));
 		for(VirtualFile virtualFile : files){

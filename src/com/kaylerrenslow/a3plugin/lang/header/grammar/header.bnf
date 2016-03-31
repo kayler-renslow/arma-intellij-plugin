@@ -12,7 +12,7 @@
   elementTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderElementType"
   tokenTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTokenType"
 
-  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.impl.PSIHeaderUtilForGrammar"
+  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderPsiUtilForGrammar"
 }
 // @formatter:off
 headerFile ::= file_entry*
@@ -33,7 +33,7 @@ array_entry ::= expression | value_ | array
 
 assignment_identifier ::= IDENTIFIER /*| NUM_IDENTIFIER*/
 
-assignment ::= basic_assignment | array_assignment
+assignment ::= basic_assignment | array_assignment {methods=[getAssigningVariable getAssigningValue]}
 basic_assignment ::= assignment_identifier EQ (expression | value_ ) {extends("basic_assignment")=assignment}
 array_assignment ::= assignment_identifier BRACKET_PAIR EQ array {extends("array_assignment")=assignment}
 
@@ -57,8 +57,8 @@ private term_ ::= (PLUS | MINUS)? (
 		  )
 
 
-class_declaration ::= class_stub class_content?
-class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)?
+class_declaration ::= class_stub class_content? {methods=[getClassName getAttributes hasAttributes]}
+class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? {methods=[getClassName]}
 
 class_content ::= LBRACE file_entry* RBRACE
 
@@ -66,5 +66,6 @@ class_content ::= LBRACE file_entry* RBRACE
 preprocessor_group ::= preprocessor+
 preprocessor ::= pre_include //| pre_define_//TODO
 
-pre_include ::= PREPROCESS_INCLUDE (STRING_LITERAL | INCLUDE_VALUE_ANGBR) //TODO does include or other preprocessor commands allow multilines? (https://community.bistudio.com/wiki/PreProcessor_Commands#Multi-line
+pre_include ::= PREPROCESS_INCLUDE (pre_include_file) {extends("pre_include")=preprocessor methods=[getPathString getHeaderFileFromInclude]} //TODO does include or other preprocessor commands allow multilines? (https://community.bistudio.com/wiki/PreProcessor_Commands#Multi-line
+pre_include_file ::= STRING_LITERAL | INCLUDE_VALUE_ANGBR
 //private pre_define_ ::= PREPROCESS_DEFINE

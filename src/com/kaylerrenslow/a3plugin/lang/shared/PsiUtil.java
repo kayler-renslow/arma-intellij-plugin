@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -130,22 +131,18 @@ public class PsiUtil {
 		return pe != null && isOfElementType(pe.getNode(), et);
 	}
 
-	/**
-	 * Traverses the entire AST tree of the given PsiFile and returns the first ASTNode that matches IElementType type
-	 *
-	 * @param file    PsiFile to traverse
-	 * @param type    IElement the type to find in the AST tree
-	 * @param content text to match inside the node, or null if doesn't matter
-	 * @return ASTNode that is the first of type, or null if none was found
-	 */
-	public static ASTNode findFirstElement(PsiFile file, IElementType type, String content) {
-		ASTNode[] children = file.getNode().getChildren(null);
-		ASTNode ret;
-		for (ASTNode child : children) {
-			ret = findFirstElement(child, type, content);
-			if (ret != null) {
-				return ret;
+
+	public static PsiElement findFirstDescendantElement(PsiElement element, Class<?> type) {
+		PsiElement child = element.getFirstChild();
+		while(child != null){
+			if(type.isInstance(child)){
+				return child;
 			}
+			PsiElement e = findFirstDescendantElement(child, type);
+			if(e != null){
+				return e;
+			}
+			child = child.getNextSibling();
 		}
 		return null;
 	}
@@ -158,7 +155,7 @@ public class PsiUtil {
 	 * @param content text to match inside the node, or null if doesn't matter
 	 * @return ASTNode that is the first of type, or null if none was found
 	 */
-	public static ASTNode findFirstElement(ASTNode node, IElementType type, String content) {
+	public static ASTNode findFirstDescendantElement(ASTNode node, IElementType type, String content) {
 		if (isOfElementType(node, type)) {
 			if (content != null && node.getText().equals(content)) {
 				return node;
@@ -169,11 +166,31 @@ public class PsiUtil {
 		}
 		ASTNode[] children = node.getChildren(null);
 		for (ASTNode child : children) {
-			findFirstElement(child, type, content);
+			findFirstDescendantElement(child, type, content);
 		}
 		return null;
 	}
 
+
+	public static ArrayList<PsiElement> findDescendantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor){
+		ArrayList<PsiElement> list = new ArrayList<>();
+		findDescdantElementsOfInstance(rootElement, type, cursor, list);
+		return list;
+	}
+
+	private static void findDescdantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor, ArrayList<PsiElement> list){
+		PsiElement child = rootElement.getFirstChild();
+		while(child != null){
+			if(cursor != null && child == cursor){
+				continue;
+			}
+			if(type.isInstance(rootElement)){
+				list.add(child);
+			}
+			findDescdantElementsOfInstance(child, type, cursor, list);
+			child = child.getNextSibling();
+		}
+	}
 
 	/**
 	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
@@ -196,7 +213,7 @@ public class PsiUtil {
 	 * @param textContent text to look for in ASTNode (null if doesn't matter)
 	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
 	 */
-	public static ArrayList<ASTNode> findDescendantElements(PsiElement element, IElementType toFind, ASTNode cursor, String textContent) {
+	public static ArrayList<ASTNode> findDescendantElements(PsiElement element, IElementType toFind, ASTNode cursor, @Nullable String textContent) {
 		ArrayList<ASTNode> list = new ArrayList<>();
 		traverseElement(list, element, toFind, cursor, textContent);
 		return list;
