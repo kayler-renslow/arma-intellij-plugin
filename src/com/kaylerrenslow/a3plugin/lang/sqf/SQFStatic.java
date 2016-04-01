@@ -27,4 +27,6 @@ public class SQFStatic{
 	public static final List<String> LIST_FUNCTIONS = TextFileListToList.appendFileNamesToList(PluginUtil.convertURLToFile(ResourceGetter.getResourceAsURL(BIS_FUNCTIONS_DOC_FILE_DIR)), new ArrayList<>(), false);
 
 	public static final String SQF_SAMPLE_CODE_TEXT = FileReader.getText("/com/kaylerrenslow/a3plugin/lang/sqf/codeStyle/sqfSampleCode.sqf");
+
+	public static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
 }

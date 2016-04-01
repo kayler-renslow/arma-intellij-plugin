@@ -109,7 +109,7 @@ public class HeaderPsiUtilForGrammar {
 	@Nullable
 	public static HeaderFile getHeaderFileFromInclude(HeaderPreInclude include) {
 		Project project = include.getProject();
-		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, HeaderFileType.INSTANCE, PluginUtil.getModuleSearchScope(include.getContainingFile()));
+		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, HeaderFileType.INSTANCE, PluginUtil.getModuleForPsiFile(include.getContainingFile()).getModuleContentScope());
 		for (VirtualFile file : files) {
 			if(file.getPath().contains(include.getPathString())){
 				return (HeaderFile) PsiManager.getInstance(project).findFile(file);

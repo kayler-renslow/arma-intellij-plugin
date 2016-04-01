@@ -33,7 +33,7 @@ local_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* 
 private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
 private whitespace_comment_ ::= WHITE_SPACE | comment
 comment ::= INLINE_COMMENT | BLOCK_COMMENT | COMMENT_COMMAND
-variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[]}
+variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules]}
 
 
 statement ::= ( assignment

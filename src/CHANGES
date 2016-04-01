@@ -8,4 +8,4 @@ SQF
 	none
 
 Header
-	GETTING THE ENTRY FOR FUNCTIONS IN A CONFIG WORKS :D
+    updates and fixes for finding config defined functions

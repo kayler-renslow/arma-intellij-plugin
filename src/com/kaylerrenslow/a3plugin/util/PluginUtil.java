@@ -26,10 +26,6 @@ public class PluginUtil{
 		return f;
 	}
 
-	public static GlobalSearchScope getModuleSearchScope(PsiFile file){
-		return GlobalSearchScope.moduleWithDependenciesAndLibrariesScope(getModuleForPsiFile(file));
-	}
-
 	public static Module getModuleForPsiFile(PsiFile file){
 		final ProjectFileIndex index = ProjectRootManager.getInstance(file.getProject()).getFileIndex();
 		final Module module = index.getModuleForFile(file.getVirtualFile());
