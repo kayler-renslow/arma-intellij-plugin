@@ -230,7 +230,10 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "ammo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "animate" { return SQFTypes.COMMAND; }
 <YYINITIAL> "animateDoor" { return SQFTypes.COMMAND; }
+<YYINITIAL> "animateSource" { return SQFTypes.COMMAND; }
+<YYINITIAL> "animationNames" { return SQFTypes.COMMAND; }
 <YYINITIAL> "animationPhase" { return SQFTypes.COMMAND; }
+<YYINITIAL> "animationSourcePhase" { return SQFTypes.COMMAND; }
 <YYINITIAL> "animationState" { return SQFTypes.COMMAND; }
 <YYINITIAL> "append" { return SQFTypes.COMMAND; }
 <YYINITIAL> "apply" { return SQFTypes.COMMAND; }
@@ -332,6 +335,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "canMove" { return SQFTypes.COMMAND; }
 <YYINITIAL> "canSlingLoad" { return SQFTypes.COMMAND; }
 <YYINITIAL> "canStand" { return SQFTypes.COMMAND; }
+<YYINITIAL> "canSuspend" { return SQFTypes.COMMAND; }
 <YYINITIAL> "canUnloadInCombat" { return SQFTypes.COMMAND; }
 <YYINITIAL> "captive" { return SQFTypes.COMMAND; }
 <YYINITIAL> "captiveNum" { return SQFTypes.COMMAND; }
@@ -341,6 +345,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "channelEnabled" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cheatsEnabled" { return SQFTypes.COMMAND; }
 <YYINITIAL> "checkAIFeature" { return SQFTypes.COMMAND; }
+<YYINITIAL> "checkVisibility" { return SQFTypes.COMMAND; }
 <YYINITIAL> "civilian" { return SQFTypes.COMMAND; }
 <YYINITIAL> "className" { return SQFTypes.COMMAND; }
 <YYINITIAL> "clearAllItemsFromBackpack" { return SQFTypes.COMMAND; }
@@ -433,6 +438,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "crew" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlActivate" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlAddEventHandler" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlAngle" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlAutoScrollDelay" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlAutoScrollRewind" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlAutoScrollSpeed" { return SQFTypes.COMMAND; }
@@ -587,6 +593,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "diag_activeSQSScripts" { return SQFTypes.COMMAND; }
 <YYINITIAL> "diag_captureFrame" { return SQFTypes.COMMAND; }
 <YYINITIAL> "diag_captureSlowFrame" { return SQFTypes.COMMAND; }
+<YYINITIAL> "diag_codePerformance" { return SQFTypes.COMMAND; }
 <YYINITIAL> "diag_fps" { return SQFTypes.COMMAND; }
 <YYINITIAL> "diag_fpsMin" { return SQFTypes.COMMAND; }
 <YYINITIAL> "diag_frameNo" { return SQFTypes.COMMAND; }
@@ -600,6 +607,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "difficulty" { return SQFTypes.COMMAND; }
 <YYINITIAL> "difficultyEnabled" { return SQFTypes.COMMAND; }
 <YYINITIAL> "difficultyEnabledRTD" { return SQFTypes.COMMAND; }
+<YYINITIAL> "difficultyOption" { return SQFTypes.COMMAND; }
 <YYINITIAL> "direction" { return SQFTypes.COMMAND; }
 <YYINITIAL> "directSay" { return SQFTypes.COMMAND; }
 <YYINITIAL> "disableAI" { return SQFTypes.COMMAND; }
@@ -787,6 +795,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "getBackpackCargo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getBleedingRemaining" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getBurningValue" { return SQFTypes.COMMAND; }
+<YYINITIAL> "getCameraViewDirection" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getCargoIndex" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getCenterOfMass" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getClientState" { return SQFTypes.COMMAND; }
@@ -910,6 +919,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "importAllGroups" { return SQFTypes.COMMAND; }
 <YYINITIAL> "importance" { return SQFTypes.COMMAND; }
 <YYINITIAL> "in" { return SQFTypes.COMMAND; }
+<YYINITIAL> "inArea" { return SQFTypes.COMMAND; }
 <YYINITIAL> "incapacitatedState" { return SQFTypes.COMMAND; }
 <YYINITIAL> "independent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "inflame" { return SQFTypes.COMMAND; }
@@ -1149,6 +1159,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "modelToWorld" { return SQFTypes.COMMAND; }
 <YYINITIAL> "modelToWorldVisual" { return SQFTypes.COMMAND; }
 <YYINITIAL> "moonIntensity" { return SQFTypes.COMMAND; }
+<YYINITIAL> "moonPhase" { return SQFTypes.COMMAND; }
 <YYINITIAL> "morale" { return SQFTypes.COMMAND; }
 <YYINITIAL> "move" { return SQFTypes.COMMAND; }
 <YYINITIAL> "move3DENCamera" { return SQFTypes.COMMAND; }
@@ -1596,9 +1607,11 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "setRepairCargo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setShadowDistance" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setSide" { return SQFTypes.COMMAND; }
+<YYINITIAL> "setSimpleTaskCustomData" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setSimpleTaskDescription" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setSimpleTaskDestination" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setSimpleTaskTarget" { return SQFTypes.COMMAND; }
+<YYINITIAL> "setSimpleTaskType" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setSimulWeatherLayers" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setSize" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setSkill" { return SQFTypes.COMMAND; }
@@ -1774,14 +1787,17 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "targetKnowledge" { return SQFTypes.COMMAND; }
 <YYINITIAL> "targetsAggregate" { return SQFTypes.COMMAND; }
 <YYINITIAL> "targetsQuery" { return SQFTypes.COMMAND; }
+<YYINITIAL> "taskAlwaysVisible" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskChildren" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskCompleted" { return SQFTypes.COMMAND; }
+<YYINITIAL> "taskCustomData" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskDescription" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskDestination" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskHint" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskParent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskResult" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskState" { return SQFTypes.COMMAND; }
+<YYINITIAL> "taskType" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teamMember" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teamName" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teams" { return SQFTypes.COMMAND; }
@@ -1949,6 +1965,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> "worldToModel" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldToModelVisual" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldToScreen" { return SQFTypes.COMMAND; }
+
 
 
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }

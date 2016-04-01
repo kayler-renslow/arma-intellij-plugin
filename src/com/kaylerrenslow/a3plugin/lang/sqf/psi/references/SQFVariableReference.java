@@ -84,7 +84,7 @@ public class SQFVariableReference implements SQFRefactorableReference{
 			referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == selfResolve.getContainingFile();
 			return referenceTo;
 		}
-		if(myVariableElementType == SQFTypes.GLOBAL_VAR && SQFPsiUtil.followsSQFFunctionNameRules(selfResolve.getText())){
+		if(myVariableElementType == SQFTypes.GLOBAL_VAR && SQFPsiUtil.followsSQFFunctionNameRules(selfResolve.getText()) && !SQFPsiUtil.isBisFunction(myElement)){
 			try{
 				HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(element.getContainingFile(), myElement.getName());
 				System.out.println(function.getCallableName());

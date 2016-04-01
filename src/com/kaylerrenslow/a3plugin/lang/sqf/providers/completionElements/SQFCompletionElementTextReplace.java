@@ -52,16 +52,11 @@ public class SQFCompletionElementTextReplace{
 			super("ife", "if () exitWith {};", 4, " if exitWith statement");
 		}
 
-		@Override
-		public void handleInsert(InsertionContext context, LookupElement item) {
-			super.handleInsert(context, item);
-//			context.getEditor().
-		}
 	}
 
 	/**
-	 * Auto completion for hintfln.
-	 * Created on 03/28/2016.
+	 * Auto completion for hintarg.
+	 * Created on 03/31/2016.
 	 */
 	public static class SQFCompInsertHandlerHintfln extends CompletionElementWithTextReplace{
 
@@ -77,6 +72,12 @@ public class SQFCompletionElementTextReplace{
 		@Override
 		public LookupElement getLookupElement(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
 			return LookupElementBuilder.create("hintfln").withInsertHandler(this).withTypeText(" hint current file and line number");
+		}
+	}
+
+	public static class SQFCompInsertHandlerHintArg extends CompletionElementWithTextReplace{
+		public SQFCompInsertHandlerHintArg() {
+			super("hintarg", "hint format[\"%1\", (_this select )];", 32, "hint a function argument");
 		}
 	}
 

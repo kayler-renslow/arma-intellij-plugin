@@ -36,20 +36,6 @@ public class SQFVisitorAnnotator extends com.kaylerrenslow.a3plugin.lang.sqf.psi
 		this.annotator = annotator;
 	}
 
-
-//	@Override
-//	public void visitPsiElement(@NotNull PsiElement o) {
-//		System.out.println(o.getClass());
-//		if(o instanceof PsiErrorElement){
-//			System.out.println(((PsiErrorElement) o).getErrorDescription());
-//			PsiErrorElement errorElement = (PsiErrorElement)o;
-//			Annotation a = annotator.createErrorAnnotation(errorElement.getContainingFile(), errorElement.getErrorDescription());
-//			a.setFileLevelAnnotation(true);
-//		}
-//		super.visitPsiElement(o);
-//	}
-
-
 	@Override
 	public void visitElement(PsiElement element) {
 		super.visitElement(element);
@@ -65,7 +51,6 @@ public class SQFVisitorAnnotator extends com.kaylerrenslow.a3plugin.lang.sqf.psi
 
 		}
 	}
-
 
 	@Override
 	public void visitPrivateDecl(@NotNull SQFPrivateDecl privateDecl) {

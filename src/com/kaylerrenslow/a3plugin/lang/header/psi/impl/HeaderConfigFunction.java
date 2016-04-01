@@ -17,6 +17,7 @@ public class HeaderConfigFunction {
 	private final String className;
 	private final String filePath;
 	private final String functionFileExtension;
+	private final boolean appendFn_;
 
 	/** This class is a wrapper class for a function that was defined inside the missionConfigFile (description.ext >> CfgFunctions)
 	 * @param classDeclaration the HeaderClassDeclaration PsiElement that links to the definition
@@ -25,7 +26,7 @@ public class HeaderConfigFunction {
 	 * @param className class declaration name for funciton
 	 * @param functionFileExtension file extension (.sqf, .fsm)
 	 */
-	public HeaderConfigFunction(HeaderClassDeclaration classDeclaration, String containingDirectoryPath, String tagName, String className, @Nullable String functionFileExtension) {
+	public HeaderConfigFunction(HeaderClassDeclaration classDeclaration, String containingDirectoryPath, String tagName, String className, @Nullable String functionFileExtension, boolean appendFn_) {
 		this.classDeclaration = classDeclaration;
 		this.filePath =containingDirectoryPath;
 		this.tagName = tagName;
@@ -35,6 +36,7 @@ public class HeaderConfigFunction {
 		}else{
 			this.functionFileExtension = functionFileExtension;
 		}
+		this.appendFn_ = appendFn_;
 	}
 
 	public HeaderClassDeclaration getClassDeclaration(){
@@ -54,7 +56,7 @@ public class HeaderConfigFunction {
 	}
 
 	public String getFullRelativePath(){
-		return this.filePath + (this.filePath.length() > 0 ? "\\" : "") + this.className + this.functionFileExtension;
+		return this.filePath + (this.filePath.length() > 0 ? "\\" : "") + (this.appendFn_ ? "fn_" : "") + this.className + this.functionFileExtension;
 	}
 
 	public static Icon getIcon(){

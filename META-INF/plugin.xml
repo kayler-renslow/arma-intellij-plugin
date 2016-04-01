@@ -20,13 +20,12 @@
 		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDocumentationProvider"/>
 		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFCommenter"/>
 		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFAnnotator"/>
+		<externalAnnotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.SharedExternalAnnotator"/>
 		<lang.findUsagesProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFFindUsagesProvider"/>
 		<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.sqf.contributors.SQFReferenceContributor"/>
 		<lang.refactoringSupport language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFRefactoringSupportProvider"/>
 		<lang.braceMatcher language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFBraceMatcher" />
 		<lang.foldingBuilder language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFFoldingBuilder" />
-		<elementDescriptionProvider implementation="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDescriptionProvider" />
-		<usageGroupingRuleProvider implementation="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFUsageGroupingProvider" />
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>
@@ -40,6 +39,7 @@
 		<langCodeStyleSettingsProvider implementation="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderLanguageCodeStyleSettingsProvider"/>
 		<lang.braceMatcher language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderBraceMatcher" />
 		<lang.foldingBuilder language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderFoldingBuilder" />
+		<externalAnnotator language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.SharedExternalAnnotator"/>
 
 		<!-- Shared for Languages -->
 		<usageTypeProvider implementation="com.kaylerrenslow.a3plugin.lang.shared.ArmaUsageTypeProvider"/>

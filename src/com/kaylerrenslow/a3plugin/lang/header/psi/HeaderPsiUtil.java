@@ -1,15 +1,10 @@
 package com.kaylerrenslow.a3plugin.lang.header.psi;
 
 import com.intellij.lang.ASTNode;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.header.ConfigClassNotDefinedException;
 import com.kaylerrenslow.a3plugin.lang.header.FunctionNotDefinedInConfigException;
-import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
 import com.kaylerrenslow.a3plugin.lang.header.MalformedConfigException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
@@ -17,13 +12,11 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.Attribute;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
-import org.apache.xmlbeans.impl.piccolo.io.FileFormatException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -207,6 +200,7 @@ public class HeaderPsiUtil {
 		HeaderClassDeclaration functionClass = null; //psi element that links to the function's class declaration
 		String containingDirectoryPath = null; //file path (directories)
 		String functionFileExtension = null; //file extension (.sqf, .fsm)
+		boolean appendFn_ = true; //append fn_ to file name
 
 		Attribute[] tagsAsAttributes = {new Attribute("tag", tagName)};
 		ArrayList<HeaderClassDeclaration> matchedClassesWithTag = (getClassDeclarationsWithEntriesEqual(cfgFuncs, null, tagsAsAttributes, true));
@@ -235,14 +229,12 @@ public class HeaderPsiUtil {
 			if (attribute.name.equals("file")) {
 				if (attribute.value.contains("\\")) {//file path includes a folder
 					containingDirectoryPath = attribute.value.substring(0, attribute.value.lastIndexOf('\\')); //has a folder (file='folder\test.sqf')
-					if (isAllowedFunctionExtension(attribute.value, cfgFuncs, functionClass)) {
-						functionFileExtension = attribute.value.substring(attribute.value.lastIndexOf('.'));
-					}
 				} else { //just the file name is inside
 					containingDirectoryPath = ""; //no path defined, just the file name (file='test.sqf')
-					if (isAllowedFunctionExtension(attribute.value, cfgFuncs, functionClass)) {
-						functionFileExtension = attribute.value.substring(attribute.value.lastIndexOf('.'));
-					}
+				}
+				appendFn_ = false;
+				if (isAllowedFunctionExtension(attribute.value, cfgFuncs, functionClass)) {
+					functionFileExtension = attribute.value.substring(attribute.value.lastIndexOf('.'));
 				}
 				break;
 			}
@@ -273,7 +265,7 @@ public class HeaderPsiUtil {
 			}
 		}
 
-		return new HeaderConfigFunction(functionClass, containingDirectoryPath, tagName, functionClassName, functionFileExtension);
+		return new HeaderConfigFunction(functionClass, containingDirectoryPath, tagName, functionClassName, functionFileExtension, appendFn_);
 	}
 
 	private static boolean isAllowedFunctionExtension(String value, HeaderClassDeclaration cfgFuncs, HeaderClassDeclaration functionClass) throws MalformedConfigException {
