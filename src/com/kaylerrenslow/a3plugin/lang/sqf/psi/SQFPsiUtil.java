@@ -177,9 +177,9 @@ public class SQFPsiUtil{
 			if(comment.getText().length() <= 2){
 				return  "";
 			}
-			return comment.getText().substring(2).trim();
+			return comment.getText().substring(2);
 		}
-		return comment.getText().substring(2, comment.getTextLength() - 2).trim();
+		return comment.getText().substring(2, comment.getTextLength() - 2).replaceAll("\t([^\r\n])","$1"); //shift comments left 1 tab if tabbed
 	}
 
 	public static PsiElement createElement(Project project, String text, IElementType type) {

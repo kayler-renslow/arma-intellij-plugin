@@ -27,7 +27,7 @@ public class TextFileListToList{
 		try{
 			scan = new Scanner(f);
 		}catch(Exception e){
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 			return null;
 		}
 

@@ -2,11 +2,12 @@ plugin
 	none
 
 shared between languages
-	added annotations for file-level. When syntax error is found in file, it will create a big box at top of editor with error message and line number
+	none
 
 SQF
-	added hintarg auto completion option
-	added _x and _this to auto completion
+	auto completion for call and spawn (will fetch config functions)
+	added documentation lookup for said config functions in auto completion
+	fixed issue where \n was being removed from block comments at the start of the comment
 
 Header
-    none
+    ability to collect all of the mission's config functions

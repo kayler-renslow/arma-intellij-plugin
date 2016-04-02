@@ -70,6 +70,10 @@ public class HeaderPsiUtilForGrammar {
 		return false;
 	}
 
+	/** Get all attributes inside the class declaration. Attributes are any assignment inside the class. If traverseIncludes is true, it will traverse include statements
+	 * @param traverseIncludes true if to traverse includes while getting attributes, false if to skip over them
+	 * @return array of attributes (assignment expressions)
+	 */
 	public static Attribute[] getAttributes(HeaderClassDeclaration decl, boolean traverseIncludes) {
 		ArrayList<Attribute> attributesList = new ArrayList<>();
 		if(decl.getClassContent() != null){

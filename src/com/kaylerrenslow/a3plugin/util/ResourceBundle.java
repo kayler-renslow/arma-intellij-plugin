@@ -12,7 +12,7 @@ public class ResourceBundle{
 		try{
 			props.load(getClass().getResourceAsStream(packagePath));
 		}catch (Exception e){
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 		}
 	}
 

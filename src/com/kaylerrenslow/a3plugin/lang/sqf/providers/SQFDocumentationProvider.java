@@ -3,16 +3,25 @@ package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.documentation.DocumentationProviderEx;
 import com.intellij.openapi.editor.Editor;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.Plugin;
+import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
+import com.kaylerrenslow.a3plugin.lang.shared.DocumentationUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
+import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.FileReader;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -54,7 +63,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		}
 		if (PsiUtil.isOfElementType(element, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(element, SQFTypes.BLOCK_COMMENT)){
 			PsiComment comment = (PsiComment) element;
-			return SQFPsiUtil.getCommentContent(comment).replaceAll("\n", "<br>");
+			return DocumentationUtil.purtify(SQFPsiUtil.getCommentContent(comment));
 		}
 		if (element instanceof PsiFile){
 			ASTNode potentialDocNode = element.getNode().getFirstChildNode();
@@ -63,7 +72,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 			}
 			if (PsiUtil.isOfElementType(potentialDocNode, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(potentialDocNode, SQFTypes.BLOCK_COMMENT)){
 				PsiComment comment = (PsiComment) potentialDocNode.getPsi();
-				return SQFPsiUtil.getCommentContent(comment).replaceAll("\n", "<br>");
+				return DocumentationUtil.purtify(SQFPsiUtil.getCommentContent(comment));
 			}
 			return null;
 		}
@@ -79,15 +88,30 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		if (element instanceof PsiFile){
 			return element;
 		}
-
+		if(object instanceof HeaderConfigFunction){
+			HeaderConfigFunction function = (HeaderConfigFunction)object;
+			if(!function.getFunctionFileExtension().equals(".sqf")){
+				return function.getClassDeclaration();
+			}
+			Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, PluginUtil.getModuleForPsiFile(function.getClassDeclaration().getContainingFile()).getModuleContentScope());
+			for(VirtualFile vf : files){
+				if(vf.getPath().endsWith(function.getFullRelativePath())){
+					return psiManager.findFile(vf);
+				}
+			}
+		}
 		return null;
 	}
 
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLink(PsiManager psiManager, String link, PsiElement context) {
-		if (link.startsWith(DOC_LINK_PREFIX_COMMAND)){
-			return SQFPsiUtil.createElement(context.getProject(), link.substring(DOC_LINK_PREFIX_COMMAND.length()), SQFTypes.COMMAND);
+		try{
+			if (link.startsWith(DOC_LINK_PREFIX_COMMAND)){
+				return SQFPsiUtil.createElement(context.getProject(), link.substring(DOC_LINK_PREFIX_COMMAND.length()), SQFTypes.COMMAND);
+			}
+		}catch(IndexOutOfBoundsException e){ //for when the commands are inside the documentation but not registered as a SQFTypes.COMMAND because lexer is not up to date
+			e.printStackTrace(System.out);
 		}
 		if(link.startsWith(DOC_LINK_PREFIX_BIS_FUNCTION)){
 			return SQFPsiUtil.createElement(context.getProject(), link.substring(DOC_LINK_PREFIX_BIS_FUNCTION.length()), SQFTypes.GLOBAL_VAR);
@@ -136,7 +160,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		try{
 			doc += FileReader.getText(SQFStatic.COMMANDS_DOC_FILE_DIR + commandName);
 		}catch (Exception e){
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 		}
 		return doc;
 	}
@@ -146,7 +170,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		try{
 			doc += FileReader.getText(SQFStatic.BIS_FUNCTIONS_DOC_FILE_DIR + functionName);
 		}catch (Exception e){
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 		}
 		return doc;
 	}

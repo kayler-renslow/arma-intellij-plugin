@@ -20,7 +20,7 @@ public class PluginUtil{
 			f = new File(url.toURI());
 			f = new File(f.getPath());
 		}catch(Exception e){
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 			return null;
 		}
 		return f;

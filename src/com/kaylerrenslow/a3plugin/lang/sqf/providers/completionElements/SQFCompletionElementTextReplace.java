@@ -34,7 +34,7 @@ public class SQFCompletionElementTextReplace{
 	 */
 	public static class SQFCompInsertHandlerIfThen extends CompletionElementWithTextReplace{
 		public SQFCompInsertHandlerIfThen() {
-			super("if", "if () then {\n};", 4, " if then statement");
+			super("ifthen", "if () then {\n};", 4, " if then statement");
 		}
 
 		@Override
@@ -44,12 +44,12 @@ public class SQFCompletionElementTextReplace{
 	}
 
 	/**
-	 * Auto completion for if exitWith statement.
+	 * Auto completion for: if exitWith statement.
 	 * Created on 03/28/2016.
 	 */
 	public static class SQFCompInsertHandlerIfExitWith extends CompletionElementWithTextReplace{
 		public SQFCompInsertHandlerIfExitWith() {
-			super("ife", "if () exitWith {};", 4, " if exitWith statement");
+			super("ifexit", "if () exitWith {};", 4, " if exitWith statement");
 		}
 
 	}
@@ -71,7 +71,7 @@ public class SQFCompletionElementTextReplace{
 
 		@Override
 		public LookupElement getLookupElement(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-			return LookupElementBuilder.create("hintfln").withInsertHandler(this).withTypeText(" hint current file and line number");
+			return LookupElementBuilder.create("hintln").withInsertHandler(this).withTypeText(" hint current file and line number");
 		}
 	}
 

@@ -40,6 +40,7 @@
 		<lang.braceMatcher language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderBraceMatcher" />
 		<lang.foldingBuilder language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderFoldingBuilder" />
 		<externalAnnotator language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.SharedExternalAnnotator"/>
+		<annotator language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderAnnotator"/>
 
 		<!-- Shared for Languages -->
 		<usageTypeProvider implementation="com.kaylerrenslow.a3plugin.lang.shared.ArmaUsageTypeProvider"/>
