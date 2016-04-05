@@ -1,26 +1,5 @@
 >add @see functionality for documentation that will create a link to a psi element (including psi files)
 
->for SQF, find each local variable in current scope and annotate them if not declared private
-
-SQFVariableAsStringMixin
-this is wrong because it won't find variables that are in strings (variableAsString). update PsiUtil to find child elements that are instanceof a certain psi type
-
-public PsiReference[] getReferences() {
-		ArrayList<ASTNode> nodes = PsiUtil.findChildElements(SQFPsiUtil.getCurrentScope(this), SQFTypes.VARIABLE, null, this.varName);
-
-for SQFCompletionProvider, find local variables that match SQFScope with cursor's SQFScope
-
-
-for armaUsageTypeProvider, Assignment type doesn't work
-
-variables declared private in a high scope will still find variables in a lower scope that are declared private there (see example below and fn_virt_buy and click _price)
-	private t //private1
-
-	t=1;
-	if(..){
-		private t;
-		t //will be found by private1
-	}
 
 To fill the completion list for named element references, the IDE calls PsiReference.getVariants() (use this instead of getReferences)
 	http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/code_completion.html

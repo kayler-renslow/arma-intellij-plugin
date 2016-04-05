@@ -28,12 +28,12 @@
 sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
 
 file_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* {extends("file_scope")=local_scope}
-local_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope"}
+local_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars]}
 
 private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
 private whitespace_comment_ ::= WHITE_SPACE | comment
 comment ::= INLINE_COMMENT | BLOCK_COMMENT | COMMENT_COMMAND
-variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules]}
+variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope]}
 
 
 statement ::= ( assignment
@@ -102,7 +102,7 @@ array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 code_block ::= LBRACE local_scope RBRACE
 
 /*control structures and other things*/
-    private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET)
+    private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET) //do not allow private[]
 	private_decl_var ::= string {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableElement"}
 
 

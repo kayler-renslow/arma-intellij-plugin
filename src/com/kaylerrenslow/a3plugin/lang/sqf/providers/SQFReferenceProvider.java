@@ -33,24 +33,27 @@ public class SQFReferenceProvider extends PsiReferenceProvider{
 		SQFVariableNamedElement var = (SQFVariableNamedElement) element;
 
 		if (var.getVariableType() == SQFTypes.LOCAL_VAR){
-			return getPsiReferencesForLocalVar(element, var);
+			return getPrivateDeclVarReferencesForLocalVar(var);
 		}
 
-		List<SQFVariable> vars = SQFPsiUtil.findGlobalVariables(element.getProject(), var.getName());
-		PsiReference[] references = new PsiReference[vars.size()];
-		for (int i = 0; i < vars.size(); i++){
-			references[i] = vars.get(i).getReference();
+		if(var.getVariableType() == SQFTypes.GLOBAL_VAR){
+			List<SQFVariable> vars = SQFPsiUtil.findGlobalVariables(element.getProject(), var.getName());
+			PsiReference[] references = new PsiReference[vars.size()];
+			for (int i = 0; i < vars.size(); i++){
+				references[i] = vars.get(i).getReference();
+			}
+			return references;
 		}
-		return references;
+		return new PsiReference[0];
 	}
 
 	@NotNull
-	private PsiReference[] getPsiReferencesForLocalVar(@NotNull PsiElement element, SQFVariableNamedElement var) {
-		SQFScope varScope = SQFPsiUtil.getCurrentScopeForVariable((SQFVariable) var);
-		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(SQFPsiUtil.getCurrentScope(element), SQFTypes.PRIVATE_DECL_VAR, null, "\"" + var.getText() + "\"");
+	private PsiReference[] getPrivateDeclVarReferencesForLocalVar(@NotNull SQFVariableNamedElement var) {
+		SQFScope varScope = ((SQFVariable) var).getDeclarationScope();
+		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(varScope, SQFTypes.PRIVATE_DECL_VAR, null, "\"" + var.getVarName() + "\"");
 		ArrayList<PsiElement> referencesList = new ArrayList<>();
 		for (int i = 0; i < nodes.size(); i++){
-			if(varScope == SQFPsiUtil.getCurrentScope(nodes.get(i).getPsi())){
+			if(varScope == SQFPsiUtil.getContainingScope(nodes.get(i).getPsi())){
 				referencesList.add(nodes.get(i).getPsi());
 			}
 		}

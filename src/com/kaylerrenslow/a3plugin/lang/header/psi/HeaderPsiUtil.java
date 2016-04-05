@@ -244,6 +244,9 @@ public class HeaderPsiUtil {
 			}
 
 			functionClass = getClassDeclaration(classWithTag, functionClassName, true, 2, 2); //get the first function class
+			if(functionClass == null){
+				throw new FunctionNotDefinedInConfigException(functionName);
+			}
 		} else {
 			for (HeaderClassDeclaration matchedTagClass : matchedClassesWithTag) {
 				functionClass = getClassDeclaration(matchedTagClass, functionClassName, true, 2, 2); //check if the class that has the tag actually holds the function's class declaration

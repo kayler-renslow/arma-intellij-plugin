@@ -16,13 +16,14 @@ import org.jetbrains.annotations.Nullable;
  */
 public class ArmaUsageTypeProvider implements UsageTypeProvider{
 
-	private static UsageType TYPE_UNKNOWN_HEADER_USAGE = new UsageType(Plugin.resources.getString("lang.shared.usage_type.unknown_header"));
-	private static UsageType TYPE_UNKNOWN_SQF_USAGE = new UsageType(Plugin.resources.getString("lang.shared.usage_type.unknown_sqf"));
-	private static UsageType TYPE_ASSIGNMENT = new UsageType(Plugin.resources.getString("lang.shared.usage_type.assignment"));
-	private static UsageType TYPE_FUNCTION_CALL = new UsageType(Plugin.resources.getString("lang.shared.usage_type.function_call"));
-	private static UsageType TYPE_FUNCTION_SPAWN = new UsageType(Plugin.resources.getString("lang.shared.usage_type.function_spawn"));
-	private static UsageType TYPE_FUNCTION_PARAMETER = new UsageType(Plugin.resources.getString("lang.shared.usage_type.function_param"));
-	private static UsageType TYPE_RETURN_STATEMENT = new UsageType(Plugin.resources.getString("lang.shared.usage_type.return_statement"));
+	private static final UsageType TYPE_PRIVATE_DECL_VAR = new UsageType(Plugin.resources.getString("lang.shared.usage_type.private_decl_var"));
+	private static final UsageType TYPE_UNKNOWN_HEADER_USAGE = new UsageType(Plugin.resources.getString("lang.shared.usage_type.unknown_header"));
+	private static final UsageType TYPE_UNKNOWN_SQF_USAGE = new UsageType(Plugin.resources.getString("lang.shared.usage_type.unknown_sqf"));
+	private static final UsageType TYPE_ASSIGNMENT = new UsageType(Plugin.resources.getString("lang.shared.usage_type.assignment"));
+	private static final UsageType TYPE_FUNCTION_CALL = new UsageType(Plugin.resources.getString("lang.shared.usage_type.function_call"));
+	private static final UsageType TYPE_FUNCTION_SPAWN = new UsageType(Plugin.resources.getString("lang.shared.usage_type.function_spawn"));
+	private static final UsageType TYPE_FUNCTION_PARAMETER = new UsageType(Plugin.resources.getString("lang.shared.usage_type.function_param"));
+	private static final UsageType TYPE_RETURN_STATEMENT = new UsageType(Plugin.resources.getString("lang.shared.usage_type.return_statement"));
 
 	@Nullable
 	@Override
@@ -33,6 +34,9 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider{
 			if (x != null){
 				return x;
 			}
+		}
+		if(PsiUtil.isOfElementType(element.getNode(), SQFTypes.PRIVATE_DECL_VAR)){
+			return TYPE_PRIVATE_DECL_VAR;
 		}
 
 		if (element.getContainingFile() instanceof SQFFile){
@@ -45,21 +49,15 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider{
 
 	@Nullable
 	private UsageType getUsageTypeForVariable(SQFVariable variable) {
-		ASTNode node = PsiUtil.getAncestorWithType(variable.getNode(), SQFTypes.ASSIGNMENT, null);
+		ASTNode node = PsiUtil.getAncestorWithType(variable.getNode(), SQFTypes.STATEMENT, null);
 		if (node != null){
-			SQFAssignment assignment = (SQFAssignment) node.getPsi();
-			if (nodeIsAssignmentVariable(assignment, variable)){
-				return TYPE_ASSIGNMENT;
-			}
-			node = PsiUtil.getAncestorWithType(node, SQFTypes.ASSIGNMENT, null);
-			while (node != null){
-				assignment = (SQFAssignment) node.getPsi();
-				if (nodeIsAssignmentVariable(assignment, variable)){
+			SQFStatement statement = (SQFStatement) node.getPsi();
+			if(statement.getAssignment() != null){
+				SQFAssignment assignment = statement.getAssignment();
+				if(assignment.getAssigningVariable() == variable){
 					return TYPE_ASSIGNMENT;
 				}
-				node = PsiUtil.getAncestorWithType(node, SQFTypes.ASSIGNMENT, null);
 			}
-
 		}
 
 		node = PsiUtil.getPrevSiblingNotWhitespace(variable.getNode());
@@ -86,13 +84,6 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider{
 		}
 
 		return null; //let intellij decide the name
-	}
-
-	private boolean nodeIsAssignmentVariable(SQFAssignment assignment, SQFVariable checkVar) {
-		boolean textMatches = assignment.getAssigningVariable().getVarName().equals(checkVar.getText());
-		SQFScope scopeAssignment = SQFPsiUtil.getCurrentScopeForVariable(assignment.getAssigningVariable());
-		SQFScope scopeCheckVar = SQFPsiUtil.getCurrentScopeForVariable(checkVar);
-		return textMatches && scopeAssignment == scopeCheckVar;
 	}
 
 	private boolean nodeIsFunctionParameter(ASTNode node) {

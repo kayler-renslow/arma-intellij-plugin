@@ -79,20 +79,10 @@ public class SQFVariableReference implements SQFRefactorableReference{
 		boolean referenceTo = other.getName().equals(getCanonicalText()) && resolve() != other;
 
 		if (myVariableElementType != SQFTypes.GLOBAL_VAR){
-			SQFScope myScope = SQFPsiUtil.getCurrentScopeForVariable((SQFVariable) selfResolve);
-			SQFScope otherScope = SQFPsiUtil.getCurrentScopeForVariable((SQFVariable) element);
+			SQFScope myScope = ((SQFVariable) selfResolve).getDeclarationScope();
+			SQFScope otherScope = ((SQFVariable) element).getDeclarationScope();
 			referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == selfResolve.getContainingFile();
 			return referenceTo;
-		}
-		if(myVariableElementType == SQFTypes.GLOBAL_VAR && SQFPsiUtil.followsSQFFunctionNameRules(selfResolve.getText()) && !SQFPsiUtil.isBisFunction(myElement)){
-			try{
-				HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(element.getContainingFile(), myElement.getName());
-				System.out.println(function.getCallableName());
-				System.out.println(function.getContainingDirectoryPath());
-				System.out.println(function.getFullRelativePath());
-			}catch (Exception e){
-				e.printStackTrace(System.out);
-			}
 		}
 		return referenceTo;
 	}

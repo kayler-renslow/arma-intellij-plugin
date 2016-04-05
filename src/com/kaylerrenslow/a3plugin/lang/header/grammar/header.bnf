@@ -25,7 +25,9 @@ file_entry ::=  WHITE_SPACE | INLINE_COMMENT | BLOCK_COMMENT | statement_ | prep
 private statement_ ::= (assignment | class_declaration) SEMICOLON
 
 private number_ ::= NUMBER_LITERAL | HEX_LITERAL
-private value_ ::= STRING_LITERAL | number_ | IDENTIFIER
+private value_ ::= stringtable_entry | STRING_LITERAL | number_ | IDENTIFIER
+
+stringtable_entry ::= DOLLAR IDENTIFIER
 
 array ::= LBRACE array_body? RBRACE
 array_body ::= array_entry (COMMA array_entry)*
@@ -34,7 +36,7 @@ array_entry ::= expression | value_ | array
 assignment_identifier ::= IDENTIFIER /*| NUM_IDENTIFIER*/
 
 assignment ::= basic_assignment | array_assignment {methods=[getAssigningVariable getAssigningValue]}
-basic_assignment ::= assignment_identifier EQ (expression | value_ ) {extends("basic_assignment")=assignment}
+basic_assignment ::= assignment_identifier EQ (expression | value_) {extends("basic_assignment")=assignment}
 array_assignment ::= assignment_identifier BRACKET_PAIR EQ array {extends("array_assignment")=assignment}
 
 expression ::= add_expression_

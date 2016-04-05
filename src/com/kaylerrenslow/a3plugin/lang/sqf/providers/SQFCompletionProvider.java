@@ -37,10 +37,9 @@ public class SQFCompletionProvider extends com.intellij.codeInsight.completion.C
 
 		if(cursor != null){
 			completeCurrentWord(parameters, context, result, cursor);
-			return;
+		}else{
+			cursor = parameters.getPosition(); //cursor is after a word
 		}
-
-		cursor = parameters.getPosition(); //cursor is after a word
 
 		if(!PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.LOCAL_VAR) && !PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.GLOBAL_VAR)){
 			return;
@@ -83,24 +82,22 @@ public class SQFCompletionProvider extends com.intellij.codeInsight.completion.C
 		result.addElement(new SQFCompInsertHandlerIfExitWith().getLookupElement(parameters, context, result));
 
 		ArrayList<ASTNode> elements = new ArrayList<>();
+		String localVarTailText;
 		if (lookForLocalVars) {
 			elements.addAll(PsiUtil.findDescendantElements(parameters.getOriginalFile(), SQFTypes.LOCAL_VAR, cursor.getNode()));
 			result.addElement(LookupElementBuilder.create("_this").withIcon(PluginIcons.ICON_SQF_MAGIC_VARIABLE).withTailText(" (magic variable)"));
 			result.addElement(LookupElementBuilder.create("_x").withIcon(PluginIcons.ICON_SQF_MAGIC_VARIABLE).withTailText(" (magic variable)"));
+			localVarTailText = " " + Plugin.resources.getString("lang.sqf.completion.tail_text.local_variable");
 		} else {
 			elements.addAll(PsiUtil.findDescendantElements(parameters.getOriginalFile(), SQFTypes.GLOBAL_VAR, cursor.getNode()));
+			localVarTailText = " " + Plugin.resources.getString("lang.sqf.completion.tail_text.global_variable");
 		}
 
 		for (ASTNode node : elements) {
-			if (!SQFPsiUtil.isBisFunction(node.getPsi())) {
-				if (node.getPsi() instanceof PsiNamedElement) {
-					result.addElement(LookupElementBuilder.create((PsiNamedElement) node.getPsi()).withIcon(PluginIcons.ICON_SQF_VARIABLE));
-				} else {
-					result.addElement(LookupElementBuilder.create(node.getText()).withIcon(PluginIcons.ICON_SQF_VARIABLE));
-				}
+			if (!SQFPsiUtil.followsSQFFunctionNameRules(node.getText())) {
+				result.addElement(LookupElementBuilder.create(node.getText()).withTailText(localVarTailText).withIcon(PluginIcons.ICON_SQF_VARIABLE));
 			}
 		}
-
 
 		if (!lookForLocalVars) {
 			String commandName;

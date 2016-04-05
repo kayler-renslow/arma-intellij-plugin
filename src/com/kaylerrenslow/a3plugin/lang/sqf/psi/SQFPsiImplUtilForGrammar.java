@@ -1,5 +1,13 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
+import com.intellij.lang.ASTNode;
+import com.intellij.psi.tree.TokenSet;
+import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author Kayler
  * SQF grammar util class.
@@ -24,6 +32,56 @@ public class SQFPsiImplUtilForGrammar{
 	 */
 	public static SQFVariable getAssigningVariable(SQFAssignment assignment){
 		return assignment.getVariable();
+	}
+
+	/** Gets the current scope of the variable's declaration (the scope where the variable is declared private in).
+	 * @param var element to get scope of
+	 * @return scope
+	 */
+	public static SQFScope getDeclarationScope(SQFVariable var){
+		SQFScope scope = SQFPsiUtil.getContainingScope(var);
+		if(var.getVariableType() == SQFTypes.LANG_VAR){
+			if(var.getVarName().equals("_this")){
+				return SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile());
+			}
+			return scope;
+		}
+		if(var.getVariableType() == SQFTypes.GLOBAL_VAR){
+			return SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile());
+		}
+
+		List<SQFPrivateDeclVar> varsForScope = scope.getPrivateDeclaredVars();
+
+		while(scope != null){
+			if(scope instanceof SQFFileScope){
+				break;
+			}
+			for (SQFPrivateDeclVar varInScope : varsForScope){
+				if (varInScope.getVarName().equals(var.getVarName())){
+					return scope;
+				}
+			}
+			scope = SQFPsiUtil.getContainingScope(scope.getParent());
+			varsForScope = scope.getPrivateDeclaredVars();
+		}
+		return scope;
+	}
+
+	/** Get all the declared private variables for the given scope. This will not go deeper than the current scope.
+	 * @param scope SQFScope
+	 * @return list of all private variables for the given scope
+	 */
+	public static List<SQFPrivateDeclVar> getPrivateDeclaredVars(SQFScope scope){
+		ASTNode[] statements = scope.getNode().getChildren(TokenSet.create(SQFTypes.STATEMENT));
+		List<SQFPrivateDeclVar> ret = new ArrayList<>();
+		SQFStatement statement;
+		for(int i = 0; i < statements.length; i++){
+			statement = (SQFStatement) statements[i].getPsi();
+			if(statement.getPrivateDecl() != null){
+				ret.addAll(statement.getPrivateDecl().getPrivateDeclVarList());
+			}
+		}
+		return ret;
 	}
 
 }
