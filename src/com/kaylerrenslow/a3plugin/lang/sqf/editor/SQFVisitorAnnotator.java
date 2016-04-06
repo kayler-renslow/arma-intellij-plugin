@@ -27,14 +27,14 @@ import java.util.List;
  *         AST visistor implementation for annotating with SQFAnnotator
  *         Created on 03/16/2016.
  */
-public class SQFVisitorAnnotator extends com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVisitor {
+public class SQFVisitorAnnotator extends SQFVisitor {
 
 	private AnnotationHolder annotator;
 
-
-	public SQFVisitorAnnotator(AnnotationHolder annotator) {
+	public void setAnnotator(@NotNull AnnotationHolder annotator) {
 		this.annotator = annotator;
 	}
+
 
 	@Override
 	public void visitElement(PsiElement element) {
@@ -70,6 +70,17 @@ public class SQFVisitorAnnotator extends com.kaylerrenslow.a3plugin.lang.sqf.psi
 		}
 		Annotation a = annotator.createWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_not_private"));
 		a.registerFix(new SQFAnnotatorFixNotPrivate(var, declScope));
+	}
+
+	@Override
+	public void visitPrivateDecl(@NotNull SQFPrivateDecl privateDecl) {
+		super.visitPrivateDecl(privateDecl);
+//		ArrayList<PsiElement> vars =PsiUtil.findDescendantElementsOfInstance(SQFPsiUtil.getContainingScope(privateDecl), SQFVariable.class, null);
+//		SQFVariable variable;
+//		for(PsiElement element : vars){
+//			variable = (SQFVariable)element;
+//
+//		}
 	}
 
 	@Override
@@ -130,11 +141,9 @@ class SQFAnnotatorFixNotPrivate extends IntentionAndQuickFixAction {
 					statement = (SQFStatement) nodeStatement.getPsi();
 					if (statement.getPrivateDecl() != null) {
 						decl = statement.getPrivateDecl();
-						if (PsiUtil.getNextSiblingNotWhitespace(decl.getFirstChild().getNode()).getElementType() == SQFTypes.LBRACKET) { //private is first child, [ is second child
-							SQFPrivateDecl newDecl = SQFPsiUtil.createPrivateDeclFromExisting(project, decl, fixVar.getVarName());
-							decl.replace(newDecl);
-							return;
-						}
+						SQFPrivateDecl newDecl = SQFPsiUtil.createPrivateDeclFromExisting(project, decl, fixVar.getVarName());
+						decl.replace(newDecl);
+						return;
 					}
 				}
 

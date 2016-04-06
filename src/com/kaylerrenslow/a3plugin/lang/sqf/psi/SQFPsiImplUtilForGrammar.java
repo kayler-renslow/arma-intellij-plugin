@@ -1,11 +1,13 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -78,10 +80,29 @@ public class SQFPsiImplUtilForGrammar{
 		for(int i = 0; i < statements.length; i++){
 			statement = (SQFStatement) statements[i].getPsi();
 			if(statement.getPrivateDecl() != null){
-				ret.addAll(statement.getPrivateDecl().getPrivateDeclVarList());
+				ret.addAll(statement.getPrivateDecl().getPrivateDeclVars());
 			}
 		}
 		return ret;
+	}
+
+	/**
+	 * DO NOT USE SQFPrivateDecl.getPrivateDeclVarList()<br>
+	 * USE THIS INSTEAD.
+	 */
+	@NotNull
+	public static List<SQFPrivateDeclVar> getPrivateDeclVars(SQFPrivateDecl decl){
+		//although a similar method is automatically generated from the parser, it won't return a valid list when grammar is like: private "_var";
+		//The valid list is only generated when grammar is like: private["_var1"];
+		//This method is a workaround.
+		PsiElement[] children = decl.getChildren();
+		List<SQFPrivateDeclVar> list = new ArrayList<>(children.length);
+		for(PsiElement child : children){
+			if(child instanceof SQFPrivateDeclVar){
+				list.add((SQFPrivateDeclVar) child);
+			}
+		}
+		return list;
 	}
 
 }

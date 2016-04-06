@@ -1,6 +1,5 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiComment;
@@ -64,7 +63,7 @@ public class SQFPsiUtil {
 
 
 	@NotNull
-	public static SQFFileScope getFileScope(SQFFile containingFile) {
+	public static SQFFileScope getFileScope(@NotNull SQFFile containingFile) {
 		return (SQFFileScope) containingFile.getNode().getChildren(TokenSet.create(SQFTypes.FILE_SCOPE))[0].getPsi();
 	}
 
@@ -76,7 +75,7 @@ public class SQFPsiUtil {
 	 * @return scope
 	 */
 	@NotNull
-	public static SQFScope getContainingScope(PsiElement element) {
+	public static SQFScope getContainingScope(@NotNull PsiElement element) {
 		PsiElement parent = element;
 		while (parent != null && !(parent instanceof SQFScope)) {
 			parent = parent.getParent();
@@ -131,19 +130,20 @@ public class SQFPsiUtil {
 	 */
 	@NotNull
 	public static SQFPrivateDecl createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
-		List<SQFPrivateDeclVar> declVars = decl.getPrivateDeclVarList();
+		List<SQFPrivateDeclVar> declVars = decl.getPrivateDeclVars();
 		String text = "private[";
-		for(SQFPrivateDeclVar declVar : declVars){
-			text += "\""+declVar.getVarName()+"\",";
+		for (SQFPrivateDeclVar declVar : declVars) {
+			text += "\"" + declVar.getVarName() + "\",";
 		}
-		for(int i = 0; i < varNames.length; i++){
-			text += "\""+varNames[i] + (i != varNames.length - 1 ? "\"," : "\"];");
+		for (int i = 0; i < varNames.length; i++) {
+			text += "\"" + varNames[i] + (i != varNames.length - 1 ? "\"," : "\"];");
 		}
 		return (SQFPrivateDecl) createElement(project, text, SQFTypes.PRIVATE_DECL);
 	}
 
-	public static SQFPrivateDeclVar createPrivateDeclVarElement(Project project, String text){
-		SQFFile file = createFile(project, text);
+	@NotNull
+	public static SQFPrivateDeclVar createPrivateDeclVarElement(@NotNull Project project, @NotNull String varName) {
+		SQFFile file = createFile(project, "private \"" + varName + "\";");
 		return (SQFPrivateDeclVar) PsiUtil.findDescendantElements(file, SQFTypes.PRIVATE_DECL_VAR, null).get(0).getPsi();
 	}
 
@@ -159,7 +159,7 @@ public class SQFPsiUtil {
 	}
 
 	@NotNull
-	public static String getCommentContent(PsiComment comment) {
+	public static String getCommentContent(@NotNull PsiComment comment) {
 		if (comment.getNode().getElementType() == SQFTypes.INLINE_COMMENT) {
 			if (comment.getText().length() <= 2) {
 				return "";

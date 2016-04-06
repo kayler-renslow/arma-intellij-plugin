@@ -79,7 +79,7 @@ private exp_operator_ ::= PLUS
 			  | GTGT
 
 
-private terminal_ ::= string
+private terminal_ ::= STRING_LITERAL
 					| variable
 					| INTEGER_LITERAL
 					| array_val
@@ -92,7 +92,6 @@ private terminal_ ::= string
 					| NAMESPACE
 					| LPAREN expression RPAREN
 
-string ::= STRING_LITERAL
 
 macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 
@@ -102,16 +101,16 @@ array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 code_block ::= LBRACE local_scope RBRACE
 
 /*control structures and other things*/
-    private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET) //do not allow private[]
-	private_decl_var ::= string {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableElement"}
+    private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET) {methods=[getPrivateDeclVars]}//do not allow private[]
+	private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclNamedElement"}
 
 
-    scope_manager ::= GOTO COLON string
-				    | BREAK_TO string
-				    | expression? BREAK_OUT string
+    scope_manager ::= GOTO COLON STRING_LITERAL
+				    | BREAK_TO STRING_LITERAL
+				    | expression? BREAK_OUT STRING_LITERAL
 				    | CONTINUE
 				    | BREAK
-				    | SCOPE_NAME string
+				    | SCOPE_NAME STRING_LITERAL
 
     private control_struct_ ::= if_statement | switch_statement | loop_ | wait_until_statement | with_statement | quest_statement
     if_statement ::= IF LPAREN expression RPAREN (
@@ -128,7 +127,7 @@ code_block ::= LBRACE local_scope RBRACE
     loop_while    ::= WHILE LBRACE expression RBRACE DO code_block
     private for_loops_ ::= loop_for | loop_for_from | loop_for_each
     loop_for  ::= FOR LBRACKET code_block COMMA LBRACE expression RBRACE COMMA code_block RBRACKET DO code_block
-    loop_for_from ::= FOR string FROM expression TO expression (STEP expression)? DO code_block
+    loop_for_from ::= FOR STRING_LITERAL FROM expression TO expression (STEP expression)? DO code_block
     loop_for_each ::= code_block FOR_EACH expression
 
     quest_statement ::= QUEST expression COLON exp

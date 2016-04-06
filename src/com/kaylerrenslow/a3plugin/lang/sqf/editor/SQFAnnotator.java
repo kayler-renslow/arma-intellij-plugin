@@ -13,8 +13,11 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SQFAnnotator implements Annotator{
 
+	private final SQFVisitorAnnotator visitorAnnotator = new SQFVisitorAnnotator();
+
 	@Override
 	public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-		element.accept(new SQFVisitorAnnotator(holder));
+		visitorAnnotator.setAnnotator(holder);
+		element.accept(visitorAnnotator);
 	}
 }

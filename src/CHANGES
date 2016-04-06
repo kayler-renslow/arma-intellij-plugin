@@ -2,19 +2,10 @@ plugin
 	none
 
 shared between languages
-	fixed find usage type for SQF assignments
+	none
 
 SQF
-	FIXED: variables declared private in a high scope will still find variables in a lower scope that are declared private there (see example below and fn_virt_buy and click _price)
-          	private t //private1
-
-          	t=1;
-          	if(..){
-          		private t;
-          		t //will be found by private1
-          	}
-    Changed functionality for when searching for already declared private vars in annotator. Now all private decl statements are searched for duplicate vars
-    Now for each local variable in current scope, they are annotated if not declared private. A quick fix option is available to make them private
+	none
 
 Header
     none

@@ -1,6 +1,5 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.references;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.IncorrectOperationException;
@@ -16,24 +15,27 @@ import org.jetbrains.annotations.Nullable;
  */
 public class SQFPrivateDeclVarReference implements SQFRefactorableReference{
 
-	private PsiElement myElement, target;
-	private TextRange range;
+	private final SQFVariableNamedElement target;
+	private final SQFPrivateDeclVar myDeclVar;
+	private final TextRange range;
 
 	public SQFPrivateDeclVarReference(SQFVariableNamedElement target, SQFPrivateDeclVar var) {
-		this.myElement = var;
+		this.myDeclVar = var;
 		this.range = TextRange.from(0, target.getTextLength());
 		this.target = target;
 	}
 
 	@Override
 	public PsiElement getElement() {
-		return myElement;
+		return myDeclVar;
 	}
+
 
 	@Override
 	public TextRange getRangeInElement() {
 		return range;
 	}
+
 
 	@Nullable
 	@Override
@@ -44,14 +46,14 @@ public class SQFPrivateDeclVarReference implements SQFRefactorableReference{
 	@NotNull
 	@Override
 	public String getCanonicalText() {
-		return myElement.getText();
+		return myDeclVar.getVarName();
 	}
 
 	@Override
 	public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-		ASTNode parent = myElement.getParent().getNode();
-		PsiElement newElement = SQFPsiUtil.createPrivateDeclVarElement(myElement.getProject(), newElementName);
-		parent.replaceChild(myElement.getNode(), newElement.getNode());
+		System.out.println(newElementName);
+		SQFPrivateDeclVar newElement = SQFPsiUtil.createPrivateDeclVarElement(this.myDeclVar.getProject(), newElementName);
+		this.myDeclVar.getParent().getNode().replaceChild(this.myDeclVar.getNode(), newElement.getNode());
 		return newElement;
 	}
 
@@ -66,9 +68,9 @@ public class SQFPrivateDeclVarReference implements SQFRefactorableReference{
 			return false;
 		}
 		SQFVariableNamedElement other = (SQFVariableNamedElement) element;
-		SQFScope myScope = SQFPsiUtil.getContainingScope(this.myElement);
+		SQFScope myScope = SQFPsiUtil.getContainingScope(this.myDeclVar);
 		SQFScope otherScope = ((SQFVariable) element).getDeclarationScope();
-		return myScope == otherScope && other.getName().equals(getCanonicalText());
+		return myScope == otherScope && other.getVarName().equals(getCanonicalText());
 	}
 
 	@NotNull
@@ -85,6 +87,6 @@ public class SQFPrivateDeclVarReference implements SQFRefactorableReference{
 	@Override
 	public String toString() {
 		return "SQFPrivateDeclVarReference{" +
-				"var name=" + myElement.getText() + '}';
+				"var name=" + myDeclVar.getText() + '}';
 	}
 }
