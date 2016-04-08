@@ -1,18 +1,15 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.util.ProcessingContext;
-import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPrivateDeclVar;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFPrivateDeclVarReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

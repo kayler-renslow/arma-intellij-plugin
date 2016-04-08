@@ -3,16 +3,11 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
-import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFPrivateDeclVarReference;
-import org.jetbrains.annotations.NonNls;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFLocalVarReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,20 +21,8 @@ import java.util.ArrayList;
  */
 public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement implements SQFPrivateDeclNamedElement {
 
-	private TextRange range;
-	private String varName;
-
 	public SQFPrivateDeclVarMixin(@NotNull ASTNode node) {
 		super(node);
-		this.range = TextRange.from(node.getStartOffset() + 1, node.getTextLength() - 1);
-		this.varName = super.getText().substring(1, this.getTextLength() - 1);
-//		System.out.println(this.getContainingFile().getName());
-//		System.out.println("SQFPrivateDeclVarMixin.SQFPrivateDeclVarMixin " + this.varName + " " + super.getText());
-	}
-
-	@Override
-	public TextRange getTextRange() {
-		return range;
 	}
 
 	@Override
@@ -66,23 +49,23 @@ public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement implements SQFP
 			}
 		};
 	}
-
+//
 	@Override
 	public PsiReference getReference() {
-		return new SQFPrivateDeclVarReference((SQFVariableNamedElement) getReferences()[0].getElement(), (SQFPrivateDeclVar) this);
+		return getReferences()[0];
 	}
 
 	@NotNull
 	@Override
 	public PsiReference[] getReferences() {
 		SQFScope myContainingScope = SQFPsiUtil.getContainingScope(this);
-		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(myContainingScope, SQFTypes.VARIABLE, null, this.varName);
+		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(myContainingScope, SQFTypes.VARIABLE, null, this.getVarName());
 		ArrayList<PsiReference> references = new ArrayList<>();
 		SQFVariable var;
 		for (ASTNode node : nodes) {
 			var = (SQFVariable) node.getPsi();
 			if (var.getDeclarationScope() == myContainingScope) {
-				references.add(var.getReference());
+				references.add(new SQFLocalVarReference(var, (SQFPrivateDeclVar) this));
 			}
 		}
 		return references.toArray(new PsiReference[references.size()]);
@@ -90,7 +73,7 @@ public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement implements SQFP
 
 	@Override
 	public String getVarName() {
-		return this.varName;
+		return super.getText().substring(1, this.getTextLength() - 1); //do not store it because when the text is changed, the stored value wouldn't be up to date
 	}
 
 }

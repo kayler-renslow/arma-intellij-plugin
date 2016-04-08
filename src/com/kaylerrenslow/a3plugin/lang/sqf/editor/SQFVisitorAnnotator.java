@@ -19,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -70,17 +71,6 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 		}
 		Annotation a = annotator.createWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_not_private"));
 		a.registerFix(new SQFAnnotatorFixNotPrivate(var, declScope));
-	}
-
-	@Override
-	public void visitPrivateDecl(@NotNull SQFPrivateDecl privateDecl) {
-		super.visitPrivateDecl(privateDecl);
-//		ArrayList<PsiElement> vars =PsiUtil.findDescendantElementsOfInstance(SQFPsiUtil.getContainingScope(privateDecl), SQFVariable.class, null);
-//		SQFVariable variable;
-//		for(PsiElement element : vars){
-//			variable = (SQFVariable)element;
-//
-//		}
 	}
 
 	@Override

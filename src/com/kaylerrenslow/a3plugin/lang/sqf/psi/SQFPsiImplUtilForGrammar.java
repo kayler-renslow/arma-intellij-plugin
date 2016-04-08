@@ -8,6 +8,7 @@ import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -30,7 +31,7 @@ public class SQFPsiImplUtilForGrammar{
 	/**Get's the assigning variable for the given SQFAssignment. Example:<br>
 	 * <p>
 	 *     variable = 1+1; //variable is assigning variable
-	 * <p/>
+	 * </p>
 	 */
 	public static SQFVariable getAssigningVariable(SQFAssignment assignment){
 		return assignment.getVariable();
@@ -103,6 +104,10 @@ public class SQFPsiImplUtilForGrammar{
 			}
 		}
 		return list;
+	}
+
+	public static String toString (SQFPrivateDeclVar var){
+		return "SQFPrivateDeclVar{"+var.getVarName()+"}";
 	}
 
 }

@@ -102,7 +102,7 @@ code_block ::= LBRACE local_scope RBRACE
 
 /*control structures and other things*/
     private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET) {methods=[getPrivateDeclVars]}//do not allow private[]
-	private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclNamedElement"}
+	private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclNamedElement" methods=[toString]}
 
 
     scope_manager ::= GOTO COLON STRING_LITERAL

@@ -1,6 +1,5 @@
 >add @see functionality for documentation that will create a link to a psi element (including psi files)
 
->annotator: when private decl var is updated, variables aren't correctly checking if they are declared private or not. Their containing scope appear to be caching private decl var list.
 >refactoring local variables is broken
 
 To fill the completion list for named element references, the IDE calls PsiReference.getVariants() (use this instead of getReferences)

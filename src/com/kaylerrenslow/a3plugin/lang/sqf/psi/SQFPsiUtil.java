@@ -143,6 +143,7 @@ public class SQFPsiUtil {
 
 	@NotNull
 	public static SQFPrivateDeclVar createPrivateDeclVarElement(@NotNull Project project, @NotNull String varName) {
+		System.out.println("SQFPsiUtil.createPrivateDeclVarElement " + varName);
 		SQFFile file = createFile(project, "private \"" + varName + "\";");
 		return (SQFPrivateDeclVar) PsiUtil.findDescendantElements(file, SQFTypes.PRIVATE_DECL_VAR, null).get(0).getPsi();
 	}
