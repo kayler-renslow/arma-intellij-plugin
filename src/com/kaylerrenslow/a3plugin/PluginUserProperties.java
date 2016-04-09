@@ -26,6 +26,10 @@ public class PluginUserProperties{
 		return pluginProps.getProperty(key.keyName, key.defaultValue);
 	}
 
+	public boolean propertyIsTrue(Plugin.UserPropertiesKey key){
+		return getPluginProperty(key).equalsIgnoreCase("true");
+	}
+
 	private void load(){
 		loadPluginProps();
 	}

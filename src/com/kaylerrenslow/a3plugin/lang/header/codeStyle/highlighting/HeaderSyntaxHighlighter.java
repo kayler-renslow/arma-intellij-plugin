@@ -38,6 +38,8 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey STRING = createTextAttributesKey("A3_HEADER_STRING", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey NUM = createTextAttributesKey("A3_HEADER_NUM", DefaultLanguageHighlighterColors.NUMBER);
 
+	public static final TextAttributesKey STRINGTABLE_VALUE = createTextAttributesKey("A3_HEADER_STRINGTABLE_VALUE", DefaultLanguageHighlighterColors.METADATA);
+
 	private static final TextAttributesKey[] OPERATOR_KEYS = new TextAttributesKey[]{OPERATOR};
 	private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
 	private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
@@ -54,6 +56,7 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 	private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
 
 	private static final TextAttributesKey[] PREPROCESSOR_KEYS = new TextAttributesKey[]{PREPROCESSOR};
+	private static final TextAttributesKey[] STRINGTABLE_VALUE_KEYS = new TextAttributesKey[]{STRINGTABLE_VALUE};
 
 	private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
@@ -110,6 +113,9 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 			if(tokenType.equals(e)){
 				return PREPROCESSOR_KEYS;
 			}
+		}
+		if(tokenType == HeaderTypes.STRINGTABLE_ENTRY){
+			return STRINGTABLE_VALUE_KEYS;
 		}
 		if (tokenType.equals(TokenType.BAD_CHARACTER)){
 			return BAD_CHAR_KEYS;

@@ -17,6 +17,7 @@ import com.intellij.psi.impl.source.tree.JavaDocElementType;
     return;
 %eof}
 
+STRINGTABLE_ENTRY = "$STR_" [:jletter:] [:jletterdigit:]*
 IDENTIFIER = [:jletter:] [:jletterdigit:]*
 //NUM_IDENTIFIER = [:jletterdigit:]+
 
@@ -51,6 +52,7 @@ STRING_LITERAL = {STRING_PART}+
 
 INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 
+
 %%
 
 <YYINITIAL> {IGNORE} { return HeaderTypes.WHITE_SPACE; }
@@ -65,6 +67,7 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 <YYINITIAL> {STRING_LITERAL} { return HeaderTypes.STRING_LITERAL; }
 <YYINITIAL> {INCLUDE_VALUE_ANGBR} { return HeaderTypes.INCLUDE_VALUE_ANGBR; }
 
+<YYINITIAL> {STRINGTABLE_ENTRY} { return HeaderTypes.STRINGTABLE_ENTRY; }
 
 <YYINITIAL> "class" { return HeaderTypes.CLASS; }
 
@@ -87,7 +90,6 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 
 //<YYINITIAL> "\\" { return HeaderTypes.BSLASH; }
 
-<YYINITIAL> "$"   { return HeaderTypes.DOLLAR; }
 <YYINITIAL> "="   { return HeaderTypes.EQ; }
 
 <YYINITIAL> "+"   { return HeaderTypes.PLUS; }

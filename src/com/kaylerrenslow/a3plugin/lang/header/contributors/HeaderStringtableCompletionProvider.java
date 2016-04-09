@@ -1,0 +1,39 @@
+package com.kaylerrenslow.a3plugin.lang.header.contributors;
+
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionProvider;
+import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.util.ProcessingContext;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
+import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.FileNotFoundException;
+
+/**
+ * @author Kayler
+ * Auto completion for $str_
+ * Created on 04/09/2016.
+ */
+public class HeaderStringtableCompletionProvider extends CompletionProvider<CompletionParameters> {
+	@Override
+	protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
+		Stringtable table;
+		Module module = PluginUtil.getModuleForPsiFile(parameters.getOriginalFile());
+		try{
+			table = ArmaProjectDataManager.getInstance().getDataForModule(module).getStringtable();
+		}catch (FileNotFoundException e){
+			e.printStackTrace(System.out);
+			return;
+		}
+		StringtableKey[] keys = table.getAllKeysValues(parameters.getEditor().getProject());
+		for(StringtableKey key : keys){
+			result.addElement(LookupElementBuilder.createWithSmartPointer(key.getDollarKeyName(), key.getXmlTag()).withTailText(" (" + key.getContainerName()+")", true));
+		}
+	}
+}

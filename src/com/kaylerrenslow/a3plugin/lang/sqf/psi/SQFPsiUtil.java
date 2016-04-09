@@ -94,12 +94,7 @@ public class SQFPsiUtil {
 	public static List<SQFVariable> findGlobalVariables(@NotNull Project project, @NotNull SQFVariable findVar) {
 		List<SQFVariable> result = new ArrayList<>();
 		Module m = PluginUtil.getModuleForPsiFile(findVar.getContainingFile());
-		GlobalSearchScope searchScope;
-		if(m == null){
-			searchScope = GlobalSearchScope.projectScope(project);
-		}else{
-			searchScope = m.getModuleContentScope();
-		}
+		GlobalSearchScope searchScope = m.getModuleContentScope();
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, searchScope);
 		for (VirtualFile virtualFile : files) {
 			SQFFile sqfFile = (SQFFile) PsiManager.getInstance(project).findFile(virtualFile);

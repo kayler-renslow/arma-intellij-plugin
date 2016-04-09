@@ -17,6 +17,8 @@
 // @formatter:off
 headerFile ::= file_entry*
 
+file_entries ::= file_entry*
+
 //TODO when $ is typed, look into stringtable.xml (try using annotator)
 //TODO add in \ lexer rule that is a waiting value just like in the properties custom language demo. This will work for any assignment
 //TODO maybe use annotator for SQF config retrieval (config >> "var"). check if the PsiFile is over HeaderFile so you can't annotate in any other language
@@ -25,9 +27,8 @@ file_entry ::=  WHITE_SPACE | INLINE_COMMENT | BLOCK_COMMENT | statement_ | prep
 private statement_ ::= (assignment | class_declaration) SEMICOLON
 
 private number_ ::= NUMBER_LITERAL | HEX_LITERAL
-private value_ ::= stringtable_entry | STRING_LITERAL | number_ | IDENTIFIER
+private value_ ::= STRINGTABLE_ENTRY | STRING_LITERAL | number_ | IDENTIFIER
 
-stringtable_entry ::= DOLLAR IDENTIFIER
 
 array ::= LBRACE array_body? RBRACE
 array_body ::= array_entry (COMMA array_entry)*
@@ -56,10 +57,10 @@ private term_ ::= (PLUS | MINUS)? (
 		  )
 
 
-class_declaration ::= class_stub class_content? {methods=[getClassName getAttributes hasAttributes]}
-class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? {methods=[getClassName]}
+class_declaration ::= class_stub class_content? {methods=[getClassName getAttributes hasAttributes getClassNameNode]}
+class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? {methods=[getClassName getClassNameNode]}
 
-class_content ::= LBRACE file_entry* RBRACE
+class_content ::= LBRACE file_entries RBRACE
 
 //Preprocessor things
 preprocessor_group ::= preprocessor+

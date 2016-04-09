@@ -9,6 +9,7 @@
 
 	<change-notes></change-notes>
 
+
 	<idea-version since-build="131"/>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- SQF Language -->
@@ -41,11 +42,15 @@
 		<lang.foldingBuilder language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderFoldingBuilder" />
 		<externalAnnotator language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.SharedExternalAnnotator"/>
 		<annotator language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderAnnotator"/>
+		<lang.documentationProvider language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderDocumentationProvider"/>
 
 		<!-- Shared for Languages -->
 		<usageTypeProvider implementation="com.kaylerrenslow.a3plugin.lang.shared.ArmaUsageTypeProvider"/>
-		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/a3plugin/colorSchemes.xml" />
-		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/a3plugin/colorSchemes.xml" />
+		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/a3plugin/armaPluginColorSchemes.xml" />
+		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/a3plugin/armaPluginColorSchemes.xml" />
+
+		<!-- Stringtable-->
+		<dom.fileDescription implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.StringtableDomFileDescription" />
 
 		<!-- Other things-->
 		<moduleBuilder builderClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleBuilder" />

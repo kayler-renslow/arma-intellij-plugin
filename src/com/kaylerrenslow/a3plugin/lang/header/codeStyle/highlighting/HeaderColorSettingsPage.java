@@ -30,7 +30,8 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 			new AttributesDescriptor("Brace", HeaderSyntaxHighlighter.BRACE),
 			new AttributesDescriptor("Bracket", HeaderSyntaxHighlighter.BRACKET),
 			new AttributesDescriptor("Parenthesis", HeaderSyntaxHighlighter.PAREN),
-			new AttributesDescriptor("Comma", HeaderSyntaxHighlighter.COMMA)
+			new AttributesDescriptor("Comma", HeaderSyntaxHighlighter.COMMA),
+			new AttributesDescriptor("Stringtable Value", HeaderSyntaxHighlighter.STRINGTABLE_VALUE)
 	};
 
 	@Nullable

@@ -1,6 +1,13 @@
 <?xml version='1.0'?>
 <list>
 	<!-- Shared -->
+	<option name="A3_BAD_WORD">
+		<value>
+			<option name="FOREGROUND" value="FF0000"/>
+			<option name="EFFECT_TYPE" value="2" />
+			<option name="EFFECT_COLOR" value="FF0000" />
+		</value>
+	</option>
 
 	<!-- SQF -->
 	<option name="A3_SQF_COMMENT_NOTE">

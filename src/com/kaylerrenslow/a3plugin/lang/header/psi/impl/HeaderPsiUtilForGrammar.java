@@ -23,13 +23,21 @@ import java.util.List;
  *         Created on 01/01/2016.
  */
 public class HeaderPsiUtilForGrammar {
+
+	public static ASTNode getClassNameNode(HeaderClassDeclaration declaration){
+		return getClassNameNode(declaration.getClassStub());
+	}
+
+	public static ASTNode getClassNameNode(HeaderClassStub classStub){
+		return PsiUtil.getNextSiblingNotWhitespace(classStub.getFirstChild().getNode());
+	}
+
 	public static String getClassName(HeaderClassDeclaration decl) {
 		return getClassName(decl.getClassStub());
 	}
 
 	public static String getClassName(HeaderClassStub classStub) {
-		ASTNode node = PsiUtil.getNextSiblingNotWhitespace(classStub.getFirstChild().getNode());
-		return node.getText();
+		return getClassNameNode(classStub).getText();
 	}
 
 	public static String getPathString(HeaderPreInclude include){
@@ -77,7 +85,7 @@ public class HeaderPsiUtilForGrammar {
 	public static Attribute[] getAttributes(HeaderClassDeclaration decl, boolean traverseIncludes) {
 		ArrayList<Attribute> attributesList = new ArrayList<>();
 		if(decl.getClassContent() != null){
-			getAttributes(decl.getClassContent().getFileEntryList(), traverseIncludes, attributesList);
+			getAttributes(decl.getClassContent().getFileEntries().getFileEntryList(), traverseIncludes, attributesList);
 		}
 		return attributesList.toArray(new Attribute[attributesList.size()]);
 	}
@@ -92,7 +100,7 @@ public class HeaderPsiUtilForGrammar {
 						if(includedFile != null){
 							HeaderClassDeclaration firstClass = (HeaderClassDeclaration)PsiUtil.findFirstDescendantElement(includedFile, HeaderClassDeclaration.class);
 							if(firstClass.getClassContent() != null){
-								getAttributes(firstClass.getClassContent().getFileEntryList(), true, attributesList);
+								getAttributes(firstClass.getClassContent().getFileEntries().getFileEntryList(), true, attributesList);
 							}
 						}
 					}

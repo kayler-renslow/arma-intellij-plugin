@@ -1,6 +1,7 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
@@ -25,7 +26,7 @@ import java.util.ArrayList;
  *         Does the backend work for SQF auto completion operations
  *         Created on 01/02/2016.
  */
-public class SQFCompletionProvider extends com.intellij.codeInsight.completion.CompletionProvider<CompletionParameters> {
+public class SQFCompletionProvider extends CompletionProvider<CompletionParameters> {
 
 	@Override
 	protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {

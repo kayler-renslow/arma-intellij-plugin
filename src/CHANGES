@@ -1,13 +1,13 @@
 plugin
-	none
+	stringtable reading xml api
+	fixed bug where module couldn't be fetched because the given psiFile's virtual file was null
 
 shared between languages
-	none
+	documentation method for stringtable keys
 
 SQF
-	moved anonymous item presentation into actual classes.
-	global variables that are functions now have their own item presentation
-	auto completion will auto complete functions when either call or spawn is typed or _fnc is typed
+	none
 
 Header
-    made the exceptions thrown from fetching config defined functions extends a common base class (GenericConfigException)
+    annotator that checks if a class is already defined in configs
+    autocompletion for stringtable entries
