@@ -7,6 +7,7 @@ import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
+import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderFile;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,9 +34,9 @@ public class ArmaModuleData{
 	 * Get a HeaderFile instance that points to the mission's description.ext
 	 *
 	 * @return description.ext as HeaderFile
-	 * @throws FileNotFoundException when description.ext doesn't exist
+	 * @throws DescriptionExtNotDefinedException when description.ext doesn't exist
 	 */
-	public HeaderFile getDescriptionExt() throws FileNotFoundException{
+	public HeaderFile getDescriptionExt() throws DescriptionExtNotDefinedException {
 		if(descriptionExt != null && descriptionExt.getVirtualFile().exists()){
 			return descriptionExt;
 		}
@@ -46,7 +47,7 @@ public class ArmaModuleData{
 				return this.descriptionExt;
 			}
 		}
-		throw new FileNotFoundException("description.ext doesn't exist");
+		throw new DescriptionExtNotDefinedException();
 
 	}
 }

@@ -10,7 +10,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 04/08/2016.
+ * @author Kayler
+ * This type of reference is used between a local variable (e.g. _var) and a private declaration (private ["_var"])
+ * Created on 04/08/2016.
  */
 public class SQFLocalVarDeclReference implements PsiReference {
 	private final SQFVariable targetVar;

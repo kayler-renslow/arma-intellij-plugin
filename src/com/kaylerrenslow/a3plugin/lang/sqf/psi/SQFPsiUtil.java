@@ -3,15 +3,15 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiComment;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFileFactory;
-import com.intellij.psi.PsiManager;
+import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.intellij.util.xml.ModuleContentRootSearchScope;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
@@ -94,7 +94,13 @@ public class SQFPsiUtil {
 	public static List<SQFVariable> findGlobalVariables(@NotNull Project project, @NotNull SQFVariable findVar) {
 		List<SQFVariable> result = new ArrayList<>();
 		Module m = PluginUtil.getModuleForPsiFile(findVar.getContainingFile());
-		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, m.getModuleContentScope());
+		GlobalSearchScope searchScope;
+		if(m == null){
+			searchScope = GlobalSearchScope.projectScope(project);
+		}else{
+			searchScope = m.getModuleContentScope();
+		}
+		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, searchScope);
 		for (VirtualFile virtualFile : files) {
 			SQFFile sqfFile = (SQFFile) PsiManager.getInstance(project).findFile(virtualFile);
 			if (sqfFile == null) {

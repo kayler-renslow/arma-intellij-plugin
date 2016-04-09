@@ -4,14 +4,12 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiReference;
-import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFPrivateDeclVarItemPresentation;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFLocalVarDeclReference;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.ArrayList;
 
 /**
@@ -27,29 +25,9 @@ public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement implements SQFP
 
 	@Override
 	public ItemPresentation getPresentation() {
-		String text = getText();
-		String location = this.getContainingFile().getName();
-		return new ItemPresentation() {
-			@Nullable
-			@Override
-			public String getPresentableText() {
-				return text;
-			}
-
-			@Nullable
-			@Override
-			public String getLocationString() {
-				return location;
-			}
-
-			@Nullable
-			@Override
-			public Icon getIcon(boolean unused) {
-				return PluginIcons.ICON_SQF_VARIABLE;
-			}
-		};
+		return new SQFPrivateDeclVarItemPresentation((SQFPrivateDeclVar) this);
 	}
-//
+
 	@Override
 	public PsiReference getReference() {
 		return getReferences()[0];

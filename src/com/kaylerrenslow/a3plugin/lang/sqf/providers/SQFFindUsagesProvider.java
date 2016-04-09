@@ -33,6 +33,10 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@Override
 	public String getHelpId(@NotNull PsiElement psiElement) {
 		if(psiElement instanceof SQFVariable){
+			SQFVariable var = (SQFVariable)psiElement;
+			if(var.followsSQFFunctionNameRules()){
+				return "Function";
+			}
 			return "Value read";
 		}
 		return getClass().getName() + " getHelpId";
@@ -42,6 +46,10 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@Override
 	public String getType(@NotNull PsiElement element) {
 		if(element instanceof SQFVariable){
+			SQFVariable var = (SQFVariable)element;
+			if(var.followsSQFFunctionNameRules()){
+				return "Function";
+			}
 			return "Variable";
 		}
 		return "unknown type";

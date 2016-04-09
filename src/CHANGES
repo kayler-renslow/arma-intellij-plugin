@@ -5,8 +5,9 @@ shared between languages
 	none
 
 SQF
-	fixed finding references for global vars
-	all local variables will reference each other now
+	moved anonymous item presentation into actual classes.
+	global variables that are functions now have their own item presentation
+	auto completion will auto complete functions when either call or spawn is typed or _fnc is typed
 
 Header
-    none
+    made the exceptions thrown from fetching config defined functions extends a common base class (GenericConfigException)

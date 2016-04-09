@@ -5,6 +5,7 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.GlobalSearchScope;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.net.URL;
@@ -26,8 +27,12 @@ public class PluginUtil{
 		return f;
 	}
 
+	@Nullable
 	public static Module getModuleForPsiFile(PsiFile file){
 		final ProjectFileIndex index = ProjectRootManager.getInstance(file.getProject()).getFileIndex();
+		if(file.getVirtualFile() == null){
+			return null;
+		}
 		final Module module = index.getModuleForFile(file.getVirtualFile());
 		return module;
 	}

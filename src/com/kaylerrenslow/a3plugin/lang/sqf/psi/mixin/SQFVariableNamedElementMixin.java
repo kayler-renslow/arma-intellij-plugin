@@ -4,20 +4,22 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.a3plugin.PluginIcons;
+import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFFunctionItemPresentation;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFVariableItemPresentation;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
 import java.util.ArrayList;
 
 /**
@@ -40,27 +42,19 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 
 	@Override
 	public ItemPresentation getPresentation() {
-		PsiFile file = this.getContainingFile();
-		PsiElement element = this;
-		return new ItemPresentation() {
-			@Nullable
-			@Override
-			public String getPresentableText() {
-				return element.getText();
+		if(this.myVariableElementType == SQFTypes.GLOBAL_VAR){
+			if(SQFPsiUtil.followsSQFFunctionNameRules(this.getVarName())){
+				try{
+					HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(this.getContainingFile(), this.getVarName());
+					if(function != null){
+						return new SQFFunctionItemPresentation(function);
+					}
+				}catch (GenericConfigException e) {
+					System.out.println(e.getMessage());
+				}
 			}
-
-			@Nullable
-			@Override
-			public String getLocationString() {
-				return file.getName();
-			}
-
-			@Nullable
-			@Override
-			public Icon getIcon(boolean unused) {
-				return PluginIcons.ICON_SQF_VARIABLE;
-			}
-		};
+		}
+		return new SQFVariableItemPresentation((SQFVariable) this);
 	}
 
 	@NotNull

@@ -3,9 +3,10 @@ package com.kaylerrenslow.a3plugin.lang.header.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.kaylerrenslow.a3plugin.lang.header.ConfigClassNotDefinedException;
-import com.kaylerrenslow.a3plugin.lang.header.FunctionNotDefinedInConfigException;
-import com.kaylerrenslow.a3plugin.lang.header.MalformedConfigException;
+import com.kaylerrenslow.a3plugin.lang.header.exception.ConfigClassNotDefinedException;
+import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
+import com.kaylerrenslow.a3plugin.lang.header.exception.FunctionNotDefinedInConfigException;
+import com.kaylerrenslow.a3plugin.lang.header.exception.MalformedConfigException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
@@ -17,7 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -186,12 +186,12 @@ public class HeaderPsiUtil {
 	 * @param functionName full function name (example: tag_fnc_functionClassName )
 	 * @return new HeaderConfigFunction instance for the given function name, or null if the functionName is formatted wrong
 	 * @throws ConfigClassNotDefinedException      when CfgFunctions is not defined in description.ext
-	 * @throws FileNotFoundException               when there is no description.ext
+	 * @throws DescriptionExtNotDefinedException              when there is no description.ext
 	 * @throws FunctionNotDefinedInConfigException when the function isn't defined anywhere in CfgFunctions in description.ext
 	 * @throws MalformedConfigException            when the config file is incorrectly being used, formatted, or syntactically incorrect
 	 */
 	@Nullable
-	public static HeaderConfigFunction getFunctionFromCfgFunctions(@NotNull PsiFile psiFile, @NotNull String functionName) throws ConfigClassNotDefinedException, FileNotFoundException, FunctionNotDefinedInConfigException, MalformedConfigException {
+	public static HeaderConfigFunction getFunctionFromCfgFunctions(@NotNull PsiFile psiFile, @NotNull String functionName) throws ConfigClassNotDefinedException, DescriptionExtNotDefinedException, FunctionNotDefinedInConfigException, MalformedConfigException {
 		//@formatter:off
 		/*
 		  //some functions
@@ -322,10 +322,10 @@ public class HeaderPsiUtil {
 	/** Get a list of all functions in the CfgFunctions class
 	 * @param file any PsiFile inside the current module
 	 * @return list of functions
-	 * @throws FileNotFoundException when Description.ext doesn't exist
+	 * @throws DescriptionExtNotDefinedException when Description.ext doesn't exist
 	 * @throws ConfigClassNotDefinedException when CfgFunctions doesn't exist
 	 */
-	public static ArrayList<HeaderConfigFunction> getAllConfigFunctionsFromDescriptionExt(PsiFile file) throws FileNotFoundException, ConfigClassNotDefinedException {
+	public static ArrayList<HeaderConfigFunction> getAllConfigFunctionsFromDescriptionExt(PsiFile file) throws DescriptionExtNotDefinedException, ConfigClassNotDefinedException {
 		HeaderClassDeclaration cfgFunc = getCfgFunctions(file);
 
 		ArrayList<HeaderClassDeclaration> tagClasses = getClassDeclarationsWithEntriesEqual(cfgFunc, null, null, true, 1, 1);
@@ -370,11 +370,11 @@ public class HeaderPsiUtil {
 	 * @param psiFile HeaderFile instance to retrieve the description.ext for. Since the project can have multiple modules (which means multiple description.ext's),
 	 *                specifying any file in a module will get the description.ext for the HeaderFile's module
 	 * @return class declaration
-	 * @throws FileNotFoundException          when description.ext doesn't exist
+	 * @throws DescriptionExtNotDefinedException          when description.ext doesn't exist
 	 * @throws ConfigClassNotDefinedException where CfgFunctions isn't defined inside description.ext
 	 */
 	@Nullable
-	public static HeaderClassDeclaration getCfgFunctions(PsiFile psiFile) throws FileNotFoundException, ConfigClassNotDefinedException {
+	public static HeaderClassDeclaration getCfgFunctions(PsiFile psiFile) throws DescriptionExtNotDefinedException, ConfigClassNotDefinedException {
 		HeaderFile file = ArmaProjectDataManager.getInstance().getDataForModule(PluginUtil.getModuleForPsiFile(psiFile)).getDescriptionExt();
 		HeaderClassDeclaration cfgFunc = getClassDeclaration(file, "CfgFunctions", true, 1, 1);
 		if(cfgFunc == null){

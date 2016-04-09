@@ -6,22 +6,18 @@ import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNamedElement;
 import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.PluginIcons;
-import com.kaylerrenslow.a3plugin.lang.header.ConfigClassNotDefinedException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
-import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace;
 import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -45,7 +41,8 @@ public class SQFCompletionProvider extends com.intellij.codeInsight.completion.C
 			return;
 		}
 		ASTNode prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode().getTreeParent()); //get parent because local_var and global_var is inside SQFTypes.VARIABLE
-		if (PsiUtil.isOfElementType(prevSiblingNotWhitespace, SQFTypes.COMMAND) && (prevSiblingNotWhitespace.getText().equals("call") || prevSiblingNotWhitespace.getText().equals("spawn"))) {
+		boolean isFunctionCallExp = PsiUtil.isOfElementType(prevSiblingNotWhitespace, SQFTypes.COMMAND) && (prevSiblingNotWhitespace.getText().equals("call") || prevSiblingNotWhitespace.getText().equals("spawn"));
+		if (isFunctionCallExp || cursor.getText().contains("_fnc")) {
 			try {
 				ArrayList<HeaderConfigFunction> configFunctions = HeaderPsiUtil.getAllConfigFunctionsFromDescriptionExt(parameters.getOriginalFile());
 				String tailTextFormat = " " + Plugin.resources.getString("lang.sqf.completion.tail_text.function");

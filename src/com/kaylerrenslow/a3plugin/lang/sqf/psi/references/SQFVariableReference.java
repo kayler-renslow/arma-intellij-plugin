@@ -13,7 +13,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 04/08/2016.
+ * @author Kayler
+ * This type of reference is used between two variables. Both variables must have the same element type.
+ * Created on 04/08/2016.
  */
 public class SQFVariableReference implements PsiReference {
 	private final SQFVariable target, var;
