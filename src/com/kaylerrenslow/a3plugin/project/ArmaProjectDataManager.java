@@ -1,6 +1,10 @@
 package com.kaylerrenslow.a3plugin.project;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.psi.PsiFile;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 
 import java.util.ArrayList;
 
@@ -17,6 +21,7 @@ public final class ArmaProjectDataManager {
 	public static ArmaProjectDataManager getInstance(){
 		return INSTANCE;
 	}
+
 
 	public ArmaModuleData getDataForModule(Module module){
 		for(ArmaModuleData moduleData : moduleDataList){

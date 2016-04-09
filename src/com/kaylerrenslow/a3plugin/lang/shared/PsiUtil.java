@@ -171,20 +171,20 @@ public class PsiUtil {
 	}
 
 
-	public static ArrayList<PsiElement> findDescendantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor){
-		ArrayList<PsiElement> list = new ArrayList<>();
+	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor){
+		ArrayList<E> list = new ArrayList<>();
 		findDescdantElementsOfInstance(rootElement, type, cursor, list);
 		return list;
 	}
 
-	private static void findDescdantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor, ArrayList<PsiElement> list){
+	private static <E extends PsiElement> void findDescdantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor, ArrayList<E> list){
 		PsiElement child = rootElement.getFirstChild();
 		while(child != null){
 			if(cursor != null && child == cursor){
 				continue;
 			}
-			if(type.isAssignableFrom(rootElement.getClass())){
-				list.add(child);
+			if(type.isAssignableFrom(child.getClass())){
+				list.add((E)child);
 			}
 			findDescdantElementsOfInstance(child, type, cursor, list);
 			child = child.getNextSibling();

@@ -5,9 +5,8 @@ shared between languages
 	none
 
 SQF
-	FIXED: annotator: when private decl var is updated, variables aren't correctly checking if they are declared private or not. Their containing scope appear to be caching private decl var list.
-	        I fixed this by NOT STORING THE VAR NAME and instead fetching it from node.getText
-	fixed references!!!!
+	fixed finding references for global vars
+	all local variables will reference each other now
 
 Header
     none

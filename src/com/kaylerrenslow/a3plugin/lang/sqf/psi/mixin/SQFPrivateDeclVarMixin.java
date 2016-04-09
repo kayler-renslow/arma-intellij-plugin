@@ -7,7 +7,7 @@ import com.intellij.psi.PsiReference;
 import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFLocalVarReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFLocalVarDeclReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -65,7 +65,7 @@ public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement implements SQFP
 		for (ASTNode node : nodes) {
 			var = (SQFVariable) node.getPsi();
 			if (var.getDeclarationScope() == myContainingScope) {
-				references.add(new SQFLocalVarReference(var, (SQFPrivateDeclVar) this));
+				references.add(new SQFLocalVarDeclReference(var, (SQFPrivateDeclVar) this));
 			}
 		}
 		return references.toArray(new PsiReference[references.size()]);

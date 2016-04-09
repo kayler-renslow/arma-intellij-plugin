@@ -1,5 +1,6 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiComment;
@@ -7,7 +8,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.intellij.psi.util.PsiTreeUtil;
@@ -15,7 +15,7 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
-import com.sun.istack.internal.Nullable;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -84,22 +84,23 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 * Adds all SQFVariables in the entire project that is equal to findVar into a list and returns it
+	 * Adds all SQFVariables in the current module that is equal to findVar into a list and returns it
 	 *
 	 * @param project project
-	 * @param findVar variable text to look for
+	 * @param findVar global variable
 	 * @return list
 	 */
 	@NotNull
-	public static List<SQFVariable> findGlobalVariables(@NotNull Project project, @Nullable String findVar) {
+	public static List<SQFVariable> findGlobalVariables(@NotNull Project project, @NotNull SQFVariable findVar) {
 		List<SQFVariable> result = new ArrayList<>();
-		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, GlobalSearchScope.allScope(project));
+		Module m = PluginUtil.getModuleForPsiFile(findVar.getContainingFile());
+		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, m.getModuleContentScope());
 		for (VirtualFile virtualFile : files) {
 			SQFFile sqfFile = (SQFFile) PsiManager.getInstance(project).findFile(virtualFile);
 			if (sqfFile == null) {
 				continue;
 			}
-			SQFVariable[] vars = PsiTreeUtil.getChildrenOfType(sqfFile, SQFVariable.class);
+			ArrayList<SQFVariable> vars = PsiUtil.<SQFVariable>findDescendantElementsOfInstance(sqfFile, SQFVariable.class, null);
 			if (vars == null) {
 				continue;
 			}
@@ -108,12 +109,8 @@ public class SQFPsiUtil {
 				if (type != SQFTypes.GLOBAL_VAR) {
 					continue;
 				}
-				if (findVar == null) {
+				if (findVar.getVarName().equals(var.getVarName())) {
 					result.add(var);
-				} else {
-					if (findVar.equals(var.getText())) {
-						result.add(var);
-					}
 				}
 			}
 		}
@@ -143,7 +140,6 @@ public class SQFPsiUtil {
 
 	@NotNull
 	public static SQFPrivateDeclVar createPrivateDeclVarElement(@NotNull Project project, @NotNull String varName) {
-		System.out.println("SQFPsiUtil.createPrivateDeclVarElement " + varName);
 		SQFFile file = createFile(project, "private \"" + varName + "\";");
 		return (SQFPrivateDeclVar) PsiUtil.findDescendantElements(file, SQFTypes.PRIVATE_DECL_VAR, null).get(0).getPsi();
 	}

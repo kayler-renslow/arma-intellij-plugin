@@ -5,17 +5,20 @@ import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.PluginIcons;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
+import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.ArrayList;
 
 /**
  * @author Kayler
@@ -60,38 +63,33 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 		};
 	}
 
-//	@NotNull
-//	@Override
-//	public PsiReference[] getReferences() {
-//		if (myVariableElementType == SQFTypes.LANG_VAR) {
-//			return new PsiReference[0];
-//		}
-//		PsiReference[] references;
-//		if (myVariableElementType == SQFTypes.GLOBAL_VAR) {
-//			references = ReferenceProvidersRegistry.getReferencesFromProviders(this);
-//		} else {
-//			SQFVariable me = ((SQFVariable) this);
-//			SQFScope varScope = me.getDeclarationScope();
-//			ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(me.getContainingFile(), SQFTypes.PRIVATE_DECL_VAR, null, "\"" + me.getVarName() + "\"");
-//			ArrayList<PsiElement> declVarsMatchedScope = new ArrayList<>();
-//			for (int i = 0; i < nodes.size(); i++) {
-//				if (varScope == SQFPsiUtil.getContainingScope(nodes.get(i).getPsi())) {
-//					declVarsMatchedScope.add(nodes.get(i).getPsi());
-//				}
-//			}
-//
-//			references = new PsiReference[declVarsMatchedScope.size()];
-//			for (int i = 0; i < declVarsMatchedScope.size(); i++) {
-//				references[i] = new SQFLocalVarReference(me, (SQFPrivateDeclVar) declVarsMatchedScope.get(i));
-//			}
-//		}
-//		return references;
-//	}
-//
-//	@Override
-//	public PsiReference getReference() {
-//		return getReferences()[0];
-//	}
+	@NotNull
+	@Override
+	public PsiReference[] getReferences() {
+		if (myVariableElementType == SQFTypes.GLOBAL_VAR) {
+			return ReferenceProvidersRegistry.getReferencesFromProviders(this);
+		}
+
+		SQFVariable me = ((SQFVariable) this);
+		SQFScope myVarScope = me.getDeclarationScope();
+
+		ArrayList<PsiReference> refs = new ArrayList<>();
+		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(myVarScope, SQFTypes.VARIABLE, null, me.getVarName());
+		SQFVariable other;
+		for (int i = 0; i < nodes.size(); i++) {
+			other = ((SQFVariable) nodes.get(i).getPsi());
+			if (myVarScope == other.getDeclarationScope()) {
+				refs.add(new SQFVariableReference(me, other));
+			}
+		}
+
+		return refs.toArray(new PsiReference[refs.size()]);
+	}
+
+	@Override
+	public PsiReference getReference() {
+		return getReferences()[0];
+	}
 
 	@Override
 	public String toString() {

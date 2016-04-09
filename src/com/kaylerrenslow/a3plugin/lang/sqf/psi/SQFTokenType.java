@@ -13,6 +13,7 @@ import java.util.Hashtable;
 public class SQFTokenType extends IElementType{
 
 	private static final Hashtable<String, String> debugNameLookup = new Hashtable<>();
+	private final String tokenName;
 
 	private String newDebugName;
 
@@ -98,10 +99,15 @@ public class SQFTokenType extends IElementType{
 	public SQFTokenType(String debugName) {
 		super(debugName, SQFLanguage.INSTANCE);
 		this.newDebugName = getNewDebugName(debugName);
+		this.tokenName = debugName;
 	}
 
 	@Override
 	public String toString(){
 		return this.newDebugName;
+	}
+
+	public String getTokenName(){
+		return this.tokenName;
 	}
 }

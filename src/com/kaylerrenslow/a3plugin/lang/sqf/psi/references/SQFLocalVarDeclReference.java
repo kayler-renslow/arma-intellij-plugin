@@ -12,12 +12,12 @@ import org.jetbrains.annotations.Nullable;
 /**
  * Created by Kayler on 04/08/2016.
  */
-public class SQFLocalVarReference implements PsiReference {
-	private final SQFVariable var;
+public class SQFLocalVarDeclReference implements PsiReference {
+	private final SQFVariable targetVar;
 	private final SQFPrivateDeclVar declVar;
 
-	public SQFLocalVarReference(SQFVariable var, SQFPrivateDeclVar declVar) {
-		this.var = var;
+	public SQFLocalVarDeclReference(SQFVariable targetVar, SQFPrivateDeclVar declVar) {
+		this.targetVar = targetVar;
 		this.declVar = declVar;
 	}
 
@@ -34,18 +34,17 @@ public class SQFLocalVarReference implements PsiReference {
 	@Nullable
 	@Override
 	public PsiElement resolve() {
-		return var;
+		return targetVar;
 	}
 
 	@NotNull
 	@Override
 	public String getCanonicalText() {
-		return var.getVarName();
+		return targetVar.getVarName();
 	}
 
 	@Override
 	public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-		var.setName(newElementName);
 		SQFPrivateDeclVar newElement = SQFPsiUtil.createPrivateDeclVarElement(declVar.getProject(), newElementName);
 		declVar.getParent().getNode().replaceChild(declVar.getNode(), newElement.getNode());
 		return declVar;
@@ -65,19 +64,6 @@ public class SQFLocalVarReference implements PsiReference {
 		SQFScope myScope = SQFPsiUtil.getContainingScope(declVar);
 		SQFScope otherScope = ((SQFVariable) element).getDeclarationScope();
 		return myScope == otherScope && other.getVarName().equals(getCanonicalText());
-		//		if (!(element instanceof SQFVariableNamedElement)) {
-		//			return false;
-		//		}
-		//		SQFVariableNamedElement other = (SQFVariableNamedElement) element;
-		//		PsiElement selfResolve = resolve();
-		//
-		//		boolean referenceTo = other.getVarName().equals(getCanonicalText()) && resolve() != other;
-		//
-		//		SQFScope myScope = ((SQFVariable) selfResolve).getDeclarationScope();
-		//		SQFScope otherScope = ((SQFVariable) element).getDeclarationScope();
-		//		referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == selfResolve.getContainingFile();
-		//		return referenceTo;
-
 	}
 
 	@NotNull
