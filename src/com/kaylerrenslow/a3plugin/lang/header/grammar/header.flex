@@ -23,10 +23,11 @@ IDENTIFIER = [:jletter:] [:jletterdigit:]*
 
 LINE_TERMINATOR = \r | \n | \r\n
 INPUT_CHARACTER = [^\r\n]
+MACRO_NEWLINE = (" \\\n" | " \\\r\n" | " \\\r") [ \t\f]*
+MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
 
-IGNORE = (" \\\n" | " \\\r\n" | " \\\r") [ \t\f]*
 
-WHITE_SPACE = [ \t\f] | {LINE_TERMINATOR}
+WHITE_SPACE = ([ \t\f] | {LINE_TERMINATOR})+
 
 BLOCK_COMMENT = "/*" ~"*/"
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
@@ -50,18 +51,28 @@ ESCAPE_SEQUENCE = \\[^\r\n]
 STRING_PART = "\"" ~"\""
 STRING_LITERAL = {STRING_PART}+
 
+
 INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
+FUNCTION_TAIL = {WHITE_SPACE}? "(" ([^\r\n()] | "(" [^\r\n()] ")")*? ")"
+EVAL = "__EVAL" {FUNCTION_TAIL}
+EXEC = "__EXEC" {FUNCTION_TAIL}
 
+MACRO_TEXT = {WHITE_SPACE} {MACRO_CHARACTER}+
 
+DEFINE   = "#define" {MACRO_TEXT}
+UNDEF    = "#undef" {MACRO_TEXT}
+IF_DEF   = "#ifdef" {MACRO_TEXT} {ELSE}? {END_IF}
+IF_N_DEF = "#ifndef" {MACRO_TEXT} {ELSE}? {END_IF}
+ELSE     = "#else" {MACRO_TEXT}
+END_IF   = "#endif"
 %%
 
-<YYINITIAL> {IGNORE} { return HeaderTypes.WHITE_SPACE; }
-<YYINITIAL> {WHITE_SPACE}+ { return HeaderTypes.WHITE_SPACE; }
+<YYINITIAL> {MACRO_NEWLINE} { return TokenType.WHITE_SPACE; }
+<YYINITIAL> {WHITE_SPACE} { return TokenType.WHITE_SPACE; }
 
 <YYINITIAL> {BLOCK_COMMENT} { return HeaderTypes.BLOCK_COMMENT; }
 <YYINITIAL> {INLINE_COMMENT} { return HeaderTypes.INLINE_COMMENT; }
 
-//<YYINITIAL> {NUM_IDENTIFIER} { return HeaderTypes.NUM_IDENTIFIER; }
 <YYINITIAL> {NUMBER_LITERAL} { return HeaderTypes.NUMBER_LITERAL; }
 <YYINITIAL> {HEX_LITERAL} { return HeaderTypes.HEX_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return HeaderTypes.STRING_LITERAL; }
@@ -72,19 +83,12 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 <YYINITIAL> "class" { return HeaderTypes.CLASS; }
 
 <YYINITIAL> "#include"  { return HeaderTypes.PREPROCESS_INCLUDE; }
-
-//<YYINITIAL> "#define"  { return HeaderTypes.PREPROCESS_DEFINE; }
-//<YYINITIAL> "#undef"  { return HeaderTypes.PREPROCESS_UNDEF; }
-//<YYINITIAL> "#ifdef"  { return HeaderTypes.PREPROCESS_IF_DEF; }
-//<YYINITIAL> "#ifndef"  { return HeaderTypes.PREPROCESS_IF_N_DEF; }
-//<YYINITIAL> "#else"  { return HeaderTypes.PREPROCESS_ELSE; }
-//<YYINITIAL> "#endif"  { return HeaderTypes.PREPROCESS_END_IF; }
-//<YYINITIAL> "#hash"  { return HeaderTypes.PREPROCESS_HASH; }
-//<YYINITIAL> "##"  { return HeaderTypes.PREPROCESS_HASH_HASH; }
-//<YYINITIAL> "__EXEC"  { return HeaderTypes.PREPROCESS_EXEC; }
-//<YYINITIAL> "__EVAL"  { return HeaderTypes.PREPROCESS_EVAL; }
-//<YYINITIAL> "__LINE__"  { return HeaderTypes.PREPROCESS_LINE; }
-//<YYINITIAL> "__FILE__"  { return HeaderTypes.PREPROCESS_FILE; }
+<YYINITIAL> {DEFINE}  { return HeaderTypes.PREPROCESS_DEFINE; }
+<YYINITIAL> {UNDEF}  { return HeaderTypes.PREPROCESS_UNDEF; }
+<YYINITIAL> {IF_DEF}  { return HeaderTypes.PREPROCESS_IF_DEF; }
+<YYINITIAL> {IF_N_DEF}  { return HeaderTypes.PREPROCESS_IF_N_DEF; }
+<YYINITIAL> {EXEC} { return HeaderTypes.PREPROCESS_EXEC; }
+<YYINITIAL> {EVAL} { return HeaderTypes.PREPROCESS_EVAL; }
 
 <YYINITIAL> {IDENTIFIER} { return HeaderTypes.IDENTIFIER; }
 
@@ -102,7 +106,6 @@ INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
 
 <YYINITIAL> "("   { return HeaderTypes.LPAREN; }
 <YYINITIAL> ")"   { return HeaderTypes.RPAREN; }
-
 
 
 <YYINITIAL> "[]"   { return HeaderTypes.BRACKET_PAIR; }

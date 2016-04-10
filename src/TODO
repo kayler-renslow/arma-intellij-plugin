@@ -1,6 +1,5 @@
 >add @see functionality for documentation that will create a link to a psi element (including psi files)
 
->refactoring local variables is broken
 >fix header block
 
 

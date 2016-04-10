@@ -27,11 +27,11 @@
 // @formatter:off
 sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
 
-file_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* {extends("file_scope")=local_scope}
-local_scope ::= item_* return_statement? (whitespace_comment_ | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars]}
+file_scope ::= item_* return_statement? (comment | BAD_CHARACTER)* {extends("file_scope")=local_scope}
+local_scope ::= item_* return_statement? (comment | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars]}
 
-private item_ ::= whitespace_comment_ | statement | BAD_CHARACTER
-private whitespace_comment_ ::= WHITE_SPACE | comment
+private item_ ::= comment | statement | BAD_CHARACTER
+
 comment ::= INLINE_COMMENT | BLOCK_COMMENT | COMMENT_COMMAND
 variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope]}
 
@@ -50,33 +50,33 @@ assignment ::= variable EQ (assignment | expression | switch_statement | if_stat
 
 expression::= exp_operand_ exp_operator_ expression | exp_operand_
 private exp_operand_ ::= (PLUS | MINUS | NOT | EXCL)? (macro_call | terminal_ COMMAND exp_operand_? | COMMAND exp_operand_ | COMMAND | terminal_)
-			 | code_block
-			 | ASSERT LPAREN expression RPAREN
+                       | code_block
+                       | ASSERT LPAREN expression RPAREN
 
 private exp_operator_ ::= PLUS
-			  | MINUS
+                        | MINUS
 
-			  | ASTERISK
-			  | FSLASH
-			  | PERC
-			  | MOD
-			  | CARET
+                        | ASTERISK
+                        | FSLASH
+                        | PERC
+                        | MOD
+                        | CARET
 
-			  | AND
-			  | AMPAMP
-			  | OR
-			  | BARBAR
+                        | AND
+                        | AMPAMP
+                        | OR
+                        | BARBAR
 
-			  | EXCL
-			  | NOT
-			  | EQEQ
-			  | NE
-			  | LT
-			  | GT
-			  | LE
-			  | GE
+                        | EXCL
+                        | NOT
+                        | EQEQ
+                        | NE
+                        | LT
+                        | GT
+                        | LE
+                        | GE
 
-			  | GTGT
+                        | GTGT
 
 
 private terminal_ ::= STRING_LITERAL

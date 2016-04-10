@@ -1,13 +1,12 @@
 plugin
-	stringtable reading xml api
-	fixed bug where module couldn't be fetched because the given psiFile's virtual file was null
+	none
 
 shared between languages
-	documentation method for stringtable keys
+	none
 
 SQF
 	none
 
 Header
-    annotator that checks if a class is already defined in configs
-    autocompletion for stringtable entries
+    all preprocessors are now in grammar and lexer
+    disabled formatting because it's soooo broken :(

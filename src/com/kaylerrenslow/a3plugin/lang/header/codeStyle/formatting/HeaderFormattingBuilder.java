@@ -23,10 +23,11 @@ public class HeaderFormattingBuilder implements FormattingModelBuilder{
 	@NotNull
 	@Override
 	public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {
-		return FormattingModelProvider.createFormattingModelForPsiFile(element.getContainingFile(), new HeaderBlock(element.getNode(), Wrap.createWrap(WrapType.NONE, false), null, Indent.getNoneIndent(), settings, createSpaceBuilder(settings)), settings);
+		HeaderBlock block = new HeaderBlock(element.getNode(), Wrap.createWrap(WrapType.NONE, false), Indent.getNoneIndent(), settings, createSpaceBuilder(settings));
+		return FormattingModelProvider.createFormattingModelForPsiFile(element.getContainingFile(), block, settings);
 	}
 
-	public static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
+	private static SpacingBuilder createSpaceBuilder(CodeStyleSettings settings) {
 		CommonCodeStyleSettings commonSettings = settings.getCommonSettings(HeaderLanguage.INSTANCE);
 		//@formatter:off
 		return new SpacingBuilder(settings, HeaderLanguage.INSTANCE)

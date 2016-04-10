@@ -15,7 +15,7 @@ import java.util.ArrayList;
 
 /**
  * @author Kayler
- *         FoldingBuilder implementation for Header language. Folding builder is what detects can be folded.
+ *         FoldingBuilder implementation for Header language. A folding builder helps you to fold the code regions and replace it with specific text.
  *         For example, if a class declaration has a left brace on line 1 and right brace on line 50, it is eligible for code folding.
  *         Code folding is replacing all text within those braces visually with ... for example.
  *         Created on 03/20/2016.

@@ -19,25 +19,21 @@ headerFile ::= file_entry*
 
 file_entries ::= file_entry*
 
-//TODO when $ is typed, look into stringtable.xml (try using annotator)
-//TODO add in \ lexer rule that is a waiting value just like in the properties custom language demo. This will work for any assignment
-//TODO maybe use annotator for SQF config retrieval (config >> "var"). check if the PsiFile is over HeaderFile so you can't annotate in any other language
-file_entry ::=  WHITE_SPACE | INLINE_COMMENT | BLOCK_COMMENT | statement_ | preprocessor_group | BAD_CHARACTER
+file_entry ::= INLINE_COMMENT | BLOCK_COMMENT | preprocessor_group | statement_ |  BAD_CHARACTER
 
 private statement_ ::= (assignment | class_declaration) SEMICOLON
 
 private number_ ::= NUMBER_LITERAL | HEX_LITERAL
 private value_ ::= STRINGTABLE_ENTRY | STRING_LITERAL | number_ | IDENTIFIER
 
-
 array ::= LBRACE array_body? RBRACE
 array_body ::= array_entry (COMMA array_entry)*
 array_entry ::= expression | value_ | array
 
-assignment_identifier ::= IDENTIFIER /*| NUM_IDENTIFIER*/
+assignment_identifier ::= IDENTIFIER
 
 assignment ::= basic_assignment | array_assignment {methods=[getAssigningVariable getAssigningValue]}
-basic_assignment ::= assignment_identifier EQ (expression | value_) {extends("basic_assignment")=assignment}
+basic_assignment ::= assignment_identifier EQ (macro_function | expression | value_) {extends("basic_assignment")=assignment}
 array_assignment ::= assignment_identifier BRACKET_PAIR EQ array {extends("array_assignment")=assignment}
 
 expression ::= add_expression_
@@ -57,15 +53,23 @@ private term_ ::= (PLUS | MINUS)? (
 		  )
 
 
-class_declaration ::= class_stub class_content? {methods=[getClassName getAttributes hasAttributes getClassNameNode]}
+class_declaration ::= class_stub class_content? {methods=[getClassName getAttributes hasAttributes getClassNameNode removeBracesIfEmpty bracesAreEmpty]}
 class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? {methods=[getClassName getClassNameNode]}
 
 class_content ::= LBRACE file_entries RBRACE
 
 //Preprocessor things
 preprocessor_group ::= preprocessor+
-preprocessor ::= pre_include //| pre_define_//TODO
+preprocessor ::= pre_include | pre_define | pre_undef | pre_ifdef | pre_ifndef | pre_exec
 
-pre_include ::= PREPROCESS_INCLUDE (pre_include_file) {extends("pre_include")=preprocessor methods=[getPathString getHeaderFileFromInclude]} //TODO does include or other preprocessor commands allow multilines? (https://community.bistudio.com/wiki/PreProcessor_Commands#Multi-line
+pre_include ::= PREPROCESS_INCLUDE (pre_include_file) {extends("pre_include")=preprocessor methods=[getPathString getHeaderFileFromInclude]}
 pre_include_file ::= STRING_LITERAL | INCLUDE_VALUE_ANGBR
-//private pre_define_ ::= PREPROCESS_DEFINE
+
+pre_define ::= PREPROCESS_DEFINE
+pre_undef ::= PREPROCESS_UNDEF
+pre_ifdef ::= PREPROCESS_IF_DEF
+pre_ifndef ::= PREPROCESS_IF_N_DEF
+pre_exec ::= PREPROCESS_EXEC
+pre_eval ::= PREPROCESS_EVAL
+
+macro_function ::= !(pre_exec) IDENTIFIER LPAREN (IDENTIFIER (COMMA IDENTIFIER)*) RPAREN | pre_eval

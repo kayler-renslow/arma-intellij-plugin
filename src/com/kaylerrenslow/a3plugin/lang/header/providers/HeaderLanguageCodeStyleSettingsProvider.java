@@ -35,27 +35,27 @@ public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSe
 	public void customizeSettings(@NotNull CodeStyleSettingsCustomizable consumer, @NotNull SettingsType settingsType) {
 		switch (settingsType) {
 			case BLANK_LINES_SETTINGS:
-				consumer.showStandardOptions("KEEP_BLANK_LINES_BEFORE_RBRACE", "KEEP_BLANK_LINES_IN_CODE");
+//				consumer.showStandardOptions("KEEP_BLANK_LINES_BEFORE_RBRACE", "KEEP_BLANK_LINES_IN_CODE");
 				break;
 			case COMMENTER_SETTINGS:
-				consumer.showAllStandardOptions();
+//				consumer.showAllStandardOptions();
 				break;
 			case INDENT_SETTINGS:
 				consumer.showStandardOptions();
 				break;
 			case LANGUAGE_SPECIFIC:
-				consumer.showAllStandardOptions();
+//				consumer.showAllStandardOptions();
 				break;
 			case SPACING_SETTINGS:
-				consumer.showStandardOptions("SPACE_AROUND_ADDITIVE_OPERATORS", "SPACE_AROUND_ASSIGNMENT_OPERATORS", "SPACE_AROUND_MULTIPLICATIVE_OPERATORS", "SPACE_AFTER_SEMICOLON", "SPACE_AFTER_COMMA", "SPACE_BEFORE_COMMA");
-				consumer.showStandardOptions("SPACE_WITHIN_ARRAY_INITIALIZER_BRACES", "SPACE_BEFORE_CLASS_LBRACE");
-
-				consumer.showStandardOptions("SPACE_BEFORE_COLON", "SPACE_AFTER_COLON");
-				consumer.moveStandardOption("SPACE_BEFORE_COLON", "Other");
-				consumer.moveStandardOption("SPACE_AFTER_COLON", "Other");
+//				consumer.showStandardOptions("SPACE_AROUND_ADDITIVE_OPERATORS", "SPACE_AROUND_ASSIGNMENT_OPERATORS", "SPACE_AROUND_MULTIPLICATIVE_OPERATORS", "SPACE_AFTER_SEMICOLON", "SPACE_AFTER_COMMA", "SPACE_BEFORE_COMMA");
+//				consumer.showStandardOptions("SPACE_WITHIN_ARRAY_INITIALIZER_BRACES", "SPACE_BEFORE_CLASS_LBRACE");
+//
+//				consumer.showStandardOptions("SPACE_BEFORE_COLON", "SPACE_AFTER_COLON");
+//				consumer.moveStandardOption("SPACE_BEFORE_COLON", "Other");
+//				consumer.moveStandardOption("SPACE_AFTER_COLON", "Other");
 				break;
 			case WRAPPING_AND_BRACES_SETTINGS:
-				consumer.showStandardOptions("WRAPPING_COMMENTS","KEEP_LINE_BREAKS", "CLASS_BRACE_STYLE", "ARRAY_INITIALIZER_WRAP", "ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE", "ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE");
+//				consumer.showStandardOptions("WRAPPING_COMMENTS","KEEP_LINE_BREAKS", "CLASS_BRACE_STYLE", "ARRAY_INITIALIZER_WRAP", "ARRAY_INITIALIZER_LBRACE_ON_NEXT_LINE", "ARRAY_INITIALIZER_RBRACE_ON_NEXT_LINE");
 				break;
 		}
 	}

@@ -22,9 +22,20 @@ public class PsiUtil {
 	 * @return non-whitespace sibling, or null if none was found
 	 */
 	public static ASTNode getNextSiblingNotWhitespace(ASTNode node) {
+		return getNextSiblingNotType(node, TokenType.WHITE_SPACE);
+	}
+
+	/**
+	 * Gets the closest next sibling, where the type is not skip, relative to node
+	 *
+	 * @param node node to find sibling of
+	 * @param skip the token to skip
+	 * @return non-skip sibling, or null if none was found
+	 */
+	public static ASTNode getNextSiblingNotType(ASTNode node, IElementType skip) {
 		ASTNode sibling = node.getTreeNext();
 		while (sibling != null) {
-			if (sibling.getElementType() == TokenType.WHITE_SPACE) {
+			if (sibling.getElementType() == skip) {
 				sibling = sibling.getTreeNext();
 			} else {
 				break;
@@ -40,9 +51,20 @@ public class PsiUtil {
 	 * @return non-whitespace sibling, or null if none was found
 	 */
 	public static ASTNode getPrevSiblingNotWhitespace(ASTNode node) {
+		return getPrevSiblingNotType(node, TokenType.WHITE_SPACE);
+	}
+
+	/**
+	 * Gets the closest previous sibling, that is not skip, relative to node
+	 *
+	 * @param node node to find sibling of
+	 * @param skip what element type to skip
+	 * @return non-whitespace sibling, or null if none was found
+	 */
+	public static ASTNode getPrevSiblingNotType(ASTNode node, IElementType skip) {
 		ASTNode sibling = node.getTreePrev();
 		while (sibling != null) {
-			if (sibling.getElementType() == TokenType.WHITE_SPACE) {
+			if (sibling.getElementType() == skip) {
 				sibling = sibling.getTreePrev();
 			} else {
 				break;
@@ -133,12 +155,12 @@ public class PsiUtil {
 
 	public static PsiElement findFirstDescendantElement(PsiElement element, Class<?> type) {
 		PsiElement child = element.getFirstChild();
-		while(child != null){
-			if(type.isInstance(child)){
+		while (child != null) {
+			if (type.isInstance(child)) {
 				return child;
 			}
 			PsiElement e = findFirstDescendantElement(child, type);
-			if(e != null){
+			if (e != null) {
 				return e;
 			}
 			child = child.getNextSibling();
@@ -171,20 +193,20 @@ public class PsiUtil {
 	}
 
 
-	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor){
+	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor) {
 		ArrayList<E> list = new ArrayList<>();
 		findDescdantElementsOfInstance(rootElement, type, cursor, list);
 		return list;
 	}
 
-	private static <E extends PsiElement> void findDescdantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor, ArrayList<E> list){
+	private static <E extends PsiElement> void findDescdantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor, ArrayList<E> list) {
 		PsiElement child = rootElement.getFirstChild();
-		while(child != null){
-			if(cursor != null && child == cursor){
+		while (child != null) {
+			if (cursor != null && child == cursor) {
 				continue;
 			}
-			if(type.isAssignableFrom(child.getClass())){
-				list.add((E)child);
+			if (type.isAssignableFrom(child.getClass())) {
+				list.add((E) child);
 			}
 			findDescdantElementsOfInstance(child, type, cursor, list);
 			child = child.getNextSibling();

@@ -24,6 +24,24 @@ import java.util.List;
  */
 public class HeaderPsiUtilForGrammar {
 
+	public static boolean bracesAreEmpty(HeaderClassDeclaration classDeclaration){
+		if(classDeclaration.getClassContent() == null){
+			return true;
+		}
+		HeaderClassContent content = classDeclaration.getClassContent();
+		return content.getFileEntries().getFileEntryList().size() == 0;
+	}
+
+	public static void removeBracesIfEmpty(HeaderClassDeclaration classDeclaration){
+		if(classDeclaration.getClassContent() == null){
+			return;
+		}
+		HeaderClassContent content = classDeclaration.getClassContent();
+		if(content.getFileEntries().getFileEntryList().size() == 0){
+			classDeclaration.getNode().removeChild(content.getNode());
+		}
+	}
+
 	public static ASTNode getClassNameNode(HeaderClassDeclaration declaration){
 		return getClassNameNode(declaration.getClassStub());
 	}
