@@ -12,9 +12,11 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.Plugin;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderAssignment;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighter;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,6 +56,15 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 	}
 
 	@Override
+	public void visitPrivateDeclVar(@NotNull SQFPrivateDeclVar declVar) {
+		super.visitPrivateDeclVar(declVar);
+		if (declVar.getReferences().length == 0) {
+			TextRange range = TextRange.from(declVar.getTextOffset() + 1, declVar.getTextLength() - 2);
+			annotator.createWeakWarningAnnotation(range, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
+		}
+	}
+
+	@Override
 	public void visitVariable(@NotNull SQFVariable var) {
 		super.visitVariable(var);
 		if (var.getVariableType() != SQFTypes.LOCAL_VAR) {
@@ -62,12 +73,35 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 		if (var.getParent() instanceof SQFMacroCall) {
 			return;
 		}
+
+		PsiReference[] references = var.getReferences();
+		int numAssignments = 0;
+		for(PsiReference reference : references){
+			if(reference.getElement().getParent() instanceof SQFAssignment){
+				if(reference.getElement().getParent().getParent() instanceof SQFStatement){ //check if the variable is left hand side of assignment (left = right = right1)
+					numAssignments++;
+				}
+			}
+		}
+		if(numAssignments == references.length){
+			annotator.createWeakWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
+		}
+
 		SQFScope declScope = var.getDeclarationScope();
+		boolean declarationNeeded = true;
+		if (declScope != SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile())) {
+			//local variables don't need to be declared private inside control structures or code blocks
+			//https://community.bistudio.com/wiki/Variables#Local_Variables
+			declarationNeeded = false;
+		}
 		List<SQFPrivateDeclVar> vars = declScope.getPrivateDeclaredVars();
 		for (SQFPrivateDeclVar declVar : vars) {
 			if (declVar.getVarName().equals(var.getVarName())) {
 				return;
 			}
+		}
+		if (!declarationNeeded) {
+			return;
 		}
 		Annotation a = annotator.createWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_not_private"));
 		a.registerFix(new SQFAnnotatorFixNotPrivate(var, declScope));

@@ -5,6 +5,7 @@ import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
@@ -13,12 +14,17 @@ import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -32,28 +38,62 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 	protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
 		PsiElement cursor = parameters.getOriginalPosition(); //cursor is on a word
 
-		if(cursor != null){
-			completeCurrentWord(parameters, context, result, cursor);
-		}else{
+		if (cursor == null) {
 			cursor = parameters.getPosition(); //cursor is after a word
 		}
 
-		if(!PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.LOCAL_VAR) && !PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.GLOBAL_VAR)){
+		ASTNode prevSiblingNotWhitespace;
+
+		if (PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.LOCAL_VAR) || PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.GLOBAL_VAR)) {
+			prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode().getTreeParent()); //get parent because local_var and global_var is inside SQFTypes.VARIABLE
+		}else{
+			prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode());
+		}
+
+		String prevSibText;
+		if(prevSiblingNotWhitespace == null){
+			prevSibText = "";
+		}else{
+			prevSibText = prevSiblingNotWhitespace.getText();
+		}
+
+		boolean isFunctionCallExp = prevSibText.equals("call") || prevSibText.equals("spawn");
+
+		if (cursor.getText().contains("_fnc") || isFunctionCallExp) {
+			completeFunctionCall(parameters, result);
+		}else if(prevSibText.equals("localize")){
+			completeLocalize(result, cursor);
+		}else{
+			completeCurrentWord(parameters, context, result, cursor);
+		}
+
+	}
+
+	private void completeLocalize(@NotNull CompletionResultSet result, @NotNull PsiElement cursor) {
+		Module module = PluginUtil.getModuleForPsiFile(cursor.getContainingFile());
+		Stringtable table;
+		try {
+			table = ArmaProjectDataManager.getInstance().getDataForModule(module).getStringtable();
+		} catch (FileNotFoundException e) {
+			e.printStackTrace(System.out);
 			return;
 		}
-		ASTNode prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode().getTreeParent()); //get parent because local_var and global_var is inside SQFTypes.VARIABLE
-		boolean isFunctionCallExp = PsiUtil.isOfElementType(prevSiblingNotWhitespace, SQFTypes.COMMAND) && (prevSiblingNotWhitespace.getText().equals("call") || prevSiblingNotWhitespace.getText().equals("spawn"));
-		if (isFunctionCallExp || cursor.getText().contains("_fnc")) {
-			try {
-				ArrayList<HeaderConfigFunction> configFunctions = HeaderPsiUtil.getAllConfigFunctionsFromDescriptionExt(parameters.getOriginalFile());
-				String tailTextFormat = " " + Plugin.resources.getString("lang.sqf.completion.tail_text.function");
-				for (HeaderConfigFunction configFunction : configFunctions) {
-					result.addElement(LookupElementBuilder.create(configFunction, configFunction.getCallableName()).withTailText(String.format(tailTextFormat, configFunction.getFullRelativePath()), true).withIcon
-							(HeaderConfigFunction.getIcon()));
-				}
-			} catch (Exception e) {
-				e.printStackTrace(System.out);
+		StringtableKey[] keys = table.getAllKeysValues();
+		for(StringtableKey key : keys){
+			result.addElement(key.getLookupElement(false));
+		}
+	}
+
+	private void completeFunctionCall(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
+		try {
+			ArrayList<HeaderConfigFunction> configFunctions = HeaderPsiUtil.getAllConfigFunctionsFromDescriptionExt(parameters.getOriginalFile());
+			String tailTextFormat = " " + Plugin.resources.getString("lang.sqf.completion.tail_text.function");
+			for (HeaderConfigFunction configFunction : configFunctions) {
+				result.addElement(LookupElementBuilder.create(configFunction, configFunction.getCallableName()).withTailText(String.format(tailTextFormat, configFunction.getFullRelativePath()), true).withIcon
+						(HeaderConfigFunction.getIcon()));
 			}
+		} catch (Exception e) {
+			e.printStackTrace(System.out);
 		}
 
 	}
@@ -61,7 +101,7 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 	private void completeCurrentWord(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result, PsiElement cursor) {
 		Project project = parameters.getOriginalFile().getProject();
 
-		if (cursor.getText().startsWith("BIS_")) {
+		if (cursor.getText().startsWith("BIS_")) { //add all bis functions
 			String functionName;
 			String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.bis_function");
 			for (int i = 0; i < SQFStatic.LIST_FUNCTIONS.size(); i++) {
@@ -76,28 +116,30 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		result.addElement(new SQFCompInsertHandlerHintfln().getLookupElement(parameters, context, result));
 		result.addElement(new SQFCompInsertHandlerHintfo().getLookupElement(parameters, context, result));
 		result.addElement(new SQFCompInsertHandlerHintArg().getLookupElement(parameters, context, result));
+		result.addElement(new SQFCompInsertHandlerHintValue().getLookupElement(parameters, context, result));
 		result.addElement(new SQFCompInsertHandlerIfThen().getLookupElement(parameters, context, result));
 		result.addElement(new SQFCompInsertHandlerIfExitWith().getLookupElement(parameters, context, result));
 
 		ArrayList<ASTNode> elements = new ArrayList<>();
 		String localVarTailText;
-		if (lookForLocalVars) {
+		if (lookForLocalVars) { //find all local vars
 			elements.addAll(PsiUtil.findDescendantElements(parameters.getOriginalFile(), SQFTypes.LOCAL_VAR, cursor.getNode()));
+			localVarTailText = " " + Plugin.resources.getString("lang.sqf.completion.tail_text.local_variable");
+
 			result.addElement(LookupElementBuilder.create("_this").withIcon(PluginIcons.ICON_SQF_MAGIC_VARIABLE).withTailText(" (magic variable)"));
 			result.addElement(LookupElementBuilder.create("_x").withIcon(PluginIcons.ICON_SQF_MAGIC_VARIABLE).withTailText(" (magic variable)"));
-			localVarTailText = " " + Plugin.resources.getString("lang.sqf.completion.tail_text.local_variable");
-		} else {
+		} else { //find all global vars
 			elements.addAll(PsiUtil.findDescendantElements(parameters.getOriginalFile(), SQFTypes.GLOBAL_VAR, cursor.getNode()));
 			localVarTailText = " " + Plugin.resources.getString("lang.sqf.completion.tail_text.global_variable");
 		}
 
-		for (ASTNode node : elements) {
+		for (ASTNode node : elements) { //add all variables
 			if (!SQFPsiUtil.followsSQFFunctionNameRules(node.getText())) {
 				result.addElement(LookupElementBuilder.create(node.getText()).withTailText(localVarTailText).withIcon(PluginIcons.ICON_SQF_VARIABLE));
 			}
 		}
 
-		if (!lookForLocalVars) {
+		if (!lookForLocalVars) { //add all commands
 			String commandName;
 			String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.command");
 			for (int i = 0; i < SQFStatic.LIST_COMMANDS.size(); i++) {

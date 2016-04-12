@@ -6,11 +6,13 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.xml.XmlTag;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.DocumentationUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
@@ -55,6 +57,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 	@Nullable
 	@Override
 	public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
+		if(element instanceof XmlTag){
+			return Stringtable.getKeyDoc((XmlTag)element);
+		}
 		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND)){
 			return generateCommandDoc(element.getText());
 		}
@@ -82,6 +87,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLookupItem(PsiManager psiManager, Object object, PsiElement element) {
+
 		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND)){
 			return element;
 		}

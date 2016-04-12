@@ -11,4 +11,5 @@ import java.util.List;
 @NameStrategy(value = StringtableXmlNameStrategy.class)
 public interface StringtableProject extends DomElement {
 	List<Package> getPackages();
+	List<Key> getKeys(); //packages aren't required
 }

@@ -1,5 +1,6 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -17,6 +18,7 @@ import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,6 +30,30 @@ import java.util.List;
  *         Created on 03/20/2016.
  */
 public class SQFPsiUtil {
+
+	/**
+	 * Check if the given element is inside a [] spawn {}. For spawn, all variables are created in a different environment
+	 * We must iterate over all upper code blocks and see if they are part of a spawn statement
+	 */
+	@Nullable
+	public static SQFScope checkIfInsideSpawn(@NotNull PsiElement element) {
+		SQFScope containingScope = SQFPsiUtil.getContainingScope(element);
+
+		PsiElement codeBlock = containingScope.getParent();
+		SQFScope spawnScope = containingScope;
+		ASTNode previous;
+		while (codeBlock instanceof SQFCodeBlock) {
+			previous = PsiUtil.getPrevSiblingNotWhitespace(codeBlock.getNode());
+			if (PsiUtil.isOfElementType(previous, SQFTypes.COMMAND)) {
+				if (previous.getText().equals("spawn")) {
+					return spawnScope;
+				}
+			}
+			spawnScope = SQFPsiUtil.getContainingScope(codeBlock);
+			codeBlock = spawnScope.getParent();
+		}
+		return null;
+	}
 
 	/**
 	 * Checks if the given variable name follows the general rules of function naming (requires tag, _fnc_ and then an identifier).
@@ -76,7 +102,7 @@ public class SQFPsiUtil {
 	 */
 	@NotNull
 	public static SQFScope getContainingScope(@NotNull PsiElement element) {
-		PsiElement parent = element;
+		PsiElement parent = element.getParent();
 		while (parent != null && !(parent instanceof SQFScope)) {
 			parent = parent.getParent();
 		}
@@ -129,7 +155,7 @@ public class SQFPsiUtil {
 	@NotNull
 	public static SQFPrivateDecl createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
 		List<SQFPrivateDeclVar> declVars = decl.getPrivateDeclVars();
-		String text = "private[";
+		String text = "private [";
 		for (SQFPrivateDeclVar declVar : declVars) {
 			text += "\"" + declVar.getVarName() + "\",";
 		}

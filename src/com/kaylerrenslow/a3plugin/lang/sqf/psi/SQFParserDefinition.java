@@ -23,9 +23,10 @@ import org.jetbrains.annotations.NotNull;
  * Created on 10/31/2015.
  */
 public class SQFParserDefinition implements ParserDefinition{
-	public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-	public static final TokenSet COMMENTS = TokenSet.create(SQFTypes.INLINE_COMMENT, SQFTypes.BLOCK_COMMENT);
-	public static final IFileElementType FILE = new IFileElementType(Language.<SQFLanguage>findInstance(SQFLanguage.class));
+	private static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
+	private static final TokenSet COMMENTS = TokenSet.create(SQFTypes.INLINE_COMMENT, SQFTypes.BLOCK_COMMENT);
+	private static final TokenSet STRING_LITERALS = TokenSet.create(SQFTypes.STRING_LITERAL);
+	private static final IFileElementType FILE = new IFileElementType(Language.<SQFLanguage>findInstance(SQFLanguage.class));
 
 	@NotNull
 	@Override
@@ -58,7 +59,7 @@ public class SQFParserDefinition implements ParserDefinition{
 	@NotNull
 	@Override
 	public TokenSet getStringLiteralElements() {
-		return TokenSet.EMPTY;
+		return STRING_LITERALS;
 	}
 
 	@NotNull

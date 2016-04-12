@@ -29,9 +29,11 @@ import java.util.List;
  */
 public class Stringtable {
 	private final VirtualFile virtualFile;
+	private final Module module;
 
-	private Stringtable(VirtualFile virtualFile){
+	private Stringtable(VirtualFile virtualFile, Module module){
 		this.virtualFile = virtualFile;
+		this.module = module;
 	}
 
 	public VirtualFile getVirtualFile(){
@@ -39,35 +41,41 @@ public class Stringtable {
 	}
 
 	/** Get the root tag*/
-	private StringtableProject getStringtableProject(Project project){
-		XmlFile xmlFile = (XmlFile) PsiManager.getInstance(project).findFile(this.virtualFile).getOriginalFile();
-		DomManager manager = DomManager.getDomManager(project);
+	private StringtableProject getStringtableProject(){
+		XmlFile xmlFile = (XmlFile) PsiManager.getInstance(module.getProject()).findFile(this.virtualFile).getOriginalFile();
+		DomManager manager = DomManager.getDomManager(module.getProject());
 
 		StringtableProject stringtableProject = (StringtableProject) manager.getFileElement(xmlFile).getRootElement();
 		return stringtableProject;
 	}
 
 	/** Gets all keys inside stringtable.xml
-	 * @param project project
 	 * @return array of all keys
 	 */
-	public StringtableKey[] getAllKeysValues(Project project){
-		StringtableProject stringtableProject = getStringtableProject(project);
+	public StringtableKey[] getAllKeysValues(){
+		StringtableProject stringtableProject = getStringtableProject();
 		List<StringtableKey> keysVals = new ArrayList<>();
 
 		List<Package> packages = stringtableProject.getPackages();
-
+		List<Key> keys = stringtableProject.getKeys();
+		addKeys(keysVals, keys, null);
 		for (Package stringtablePackage : packages) {
 			List<Container> containers = stringtablePackage.getContainers();
+			keys = stringtablePackage.getKeys();
+			addKeys(keysVals, keys, null);
 			for (Container container : containers) {
-				List<Key> keys = container.getKeys();
-				for(Key key : keys){
-					keysVals.add(new StringtableKey(key, container));
-				}
+				keys = container.getKeys();
+				addKeys(keysVals, keys, container);
 			}
 		}
 
 		return keysVals.toArray(new StringtableKey[keysVals.size()]);
+	}
+
+	private void addKeys(List<StringtableKey> keysVals, List<Key> keys, Container container) {
+		for(Key key : keys){
+			keysVals.add(new StringtableKey(key, container));
+		}
 	}
 
 	/** Get documentation html for the given stringtable key
@@ -105,7 +113,7 @@ public class Stringtable {
 		if (stringtableXmlVf == null) {
 			throw new FileNotFoundException("stringtable.xml wasn't found");
 		}
-		Stringtable instance = new Stringtable(stringtableXmlVf);
+		Stringtable instance = new Stringtable(stringtableXmlVf, module);
 		return instance;
 	}
 }

@@ -21,10 +21,10 @@ file_entries ::= file_entry*
 
 file_entry ::= INLINE_COMMENT | BLOCK_COMMENT | preprocessor_group | statement_ |  BAD_CHARACTER
 
-private statement_ ::= (assignment | class_declaration) SEMICOLON
+private statement_ ::= (macro_function | assignment | class_declaration) SEMICOLON
 
 private number_ ::= NUMBER_LITERAL | HEX_LITERAL
-private value_ ::= STRINGTABLE_ENTRY | STRING_LITERAL | number_ | IDENTIFIER
+private value_ ::= STRING_LITERAL | number_ | IDENTIFIER | macro_function
 
 array ::= LBRACE array_body? RBRACE
 array_body ::= array_entry (COMMA array_entry)*
@@ -33,7 +33,7 @@ array_entry ::= expression | value_ | array
 assignment_identifier ::= IDENTIFIER
 
 assignment ::= basic_assignment | array_assignment {methods=[getAssigningVariable getAssigningValue]}
-basic_assignment ::= assignment_identifier EQ (macro_function | expression | value_) {extends("basic_assignment")=assignment}
+basic_assignment ::= assignment_identifier EQ (STRINGTABLE_ENTRY | expression | value_) {extends("basic_assignment")=assignment}
 array_assignment ::= assignment_identifier BRACKET_PAIR EQ array {extends("array_assignment")=assignment}
 
 expression ::= add_expression_
@@ -72,4 +72,4 @@ pre_ifndef ::= PREPROCESS_IF_N_DEF
 pre_exec ::= PREPROCESS_EXEC
 pre_eval ::= PREPROCESS_EVAL
 
-macro_function ::= !(pre_exec) IDENTIFIER LPAREN (IDENTIFIER (COMMA IDENTIFIER)*) RPAREN | pre_eval
+macro_function ::= !(pre_exec) IDENTIFIER LPAREN ((value_ | array) (COMMA (value_ | array))*) RPAREN | pre_eval

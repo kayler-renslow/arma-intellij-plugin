@@ -1,7 +1,1 @@
->add @see functionality for documentation that will create a link to a psi element (including psi files)
-
->fix header block
-
-
-To fill the completion list for named element references, the IDE calls PsiReference.getVariants() (use this instead of getReferences)
-	http://www.jetbrains.org/intellij/sdk/docs/reference_guide/custom_language_support/code_completion.html
+instead of making new references for each SQFVariable, make all of them resolve to the first declaration

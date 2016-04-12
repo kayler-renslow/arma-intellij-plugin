@@ -15,7 +15,6 @@ public class StringtableXmlNameStrategy extends DomNameStrategy{
 
 	@Override
 	public String splitIntoWords(String xmlElementName) {
-		System.out.println("StringtableXmlNameStrategy.splitIntoWords " + xmlElementName);
 		return xmlElementName;
 	}
 

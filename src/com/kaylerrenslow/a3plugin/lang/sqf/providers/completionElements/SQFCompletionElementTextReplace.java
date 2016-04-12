@@ -81,4 +81,14 @@ public class SQFCompletionElementTextReplace{
 		}
 	}
 
+	/**
+	 * Auto completion for hintvalue.
+	 * Created on 04/10/2016.
+	 */
+	public static class SQFCompInsertHandlerHintValue extends CompletionElementWithTextReplace{
+		public SQFCompInsertHandlerHintValue() {
+			super("hintvalue", "hint format[\"%1\", ];", 18, "hint format a value");
+		}
+	}
+
 }

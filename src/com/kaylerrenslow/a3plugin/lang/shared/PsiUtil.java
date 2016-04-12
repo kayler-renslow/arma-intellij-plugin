@@ -4,6 +4,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
+import com.intellij.util.containers.Queue;
+import com.kaylerrenslow.a3plugin.util.TraversalObjectFinder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -15,13 +19,42 @@ import java.util.List;
  */
 public class PsiUtil {
 
+	/**Traverses the entire ast tree with BFS, starting from start. Each node that is found will be sent to finder. It is also possible to stop the traversal at any time with finder
+	 * @param start starting ASTNode
+	 * @param finder TraversalObjectFinder
+	 */
+	public static void traverseBreadthFirstSearch(@NotNull ASTNode start, @NotNull TraversalObjectFinder<ASTNode> finder){
+		finder.found(start);
+		ASTNode[] children = start.getChildren(null);
+		Queue<ASTNode> nodes = new Queue<>(children.length);
+
+		for(ASTNode child : children){
+			nodes.addLast(child);
+		}
+		ASTNode node;
+		while(nodes.size() > 0){
+			node = nodes.pullFirst();
+			finder.found(node);
+			if(finder.stopped()){
+				return;
+			}
+			if(finder.traverseFoundNodesChildren()){
+				children = node.getChildren(null);
+				for(ASTNode child : children){
+					nodes.addLast(child);
+				}
+			}
+		}
+	}
+
 	/**
 	 * Gets the closest next sibling, that is non-whitespace, relative to node
 	 *
 	 * @param node node to find sibling of
 	 * @return non-whitespace sibling, or null if none was found
 	 */
-	public static ASTNode getNextSiblingNotWhitespace(ASTNode node) {
+	@Nullable
+	public static ASTNode getNextSiblingNotWhitespace(@NotNull ASTNode node) {
 		return getNextSiblingNotType(node, TokenType.WHITE_SPACE);
 	}
 
@@ -32,7 +65,8 @@ public class PsiUtil {
 	 * @param skip the token to skip
 	 * @return non-skip sibling, or null if none was found
 	 */
-	public static ASTNode getNextSiblingNotType(ASTNode node, IElementType skip) {
+	@Nullable
+	public static ASTNode getNextSiblingNotType(@NotNull ASTNode node, @NotNull IElementType skip) {
 		ASTNode sibling = node.getTreeNext();
 		while (sibling != null) {
 			if (sibling.getElementType() == skip) {
@@ -50,7 +84,8 @@ public class PsiUtil {
 	 * @param node node to find sibling of
 	 * @return non-whitespace sibling, or null if none was found
 	 */
-	public static ASTNode getPrevSiblingNotWhitespace(ASTNode node) {
+	@Nullable
+	public static ASTNode getPrevSiblingNotWhitespace(@NotNull ASTNode node) {
 		return getPrevSiblingNotType(node, TokenType.WHITE_SPACE);
 	}
 
@@ -61,7 +96,8 @@ public class PsiUtil {
 	 * @param skip what element type to skip
 	 * @return non-whitespace sibling, or null if none was found
 	 */
-	public static ASTNode getPrevSiblingNotType(ASTNode node, IElementType skip) {
+	@Nullable
+	public static ASTNode getPrevSiblingNotType(@NotNull ASTNode node, @NotNull IElementType skip) {
 		ASTNode sibling = node.getTreePrev();
 		while (sibling != null) {
 			if (sibling.getElementType() == skip) {
@@ -82,7 +118,7 @@ public class PsiUtil {
 	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
 	 * @return true if node has ancestor of IElementType type and ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
 	 */
-	public static boolean isDescendantOf(ASTNode node, IElementType type, String textContent) {
+	public static boolean isDescendantOf(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String textContent) {
 		return getAncestorWithType(node, type, textContent) != null;
 	}
 
@@ -95,7 +131,8 @@ public class PsiUtil {
 	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
 	 * @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
 	 */
-	public static ASTNode getAncestorWithType(ASTNode node, IElementType type, String textContent) {
+	@Nullable
+	public static ASTNode getAncestorWithType(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String textContent) {
 		ASTNode parent = node.getTreeParent();
 		boolean isChild = false;
 		while (parent != null && !isChild) {
@@ -148,12 +185,13 @@ public class PsiUtil {
 	 * @param et IElement type
 	 * @return true if pe is of type et, false otherwise
 	 */
-	public static boolean isOfElementType(PsiElement pe, IElementType et) {
+	public static boolean isOfElementType(@NotNull PsiElement pe, @NotNull IElementType et) {
 		return pe != null && isOfElementType(pe.getNode(), et);
 	}
 
 
-	public static PsiElement findFirstDescendantElement(PsiElement element, Class<?> type) {
+	@Nullable
+	public static PsiElement findFirstDescendantElement(@NotNull PsiElement element, @NotNull Class<?> type) {
 		PsiElement child = element.getFirstChild();
 		while (child != null) {
 			if (type.isInstance(child)) {
@@ -176,7 +214,8 @@ public class PsiUtil {
 	 * @param content text to match inside the node, or null if doesn't matter
 	 * @return ASTNode that is the first of type, or null if none was found
 	 */
-	public static ASTNode findFirstDescendantElement(ASTNode node, IElementType type, String content) {
+	@Nullable
+	public static ASTNode findFirstDescendantElement(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String content) {
 		if (isOfElementType(node, type)) {
 			if (content != null && node.getText().equals(content)) {
 				return node;
@@ -186,8 +225,12 @@ public class PsiUtil {
 			return node;
 		}
 		ASTNode[] children = node.getChildren(null);
+		ASTNode astNode;
 		for (ASTNode child : children) {
-			findFirstDescendantElement(child, type, content);
+			astNode = findFirstDescendantElement(child, type, content);
+			if(astNode != null){
+				return astNode;
+			}
 		}
 		return null;
 	}

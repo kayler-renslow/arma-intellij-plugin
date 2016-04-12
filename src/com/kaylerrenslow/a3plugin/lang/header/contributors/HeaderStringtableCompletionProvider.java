@@ -3,9 +3,7 @@ package com.kaylerrenslow.a3plugin.lang.header.contributors;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
@@ -31,9 +29,9 @@ public class HeaderStringtableCompletionProvider extends CompletionProvider<Comp
 			e.printStackTrace(System.out);
 			return;
 		}
-		StringtableKey[] keys = table.getAllKeysValues(parameters.getEditor().getProject());
+		StringtableKey[] keys = table.getAllKeysValues();
 		for(StringtableKey key : keys){
-			result.addElement(LookupElementBuilder.createWithSmartPointer(key.getDollarKeyName(), key.getXmlTag()).withTailText(" (" + key.getContainerName()+")", true));
+			result.addElement(key.getLookupElement(true));
 		}
 	}
 }

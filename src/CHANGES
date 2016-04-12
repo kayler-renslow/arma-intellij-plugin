@@ -5,8 +5,11 @@ shared between languages
 	none
 
 SQF
-	none
+	added auto completion for localize command. it will search stringtable.xml and add all entries
+	tweaked auto completion handling so that it generates more useful results and less garbage
+	added auto completed for hint format that works like hintarg except it doesn't inject _this select 1
+	fixed finding declarations for variables
+	annotation will popup telling user when variable is needlessly private
 
 Header
-    all preprocessors are now in grammar and lexer
-    disabled formatting because it's soooo broken :(
+    none
