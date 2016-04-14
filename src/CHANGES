@@ -5,11 +5,9 @@ shared between languages
 	none
 
 SQF
-	added auto completion for localize command. it will search stringtable.xml and add all entries
-	tweaked auto completion handling so that it generates more useful results and less garbage
-	added auto completed for hint format that works like hintarg except it doesn't inject _this select 1
-	fixed finding declarations for variables
-	annotation will popup telling user when variable is needlessly private
+	Annotator: check for usages of local variables and check if the variable is initialized
+	references between local vars and strings now added
+
 
 Header
     none

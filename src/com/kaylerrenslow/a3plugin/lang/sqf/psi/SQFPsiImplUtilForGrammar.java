@@ -4,8 +4,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase;
 import com.kaylerrenslow.a3plugin.util.TraversalObjectFinder;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,40 @@ import java.util.List;
  *         Created on 03/19/2016.
  */
 public class SQFPsiImplUtilForGrammar {
+
+
+
+	@Nullable
+	public static String[] getIterationVariables(SQFForLoopBase forLoop){
+		if(forLoop instanceof SQFLoopFor){
+			SQFLoopFor loop = (SQFLoopFor)forLoop;
+			List<SQFForLoopIterVarInit> vars = loop.getForLoopIterVarInitList();
+			if (vars.size() == 0) {
+				return null;
+			}
+			String[] varNames = new String[vars.size()];
+			int i = 0;
+			for(SQFForLoopIterVarInit iterVarInit : vars){
+				if(iterVarInit.getStatement().getAssignment() == null){
+					varNames[i] = "";
+					i++;
+				}
+				varNames[i] = iterVarInit.getStatement().getAssignment().getAssigningVariable().getVarName();
+				i++;
+			}
+			return varNames;
+		}
+		if(forLoop instanceof SQFLoopForFrom){
+			SQFLoopForFrom loop = (SQFLoopForFrom)forLoop;
+			return new String[]{loop.getString().getNonQuoteText()};
+		}
+		if(forLoop instanceof SQFLoopForEach){
+			return new String[]{"_x"};
+		}
+
+		return null;
+	}
+
 
 	/**
 	 * Checks if the given variable name follows the general rules of function naming (requires tag, _fnc_ and then an identifier).
@@ -35,6 +71,7 @@ public class SQFPsiImplUtilForGrammar {
 	 * variable = 1+1; //variable is assigning variable
 	 * </p>
 	 */
+	@NotNull
 	public static SQFVariable getAssigningVariable(SQFAssignment assignment) {
 		return assignment.getVariable();
 	}
@@ -48,7 +85,7 @@ public class SQFPsiImplUtilForGrammar {
 	public static SQFScope getDeclarationScope(SQFVariable var) {
 		SQFScope containingScope = SQFPsiUtil.getContainingScope(var);
 
-		if(containingScope instanceof SQFFileScope){
+		if (containingScope instanceof SQFFileScope) {
 			return containingScope; //no need to do anything special
 		}
 
@@ -56,7 +93,7 @@ public class SQFPsiImplUtilForGrammar {
 		if (var.getVariableType() == SQFTypes.LANG_VAR) {
 			if (var.getVarName().equals("_this")) { //_this is either file scope or spawn's statement scope
 				_this = true;
-			}else{
+			} else {
 				return containingScope;
 			}
 		}
@@ -67,8 +104,8 @@ public class SQFPsiImplUtilForGrammar {
 		SQFScope spawnScope = SQFPsiUtil.checkIfInsideSpawn(var);
 		boolean insideSpawn = spawnScope != null;
 
-		if(_this){
-			if(insideSpawn){
+		if (_this) {
+			if (insideSpawn) {
 				return spawnScope;
 			}
 			return SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile());
@@ -83,13 +120,13 @@ public class SQFPsiImplUtilForGrammar {
 			if (insideSpawn && privatizedScope == spawnScope) {
 				return spawnScope; //can't escape the spawn's environment
 			}
-			if (privatizedScope instanceof SQFFileScope) {
-				break;
-			}
 			for (SQFPrivateDeclVar varInScope : privateDeclaredVarsForScope) {
 				if (varInScope.getVarName().equals(var.getVarName())) {
 					return privatizedScope; //declared private
 				}
+			}
+			if (privatizedScope instanceof SQFFileScope) {
+				break;
 			}
 			privatizedScope = SQFPsiUtil.getContainingScope(privatizedScope.getParent());
 			privateDeclaredVarsForScope = privatizedScope.getPrivateDeclaredVars();
@@ -138,7 +175,12 @@ public class SQFPsiImplUtilForGrammar {
 
 		@Override
 		public void found(@NotNull ASTNode astNode) {
-			if(astNode.getElementType() == SQFTypes.CODE_BLOCK){
+			//check to make sure that the found variable comes BEFORE this.var
+			if(astNode.getStartOffset() > this.var.getNode().getStartOffset()){
+				this.traverseFoundChildren = false; //no need to go deeper on this node since it comes after this.var
+				return;
+			}
+			if (astNode.getElementType() == SQFTypes.CODE_BLOCK) {
 				ASTNode previous = PsiUtil.getPrevSiblingNotWhitespace(astNode);
 				if (PsiUtil.isOfElementType(previous, SQFTypes.COMMAND)) {
 					if (previous.getText().equals("spawn")) {
@@ -146,22 +188,22 @@ public class SQFPsiImplUtilForGrammar {
 					}
 				}
 			}
-			if(astNode.getElementType() == SQFTypes.LOCAL_VAR){
-				if(astNode.getText().equals(var.getVarName())){
-
+			if (astNode.getElementType() == SQFTypes.LOCAL_VAR) {
+				if (astNode.getText().equals(var.getVarName())) {
 					//now check if found variable's scope is a container for this.var's scope
 					ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(SQFPsiUtil.getContainingScope(astNode.getPsi()), SQFTypes.VARIABLE, astNode, var.getVarName());
-					for(ASTNode node: nodes){
-						if(node == this.var.getNode()){
+					for (ASTNode node : nodes) {
+						if (node == this.var.getNode()) {
 							//yes. the found variable's scope is a container for this.var's scope
 							stopped = true;
-							if(astNode.getPsi() instanceof SQFVariable){
+							if (astNode.getPsi() instanceof SQFVariable) {
 								firstDeclaration = (SQFVariable) astNode.getPsi();
-							}else if(astNode.getPsi().getParent() instanceof SQFVariable){
+							} else if (astNode.getPsi().getParent() instanceof SQFVariable) {
 								firstDeclaration = (SQFVariable) astNode.getPsi().getParent();
-							}else{
+							} else {
 								throw new RuntimeException("this shouldn't happen");
 							}
+
 						}
 					}
 				}

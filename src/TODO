@@ -1,1 +1,6 @@
-instead of making new references for each SQFVariable, make all of them resolve to the first declaration
+fix the scope of iteration variables in while loops and for loops
+
+fix this scenario: (but maybe not because it will mess up private declarations?)
+_i = 100;
+for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
+hint str _i; // 100

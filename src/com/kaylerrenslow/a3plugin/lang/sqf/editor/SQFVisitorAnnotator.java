@@ -12,16 +12,13 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderAssignment;
-import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighter;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -76,15 +73,31 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 
 		PsiReference[] references = var.getReferences();
 		int numAssignments = 0;
+		SQFScope containingScope;
 		for(PsiReference reference : references){
-			if(reference.getElement().getParent() instanceof SQFAssignment){
-				if(reference.getElement().getParent().getParent() instanceof SQFStatement){ //check if the variable is left hand side of assignment (left = right = right1)
+			PsiElement resolve = reference.resolve();
+			if(resolve == null){
+				continue;
+			}
+			if(resolve.getParent() instanceof SQFAssignment){
+				if(resolve.getParent().getParent() instanceof SQFStatement){ //check if the variable is left hand side of assignment (left = right)
 					numAssignments++;
 				}
 			}
+			System.out.println(reference.getElement().getText());
+			System.out.println(resolve.getText());
+//			containingScope = SQFPsiUtil.getContainingScope(resolve);
+//			if(containingScope.getParent() instanceof SQFCodeBlock){
+//				if(containingScope.getParent().getParent() instanceof SQFForLoopBase){
+//					numAssignments++;
+//				}
+//			}
 		}
 		if(numAssignments == references.length){
 			annotator.createWeakWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
+		}
+		if(numAssignments == 0){
+			annotator.createWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_uninitialized"));
 		}
 
 		SQFScope declScope = var.getDeclarationScope();

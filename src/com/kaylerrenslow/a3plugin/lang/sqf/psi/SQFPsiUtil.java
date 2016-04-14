@@ -31,6 +31,7 @@ import java.util.List;
  */
 public class SQFPsiUtil {
 
+
 	/**
 	 * Check if the given element is inside a [] spawn {}. For spawn, all variables are created in a different environment
 	 * We must iterate over all upper code blocks and see if they are part of a spawn statement
@@ -197,5 +198,9 @@ public class SQFPsiUtil {
 	public static PsiElement createElement(@NotNull Project project, @NotNull String text, @NotNull IElementType type) {
 		SQFFile file = createFile(project, text);
 		return PsiUtil.findDescendantElements(file, type, null).get(0).getPsi();
+	}
+
+	public static SQFString createNewStringLiteral(Project project, String textWithoutQuotes) {
+		return (SQFString) createElement(project, "\"" + textWithoutQuotes + "\"", SQFTypes.STRING);
 	}
 }

@@ -15,6 +15,7 @@ import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFFunctionItemPresentation;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFVariableItemPresentation;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFLocalVarInStringReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
