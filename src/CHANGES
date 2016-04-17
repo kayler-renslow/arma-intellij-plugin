@@ -5,9 +5,8 @@ shared between languages
 	none
 
 SQF
-	Annotator: check for usages of local variables and check if the variable is initialized
-	references between local vars and strings now added
-
+	variables inside for loops are initialized now
+	command parameter info sort of works..
 
 Header
     none

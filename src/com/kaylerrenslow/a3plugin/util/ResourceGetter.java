@@ -1,5 +1,7 @@
 package com.kaylerrenslow.a3plugin.util;
 
+import org.jetbrains.annotations.Nullable;
+
 import java.io.InputStream;
 import java.net.URL;
 
@@ -15,6 +17,7 @@ public class ResourceGetter{
 	private static final ResourceGetter instance = new ResourceGetter();
 
 	/**Get the resource at location s from the build path as a URL*/
+	@Nullable
 	public static URL getResourceAsURL(String s){
 		return instance.getClass().getResource(s);
 	}

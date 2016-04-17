@@ -27,6 +27,7 @@
 		<lang.refactoringSupport language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFRefactoringSupportProvider"/>
 		<lang.braceMatcher language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFBraceMatcher" />
 		<lang.foldingBuilder language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFFoldingBuilder" />
+		<codeInsight.parameterInfo language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFParameterInfo" />
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>

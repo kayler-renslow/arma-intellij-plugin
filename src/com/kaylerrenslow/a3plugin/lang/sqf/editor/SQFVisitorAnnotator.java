@@ -62,6 +62,22 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 	}
 
 	@Override
+	public void visitLoopFor(@NotNull SQFLoopFor o) {
+		visitForLoop(o);
+		super.visitLoopFor(o);
+	}
+
+	@Override
+	public void visitLoopForFrom(@NotNull SQFLoopForFrom o) {
+		visitForLoop(o);
+		super.visitLoopForFrom(o);
+	}
+
+	private void visitForLoop(@NotNull SQFForLoopBase forLoop){
+		forLoop.getLoopScope().putUserData(SQFScope.KEY_ITERATION_VARS, forLoop.getIterationVariables());
+	}
+
+	@Override
 	public void visitVariable(@NotNull SQFVariable var) {
 		super.visitVariable(var);
 		if (var.getVariableType() != SQFTypes.LOCAL_VAR) {
@@ -74,6 +90,7 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 		PsiReference[] references = var.getReferences();
 		int numAssignments = 0;
 		SQFScope containingScope;
+		boolean isUsedOverride = false;
 		for(PsiReference reference : references){
 			PsiElement resolve = reference.resolve();
 			if(resolve == null){
@@ -84,16 +101,19 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 					numAssignments++;
 				}
 			}
-			System.out.println(reference.getElement().getText());
-			System.out.println(resolve.getText());
-//			containingScope = SQFPsiUtil.getContainingScope(resolve);
-//			if(containingScope.getParent() instanceof SQFCodeBlock){
-//				if(containingScope.getParent().getParent() instanceof SQFForLoopBase){
-//					numAssignments++;
-//				}
-//			}
+			containingScope = SQFPsiUtil.getContainingScope(resolve);
+			String[] iterVars = containingScope.getUserData(SQFScope.KEY_ITERATION_VARS);
+			if(iterVars != null){
+				for(String iterVar : iterVars){
+					if(iterVar.equals(resolve.getText())){
+						numAssignments++;
+						isUsedOverride = true;
+					}
+				}
+			}
 		}
-		if(numAssignments == references.length){
+
+		if(numAssignments == references.length && !isUsedOverride){
 			annotator.createWeakWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
 		}
 		if(numAssignments == 0){

@@ -19,7 +19,10 @@ import java.util.List;
  */
 public class SQFPsiImplUtilForGrammar {
 
-
+	public static SQFScope getLoopScope(SQFForLoopBase loop){
+		SQFCodeBlock  codeBlock = (SQFCodeBlock)loop.getNode().getChildren(TokenSet.create(SQFTypes.CODE_BLOCK))[0].getPsi();
+		return codeBlock.getLocalScope();
+	}
 
 	@Nullable
 	public static String[] getIterationVariables(SQFForLoopBase forLoop){
@@ -27,6 +30,8 @@ public class SQFPsiImplUtilForGrammar {
 			SQFLoopFor loop = (SQFLoopFor)forLoop;
 			List<SQFForLoopIterVarInit> vars = loop.getForLoopIterVarInitList();
 			if (vars.size() == 0) {
+				System.out.println("SQFPsiImplUtilForGrammar.getIterationVariables 33");
+				System.out.println(forLoop.getText().substring(0, Math.min(forLoop.getText().length(), 40)));
 				return null;
 			}
 			String[] varNames = new String[vars.size()];

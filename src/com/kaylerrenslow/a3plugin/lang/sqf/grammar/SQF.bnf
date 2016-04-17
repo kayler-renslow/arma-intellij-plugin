@@ -126,11 +126,11 @@ code_block ::= LBRACE local_scope RBRACE
 				  | (DEFAULT code_block SEMICOLON)
 
     private loop_ ::= loop_while | for_loops_
-    loop_while    ::= WHILE LBRACE expression RBRACE DO code_block
+    loop_while    ::= WHILE LBRACE statement+ RBRACE DO code_block
     private for_loops_ ::= loop_for | loop_for_from | loop_for_each
-    loop_for  ::= FOR LBRACKET LBRACE (for_loop_iter_var_init)* RBRACE COMMA LBRACE expression RBRACE COMMA LBRACE (statement)* RBRACE RBRACKET DO code_block {methods=[getIterationVariables] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
-    loop_for_from ::= FOR string FROM expression TO expression (STEP expression)? DO code_block {extends("loop_for_from")=loop_for}
-    loop_for_each ::= code_block FOR_EACH expression {extends("loop_for_each")=loop_for}
+    loop_for  ::= FOR LBRACKET LBRACE (for_loop_iter_var_init)* RBRACE COMMA LBRACE expression RBRACE COMMA LBRACE (statement)* RBRACE RBRACKET DO code_block {methods=[getIterationVariables getLoopScope] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
+    loop_for_from ::= FOR string FROM expression TO expression (STEP expression)? DO code_block {methods=[getIterationVariables getLoopScope] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
+    loop_for_each ::= code_block FOR_EACH expression  {methods=[getIterationVariables getLoopScope] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
 
     for_loop_iter_var_init ::= statement
 

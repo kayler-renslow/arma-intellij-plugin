@@ -5,8 +5,12 @@ import com.kaylerrenslow.a3plugin.util.FileReader;
 import com.kaylerrenslow.a3plugin.util.ResourceGetter;
 import com.kaylerrenslow.a3plugin.util.TextFileListToList;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,4 +33,37 @@ public class SQFStatic{
 	public static final String SQF_SAMPLE_CODE_TEXT = FileReader.getText("/com/kaylerrenslow/a3plugin/lang/sqf/codeStyle/sqfSampleCode.sqf");
 
 	public static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
+
+	/** Fetch command syntax for given command. This method will fetch the syntax and params from file and make it readable. Example: "paramName COMMAND paramName2" to "paramName:Number COMMAND paramName2:Number"
+	 * @param command command String name
+	 * @return syntax with params and param types, or null if the command doesn't have a known syntax
+	 */
+	@Nullable
+	public static String getCommandDocSyntax(@NotNull String command){
+		String path = COMMANDS_DOC_FILE_DIR + "syntax/" + command + ".param.list";
+		List<String> paramsList = new ArrayList<>();
+		URL url = ResourceGetter.getResourceAsURL(path);
+		if(url == null){
+			return null;
+		}
+		TextFileListToList.getListFromFile(PluginUtil.convertURLToFile(url), paramsList);
+		String syntax = paramsList.get(0);
+		for(int i = 1; i < paramsList.size(); i++){
+			String detailedParam = paramsList.get(i);
+			int indexDash = detailedParam.indexOf('-');
+			if(indexDash > 0){
+				detailedParam = detailedParam.substring(0, indexDash);
+			}
+			String paramName = detailedParam.substring(0, detailedParam.indexOf(':'));
+			syntax = syntax.replace(paramName.trim(), detailedParam);
+
+		}
+
+		return syntax;
+	}
+
+	static{
+		Collections.sort(LIST_COMMANDS);
+		Collections.sort(LIST_FUNCTIONS);
+	}
 }

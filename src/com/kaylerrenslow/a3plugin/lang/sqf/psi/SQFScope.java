@@ -1,5 +1,6 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 
+import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 
 import java.util.List;
@@ -11,4 +12,5 @@ import java.util.List;
  */
 public interface SQFScope extends PsiElement{
 	List<SQFPrivateDeclVar> getPrivateDeclaredVars();
+	Key<String[]> KEY_ITERATION_VARS = new Key<>("KEY_ITERATION_VARS");
 }
