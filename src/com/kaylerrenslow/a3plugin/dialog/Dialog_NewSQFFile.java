@@ -2,16 +2,14 @@ package com.kaylerrenslow.a3plugin.dialog;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.DataKeys;
-import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.dialog.actions.SimpleGuiAction;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
-import java.util.Arrays;
 
 public class Dialog_NewSQFFile extends JDialog {
 	private JPanel contentPane;
@@ -22,17 +20,17 @@ public class Dialog_NewSQFFile extends JDialog {
 	private SimpleGuiAction<Pair<String, VirtualFile>> okAction;
 	private VirtualFile newFileDirectory;
 
-	private Dialog_NewSQFFile(AnActionEvent event) {
+	private Dialog_NewSQFFile(AnActionEvent creationEvent) {
 		setContentPane(contentPane);
 		setModal(true);
 		getRootPane().setDefaultButton(buttonOK);
 
-		this.newFileDirectory = event.getData(DataKeys.VIRTUAL_FILE);
-		System.out.println("Dialog_NewSQFFile.Dialog_NewSQFFile " + this.newFileDirectory);
+		this.newFileDirectory = creationEvent.getData(DataKeys.VIRTUAL_FILE);
+
 		if(!this.newFileDirectory.isDirectory()){
 			this.newFileDirectory = this.newFileDirectory.getParent();
 		}
-		this.lblFolder.setText(this.newFileDirectory.getCanonicalPath());
+		this.lblFolder.setText(this.newFileDirectory.getName() + "/");
 
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -60,7 +58,6 @@ public class Dialog_NewSQFFile extends JDialog {
 				onCancel();
 			}
 		}, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT);
-//		setLocationRelativeTo(PlatformDataKeys.FILE_EDITOR.getData(event.getDataContext()).getComponent()); //TODO null pointer
 	}
 
 	private void onOK() {
@@ -75,6 +72,11 @@ public class Dialog_NewSQFFile extends JDialog {
 	public static void showNewInstance(AnActionEvent actionEvent, SimpleGuiAction<Pair<String, VirtualFile>> okAction) {
 		Dialog_NewSQFFile dialog = new Dialog_NewSQFFile(actionEvent);
 		dialog.pack();
+		Component component = actionEvent.getData(DataKeys.CONTEXT_COMPONENT);
+		while(component.getParent() != null){
+			component = component.getParent();
+		}
+		dialog.setLocationRelativeTo(component);
 		dialog.okAction = okAction;
 		dialog.setTitle(Plugin.resources.getString("plugin.dialog.new_sqf_file.title"));
 		dialog.setVisible(true);

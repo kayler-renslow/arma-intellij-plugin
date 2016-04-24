@@ -1,5 +1,6 @@
 package com.kaylerrenslow.a3plugin.lang.sqf;
 
+import com.intellij.openapi.util.Pair;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.util.FileReader;
 import com.kaylerrenslow.a3plugin.util.ResourceGetter;
@@ -65,5 +66,35 @@ public class SQFStatic{
 	static{
 		Collections.sort(LIST_COMMANDS);
 		Collections.sort(LIST_FUNCTIONS);
+	}
+
+	/** Parses a full function name (e.g. tag_fnc_functionClass) and returns a pair containing the tag name and function class name. Pair first = tag, pair second = function class name
+	 * @param fullFunctionName full function name
+	 * @return SQFFunctionTagAndName instance
+	 */
+	public static SQFFunctionTagAndName getFunctionTagAndName(String fullFunctionName){
+		int _fnc_Index = fullFunctionName.indexOf("_fnc_");
+		String tagName = fullFunctionName.substring(0, _fnc_Index); //the function's prefix tag. exampleTag_fnc_functionClassName
+		String functionClassName = fullFunctionName.substring(_fnc_Index + 5); //function's class name.
+		return new SQFFunctionTagAndName(tagName, functionClassName);
+	}
+
+	/** Takes a tag and class name and returns the full SQF callable function name (e.g. tag_fnc_className)
+	 * @param tag tag
+	 * @param functionClassName class name
+	 * @return full callable function name
+	 */
+	public static String getFullFunctionName(String tag, String functionClassName){
+		return tag + "_fnc_" + functionClassName;
+	}
+
+	public static class SQFFunctionTagAndName{
+		public final String tagName;
+		public final String functionClassName;
+
+		public SQFFunctionTagAndName(String tagName, String functionClassName) {
+			this.tagName = tagName;
+			this.functionClassName = functionClassName;
+		}
 	}
 }

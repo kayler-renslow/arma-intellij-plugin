@@ -27,7 +27,6 @@ public class Action_NewSQFFile extends AnAction {
 			e.getInputEvent().consume();
 			return;
 		}
-		System.out.println("Action_NewSQFFile.update " + e.getData(DataKeys.VIRTUAL_FILE).getName());
 	}
 
 	private class CreateNewSQFFile implements SimpleGuiAction<Pair<String, VirtualFile>> {
@@ -56,8 +55,6 @@ public class Action_NewSQFFile extends AnAction {
 					}
 				}
 			});
-			System.out.println(data.first);
-			System.out.println(data.second.getName());
 		}
 	}
 }

@@ -5,7 +5,8 @@ shared between languages
 	none
 
 SQF
-	creating new sqf file now locates the directory for where to place it in
+	new sqf file action dialog will now appear centered and at correct location
+	new sqf function dialog and implementation (no file creation or psi manipulation yet)
 
 Header
     none
