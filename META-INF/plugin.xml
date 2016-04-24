@@ -27,7 +27,7 @@
 		<lang.refactoringSupport language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFRefactoringSupportProvider"/>
 		<lang.braceMatcher language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFBraceMatcher" />
 		<lang.foldingBuilder language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFFoldingBuilder" />
-		<codeInsight.parameterInfo language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFParameterInfo" />
+		<!--<codeInsight.parameterInfo language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFParameterInfo" />-->
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>
@@ -72,10 +72,10 @@
 			<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_About" text="About" description="About the Plugin" />
 		</group>
 		<action id="a3plugin.action.newGroup.new_SQF_file" class="com.kaylerrenslow.a3plugin.dialog.actions.newGroup.Action_NewSQFFile" text="New SQF File"	description="Create a new SQF File" icon="/com/kaylerrenslow/a3plugin/icons/sqf.png">
-			<add-to-group group-id="NewGroup" anchor="first"/>
+			<add-to-group group-id="NewGroup1" anchor="first"/>
 		</action>
 		<action id="a3plugin.action.newGroup.new_SQF_function" class="com.kaylerrenslow.a3plugin.dialog.actions.newGroup.Action_NewSQFFunction" text="New SQF Function"	description="Create a new SQF Function" icon="/com/kaylerrenslow/a3plugin/icons/function.png">
-			<add-to-group group-id="NewGroup" anchor="first"/>
+			<add-to-group group-id="NewGroup1" anchor="first"/>
 		</action>
 	</actions>
 

@@ -5,8 +5,7 @@ shared between languages
 	none
 
 SQF
-	variables inside for loops are initialized now
-	command parameter info sort of works..
+	creating new sqf file now locates the directory for where to place it in
 
 Header
     none
