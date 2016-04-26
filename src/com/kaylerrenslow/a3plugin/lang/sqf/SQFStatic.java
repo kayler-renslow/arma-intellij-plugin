@@ -88,6 +88,14 @@ public class SQFStatic{
 		return tag + "_fnc_" + functionClassName;
 	}
 
+	/** Returns the file name for the given sqf config function class name
+	 * @param functionClassName name to get file name for
+	 * @return fn_functionClassName.sqf
+	 */
+	public static String getConfigFunctionFileName(String functionClassName){
+		return "fn_" + functionClassName + ".sqf";
+	}
+
 	public static class SQFFunctionTagAndName{
 		public final String tagName;
 		public final String functionClassName;

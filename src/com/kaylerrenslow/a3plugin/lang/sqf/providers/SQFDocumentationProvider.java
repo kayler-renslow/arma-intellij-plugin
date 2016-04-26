@@ -13,6 +13,7 @@ import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.DocumentationUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableLookupElementDataObject;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
@@ -87,7 +88,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLookupItem(PsiManager psiManager, Object object, PsiElement element) {
-
+		if(object instanceof StringtableLookupElementDataObject){
+			return ((StringtableLookupElementDataObject)object).getTargetTag();
+		}
 		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND)){
 			return element;
 		}
@@ -99,11 +102,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 			if(!function.getFunctionFileExtension().equals(".sqf")){
 				return function.getClassDeclaration();
 			}
-			Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, PluginUtil.getModuleForPsiFile(function.getClassDeclaration().getContainingFile()).getModuleContentScope());
-			for(VirtualFile vf : files){
-				if(vf.getPath().endsWith(function.getFullRelativePath())){
-					return psiManager.findFile(vf);
-				}
+			VirtualFile functionFile = PluginUtil.findFileInModule(function.getFullRelativePath(), PluginUtil.getModuleForPsiFile(function.getClassDeclaration().getContainingFile()),SQFFileType.INSTANCE);
+			if(functionFile != null){
+				return psiManager.findFile(functionFile);
 			}
 		}
 		return null;

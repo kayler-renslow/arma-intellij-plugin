@@ -22,7 +22,7 @@ public class Dialog_NewSQFFunction extends JDialog {
 	private JTextField tfFunctionName;
 	private JComboBox<String> cbKnownTagNames;
 	private JComboBox<String> cbKnownFunctionLocations;
-	private SimpleGuiAction<NewSQFFunctionActionPerformedData> okAction;
+	private SimpleGuiAction<SQFConfigFunctionInformationHolder> okAction;
 	private JTextField tfFunctionTagName;
 	private JTextField tfFunctionLocation;
 	private JLabel lblError;
@@ -36,8 +36,6 @@ public class Dialog_NewSQFFunction extends JDialog {
 
 		this.module = creationEvent.getData(DataKeys.MODULE);
 		initializeThings();
-
-		System.out.println("Dialog_NewSQFFunction.Dialog_NewSQFFunction " + this.module.getName());
 
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -134,7 +132,7 @@ public class Dialog_NewSQFFunction extends JDialog {
 				return;
 			}
 		}
-		okAction.actionPerformed(new NewSQFFunctionActionPerformedData(this.tfFunctionTagName.getText(), this.tfFunctionName.getText(), this.tfFunctionLocation.getText(), this.module));
+		okAction.actionPerformed(new SQFConfigFunctionInformationHolder(this.tfFunctionTagName.getText(), this.tfFunctionName.getText(), this.tfFunctionLocation.getText(), this.module, null));
 		dispose();
 	}
 
@@ -147,7 +145,7 @@ public class Dialog_NewSQFFunction extends JDialog {
 		dispose();
 	}
 
-	public static void showNewInstance(AnActionEvent actionEvent, SimpleGuiAction<NewSQFFunctionActionPerformedData> okAction) {
+	public static void showNewInstance(AnActionEvent actionEvent, SimpleGuiAction<SQFConfigFunctionInformationHolder> okAction) {
 		Dialog_NewSQFFunction dialog = new Dialog_NewSQFFunction(actionEvent);
 		dialog.pack();
 		Component component = actionEvent.getData(DataKeys.CONTEXT_COMPONENT);
@@ -158,30 +156,6 @@ public class Dialog_NewSQFFunction extends JDialog {
 		dialog.okAction = okAction;
 		dialog.setTitle(Plugin.resources.getString("plugin.dialog.new_sqf_function.title"));
 		dialog.setVisible(true);
-	}
-
-	public static class NewSQFFunctionActionPerformedData {
-		public final String functionTagName;
-		public final String functionClassName;
-		public final String functionLocation;
-		public final Module module;
-
-		public NewSQFFunctionActionPerformedData(String functionTagName, String functionClassName, String functionLocation, Module module) {
-			this.functionTagName = functionTagName;
-			this.functionClassName = functionClassName;
-			this.functionLocation = functionLocation;
-			this.module = module;
-		}
-
-		@Override
-		public String toString() {
-			return "NewSQFFunctionActionPerformedData{" +
-					"functionTagName='" + functionTagName + '\'' +
-					", functionClassName='" + functionClassName + '\'' +
-					", functionLocation='" + functionLocation + '\'' +
-					", module=" + module +
-					'}';
-		}
 	}
 
 }

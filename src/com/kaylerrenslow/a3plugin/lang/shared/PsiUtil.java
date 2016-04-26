@@ -174,7 +174,7 @@ public class PsiUtil {
 	 * @param et   IElement type
 	 * @return true if node is of type et, false otherwise
 	 */
-	public static boolean isOfElementType(ASTNode node, IElementType et) {
+	public static boolean isOfElementType(@Nullable ASTNode node, @NotNull IElementType et) {
 		return node != null && node.getElementType() == et;
 	}
 
@@ -185,7 +185,7 @@ public class PsiUtil {
 	 * @param et IElement type
 	 * @return true if pe is of type et, false otherwise
 	 */
-	public static boolean isOfElementType(@NotNull PsiElement pe, @NotNull IElementType et) {
+	public static boolean isOfElementType(@Nullable PsiElement pe, @NotNull IElementType et) {
 		return pe != null && isOfElementType(pe.getNode(), et);
 	}
 

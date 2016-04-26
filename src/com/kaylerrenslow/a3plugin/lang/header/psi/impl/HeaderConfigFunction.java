@@ -67,7 +67,11 @@ public class HeaderConfigFunction {
 	 * Get the full path to this function (\ will be converted to / and fn_ will be appended if required)
 	 */
 	public String getFullRelativePath() {
-		return (this.filePath + (this.filePath.length() > 0 ? "\\" : "") + (this.appendFn_ ? "fn_" : "") + getFunctionClassName() + this.functionFileExtension).replaceAll("\\\\", "/");
+		return getFullRelativePath(getFunctionClassName(), this.filePath, this.functionFileExtension, this.appendFn_);
+	}
+
+	public static String getFullRelativePath(String functionClassName, String functionFilePath, String functionFileExtension, boolean appendFn_){
+		return (functionFilePath + (functionFileExtension.length() > 0 ? "\\" : "") + (appendFn_ ? "fn_" : "") + functionClassName + functionFileExtension).replaceAll("\\\\", "/");
 	}
 
 	public static Icon getIcon() {

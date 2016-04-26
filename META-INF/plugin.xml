@@ -49,6 +49,7 @@
 		<usageTypeProvider implementation="com.kaylerrenslow.a3plugin.lang.shared.ArmaUsageTypeProvider"/>
 		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/a3plugin/armaPluginColorSchemes.xml" />
 		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/a3plugin/armaPluginColorSchemes.xml" />
+		<lang.documentationProvider language="XML" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.XMLDocumentationProvider"/>
 
 		<!-- Stringtable-->
 		<dom.fileDescription implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.StringtableDomFileDescription" />

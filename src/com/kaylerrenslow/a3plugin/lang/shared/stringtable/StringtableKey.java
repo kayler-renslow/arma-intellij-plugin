@@ -55,7 +55,7 @@ public class StringtableKey {
 	 * @return new lookup element
 	 */
 	public LookupElement getLookupElement(boolean isDollar) {
-		LookupElementBuilder element = LookupElementBuilder.createWithSmartPointer(isDollar ? getDollarKeyName() : getKeyName(), key.getXmlTag()).withTailText(" (" + getTailText() + ")", true).withCaseSensitivity(false);
+		LookupElementBuilder element = LookupElementBuilder.create(new StringtableLookupElementDataObject(key.getXmlTag()), isDollar ? getDollarKeyName() : getKeyName()).withTailText(" (" + getTailText() + ")", true).withCaseSensitivity(false);
 		if (!isDollar) {
 			element = element.withInsertHandler(new TextReplace());
 		}

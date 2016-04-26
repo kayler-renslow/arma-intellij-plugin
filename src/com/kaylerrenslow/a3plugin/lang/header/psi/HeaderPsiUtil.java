@@ -2,13 +2,14 @@ package com.kaylerrenslow.a3plugin.lang.header.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.util.Pair;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.kaylerrenslow.a3plugin.lang.header.exception.ConfigClassNotDefinedException;
-import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
-import com.kaylerrenslow.a3plugin.lang.header.exception.FunctionNotDefinedInConfigException;
-import com.kaylerrenslow.a3plugin.lang.header.exception.MalformedConfigException;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.tree.IElementType;
+import com.kaylerrenslow.a3plugin.dialog.SQFConfigFunctionInformationHolder;
+import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
+import com.kaylerrenslow.a3plugin.lang.header.exception.*;
 import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
@@ -27,6 +28,67 @@ import java.util.List;
  *         Created on 03/30/2016.
  */
 public class HeaderPsiUtil {
+
+	/** Creates a new config function and inserts it into CfgFunctions. The CfgFunctions is determined by the module inside newFunction.module
+	 * @param newFunction class that contains information about the new function
+	 * @throws GenericConfigException when class failed to be inserted
+	 */
+	public static void insertNewFunctionIntoCfgFunctions(@NotNull SQFConfigFunctionInformationHolder newFunction) throws GenericConfigException {
+		HeaderClassDeclaration cfgFunctions = getCfgFunctions(newFunction.module);
+
+		//get all tag classes inside cfg functions
+		ArrayList<HeaderClassDeclaration> tagClasses = getClassDeclarationsWithEntriesEqual(cfgFunctions, null, null, true, 1, 1);
+		HeaderClassDeclaration definedTagClass = null; //class that contains the tag for the function
+		HeaderClassDeclaration definedContainerClass = null; //class that contains the class declaration for the function class
+
+
+		Attribute[] tagAttribute = {new Attribute("tag", newFunction.functionTagName)};
+		Attribute[] fileAttribute = {new Attribute("file", newFunction.functionLocation)};
+
+		// check if tag is defined
+		for (HeaderClassDeclaration tagClass : tagClasses) {
+			if (tagClass.hasAttributes(tagAttribute, true)) {
+				definedTagClass = tagClass;
+			}
+		}
+		//tag attribute wasn't found, just check class names now
+		if (definedTagClass == null) {
+			for (HeaderClassDeclaration tagClass : tagClasses) {
+				if (tagClass.getClassName().equals(newFunction.functionTagName)) {
+					definedTagClass = tagClass;
+				}
+			}
+		}
+		//tag hasn't been defined yet. create a new class
+		if (definedTagClass == null) {
+			definedTagClass = HeaderPsiUtil.createClassDeclaration(newFunction.module.getProject(), "Tag_Class_" + newFunction.functionTagName, tagAttribute);
+		}
+
+		//check if file path has been defined
+		ArrayList<HeaderClassDeclaration> containerClasses = getClassDeclarationsWithEntriesEqual(definedTagClass, null, null, true, 1, 1); //all container classes for the given tag class
+
+		// find container class where the path matches and is inside the tag class
+		for (HeaderClassDeclaration containerClass : containerClasses) {
+			if (containerClass.hasAttributes(fileAttribute, true)) {
+				definedContainerClass = containerClass;
+			}
+		}
+		// if there is no class with matching path, create new container class with path=location
+		if (definedContainerClass == null) {
+			String name = "Container_Class_" + System.currentTimeMillis();
+			definedContainerClass = createClassDeclaration(newFunction.module.getProject(), name, fileAttribute);
+			definedTagClass.getClassContent().getNode().addChild(definedContainerClass.getNode()); //add the new container class to the defined tag class
+		}
+
+		// insert function declaration class in containing class
+		HeaderClassDeclaration functionClass = createClassDeclaration(newFunction.module.getProject(), newFunction.functionClassName, newFunction.attributes); //new function class declaration
+
+		if(definedContainerClass.getClassContent() == null){
+			definedContainerClass.getNode().addChild(createClassDeclaration(newFunction.module.getProject(), "t",null).getClassContent().getNode());
+		}
+		definedContainerClass.getClassContent().getFileEntries().getNode().addChild(createElement(newFunction.module.getProject(), functionClass.getText()+";",HeaderTypes.FILE_ENTRY).getNode());
+
+	}
 
 
 	/**
@@ -396,7 +458,7 @@ public class HeaderPsiUtil {
 	 * @throws DescriptionExtNotDefinedException when description.ext doesn't exist
 	 * @throws ConfigClassNotDefinedException    where CfgFunctions isn't defined inside description.ext
 	 */
-	@Nullable
+	@NotNull
 	public static HeaderClassDeclaration getCfgFunctions(PsiFile psiFile) throws DescriptionExtNotDefinedException, ConfigClassNotDefinedException {
 		return getCfgFunctions(PluginUtil.getModuleForPsiFile(psiFile));
 	}
@@ -409,7 +471,7 @@ public class HeaderPsiUtil {
 	 * @throws DescriptionExtNotDefinedException when description.ext doesn't exist
 	 * @throws ConfigClassNotDefinedException    where CfgFunctions isn't defined inside description.ext
 	 */
-	@Nullable
+	@NotNull
 	public static HeaderClassDeclaration getCfgFunctions(Module module) throws DescriptionExtNotDefinedException, ConfigClassNotDefinedException {
 		HeaderFile file = ArmaProjectDataManager.getInstance().getDataForModule(module).getDescriptionExt();
 		HeaderClassDeclaration cfgFunc = getClassDeclaration(file, "CfgFunctions", true, 1, 1);
@@ -419,5 +481,36 @@ public class HeaderPsiUtil {
 		return cfgFunc;
 	}
 
+	/**
+	 * Creates and returns a new HeaderClassDeclaration PsiElement with the given class name and attributes
+	 *
+	 * @param project    project
+	 * @param className  class name of the class
+	 * @param attributes all attributes (null if there is none). Attributes are assignments (basic or array)
+	 * @return new HeaderClassDeclaration PsiElement
+	 */
+	public static HeaderClassDeclaration createClassDeclaration(@NotNull Project project, @NotNull String className, @Nullable Attribute[] attributes) {
+		String class_decl_f = "class %s {%s};";
+		String attribute_f = "%s=%s;\n";
+		String attributeText = "";
+		if (attributes != null) {
+			for (Attribute attribute : attributes) {
+				attributeText += String.format(attribute_f, attribute.name, attribute.value);
+			}
+		}
+		return (HeaderClassDeclaration) createElement(project, String.format(class_decl_f, className, attributeText), HeaderTypes.CLASS_DECLARATION);
+	}
+
+	@NotNull
+	public static HeaderFile createFile(@NotNull Project project, @NotNull String text) {
+		String fileName = "fake_header_file.sqf";
+		return (HeaderFile) PsiFileFactory.getInstance(project).createFileFromText(fileName, HeaderFileType.INSTANCE, text);
+	}
+
+	@NotNull
+	public static PsiElement createElement(@NotNull Project project, @NotNull String text, @NotNull IElementType type) {
+		HeaderFile file = createFile(project, text);
+		return PsiUtil.findDescendantElements(file, type, null).get(0).getPsi();
+	}
 
 }

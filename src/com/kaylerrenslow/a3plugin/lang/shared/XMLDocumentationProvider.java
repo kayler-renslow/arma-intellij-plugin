@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.header.providers;
+package com.kaylerrenslow.a3plugin.lang.shared;
 
 import com.intellij.lang.documentation.DocumentationProvider;
 import com.intellij.psi.PsiElement;
@@ -11,13 +11,15 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- * Created by Kayler on 04/09/2016.
+ * @author Kayler
+ * This is mostly to get stringtable.xml documentation
+ * Created on 04/25/2016.
  */
-public class HeaderDocumentationProvider implements DocumentationProvider {
+public class XMLDocumentationProvider implements DocumentationProvider {
 	@Nullable
 	@Override
 	public String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
-		return generateDoc(element, originalElement);
+		return null;
 	}
 
 	@Nullable
@@ -29,8 +31,12 @@ public class HeaderDocumentationProvider implements DocumentationProvider {
 	@Nullable
 	@Override
 	public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
-		if(element instanceof XmlTag){
-			return Stringtable.getKeyDoc((XmlTag)element);
+		if(element instanceof XmlTag){ //do not delete. this is necessary for SQF auto completion for localize "stringtableEntry"
+			XmlTag tag = ((XmlTag)element);
+			Boolean keyValue = tag.getUserData(StringtableLookupElementDataObject.KEY_IS_STRINGTABLE_XML);
+			if(keyValue != null && keyValue){
+				return Stringtable.getKeyDoc(tag);
+			}
 		}
 		return null;
 	}
@@ -38,9 +44,6 @@ public class HeaderDocumentationProvider implements DocumentationProvider {
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLookupItem(PsiManager psiManager, Object object, PsiElement element) {
-		if(object instanceof StringtableLookupElementDataObject){
-			return ((StringtableLookupElementDataObject)object).getTargetTag();
-		}
 		return null;
 	}
 

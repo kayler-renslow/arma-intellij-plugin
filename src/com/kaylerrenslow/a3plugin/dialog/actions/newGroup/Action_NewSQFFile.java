@@ -25,7 +25,6 @@ public class Action_NewSQFFile extends AnAction {
 	public void update(AnActionEvent e) {
 		if(e.getProject() == null){
 			e.getInputEvent().consume();
-			return;
 		}
 	}
 

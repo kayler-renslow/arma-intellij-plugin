@@ -15,6 +15,7 @@ import com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.Container;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.Key;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.Package;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.StringtableProject;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
@@ -103,13 +104,7 @@ public class Stringtable {
 	 * @throws FileNotFoundException when stringtable.xml doens't exist
 	 */
 	public static Stringtable load(Module module) throws FileNotFoundException {
-		VirtualFile stringtableXmlVf = null;
-		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, XmlFileType.INSTANCE, module.getModuleContentScope());
-		for (VirtualFile file : files) {
-			if (file.getName().equalsIgnoreCase("stringtable.xml")) {
-				stringtableXmlVf = file;
-			}
-		}
+		VirtualFile stringtableXmlVf = PluginUtil.findFileInModuleByName("stringtable.xml", module, XmlFileType.INSTANCE, true);
 		if (stringtableXmlVf == null) {
 			throw new FileNotFoundException("stringtable.xml wasn't found");
 		}
