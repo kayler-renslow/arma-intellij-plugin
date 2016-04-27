@@ -48,7 +48,7 @@ HEX_DIGIT   = [0-9a-fA-F]
 
 ESCAPE_SEQUENCE = \\[^\r\n]
 
-STRING_PART = "\"" ~"\""
+STRING_PART = "\"" ~"\"" //if you ever decide to allow single quotes for strings, you must go back and change the search for config function tags, since tag="tag" != tag='tag'
 STRING_LITERAL = {STRING_PART}+
 
 

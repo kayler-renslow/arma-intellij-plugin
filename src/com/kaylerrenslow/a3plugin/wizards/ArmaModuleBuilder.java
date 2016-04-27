@@ -26,12 +26,10 @@ import java.util.List;
  */
 public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuilder{
 
-	private Project project;
 	private List<Pair<String, String>> sourcePaths;
 
 	@Override
 	public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
-		setProject(rootModel.getProject());
 		ContentEntry contentEntry = doAddContentEntry(rootModel);
 		if(contentEntry != null){
 			final List<Pair<String, String>> sourcePaths = getSourcePaths();
@@ -55,9 +53,6 @@ public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 		return new ArmaWizardStepMain(context, parentDisposable);
 	}
 
-	private void setProject(Project p){
-		this.project = p;
-	}
 
 	@Override
 	public ModuleType getModuleType() {

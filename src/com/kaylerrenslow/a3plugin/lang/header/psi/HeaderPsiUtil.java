@@ -29,21 +29,26 @@ import java.util.List;
  */
 public class HeaderPsiUtil {
 
-	/** Creates a new config function and inserts it into CfgFunctions. The CfgFunctions is determined by the module inside newFunction.module
+	/**
+	 * Creates a new config function and inserts it into CfgFunctions. The CfgFunctions is determined by the module inside newFunction.module
+	 *
 	 * @param newFunction class that contains information about the new function
 	 * @throws GenericConfigException when class failed to be inserted
 	 */
 	public static void insertNewFunctionIntoCfgFunctions(@NotNull SQFConfigFunctionInformationHolder newFunction) throws GenericConfigException {
+		Project project = newFunction.module.getProject();
+
 		HeaderClassDeclaration cfgFunctions = getCfgFunctions(newFunction.module);
 
-		//get all tag classes inside cfg functions
-		ArrayList<HeaderClassDeclaration> tagClasses = getClassDeclarationsWithEntriesEqual(cfgFunctions, null, null, true, 1, 1);
 		HeaderClassDeclaration definedTagClass = null; //class that contains the tag for the function
 		HeaderClassDeclaration definedContainerClass = null; //class that contains the class declaration for the function class
 
 
-		Attribute[] tagAttribute = {new Attribute("tag", newFunction.functionTagName)};
-		Attribute[] fileAttribute = {new Attribute("file", newFunction.functionLocation)};
+		Attribute[] tagAttribute = {new Attribute("tag", "\"" + newFunction.functionTagName + "\"")};
+		Attribute[] fileAttribute = {new Attribute("file", "\"" + newFunction.functionLocation + "\"")};
+
+		//get all tag classes inside cfg functions
+		ArrayList<HeaderClassDeclaration> tagClasses = getClassDeclarationsWithEntriesEqual(cfgFunctions, null, null, true, 1, 1);
 
 		// check if tag is defined
 		for (HeaderClassDeclaration tagClass : tagClasses) {
@@ -61,7 +66,10 @@ public class HeaderPsiUtil {
 		}
 		//tag hasn't been defined yet. create a new class
 		if (definedTagClass == null) {
-			definedTagClass = HeaderPsiUtil.createClassDeclaration(newFunction.module.getProject(), "Tag_Class_" + newFunction.functionTagName, tagAttribute);
+			definedTagClass = HeaderPsiUtil.createClassDeclaration(project, "Tag_Class_" + newFunction.functionTagName, tagAttribute);
+
+			//write new tag class to CfgFunctions
+			cfgFunctions.getClassContent().getFileEntries().getNode().addChild(createFileEntryForClass(project, definedTagClass).getNode());
 		}
 
 		//check if file path has been defined
@@ -76,17 +84,17 @@ public class HeaderPsiUtil {
 		// if there is no class with matching path, create new container class with path=location
 		if (definedContainerClass == null) {
 			String name = "Container_Class_" + System.currentTimeMillis();
-			definedContainerClass = createClassDeclaration(newFunction.module.getProject(), name, fileAttribute);
-			definedTagClass.getClassContent().getNode().addChild(definedContainerClass.getNode()); //add the new container class to the defined tag class
+			definedContainerClass = createClassDeclaration(project, name, fileAttribute);
+			definedTagClass.getClassContent().getFileEntries().getNode().addChild(createFileEntryForClass(project, definedContainerClass).getNode()); //add the new container class to the defined tag class
 		}
 
 		// insert function declaration class in containing class
-		HeaderClassDeclaration functionClass = createClassDeclaration(newFunction.module.getProject(), newFunction.functionClassName, newFunction.attributes); //new function class declaration
+		HeaderClassDeclaration functionClass = createClassDeclaration(project, newFunction.functionClassName, newFunction.attributes); //new function class declaration
 
-		if(definedContainerClass.getClassContent() == null){
-			definedContainerClass.getNode().addChild(createClassDeclaration(newFunction.module.getProject(), "t",null).getClassContent().getNode());
+		if (definedContainerClass.getClassContent() == null) {
+			definedContainerClass.getNode().addChild(createClassDeclaration(project, "t", null).getClassContent().getNode());
 		}
-		definedContainerClass.getClassContent().getFileEntries().getNode().addChild(createElement(newFunction.module.getProject(), functionClass.getText()+";",HeaderTypes.FILE_ENTRY).getNode());
+		definedContainerClass.getClassContent().getFileEntries().getNode().addChild(createFileEntryForClass(project, functionClass).getNode());
 
 	}
 
@@ -116,19 +124,6 @@ public class HeaderPsiUtil {
 		return null;
 	}
 
-	/**
-	 * Gets all class declarations where the given attributes are children inside the given class. If className is not null, class declarations will be added if it contains the given attributes and className=classDeclaration.className
-	 *
-	 * @param start            PsiElement to start at to get class declarations from
-	 * @param className        class name to search for, or null if class name doesn't matter
-	 * @param attributes       array of attributes to match, or null if attributes don't matter
-	 * @param traverseIncludes true if the includes inside the HeaderFile should be traversed, false if to ignore them
-	 * @return list of all matched class declarations
-	 */
-	@NotNull
-	public static ArrayList<HeaderClassDeclaration> getClassDeclarationsWithEntriesEqual(@NotNull PsiElement start, @Nullable String className, @Nullable Attribute[] attributes, boolean traverseIncludes) {
-		return getClassDeclarationsWithEntriesEqual(start, className, attributes, traverseIncludes, 1, 1);
-	}
 
 	/**
 	 * Gets all class declarations inside the given class that own the given attributes. If className is not null, class declarations will be added if it contains the given attributes and className=classDeclaration.className
@@ -216,34 +211,6 @@ public class HeaderPsiUtil {
 
 
 	/**
-	 * Gets all included HeaderFiles included inside the given HeaderFile
-	 *
-	 * @param root root HeaderFile
-	 * @return list of all included files
-	 */
-	@NotNull
-	public static ArrayList<HeaderFile> getAllIncludedHeaderFilesInFile(@NotNull HeaderFile root) {
-		ArrayList<HeaderFile> includedFiles = new ArrayList<>();
-		getAllIncludedHeaderFilesInFile(root, includedFiles);
-		return includedFiles;
-	}
-
-	private static void getAllIncludedHeaderFilesInFile(@NotNull HeaderFile root, @NotNull ArrayList<HeaderFile> includedFiles) {
-		ArrayList<ASTNode> includeStatements = PsiUtil.findDescendantElements(root, HeaderTypes.PRE_INCLUDE, null);
-		HeaderPreInclude include;
-		for (ASTNode node : includeStatements) {
-			include = (HeaderPreInclude) node.getPsi();
-			HeaderFile f = include.getHeaderFileFromInclude();
-			if (f != null) {
-				includedFiles.add(f);
-			}
-		}
-		for (HeaderFile headerFile : includedFiles) {
-			getAllIncludedHeaderFilesInFile(headerFile, includedFiles);
-		}
-	}
-
-	/**
 	 * Creates a new HeaderConfigFunction instance for the given functionName
 	 *
 	 * @param psiFile      HeaderFile instance to retrieve the description.ext for
@@ -298,11 +265,11 @@ public class HeaderPsiUtil {
 
 		HeaderClassDeclaration functionClass = null; //psi element that links to the function's class declaration
 
-		Attribute[] tagsAsAttributes = {new Attribute("tag", tagName)};
+		Attribute[] tagsAsAttributes = {new Attribute("tag", "\"" + tagName + "\"")};
 		ArrayList<HeaderClassDeclaration> matchedClassesWithTag = (getClassDeclarationsWithEntriesEqual(cfgFuncs, null, tagsAsAttributes, true, 1, 1)); //classes inside CfgFunctions that have tag attribute
 
 		if (matchedClassesWithTag.size() == 0) { //no classes of depth 1 relative to CfgFunctions have tag attribute, so find the class itself with its className=tagName
-			HeaderClassDeclaration classWithTag = getClassDeclaration(cfgFuncs, tagName, true, 1, 1); //class with tag attribute
+			HeaderClassDeclaration classWithTag = getClassDeclaration(cfgFuncs, tagName, true, 1, 1); //class with tag as class name
 			if (classWithTag == null) {
 				throw new FunctionNotDefinedInConfigException(functionName);
 			}
@@ -344,19 +311,19 @@ public class HeaderPsiUtil {
 		for (Attribute attribute : functionClassAttributes) { //read the function's inner attributes
 			if (attribute.name.equals("file")) {
 				if (attribute.value.contains("\\")) {//file path includes a folder
-					containingDirectoryPath = attribute.value.substring(0, attribute.value.lastIndexOf('\\')); //has a folder (file='folder\test.sqf')
+					containingDirectoryPath = attribute.value.substring(1, attribute.value.lastIndexOf('\\')); //has a folder (file='folder\test.sqf'). Also, substring must start at 1 to skip over first "
 				} else { //just the file name is inside
 					containingDirectoryPath = ""; //no path defined, just the file name (file='test.sqf')
 				}
 				appendFn_ = false;
 				if (isAllowedFunctionExtension(attribute.value, cfgFuncs, functionClass)) {
-					functionFileExtension = attribute.value.substring(attribute.value.lastIndexOf('.'));
+					functionFileExtension = attribute.value.substring(attribute.value.lastIndexOf('.'), attribute.value.length() - 1); //must be length -1 because ending quote
 				}
 				break;
 			}
 			if (attribute.name.equals("ext")) {
 				if (isAllowedFunctionExtension(attribute.value, cfgFuncs, functionClass)) {
-					functionFileExtension = attribute.value;
+					functionFileExtension = stripOuterQuotes(attribute.value);
 				}
 			}
 		}
@@ -368,7 +335,7 @@ public class HeaderPsiUtil {
 				boolean filePathDefined = false;
 				for (Attribute attribute : attributes) {
 					if (attribute.name.equals("file")) {
-						containingDirectoryPath = attribute.value;
+						containingDirectoryPath = stripOuterQuotes(attribute.value);
 						filePathDefined = true;
 						break;
 					}
@@ -421,7 +388,7 @@ public class HeaderPsiUtil {
 			Attribute[] attributes = tagClass.getAttributes(true);
 			for (Attribute attribute : attributes) {
 				if (attribute.name.equals("tag")) {
-					tag = attribute.value;
+					tag = stripOuterQuotes(attribute.value);
 				}
 			}
 			if (tag == null) {
@@ -433,6 +400,7 @@ public class HeaderPsiUtil {
 					functions.add(getHeaderConfigFunction(cfgFunc, tag, functionClass));
 				}
 			} catch (Exception e) {
+				e.printStackTrace();
 				//this should never happen
 			}
 		}
@@ -442,6 +410,7 @@ public class HeaderPsiUtil {
 
 
 	private static boolean isAllowedFunctionExtension(String value, HeaderClassDeclaration cfgFuncs, HeaderClassDeclaration functionClass) throws MalformedConfigException {
+		value = stripOuterQuotes(value);
 		if (value.endsWith(".sqf") || value.endsWith(".fsm")) {
 			return true;
 		}
@@ -507,10 +476,21 @@ public class HeaderPsiUtil {
 		return (HeaderFile) PsiFileFactory.getInstance(project).createFileFromText(fileName, HeaderFileType.INSTANCE, text);
 	}
 
+	public static HeaderFileEntry createFileEntryForClass(@NotNull Project project, @NotNull HeaderClassDeclaration classDeclaration) {
+		return (HeaderFileEntry) createElement(project, classDeclaration.getText() + ";", HeaderTypes.FILE_ENTRY);
+	}
+
 	@NotNull
 	public static PsiElement createElement(@NotNull Project project, @NotNull String text, @NotNull IElementType type) {
 		HeaderFile file = createFile(project, text);
 		return PsiUtil.findDescendantElements(file, type, null).get(0).getPsi();
+	}
+
+	private static String stripOuterQuotes(String s) {
+		if (s.charAt(0) == '"' && s.charAt(s.length() - 1) == '"') {
+			s = s.substring(1, s.length() - 1);
+		}
+		return s;
 	}
 
 }

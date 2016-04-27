@@ -20,17 +20,13 @@ public class Dialog_NewSQFFile extends JDialog {
 	private SimpleGuiAction<Pair<String, VirtualFile>> okAction;
 	private VirtualFile newFileDirectory;
 
-	private Dialog_NewSQFFile(AnActionEvent creationEvent) {
+	private Dialog_NewSQFFile(VirtualFile newFileDirectory) {
 		setContentPane(contentPane);
 		setModal(true);
 		getRootPane().setDefaultButton(buttonOK);
 
-		this.newFileDirectory = creationEvent.getData(DataKeys.VIRTUAL_FILE);
-
-		if(!this.newFileDirectory.isDirectory()){
-			this.newFileDirectory = this.newFileDirectory.getParent();
-		}
-		this.lblFolder.setText(this.newFileDirectory.getName() + "/");
+		this.newFileDirectory = newFileDirectory;
+		this.lblFolder.setText(newFileDirectory.getName() + "/");
 
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -70,7 +66,13 @@ public class Dialog_NewSQFFile extends JDialog {
 	}
 
 	public static void showNewInstance(AnActionEvent actionEvent, SimpleGuiAction<Pair<String, VirtualFile>> okAction) {
-		Dialog_NewSQFFile dialog = new Dialog_NewSQFFile(actionEvent);
+		VirtualFile newFileDirectory = actionEvent.getData(DataKeys.VIRTUAL_FILE);
+
+		if(!newFileDirectory.isDirectory()){
+			newFileDirectory = newFileDirectory.getParent();
+		}
+
+		Dialog_NewSQFFile dialog = new Dialog_NewSQFFile(newFileDirectory);
 		dialog.pack();
 		Component component = actionEvent.getData(DataKeys.CONTEXT_COMPONENT);
 		while(component.getParent() != null){

@@ -24,29 +24,29 @@ import java.util.List;
  */
 public class HeaderPsiUtilForGrammar {
 
-	public static boolean bracesAreEmpty(HeaderClassDeclaration classDeclaration){
-		if(classDeclaration.getClassContent() == null){
+	public static boolean bracesAreEmpty(HeaderClassDeclaration classDeclaration) {
+		if (classDeclaration.getClassContent() == null) {
 			return true;
 		}
 		HeaderClassContent content = classDeclaration.getClassContent();
 		return content.getFileEntries().getFileEntryList().size() == 0;
 	}
 
-	public static void removeBracesIfEmpty(HeaderClassDeclaration classDeclaration){
-		if(classDeclaration.getClassContent() == null){
+	public static void removeBracesIfEmpty(HeaderClassDeclaration classDeclaration) {
+		if (classDeclaration.getClassContent() == null) {
 			return;
 		}
 		HeaderClassContent content = classDeclaration.getClassContent();
-		if(content.getFileEntries().getFileEntryList().size() == 0){
+		if (content.getFileEntries().getFileEntryList().size() == 0) {
 			classDeclaration.getNode().removeChild(content.getNode());
 		}
 	}
 
-	public static ASTNode getClassNameNode(HeaderClassDeclaration declaration){
+	public static ASTNode getClassNameNode(HeaderClassDeclaration declaration) {
 		return getClassNameNode(declaration.getClassStub());
 	}
 
-	public static ASTNode getClassNameNode(HeaderClassStub classStub){
+	public static ASTNode getClassNameNode(HeaderClassStub classStub) {
 		return PsiUtil.getNextSiblingNotWhitespace(classStub.getFirstChild().getNode());
 	}
 
@@ -58,73 +58,71 @@ public class HeaderPsiUtilForGrammar {
 		return getClassNameNode(classStub).getText();
 	}
 
-	public static String getPathString(HeaderPreInclude include){
+	public static String getPathString(HeaderPreInclude include) {
 		return include.getPreIncludeFile().getText().substring(1, include.getPreIncludeFile().getText().length() - 1);
 	}
 
-	public static String getAssigningVariable(HeaderAssignment assignment){
-		if(assignment instanceof HeaderBasicAssignment){
-			return ((HeaderBasicAssignment)assignment).getAssignmentIdentifier().getText();
+	public static String getAssigningVariable(HeaderAssignment assignment) {
+		if (assignment instanceof HeaderBasicAssignment) {
+			return ((HeaderBasicAssignment) assignment).getAssignmentIdentifier().getText();
 		}
-		if(assignment instanceof HeaderArrayAssignment){
-			return ((HeaderArrayAssignment)assignment).getAssignmentIdentifier().getText();
+		if (assignment instanceof HeaderArrayAssignment) {
+			return ((HeaderArrayAssignment) assignment).getAssignmentIdentifier().getText();
 		}
 		throw new RuntimeException("can't get assigning variable from assignment type " + assignment.getClass());
 	}
 
-	public static String getAssigningValue(HeaderAssignment assignment){
-		String s =assignment.getText().substring(assignment.getText().indexOf('=') + 1).trim();
-		if(s.charAt(0) == '\"' || s.charAt(0) == '\''){
-			return s.substring(1,s.length() - 1);
-		}
-		return s;
+	public static String getAssigningValue(HeaderAssignment assignment) {
+		return assignment.getText().substring(assignment.getText().indexOf('=') + 1).trim();
 	}
 
 	public static boolean hasAttributes(HeaderClassDeclaration classDeclaration, Attribute[] attributes, boolean traverseIncludes) {
 		Attribute[] classAttributes = classDeclaration.getAttributes(traverseIncludes);
 		int matched = 0;
-		for(int i = 0; i < classAttributes.length; i++){
-			for(int j = 0; j < attributes.length; j++){
-				if(attributes[j].equals(classAttributes[i])){
+		for (int i = 0; i < classAttributes.length; i++) {
+			for (int j = 0; j < attributes.length; j++) {
+				if (attributes[j].equals(classAttributes[i])) {
 					matched++;
 				}
 			}
 		}
-		if(matched == attributes.length){
+		if (matched == attributes.length) {
 			return true;
 		}
 		return false;
 	}
 
-	/** Get all attributes inside the class declaration. Attributes are any assignment inside the class. If traverseIncludes is true, it will traverse include statements
+	/**
+	 * Get all attributes inside the class declaration. Attributes are any assignment inside the class. If traverseIncludes is true, it will traverse include statements
+	 *
 	 * @param traverseIncludes true if to traverse includes while getting attributes, false if to skip over them
 	 * @return array of attributes (assignment expressions)
 	 */
 	public static Attribute[] getAttributes(HeaderClassDeclaration decl, boolean traverseIncludes) {
 		ArrayList<Attribute> attributesList = new ArrayList<>();
-		if(decl.getClassContent() != null){
+		if (decl.getClassContent() != null) {
 			getAttributes(decl.getClassContent().getFileEntries().getFileEntryList(), traverseIncludes, attributesList);
 		}
 		return attributesList.toArray(new Attribute[attributesList.size()]);
 	}
 
 	private static void getAttributes(List<HeaderFileEntry> fileEntryList, boolean traverseIncludes, ArrayList<Attribute> attributesList) {
-		for(HeaderFileEntry entry : fileEntryList){
-			if(entry.getPreprocessorGroup() != null && traverseIncludes){
+		for (HeaderFileEntry entry : fileEntryList) {
+			if (entry.getPreprocessorGroup() != null && traverseIncludes) {
 				List<HeaderPreprocessor> processors = entry.getPreprocessorGroup().getPreprocessorList();
-				for(HeaderPreprocessor preprocessor : processors){
-					if(preprocessor instanceof HeaderPreInclude){
+				for (HeaderPreprocessor preprocessor : processors) {
+					if (preprocessor instanceof HeaderPreInclude) {
 						HeaderFile includedFile = ((HeaderPreInclude) preprocessor).getHeaderFileFromInclude();
-						if(includedFile != null){
-							HeaderClassDeclaration firstClass = (HeaderClassDeclaration)PsiUtil.findFirstDescendantElement(includedFile, HeaderClassDeclaration.class);
-							if(firstClass.getClassContent() != null){
+						if (includedFile != null) {
+							HeaderClassDeclaration firstClass = (HeaderClassDeclaration) PsiUtil.findFirstDescendantElement(includedFile, HeaderClassDeclaration.class);
+							if (firstClass.getClassContent() != null) {
 								getAttributes(firstClass.getClassContent().getFileEntries().getFileEntryList(), true, attributesList);
 							}
 						}
 					}
 				}
 			}
-			if(entry.getAssignment() != null){
+			if (entry.getAssignment() != null) {
 				attributesList.add(new Attribute(entry.getAssignment().getAssigningVariable(), entry.getAssignment().getAssigningValue()));
 			}
 		}
@@ -141,7 +139,7 @@ public class HeaderPsiUtilForGrammar {
 		Project project = include.getProject();
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, HeaderFileType.INSTANCE, PluginUtil.getModuleForPsiFile(include.getContainingFile()).getModuleContentScope());
 		for (VirtualFile file : files) {
-			if(file.getPath().contains(include.getPathString())){
+			if (file.getPath().contains(include.getPathString())) {
 				return (HeaderFile) PsiManager.getInstance(project).findFile(file);
 			}
 		}

@@ -1,11 +1,12 @@
 plugin
-	removed duplicate find file code
+	none
 
 shared between languages
-	fixed stringtable documentation lookup in sqf for when there was no text
+	none
 
 SQF
-	inserting new function action works, but is buggy
+	fixed issue when create sqf file or create sqf function would appear even when it shouldn't
+	creating a new sqf function from menu will now detect current directory path
 
 Header
     none

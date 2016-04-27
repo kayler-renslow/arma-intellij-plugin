@@ -1,18 +1,23 @@
 package com.kaylerrenslow.a3plugin.dialog.actions.newGroup;
 
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiFile;
+import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.dialog.Dialog_NewSQFFile;
+import com.kaylerrenslow.a3plugin.dialog.SimpleMessageDialog;
 import com.kaylerrenslow.a3plugin.dialog.actions.SimpleGuiAction;
 
 import java.io.IOException;
 
 /**
- * Created by Kayler on 04/05/2016.
+ * @author Kayler
+ * Action invoked when New->New SQF File is called from main menu
+ * Created on 04/05/2016.
  */
 public class Action_NewSQFFile extends AnAction {
 
@@ -23,9 +28,15 @@ public class Action_NewSQFFile extends AnAction {
 
 	@Override
 	public void update(AnActionEvent e) {
+		boolean disable = false;
 		if(e.getProject() == null){
-			e.getInputEvent().consume();
+			disable = true;
 		}
+		VirtualFile directory = e.getData(CommonDataKeys.VIRTUAL_FILE);
+		if(directory == null){
+			disable = true;
+		}
+		e.getPresentation().setVisible(!disable);
 	}
 
 	private class CreateNewSQFFile implements SimpleGuiAction<Pair<String, VirtualFile>> {
@@ -47,10 +58,12 @@ public class Action_NewSQFFile extends AnAction {
 					}
 					try {
 						VirtualFile directory = data.second;
-						VirtualFile created = directory.createChildData(null, fileName);
+						directory.createChildData(null, fileName);
 					} catch (IOException e) {
 						e.printStackTrace(System.out);
-						return;
+						String title = Plugin.resources.getString("plugin.message.file_creation_error.title");
+						String message = String.format(Plugin.resources.getString("plugin.message.file_creation_error"), e.getMessage());
+						SimpleMessageDialog.newDialog(title, message).show();
 					}
 				}
 			});

@@ -29,6 +29,7 @@ public class ArmaModuleData{
 	private final Module module;
 	private HeaderFile descriptionExt = null;
 	private Stringtable stringtable;
+	private VirtualFile descriptionExtVF;
 
 	ArmaModuleData(@NotNull Module module) {
 		this.module = module;
@@ -48,12 +49,21 @@ public class ArmaModuleData{
 		if(descriptionExt != null && descriptionExt.getVirtualFile().exists()){
 			return descriptionExt;
 		}
-		VirtualFile descriptionExtVF = PluginUtil.findFileInModuleByName("description.ext", this.module, HeaderFileType.INSTANCE, true);
+		this.descriptionExtVF = PluginUtil.findFileInModuleByName("description.ext", this.module, HeaderFileType.INSTANCE, true);
+
 		if(descriptionExtVF == null){
 			throw new DescriptionExtNotDefinedException();
 		}
 		this.descriptionExt = (HeaderFile) PsiManager.getInstance(this.module.getProject()).findFile(descriptionExtVF);
 		return this.descriptionExt;
+	}
+
+	/** Get's the root mission directory file (description.ext's parent directory)
+	 * @return directory, or null if the description.ext isn't defined
+	 */
+	public VirtualFile getRootMissionDirectory() throws DescriptionExtNotDefinedException {
+		getDescriptionExt();
+		return this.descriptionExtVF.getParent();
 	}
 
 	/** Get the stringtable.xml for this module
