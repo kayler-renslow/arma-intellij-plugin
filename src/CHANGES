@@ -5,8 +5,8 @@ shared between languages
 	none
 
 SQF
-	fixed auto completion for call BIS_fnc...
-	fixed documentation lookup for BIS functions
+	fixed getting documentation for sqf psi files
+	added #include to sqf grammar file
 
 Header
     none

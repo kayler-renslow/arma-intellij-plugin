@@ -40,6 +40,8 @@ STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 BLOCK_COMMENT = "/*" [^*] ~"*/" | "/*" "*"+ "/"
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 
+INCLUDE = "#include" [ ]+ {INPUT_CHARACTER}+
+
 %%
 
 <YYINITIAL> {WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
@@ -50,6 +52,8 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; }
+
+<YYINITIAL> {INCLUDE} {return TokenType.WHITE_SPACE;}
 
 <YYINITIAL> "true" { return SQFTypes.TRUE; }
 <YYINITIAL> "false" { return SQFTypes.FALSE; }

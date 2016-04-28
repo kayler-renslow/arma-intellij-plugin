@@ -47,11 +47,11 @@ public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 		}
 	}
 
-	@Nullable
-	@Override
-	public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
-		return new ArmaWizardStepMain(context, parentDisposable);
-	}
+//	@Nullable
+//	@Override
+//	public ModuleWizardStep getCustomOptionsStep(WizardContext context, Disposable parentDisposable) {
+//		return new ArmaWizardStepMain(context, parentDisposable);
+//	}
 
 
 	@Override

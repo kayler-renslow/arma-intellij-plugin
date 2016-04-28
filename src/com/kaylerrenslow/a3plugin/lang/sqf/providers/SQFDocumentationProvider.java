@@ -68,13 +68,14 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 			return DocumentationUtil.purtify(SQFPsiUtil.getCommentContent(comment));
 		}
 		if (element instanceof PsiFile){
-			ASTNode potentialDocNode = element.getNode().getFirstChildNode();
-			if (!PsiUtil.isOfElementType(potentialDocNode, SQFTypes.INLINE_COMMENT) && !PsiUtil.isOfElementType(potentialDocNode, SQFTypes.BLOCK_COMMENT)){
-				potentialDocNode = potentialDocNode.getTreeNext();
-			}
-			if (PsiUtil.isOfElementType(potentialDocNode, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(potentialDocNode, SQFTypes.BLOCK_COMMENT)){
-				PsiComment comment = (PsiComment) potentialDocNode.getPsi();
-				return DocumentationUtil.purtify(SQFPsiUtil.getCommentContent(comment));
+			PsiElement[] children = element.getChildren();
+			for(PsiElement child: children){
+				if(child instanceof SQFScope){
+					break;
+				}
+				if(child instanceof PsiComment){
+					return DocumentationUtil.purtify(SQFPsiUtil.getCommentContent((PsiComment)child));
+				}
 			}
 			return null;
 		}
