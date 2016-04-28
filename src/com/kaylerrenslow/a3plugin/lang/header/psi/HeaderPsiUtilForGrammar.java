@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.header.psi.impl;
+package com.kaylerrenslow.a3plugin.lang.header.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
@@ -7,14 +7,15 @@ import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
-import com.kaylerrenslow.a3plugin.lang.header.psi.*;
+import com.kaylerrenslow.a3plugin.lang.header.editor.HeaderAnnotator;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.util.Attribute;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
+import com.kaylerrenslow.a3plugin.util.TraversalObjectFinder;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -50,6 +51,19 @@ public class HeaderPsiUtilForGrammar {
 		return PsiUtil.getNextSiblingNotWhitespace(classStub.getFirstChild().getNode());
 	}
 
+	public static String getExtendClassName(HeaderClassDeclaration declaration) {
+		return getExtendClassName(declaration.getClassStub());
+	}
+
+	public static String getExtendClassName(HeaderClassStub classStub) {
+		if (classStub.getText().contains(":")) {
+			int index = classStub.getText().indexOf(':') + 1;
+			return classStub.getText().substring(index).trim();
+		} else {
+			return null;
+		}
+	}
+
 	public static String getClassName(HeaderClassDeclaration decl) {
 		return getClassName(decl.getClassStub());
 	}
@@ -62,14 +76,18 @@ public class HeaderPsiUtilForGrammar {
 		return include.getPreIncludeFile().getText().substring(1, include.getPreIncludeFile().getText().length() - 1);
 	}
 
-	public static String getAssigningVariable(HeaderAssignment assignment) {
+	public static ASTNode getAssigningIdentifierNode(HeaderAssignment assignment) {
 		if (assignment instanceof HeaderBasicAssignment) {
-			return ((HeaderBasicAssignment) assignment).getAssignmentIdentifier().getText();
+			return ((HeaderBasicAssignment) assignment).getAssignmentIdentifier().getNode();
 		}
 		if (assignment instanceof HeaderArrayAssignment) {
-			return ((HeaderArrayAssignment) assignment).getAssignmentIdentifier().getText();
+			return ((HeaderArrayAssignment) assignment).getAssignmentIdentifier().getNode();
 		}
 		throw new RuntimeException("can't get assigning variable from assignment type " + assignment.getClass());
+	}
+
+	public static String getAssigningVariable(HeaderAssignment assignment) {
+		return assignment.getAssigningIdentifierNode().getText();
 	}
 
 	public static String getAssigningValue(HeaderAssignment assignment) {
@@ -106,7 +124,52 @@ public class HeaderPsiUtilForGrammar {
 		return attributesList.toArray(new Attribute[attributesList.size()]);
 	}
 
+	public static void setAttribute(HeaderClassDeclaration decl, String attribute, String newValue) {
+		traverseFileEntries(decl.getClassContent().getFileEntries().getFileEntryList(), true, new TraversalObjectFinder<HeaderFileEntry>() {
+			private boolean stopped;
+
+			@Override
+			public void found(@NotNull HeaderFileEntry headerFileEntry) {
+				HeaderAssignment assignment = headerFileEntry.getAssignment();
+				if (assignment.getAssigningVariable().equals(attribute)) {
+					this.stopped = true;
+					Project project = headerFileEntry.getProject();
+					assignment.getParent().getNode().replaceChild(assignment.getNode(), HeaderPsiUtil.createElement(project, attribute + "=" + newValue + ";", HeaderTypes.ASSIGNMENT).getNode());
+				}
+			}
+
+			@Override
+			public boolean stopped() {
+				return this.stopped;
+			}
+
+			@Override
+			public boolean traverseFoundNodesChildren() {
+				return true;
+			}
+		});
+	}
+
 	private static void getAttributes(List<HeaderFileEntry> fileEntryList, boolean traverseIncludes, ArrayList<Attribute> attributesList) {
+		traverseFileEntries(fileEntryList, traverseIncludes, new TraversalObjectFinder<HeaderFileEntry>() {
+			@Override
+			public void found(@NotNull HeaderFileEntry headerFileEntry) {
+				attributesList.add(new Attribute(headerFileEntry.getAssignment().getAssigningVariable(), headerFileEntry.getAssignment().getAssigningValue()));
+			}
+
+			@Override
+			public boolean stopped() {
+				return false;
+			}
+
+			@Override
+			public boolean traverseFoundNodesChildren() {
+				return true;
+			}
+		});
+	}
+
+	private static void traverseFileEntries(List<HeaderFileEntry> fileEntryList, boolean traverseIncludes, TraversalObjectFinder<HeaderFileEntry> entryFinder) {
 		for (HeaderFileEntry entry : fileEntryList) {
 			if (entry.getPreprocessorGroup() != null && traverseIncludes) {
 				List<HeaderPreprocessor> processors = entry.getPreprocessorGroup().getPreprocessorList();
@@ -116,14 +179,20 @@ public class HeaderPsiUtilForGrammar {
 						if (includedFile != null) {
 							HeaderClassDeclaration firstClass = (HeaderClassDeclaration) PsiUtil.findFirstDescendantElement(includedFile, HeaderClassDeclaration.class);
 							if (firstClass.getClassContent() != null) {
-								getAttributes(firstClass.getClassContent().getFileEntries().getFileEntryList(), true, attributesList);
+								if (entryFinder.stopped()) {
+									return;
+								}
+								traverseFileEntries(firstClass.getClassContent().getFileEntries().getFileEntryList(), true, entryFinder);
 							}
 						}
 					}
 				}
 			}
 			if (entry.getAssignment() != null) {
-				attributesList.add(new Attribute(entry.getAssignment().getAssigningVariable(), entry.getAssignment().getAssigningValue()));
+				entryFinder.found(entry);
+			}
+			if (entryFinder.stopped()) {
+				return;
 			}
 		}
 	}

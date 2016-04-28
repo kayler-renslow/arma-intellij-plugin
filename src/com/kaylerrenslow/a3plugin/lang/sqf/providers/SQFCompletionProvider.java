@@ -12,7 +12,7 @@ import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
@@ -104,8 +104,8 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		if (cursor.getText().startsWith("BIS_")) { //add all bis functions
 			String functionName;
 			String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.bis_function");
-			for (int i = 0; i < SQFStatic.LIST_FUNCTIONS.size(); i++) {
-				functionName = SQFStatic.LIST_FUNCTIONS.get(i);
+			for (int i = 0; i < SQFStatic.LIST_BIS_FUNCTIONS.size(); i++) {
+				functionName = SQFStatic.LIST_BIS_FUNCTIONS.get(i);
 				result.addElement(LookupElementBuilder.createWithSmartPointer(functionName, SQFPsiUtil.createElement(project, functionName, SQFTypes.GLOBAL_VAR)).withIcon(PluginIcons.ICON_SQF_FUNCTION).appendTailText(" " + trailText, true));
 			}
 			return; //adding anything else is a waste of computation at this point
@@ -134,7 +134,7 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		}
 
 		for (ASTNode node : elements) { //add all variables
-			if (!SQFPsiUtil.followsSQFFunctionNameRules(node.getText())) {
+			if (!SQFStatic.followsSQFFunctionNameRules(node.getText())) {
 				result.addElement(LookupElementBuilder.create(node.getText()).withTailText(localVarTailText).withIcon(PluginIcons.ICON_SQF_VARIABLE));
 			}
 		}

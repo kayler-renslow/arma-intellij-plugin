@@ -1,6 +1,5 @@
 package com.kaylerrenslow.a3plugin.lang.sqf;
 
-import com.intellij.openapi.util.Pair;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.util.FileReader;
 import com.kaylerrenslow.a3plugin.util.ResourceGetter;
@@ -22,18 +21,24 @@ public class SQFStatic{
 	public static final String NAME = "Arma.SQF";
 	public static final String NAME_FOR_DISPLAY = Plugin.resources.getString("lang.sqf.name_for_display");
 	public static final String DESCRIPTION = Plugin.resources.getString("lang.sqf.description");
-	public static final String FILE_EXTENSION = Plugin.resources.getString("lang.sqf.file_extension");
-	public static final String FILE_EXTENSION_DEFAULT = Plugin.resources.getString("lang.sqf.file_extension_default");
+	static final String FILE_EXTENSION = Plugin.resources.getString("lang.sqf.file_extension");
+	static final String FILE_EXTENSION_DEFAULT = Plugin.resources.getString("lang.sqf.file_extension_default");
 
 	public static final String COMMANDS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/commands-doc/";
 	public static final String BIS_FUNCTIONS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/bis-functions-doc/";
 
 	public static final List<String> LIST_COMMANDS = TextFileListToList.appendFileNamesToList(PluginUtil.convertURLToFile(ResourceGetter.getResourceAsURL(COMMANDS_DOC_FILE_DIR)), new ArrayList<>(), false);
-	public static final List<String> LIST_FUNCTIONS = TextFileListToList.appendFileNamesToList(PluginUtil.convertURLToFile(ResourceGetter.getResourceAsURL(BIS_FUNCTIONS_DOC_FILE_DIR)), new ArrayList<>(), false);
+	public static final List<String> LIST_BIS_FUNCTIONS = TextFileListToList.appendFileNamesToList(PluginUtil.convertURLToFile(ResourceGetter.getResourceAsURL(BIS_FUNCTIONS_DOC_FILE_DIR)), new ArrayList<>(), false);
 
 	public static final String SQF_SAMPLE_CODE_TEXT = FileReader.getText("/com/kaylerrenslow/a3plugin/lang/sqf/codeStyle/sqfSampleCode.sqf");
 
-	public static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
+	private static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
+
+
+	static{
+		Collections.sort(LIST_COMMANDS);
+		Collections.sort(LIST_BIS_FUNCTIONS);
+	}
 
 	/** Fetch command syntax for given command. This method will fetch the syntax and params from file and make it readable. Example: "paramName COMMAND paramName2" to "paramName:Number COMMAND paramName2:Number"
 	 * @param command command String name
@@ -63,10 +68,6 @@ public class SQFStatic{
 		return syntax;
 	}
 
-	static{
-		Collections.sort(LIST_COMMANDS);
-		Collections.sort(LIST_FUNCTIONS);
-	}
 
 	/** Parses a full function name (e.g. tag_fnc_functionClass) and returns a pair containing the tag name and function class name. Pair first = tag, pair second = function class name
 	 * @param fullFunctionName full function name
@@ -94,6 +95,28 @@ public class SQFStatic{
 	 */
 	public static String getConfigFunctionFileName(String functionClassName){
 		return "fn_" + functionClassName + ".sqf";
+	}
+
+	/**
+	 * Checks if the given variable name follows the general rules of function naming (requires tag, _fnc_ and then an identifier).
+	 * <p>Examples: tag_fnc_function, sj_fnc_function2</p>
+	 * <p>Counter Examples: tag_fn_c_function, sj_nc_function2, potatoes, _fnc_function</p>
+	 *
+	 * @param variable Variable to test
+	 * @return true if matches, false if it doesn't
+	 */
+	public static boolean followsSQFFunctionNameRules(@NotNull String variable) {
+		return variable.matches(FUNCTION_NAMING_RULE_REGEX); //don't need to explicitly check if a number starts the variable name since that is asserted by the lexer
+	}
+
+	/**
+	 * Return true if the given var name is a BIS function, false if it isn't.
+	 */
+	public static boolean isBisFunction(String varName) {
+		if(!varName.startsWith("BIS_fnc_")){
+			return false;
+		}
+		return Collections.binarySearch(LIST_BIS_FUNCTIONS, varName) >= 0;
 	}
 
 	public static class SQFFunctionTagAndName{

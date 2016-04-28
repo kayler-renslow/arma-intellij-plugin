@@ -5,11 +5,9 @@ import com.intellij.lang.documentation.DocumentationProviderEx;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.DocumentationUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
@@ -17,14 +15,12 @@ import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableLookupEleme
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
-import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.FileReader;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**

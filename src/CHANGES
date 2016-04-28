@@ -5,8 +5,7 @@ shared between languages
 	none
 
 SQF
-	fixed issue when create sqf file or create sqf function would appear even when it shouldn't
-	creating a new sqf function from menu will now detect current directory path
+	refactor->renaming functions sort of works
 
 Header
     none

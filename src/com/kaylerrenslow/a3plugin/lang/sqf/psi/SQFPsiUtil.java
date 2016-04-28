@@ -57,18 +57,6 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 * Checks if the given variable name follows the general rules of function naming (requires tag, _fnc_ and then an identifier).
-	 * <p>Examples: tag_fnc_function, sj_fnc_function2</p>
-	 * <p>Counter Examples: tag_fn_c_function, sj_nc_function2, potatoes, _fnc_function</p>
-	 *
-	 * @param variable Variable to test
-	 * @return true if matches, false if it doesn't
-	 */
-	public static boolean followsSQFFunctionNameRules(@NotNull String variable) {
-		return variable.matches(SQFStatic.FUNCTION_NAMING_RULE_REGEX); //don't need to explicitly check if a number starts the variable name since that is asserted by the lexer
-	}
-
-	/**
 	 * Checks if the given PsiElement is a BIS function (is of type SQFTypes.VARIABLE or SQFTypes.GLOBAL_VAR and text starts with BIS_fnc, false otherwise).
 	 *
 	 * @param element element
@@ -76,14 +64,10 @@ public class SQFPsiUtil {
 	 */
 	public static boolean isBisFunction(@NotNull PsiElement element) {
 		if (PsiUtil.isOfElementType(element, SQFTypes.VARIABLE)) {
-			if (((SQFVariable) element).getVarName().startsWith("BIS_fnc")) {
-				return true;
-			}
+			return SQFStatic.isBisFunction(((SQFVariable) element).getVarName());
 		}
 		if (PsiUtil.isOfElementType(element, SQFTypes.GLOBAL_VAR)) {
-			if (element.getText().startsWith("BIS_fnc")) {
-				return true;
-			}
+			SQFStatic.isBisFunction(element.getText());
 		}
 		return false;
 	}

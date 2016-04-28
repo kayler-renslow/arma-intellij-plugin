@@ -1,23 +1,18 @@
 package com.kaylerrenslow.a3plugin.dialog;
 
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiManager;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.dialog.actions.SimpleGuiAction;
+import com.kaylerrenslow.a3plugin.dialog.util.DialogUtil;
 import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
-import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 
@@ -145,7 +140,6 @@ public class Dialog_NewSQFFunction extends JDialog {
 		}
 		okAction.actionPerformed(new SQFConfigFunctionInformationHolder(this.tfFunctionTagName.getText(), this.tfFunctionName.getText(), this.tfFunctionLocation.getText(), this.module, null));
 		dispose();
-		dispose();
 	}
 
 	private void error(JComponent component, String message){
@@ -162,11 +156,7 @@ public class Dialog_NewSQFFunction extends JDialog {
 		dialog.pack();
 
 		//center window
-		Component component = e.getData(DataKeys.CONTEXT_COMPONENT);
-		while (component.getParent() != null) {
-			component = component.getParent();
-		}
-		dialog.setLocationRelativeTo(component);
+		dialog.setLocationRelativeTo(DialogUtil.getHighestAncestor(e.getData(DataKeys.CONTEXT_COMPONENT)));
 
 		dialog.okAction = okAction;
 		dialog.setTitle(Plugin.resources.getString("plugin.dialog.new_sqf_function.title"));

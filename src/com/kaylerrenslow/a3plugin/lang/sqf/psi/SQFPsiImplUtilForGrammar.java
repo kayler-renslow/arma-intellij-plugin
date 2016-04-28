@@ -4,6 +4,7 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase;
 import com.kaylerrenslow.a3plugin.util.TraversalObjectFinder;
 import org.jetbrains.annotations.NotNull;
@@ -65,7 +66,7 @@ public class SQFPsiImplUtilForGrammar {
 	 * @return true if matches, false if it doesn't
 	 */
 	public static boolean followsSQFFunctionNameRules(SQFVariable variable) {
-		return SQFPsiUtil.followsSQFFunctionNameRules(variable.getVarName());
+		return SQFStatic.followsSQFFunctionNameRules(variable.getVarName());
 	}
 
 	/**

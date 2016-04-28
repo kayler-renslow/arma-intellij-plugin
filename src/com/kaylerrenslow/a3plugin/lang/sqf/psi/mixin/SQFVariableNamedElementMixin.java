@@ -10,12 +10,12 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFFunctionItemPresentation;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFVariableItemPresentation;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFLocalVarInStringReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +44,7 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 	@Override
 	public ItemPresentation getPresentation() {
 		if(this.myVariableElementType == SQFTypes.GLOBAL_VAR){
-			if(SQFPsiUtil.followsSQFFunctionNameRules(this.getVarName())){
+			if(SQFStatic.followsSQFFunctionNameRules(this.getVarName())){
 				try{
 					HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(this.getContainingFile(), this.getVarName());
 					if(function != null){

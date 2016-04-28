@@ -1,6 +1,5 @@
 package com.kaylerrenslow.a3plugin.lang.header.psi;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
@@ -10,10 +9,8 @@ import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.dialog.SQFConfigFunctionInformationHolder;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
 import com.kaylerrenslow.a3plugin.lang.header.exception.*;
-import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.Attribute;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
@@ -21,6 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -223,6 +221,30 @@ public class HeaderPsiUtil {
 	 */
 	@Nullable
 	public static HeaderConfigFunction getFunctionFromCfgFunctions(@NotNull PsiFile psiFile, @NotNull String functionName) throws ConfigClassNotDefinedException, DescriptionExtNotDefinedException, FunctionNotDefinedInConfigException, MalformedConfigException {
+		HeaderClassDeclaration cfgFuncs = getCfgFunctions(psiFile);
+		return getFunctionFromCfgFunctionsBody(functionName, cfgFuncs);
+	}
+
+	/**
+	 * Creates a new HeaderConfigFunction instance for the given functionName
+	 *
+	 * @param module       Module that contains the description.ext
+	 * @param functionName full function name (example: tag_fnc_functionClassName )
+	 * @return new HeaderConfigFunction instance for the given function name, or null if the functionName is formatted wrong
+	 * @throws ConfigClassNotDefinedException      when CfgFunctions is not defined in description.ext
+	 * @throws DescriptionExtNotDefinedException   when there is no description.ext
+	 * @throws FunctionNotDefinedInConfigException when the function isn't defined anywhere in CfgFunctions in description.ext
+	 * @throws MalformedConfigException            when the config file is incorrectly being used, formatted, or syntactically incorrect
+	 */
+	@Nullable
+	public static HeaderConfigFunction getFunctionFromCfgFunctions(@NotNull Module module, @NotNull String functionName) throws ConfigClassNotDefinedException, DescriptionExtNotDefinedException, FunctionNotDefinedInConfigException,
+			MalformedConfigException {
+		HeaderClassDeclaration cfgFuncs = getCfgFunctions(module);
+		return getFunctionFromCfgFunctionsBody(functionName, cfgFuncs);
+	}
+
+	@Nullable
+	private static HeaderConfigFunction getFunctionFromCfgFunctionsBody(@NotNull String functionName, HeaderClassDeclaration cfgFuncs) throws FunctionNotDefinedInConfigException, MalformedConfigException {
 		//@formatter:off
 		/*
 		  //some functions
@@ -255,21 +277,22 @@ public class HeaderPsiUtil {
 		  };
 		*/
 		//@formatter:on
-		if (!SQFPsiUtil.followsSQFFunctionNameRules(functionName)) {
+		if (!SQFStatic.followsSQFFunctionNameRules(functionName)) {
 			return null;
 		}
-		HeaderClassDeclaration cfgFuncs = getCfgFunctions(psiFile);
 		SQFStatic.SQFFunctionTagAndName tagAndClass = SQFStatic.getFunctionTagAndName(functionName);
 		String tagName = tagAndClass.tagName;
 		String functionClassName = tagAndClass.functionClassName;
 
 		HeaderClassDeclaration functionClass = null; //psi element that links to the function's class declaration
+		HeaderClassDeclaration classWithTag = null; //class with tag as class name
 
 		Attribute[] tagsAsAttributes = {new Attribute("tag", "\"" + tagName + "\"")};
+
 		ArrayList<HeaderClassDeclaration> matchedClassesWithTag = (getClassDeclarationsWithEntriesEqual(cfgFuncs, null, tagsAsAttributes, true, 1, 1)); //classes inside CfgFunctions that have tag attribute
 
 		if (matchedClassesWithTag.size() == 0) { //no classes of depth 1 relative to CfgFunctions have tag attribute, so find the class itself with its className=tagName
-			HeaderClassDeclaration classWithTag = getClassDeclaration(cfgFuncs, tagName, true, 1, 1); //class with tag as class name
+			classWithTag = getClassDeclaration(cfgFuncs, tagName, true, 1, 1);
 			if (classWithTag == null) {
 				throw new FunctionNotDefinedInConfigException(functionName);
 			}
@@ -282,6 +305,7 @@ public class HeaderPsiUtil {
 			for (HeaderClassDeclaration matchedTagClass : matchedClassesWithTag) {
 				functionClass = getClassDeclaration(matchedTagClass, functionClassName, true, 2, 2); //check if the class that has the tag actually holds the function's class declaration
 				if (functionClass != null) {
+					classWithTag = matchedTagClass;
 					break;
 				}
 			}
@@ -290,7 +314,7 @@ public class HeaderPsiUtil {
 			}
 		}
 
-		return getHeaderConfigFunction(cfgFuncs, tagName, functionClass);
+		return getHeaderConfigFunction(cfgFuncs, tagName, classWithTag, functionClass);
 	}
 
 	/**
@@ -302,7 +326,9 @@ public class HeaderPsiUtil {
 	 * @return the HeaderConfigFunction instance representing this function
 	 */
 	@NotNull
-	private static HeaderConfigFunction getHeaderConfigFunction(@NotNull HeaderClassDeclaration cfgFuncs, @NotNull String tagName, @NotNull HeaderClassDeclaration functionClass) throws MalformedConfigException, FunctionNotDefinedInConfigException {
+	private static HeaderConfigFunction getHeaderConfigFunction(@NotNull HeaderClassDeclaration cfgFuncs, @NotNull String tagName, @NotNull HeaderClassDeclaration tagClass, @NotNull HeaderClassDeclaration functionClass) throws
+			MalformedConfigException,
+			FunctionNotDefinedInConfigException {
 		String containingDirectoryPath = null; //file path (directories)
 		String functionFileExtension = null; //file extension (.sqf, .fsm)
 		boolean appendFn_ = true; //append fn_ to file name
@@ -348,7 +374,7 @@ public class HeaderPsiUtil {
 			}
 		}
 
-		return new HeaderConfigFunction(functionClass, containingDirectoryPath, tagName, functionFileExtension, appendFn_);
+		return new HeaderConfigFunction(functionClass, containingDirectoryPath, tagName, tagClass, functionFileExtension, appendFn_);
 	}
 
 
@@ -397,7 +423,7 @@ public class HeaderPsiUtil {
 			ArrayList<HeaderClassDeclaration> functionClasses = getClassDeclarationsWithEntriesEqual(tagClass, null, null, true, 2, 2);
 			try {
 				for (HeaderClassDeclaration functionClass : functionClasses) {
-					functions.add(getHeaderConfigFunction(cfgFunc, tag, functionClass));
+					functions.add(getHeaderConfigFunction(cfgFunc, tag, tagClass, functionClass));
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

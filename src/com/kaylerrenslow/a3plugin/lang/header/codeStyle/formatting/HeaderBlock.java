@@ -9,7 +9,7 @@ import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassContent;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassDeclaration;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
-import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderPsiUtilForGrammar;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtilForGrammar;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;

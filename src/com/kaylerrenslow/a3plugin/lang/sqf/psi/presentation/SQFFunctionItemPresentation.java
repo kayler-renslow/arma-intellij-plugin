@@ -1,7 +1,7 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation;
 
 import com.intellij.navigation.ItemPresentation;
-import com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderConfigFunction;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;

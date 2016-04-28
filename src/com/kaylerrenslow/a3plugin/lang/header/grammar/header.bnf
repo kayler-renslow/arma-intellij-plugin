@@ -12,7 +12,7 @@
   elementTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderElementType"
   tokenTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTokenType"
 
-  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.impl.HeaderPsiUtilForGrammar"
+  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtilForGrammar"
 }
 // @formatter:off
 headerFile ::= file_entry*
@@ -32,7 +32,7 @@ array_entry ::= expression | value_ | array
 
 assignment_identifier ::= IDENTIFIER
 
-assignment ::= basic_assignment | array_assignment {methods=[getAssigningVariable getAssigningValue]}
+assignment ::= basic_assignment | array_assignment {methods=[getAssigningVariable getAssigningValue getAssigningIdentifierNode]}
 basic_assignment ::= assignment_identifier EQ (STRINGTABLE_ENTRY | expression | value_) {extends("basic_assignment")=assignment}
 array_assignment ::= assignment_identifier BRACKET_PAIR EQ array {extends("array_assignment")=assignment}
 
@@ -53,8 +53,8 @@ private term_ ::= (PLUS | MINUS)? (
 		  )
 
 
-class_declaration ::= class_stub class_content? {methods=[getClassName getAttributes hasAttributes getClassNameNode removeBracesIfEmpty bracesAreEmpty]}
-class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? {methods=[getClassName getClassNameNode]}
+class_declaration ::= class_stub class_content? {methods=[getClassName getExtendClassName getAttributes hasAttributes setAttribute getClassNameNode removeBracesIfEmpty bracesAreEmpty]}
+class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? {mixin="com.kaylerrenslow.a3plugin.lang.header.psi.mixin.HeaderClassStubMixin" implements="com.intellij.psi.PsiNamedElement" methods=[getClassName getExtendClassName getClassNameNode]}
 
 class_content ::= LBRACE file_entries RBRACE
 

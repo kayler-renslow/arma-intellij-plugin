@@ -6,6 +6,7 @@ import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.dialog.actions.SimpleGuiAction;
+import com.kaylerrenslow.a3plugin.dialog.util.DialogUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -74,11 +75,7 @@ public class Dialog_NewSQFFile extends JDialog {
 
 		Dialog_NewSQFFile dialog = new Dialog_NewSQFFile(newFileDirectory);
 		dialog.pack();
-		Component component = actionEvent.getData(DataKeys.CONTEXT_COMPONENT);
-		while(component.getParent() != null){
-			component = component.getParent();
-		}
-		dialog.setLocationRelativeTo(component);
+		dialog.setLocationRelativeTo(DialogUtil.getHighestAncestor(actionEvent.getData(DataKeys.CONTEXT_COMPONENT)));
 		dialog.okAction = okAction;
 		dialog.setTitle(Plugin.resources.getString("plugin.dialog.new_sqf_file.title"));
 		dialog.setVisible(true);

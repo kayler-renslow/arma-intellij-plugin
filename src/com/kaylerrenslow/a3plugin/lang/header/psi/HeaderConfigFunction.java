@@ -1,7 +1,8 @@
-package com.kaylerrenslow.a3plugin.lang.header.psi.impl;
+package com.kaylerrenslow.a3plugin.lang.header.psi;
 
 import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassDeclaration;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -17,6 +18,7 @@ public class HeaderConfigFunction {
 	private final String filePath;
 	private final String functionFileExtension;
 	private final boolean appendFn_;
+	private final HeaderClassDeclaration classWithTag;
 
 	/**
 	 * This class is a wrapper class for a function that was defined inside the missionConfigFile (description.ext >> CfgFunctions)
@@ -26,10 +28,11 @@ public class HeaderConfigFunction {
 	 * @param tagName                 the prefix tag for the function. This is defined in the config with tag="something" (or if not defined, it is the first child class of CfgFunctions)
 	 * @param functionFileExtension   file extension (.sqf, .fsm)
 	 */
-	public HeaderConfigFunction(HeaderClassDeclaration classDeclaration, String containingDirectoryPath, String tagName, @Nullable String functionFileExtension, boolean appendFn_) {
+	public HeaderConfigFunction(@NotNull HeaderClassDeclaration classDeclaration, @NotNull String containingDirectoryPath, @NotNull String tagName, @NotNull HeaderClassDeclaration classWithTag, @Nullable String functionFileExtension, boolean appendFn_) {
 		this.classDeclaration = classDeclaration;
 		this.filePath = containingDirectoryPath;
 		this.tagName = tagName;
+		this.classWithTag = classWithTag;
 		if (functionFileExtension == null) {
 			this.functionFileExtension = ".sqf";
 		} else {
@@ -38,27 +41,37 @@ public class HeaderConfigFunction {
 		this.appendFn_ = appendFn_;
 	}
 
+	@NotNull
 	public HeaderClassDeclaration getClassDeclaration() {
 		return this.classDeclaration;
 	}
 
-
+	@NotNull
 	public String getFunctionClassName(){
 		return this.classDeclaration.getClassName();
 	}
 
+	@NotNull
+	public HeaderClassDeclaration getClassWithTag() {
+		return classWithTag;
+	}
+
+	@NotNull
 	public String getTagName() {
 		return this.tagName;
 	}
 
+	@NotNull
 	public String getCallableName() {
 		return tagName + "_fnc_" + getFunctionClassName();
 	}
 
+	@NotNull
 	public String getContainingDirectoryPath() {
 		return this.filePath;
 	}
 
+	@NotNull
 	public String getFunctionFileExtension() {
 		return this.functionFileExtension;
 	}
@@ -66,14 +79,17 @@ public class HeaderConfigFunction {
 	/**
 	 * Get the full path to this function (\ will be converted to / and fn_ will be appended if required)
 	 */
+	@NotNull
 	public String getFullRelativePath() {
 		return getFullRelativePath(getFunctionClassName(), this.filePath, this.functionFileExtension, this.appendFn_);
 	}
 
+	@NotNull
 	public static String getFullRelativePath(String functionClassName, String functionFilePath, String functionFileExtension, boolean appendFn_){
 		return (functionFilePath + (functionFileExtension.length() > 0 ? "\\" : "") + (appendFn_ ? "fn_" : "") + functionClassName + functionFileExtension).replaceAll("\\\\", "/");
 	}
 
+	@NotNull
 	public static Icon getIcon() {
 		return PluginIcons.ICON_SQF_FUNCTION;
 	}

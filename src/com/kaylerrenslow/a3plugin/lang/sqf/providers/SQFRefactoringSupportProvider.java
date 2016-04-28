@@ -3,6 +3,10 @@ package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 import com.intellij.lang.refactoring.RefactoringSupportProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
+import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,6 +19,21 @@ public class SQFRefactoringSupportProvider extends RefactoringSupportProvider{
 
 	@Override
 	public boolean isMemberInplaceRenameAvailable(@NotNull PsiElement element, @Nullable PsiElement context) {
-		return element instanceof PsiNamedElement;
+		if(!(element instanceof PsiNamedElement)){
+			return false;
+		}
+		if(element instanceof SQFVariable){
+			SQFVariable variable = (SQFVariable)element;
+			if(SQFStatic.isBisFunction(variable.getVarName())){
+				return true;
+			}
+			try{
+				HeaderPsiUtil.getFunctionFromCfgFunctions(element.getContainingFile(),variable.getVarName());
+				return false;
+			}catch (GenericConfigException e){
+
+			}
+		}
+		return false;
 	}
 }
