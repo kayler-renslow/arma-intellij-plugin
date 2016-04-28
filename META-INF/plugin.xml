@@ -2,7 +2,7 @@
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
 	<version>1.0.0</version>
-	<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>
+	<!--<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>-->
 	<description>
 		Plugin to offer smart editing of Arma games' mission files.
 	</description>
@@ -53,6 +53,9 @@
 		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/a3plugin/armaPluginColorSchemes.xml" />
 		<lang.documentationProvider language="XML" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.XMLDocumentationProvider"/>
 
+		<!-- File Templates-->
+		<!--<internalFileTemplate name="sqfFileTemplate" />-->
+
 		<!-- Stringtable-->
 		<dom.fileDescription implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.StringtableDomFileDescription" />
 
@@ -68,11 +71,11 @@
 	<actions>
 		<group id="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.group" text="_Arma Plugin" description="Arma Plugin Menu">
 			<add-to-group group-id="MainMenu" anchor="last" />
-			<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma Plugin Properties" />
+			<!--<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma Plugin Properties" />-->
 			<action id="a3plugin.action.mm.wiki_scripting" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowScriptingWiki" text="Arma 3 Wiki for Scripting Commands" description="View the Wiki page for Arma 3 scripting commands" />
 			<action id="a3plugin.action.mm.wiki_home" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowWikiHomepage" text="Arma 3 Wiki Homepage" description="View the Wiki home page for Arma 3" />
 			<action id="a3plugin.action.mm.color_picker" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowArmaColorPicker" text="Arma Color Picker" description="Arma Color Picker" />
-			<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_About" text="About" description="About the Plugin" />
+			<!--<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_About" text="About" description="About the Plugin" />-->
 		</group>
 		<action id="a3plugin.action.newGroup.new_SQF_file" class="com.kaylerrenslow.a3plugin.dialog.actions.newGroup.Action_NewSQFFile" text="New SQF File"	description="Create a new SQF File" icon="/com/kaylerrenslow/a3plugin/icons/sqf.png">
 			<add-to-group group-id="NewGroup1" anchor="first"/>

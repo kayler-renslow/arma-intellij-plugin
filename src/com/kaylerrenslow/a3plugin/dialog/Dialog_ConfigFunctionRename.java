@@ -67,6 +67,10 @@ public class Dialog_ConfigFunctionRename extends JDialog {
 		this.tfFunctionName.setText(tagAndName.functionClassName);
 
 		this.oldData = new SQFConfigFunctionInformationHolder(this.tfFunctionTagName.getText(), this.tfFunctionName.getText(), "", this.module, null);
+
+		this.cbKnownTagNames.setVisible(false);
+		this.btnPreview.setVisible(false);
+		this.tfFunctionTagName.setEditable(false);
 	}
 
 	private void initializeListeners() {

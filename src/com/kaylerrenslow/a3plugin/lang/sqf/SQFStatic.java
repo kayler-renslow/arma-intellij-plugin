@@ -113,10 +113,21 @@ public class SQFStatic{
 	 * Return true if the given var name is a BIS function, false if it isn't.
 	 */
 	public static boolean isBisFunction(String varName) {
-		if(!varName.startsWith("BIS_fnc_")){
+		if(!varName.startsWith("BIS_fnc_")){ //do a quick check instead of always doing a bin search.
 			return false;
 		}
 		return Collections.binarySearch(LIST_BIS_FUNCTIONS, varName) >= 0;
+	}
+
+	/**
+	 * Checks if the given variable name is possibly a BIS function (varName starts with BIS_).
+	 *
+	 * @param varName variable name to check
+	 * @return true if starts with BIS_, false otherwise
+	 */
+	public static boolean isMaybeBISFunction(String varName) {
+		String bis = "BIS_";
+		return varName.startsWith(bis);
 	}
 
 	public static class SQFFunctionTagAndName{

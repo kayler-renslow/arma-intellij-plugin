@@ -1,4 +1,5 @@
-fix the scope of iteration variables in while loops and for loops
+fix renaming config function variables
+
 
 fix this scenario: (but maybe not because it will mess up private declarations?)
 _i = 100;

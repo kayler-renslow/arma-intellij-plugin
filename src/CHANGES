@@ -5,7 +5,8 @@ shared between languages
 	none
 
 SQF
-	refactor->renaming functions sort of works
+	fixed auto completion for call BIS_fnc...
+	fixed documentation lookup for BIS functions
 
 Header
     none

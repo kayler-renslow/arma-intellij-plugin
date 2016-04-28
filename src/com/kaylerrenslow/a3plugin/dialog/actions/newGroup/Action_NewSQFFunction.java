@@ -64,9 +64,7 @@ public class Action_NewSQFFunction extends AnAction {
 			}
 		}
 
-		Editor editor = e.getData(DataKeys.EDITOR);
-
-		Dialog_NewSQFFunction.showNewInstance(e, module, functionDirectoryPath, new CreateNewSQFFunction(e.getProject(), directory, editor));
+		Dialog_NewSQFFunction.showNewInstance(e, module, functionDirectoryPath, new CreateNewSQFFunction(e.getProject(), directory));
 	}
 
 	@Override
@@ -83,10 +81,6 @@ public class Action_NewSQFFunction extends AnAction {
 		if(module == null){
 			disable = true;
 		}
-		Editor editor = e.getData(DataKeys.EDITOR);
-		if(editor == null){
-			disable = true;
-		}
 		if(!disable){
 			try {
 				ArmaProjectDataManager.getInstance().getDataForModule(module).getRootMissionDirectory();
@@ -101,12 +95,10 @@ public class Action_NewSQFFunction extends AnAction {
 
 		private final Project project;
 		private final VirtualFile directoryFile;
-		private final Editor editor;
 
-		CreateNewSQFFunction(Project project, VirtualFile directoryFile, Editor editor) {
+		CreateNewSQFFunction(Project project, VirtualFile directoryFile) {
 			this.project = project;
 			this.directoryFile = directoryFile;
-			this.editor = editor;
 		}
 
 		@Override

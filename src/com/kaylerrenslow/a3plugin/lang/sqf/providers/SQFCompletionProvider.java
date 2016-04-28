@@ -46,24 +46,27 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 
 		if (PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.LOCAL_VAR) || PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.GLOBAL_VAR)) {
 			prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode().getTreeParent()); //get parent because local_var and global_var is inside SQFTypes.VARIABLE
-		}else{
+		} else {
 			prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode());
 		}
 
 		String prevSibText;
-		if(prevSiblingNotWhitespace == null){
+		if (prevSiblingNotWhitespace == null) {
 			prevSibText = "";
-		}else{
+		} else {
 			prevSibText = prevSiblingNotWhitespace.getText();
 		}
 
 		boolean isFunctionCallExp = prevSibText.equals("call") || prevSibText.equals("spawn");
 
 		if (cursor.getText().contains("_fnc") || isFunctionCallExp) {
-			completeFunctionCall(parameters, result);
-		}else if(prevSibText.equals("localize")){
+			if (!addBisFunctions(result, cursor)) {
+				completeFunctionCall(parameters, result);
+				addVariablesAndCommands(parameters, result, cursor, false);
+			}
+		} else if (prevSibText.equals("localize")) {
 			completeLocalize(result, cursor);
-		}else{
+		} else {
 			completeCurrentWord(parameters, context, result, cursor);
 		}
 
@@ -79,7 +82,7 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 			return;
 		}
 		StringtableKey[] keys = table.getAllKeysValues();
-		for(StringtableKey key : keys){
+		for (StringtableKey key : keys) {
 			result.addElement(key.getLookupElement(false));
 		}
 	}
@@ -99,19 +102,9 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 	}
 
 	private void completeCurrentWord(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result, PsiElement cursor) {
-		Project project = parameters.getOriginalFile().getProject();
-
-		if (cursor.getText().startsWith("BIS_")) { //add all bis functions
-			String functionName;
-			String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.bis_function");
-			for (int i = 0; i < SQFStatic.LIST_BIS_FUNCTIONS.size(); i++) {
-				functionName = SQFStatic.LIST_BIS_FUNCTIONS.get(i);
-				result.addElement(LookupElementBuilder.createWithSmartPointer(functionName, SQFPsiUtil.createElement(project, functionName, SQFTypes.GLOBAL_VAR)).withIcon(PluginIcons.ICON_SQF_FUNCTION).appendTailText(" " + trailText, true));
-			}
+		if (addBisFunctions(result, cursor)) {
 			return; //adding anything else is a waste of computation at this point
 		}
-
-		boolean lookForLocalVars = cursor.getNode().getText().charAt(0) == '_';
 
 		result.addElement(new SQFCompInsertHandlerHintfln().getLookupElement(parameters, context, result));
 		result.addElement(new SQFCompInsertHandlerHintfo().getLookupElement(parameters, context, result));
@@ -119,6 +112,14 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		result.addElement(new SQFCompInsertHandlerHintValue().getLookupElement(parameters, context, result));
 		result.addElement(new SQFCompInsertHandlerIfThen().getLookupElement(parameters, context, result));
 		result.addElement(new SQFCompInsertHandlerIfExitWith().getLookupElement(parameters, context, result));
+
+		addVariablesAndCommands(parameters, result, cursor, true);
+
+	}
+
+	private void addVariablesAndCommands(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result, PsiElement cursor, boolean allowCommands) {
+		Project project = cursor.getProject();
+		boolean lookForLocalVars = cursor.getNode().getText().charAt(0) == '_';
 
 		ArrayList<ASTNode> elements = new ArrayList<>();
 		String localVarTailText;
@@ -139,7 +140,7 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 			}
 		}
 
-		if (!lookForLocalVars) { //add all commands
+		if (!lookForLocalVars && allowCommands) { //add all commands
 			String commandName;
 			String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.command");
 			for (int i = 0; i < SQFStatic.LIST_COMMANDS.size(); i++) {
@@ -147,5 +148,19 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 				result.addElement(LookupElementBuilder.createWithSmartPointer(commandName, SQFPsiUtil.createElement(project, commandName, SQFTypes.COMMAND)).withIcon(PluginIcons.ICON_SQF_COMMAND).appendTailText(" " + trailText, true));
 			}
 		}
+	}
+
+	private boolean addBisFunctions(@NotNull CompletionResultSet result, PsiElement cursor) {
+		Project project = cursor.getProject();
+		if (SQFStatic.isMaybeBISFunction(cursor.getText())) { //add all bis functions
+			String functionName;
+			String tailText = Plugin.resources.getString("lang.sqf.completion.tail_text.bis_function");
+			for (int i = 0; i < SQFStatic.LIST_BIS_FUNCTIONS.size(); i++) {
+				functionName = SQFStatic.LIST_BIS_FUNCTIONS.get(i);
+				result.addElement(LookupElementBuilder.createWithSmartPointer(functionName, SQFPsiUtil.createElement(project, functionName, SQFTypes.GLOBAL_VAR)).withIcon(PluginIcons.ICON_SQF_FUNCTION).appendTailText(" " + tailText, true));
+			}
+			return true;
+		}
+		return false;
 	}
 }

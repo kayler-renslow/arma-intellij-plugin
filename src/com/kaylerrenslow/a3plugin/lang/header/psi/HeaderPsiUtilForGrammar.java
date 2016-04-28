@@ -5,6 +5,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
 import com.kaylerrenslow.a3plugin.lang.header.editor.HeaderAnnotator;
@@ -134,7 +135,9 @@ public class HeaderPsiUtilForGrammar {
 				if (assignment.getAssigningVariable().equals(attribute)) {
 					this.stopped = true;
 					Project project = headerFileEntry.getProject();
-					assignment.getParent().getNode().replaceChild(assignment.getNode(), HeaderPsiUtil.createElement(project, attribute + "=" + newValue + ";", HeaderTypes.ASSIGNMENT).getNode());
+					IElementType type = assignment.getText().contains("[]") ? HeaderTypes.ARRAY_ASSIGNMENT :HeaderTypes.BASIC_ASSIGNMENT;
+
+					assignment.getParent().getNode().replaceChild(assignment.getNode(), HeaderPsiUtil.createElement(project, attribute + "=" + newValue + ";", type).getNode());
 				}
 			}
 

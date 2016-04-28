@@ -1,6 +1,7 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation;
 
 import com.intellij.navigation.ItemPresentation;
+import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import org.jetbrains.annotations.Nullable;
 
@@ -12,22 +13,24 @@ import javax.swing.*;
  * Created on 04/08/2016.
  */
 public class SQFFunctionItemPresentation implements ItemPresentation {
-	private final HeaderConfigFunction function;
+	private final String varName;
+	private final PsiFile file;
 
-	public SQFFunctionItemPresentation(HeaderConfigFunction function) {
-		this.function = function;
+	public SQFFunctionItemPresentation(String varName, PsiFile file) {
+		this.varName = varName;
+		this.file = file;
 	}
 
 	@Nullable
 	@Override
 	public String getPresentableText() {
-		return function.getCallableName();
+		return this.varName;
 	}
 
 	@Nullable
 	@Override
 	public String getLocationString() {
-		return function.getClassDeclaration().getContainingFile().getName();
+		return this.file.getName();
 	}
 
 	@Nullable

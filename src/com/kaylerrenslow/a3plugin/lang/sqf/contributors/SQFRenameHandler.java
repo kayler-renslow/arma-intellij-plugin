@@ -1,5 +1,7 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.contributors;
 
+import com.intellij.ide.actions.CreateTemplateInPackageAction;
+import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
@@ -55,6 +57,9 @@ public class SQFRenameHandler implements RenameHandler {
 		if (!variable.followsSQFFunctionNameRules()) {
 			return;
 		}
+		if(SQFStatic.isBisFunction(variable.getVarName())){
+			return;
+		}
 		Module module = DataKeys.MODULE.getData(dataContext);
 		Component contextComponent = DataKeys.CONTEXT_COMPONENT.getData(dataContext);
 		Dialog_ConfigFunctionRename.showNewInstance(contextComponent, module, variable.getVarName(), new SimpleGuiAction<Pair<SQFConfigFunctionInformationHolder, SQFConfigFunctionInformationHolder>>() {
@@ -80,17 +85,18 @@ public class SQFRenameHandler implements RenameHandler {
 					SimpleMessageDialog.newDialog("Error", e.getMessage()).show();
 					return;
 				}
-				if(!old.functionTagName.equals(neww.functionTagName) || true){
-					function.getClassDeclaration().getClassStub().setName(neww.functionClassName);
+				if(!old.functionTagName.equals(neww.functionTagName)){
 					function.getClassWithTag().setAttribute("tag", "\"" + neww.functionTagName + "\"");
+					//todo, have checkbox that asks if all functions with tag should be renamed or just this function's tag should be renamed
+					//if just this function's tag is renamed, we will have to remove the class decl from the tag class
+					//we can locate all variables with the given tag with SQFPsiUtil.findConfigFunctionVariablesWithTag()
 				}
 				if(!old.functionClassName.equals(neww.functionClassName)){
+					function.getClassDeclaration().getClassStub().setName(neww.functionClassName);
 					invokeRefactoring(createRenameProcessor(variable.getProject(), variable, newFunctionName));
 				}
-
-
-				//				variable.setName(SQFStatic.getFullFunctionName(neww.functionTagName, neww.functionClassName));
-				//		List<HeaderFileEntry> fileEntries = function.getClassWithTag().getClassContent().getFileEntries().getFileEntryList();
+//				CreateTemplateInPackageaction
+//				FileTemplateUtil
 			}
 		});
 
@@ -101,7 +107,12 @@ public class SQFRenameHandler implements RenameHandler {
 	}
 
 	private void invokeRefactoring(BaseRefactoringProcessor processor) {
-		//		processor.setPrepareSuccessfulSwingThreadCallback(prepareSuccessfulCallback);
+				processor.setPrepareSuccessfulSwingThreadCallback(new Runnable() {
+					@Override
+					public void run() {
+//						System.out.println("SQFRenameHandler.run");
+					}
+				});
 		processor.setPreviewUsages(false);
 		processor.run();
 	}

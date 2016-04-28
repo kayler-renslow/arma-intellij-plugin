@@ -57,7 +57,7 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 * Checks if the given PsiElement is a BIS function (is of type SQFTypes.VARIABLE or SQFTypes.GLOBAL_VAR and text starts with BIS_fnc, false otherwise).
+	 * Checks if the given PsiElement is a BIS function (is of type SQFTypes.VARIABLE or SQFTypes.GLOBAL_VAR and is defined in documentation, false otherwise).
 	 *
 	 * @param element element
 	 * @return true if the given PsiElement is a BIS function, false otherwise
@@ -123,6 +123,43 @@ public class SQFPsiUtil {
 				}
 				if (findVar.getVarName().equals(var.getVarName())) {
 					result.add(var);
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Adds all SQFVariables in the current module where the variable name is a config function and the function tag is equal to parameter tag
+	 *
+	 * @param module module
+	 * @param tag tag to search for
+	 * @return list
+	 */
+	@NotNull
+	public static List<SQFVariable> findConfigFunctionVariablesWithTag(@NotNull Module module, @NotNull String tag) {
+		List<SQFVariable> result = new ArrayList<>();
+		GlobalSearchScope searchScope = module.getModuleContentScope();
+		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, searchScope);
+		for (VirtualFile virtualFile : files) {
+			SQFFile sqfFile = (SQFFile) PsiManager.getInstance(module.getProject()).findFile(virtualFile);
+			if (sqfFile == null) {
+				continue;
+			}
+			ArrayList<SQFVariable> vars = PsiUtil.<SQFVariable>findDescendantElementsOfInstance(sqfFile, SQFVariable.class, null);
+			if (vars == null) {
+				continue;
+			}
+			for (SQFVariable var : vars) {
+				IElementType type = var.getVariableType();
+				if (type != SQFTypes.GLOBAL_VAR) {
+					continue;
+				}
+				if(SQFStatic.followsSQFFunctionNameRules(var.getVarName())){
+					SQFStatic.SQFFunctionTagAndName tagAndName = SQFStatic.getFunctionTagAndName(var.getVarName());
+					if(tagAndName.tagName.equals(tag)){
+						result.add(var);
+					}
 				}
 			}
 		}

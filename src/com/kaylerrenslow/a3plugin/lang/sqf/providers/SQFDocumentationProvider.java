@@ -31,8 +31,8 @@ import java.util.List;
 public class SQFDocumentationProvider extends DocumentationProviderEx{
 	private static final String BIS_WIKI_URL_PREFIX = Plugin.resources.getString("plugin.doc.sqf.wiki_URL_prefix");
 	private static final String EXTERNAL_LINK_NOTIFICATION = Plugin.resources.getString("plugin.doc.sqf.wiki_doc_external_link_notification_string_format");
-	public static final String DOC_LINK_PREFIX_BIS_FUNCTION = "bis-function:";
-	public static final String DOC_LINK_PREFIX_COMMAND = "command:";
+	private static final String DOC_LINK_PREFIX_BIS_FUNCTION = "bis-function:";
+	private static final String DOC_LINK_PREFIX_COMMAND = "command:";
 
 	@Nullable
 	@Override
@@ -44,7 +44,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 	@Override
 	public List<String> getUrlFor(PsiElement element, PsiElement originalElement) {
 		List<String> lst = new ArrayList<>();
-		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND) || SQFPsiUtil.isBisFunction(element)){
+		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND) || SQFStatic.isBisFunction(element.getText())){
 			lst.add(getWikiUrl(element.getText()));
 			return lst;
 		}
@@ -60,7 +60,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx{
 		if (PsiUtil.isOfElementType(element, SQFTypes.COMMAND)){
 			return generateCommandDoc(element.getText());
 		}
-		if(SQFPsiUtil.isBisFunction(element)){
+		if(SQFStatic.isBisFunction(element.getText())){
 			return generateFunctionDoc(element.getText());
 		}
 		if (PsiUtil.isOfElementType(element, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(element, SQFTypes.BLOCK_COMMENT)){
