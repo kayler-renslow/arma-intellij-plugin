@@ -27,8 +27,11 @@ public class SQFStatic{
 	public static final String COMMANDS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/commands-doc/";
 	public static final String BIS_FUNCTIONS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/bis-functions-doc/";
 
-	public static final List<String> LIST_COMMANDS = TextFileListToList.appendFileNamesToList(PluginUtil.convertURLToFile(ResourceGetter.getResourceAsURL(COMMANDS_DOC_FILE_DIR)), new ArrayList<>(), false);
-	public static final List<String> LIST_BIS_FUNCTIONS = TextFileListToList.appendFileNamesToList(PluginUtil.convertURLToFile(ResourceGetter.getResourceAsURL(BIS_FUNCTIONS_DOC_FILE_DIR)), new ArrayList<>(), false);
+	private static final String COMMANDS_DOC_FILE_LOOKUP = COMMANDS_DOC_FILE_DIR + "lookup.list";
+	private static final String BIS_FUNCTIONS_DOC_FILE_LOOKUP = BIS_FUNCTIONS_DOC_FILE_DIR + "lookup.list";
+
+	public static final List<String> LIST_COMMANDS = TextFileListToList.getListFromStream(ResourceGetter.getResourceAsStream(COMMANDS_DOC_FILE_LOOKUP), new ArrayList<>());
+	public static final List<String> LIST_BIS_FUNCTIONS = TextFileListToList.getListFromStream(ResourceGetter.getResourceAsStream(BIS_FUNCTIONS_DOC_FILE_LOOKUP), new ArrayList<>());
 
 	public static final String SQF_SAMPLE_CODE_TEXT = FileReader.getText("/com/kaylerrenslow/a3plugin/lang/sqf/codeStyle/sqfSampleCode.sqf");
 
@@ -45,27 +48,29 @@ public class SQFStatic{
 	 * @return syntax with params and param types, or null if the command doesn't have a known syntax
 	 */
 	@Nullable
+	@Deprecated
 	public static String getCommandDocSyntax(@NotNull String command){
-		String path = COMMANDS_DOC_FILE_DIR + "syntax/" + command + ".param.list";
-		List<String> paramsList = new ArrayList<>();
-		URL url = ResourceGetter.getResourceAsURL(path);
-		if(url == null){
-			return null;
-		}
-		TextFileListToList.getListFromFile(PluginUtil.convertURLToFile(url), paramsList);
-		String syntax = paramsList.get(0);
-		for(int i = 1; i < paramsList.size(); i++){
-			String detailedParam = paramsList.get(i);
-			int indexDash = detailedParam.indexOf('-');
-			if(indexDash > 0){
-				detailedParam = detailedParam.substring(0, indexDash);
-			}
-			String paramName = detailedParam.substring(0, detailedParam.indexOf(':'));
-			syntax = syntax.replace(paramName.trim(), detailedParam);
-
-		}
-
-		return syntax;
+//		String path = COMMANDS_DOC_FILE_DIR + "syntax/" + command + ".param.list";
+//		List<String> paramsList = new ArrayList<>();
+//		URL url = ResourceGetter.getResourceAsURL(path);
+//		if(url == null){
+//			return null;
+//		}
+//		TextFileListToList.getListFromFile(PluginUtil.convertURLToFile(url), paramsList);
+//		String syntax = paramsList.get(0);
+//		for(int i = 1; i < paramsList.size(); i++){
+//			String detailedParam = paramsList.get(i);
+//			int indexDash = detailedParam.indexOf('-');
+//			if(indexDash > 0){
+//				detailedParam = detailedParam.substring(0, indexDash);
+//			}
+//			String paramName = detailedParam.substring(0, detailedParam.indexOf(':'));
+//			syntax = syntax.replace(paramName.trim(), detailedParam);
+//
+//		}
+//
+//		return syntax;
+		return null;
 	}
 
 

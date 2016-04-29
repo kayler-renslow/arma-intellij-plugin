@@ -13,25 +13,21 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.jar.JarEntry;
+import java.util.jar.JarInputStream;
 
 /**
  * Created on 01/02/2016.
  */
 public class PluginUtil {
 
-	public static File convertURLToFile(URL url) {
-		File f;
-		try {
-			f = new File(url.toURI());
-			f = new File(f.getPath());
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
-			return null;
-		}
-		return f;
-	}
 
 	/**
 	 * Finds the filePath inside the given module

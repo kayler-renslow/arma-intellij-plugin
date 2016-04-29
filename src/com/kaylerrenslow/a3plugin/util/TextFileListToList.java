@@ -1,14 +1,19 @@
 package com.kaylerrenslow.a3plugin.util;
 
-import java.io.File;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * @author Kayler
  * Created on 01/02/2016.
  */
 public class TextFileListToList{
+
 
 	/** Reads a *.list file and returns a list. Any line starting with # is ignored. Every new line is a new entry. Empty lines are ignored.
 	 * <p>Sample .list file: <br>
@@ -18,51 +23,40 @@ public class TextFileListToList{
 	 *     this line will be added including comment #comment
 	 *     </pre>
 	 *     </p>
-	 * @param f File to read
+	 * @param is InputStream that is linked to the list file
 	 * @param list list to add the contents to
 	 * @return list of the contents or null if a problem occurred
 	 */
-	public static List<String> getListFromFile(File f, List<String> list){
-		Scanner scan;
+	public static List<String> getListFromStream(@NotNull InputStream is, @NotNull List<String> list){
 		try{
-			scan = new Scanner(f);
-		}catch(Exception e){
+			InputStreamReader reader = new InputStreamReader(is);
+			String current = "";
+			char c;
+			while(!reader.finished()){
+				c = reader.readWithCast();
+				if(c != '#'){
+					if(!reader.lastReadIsNewline()){
+						current += c;
+					}
+					while(!reader.finished()){ // read non-commented line
+						c = reader.readWithCast();
+						if(reader.lastReadIsNewline()){
+							list.add(current);
+							current = "";
+							break;
+						}
+						current += c;
+					}
+				}
+
+			}
+			reader.closeStream();
+		}catch(IOException e){
 			e.printStackTrace(System.out);
-			return null;
-		}
-
-		while(scan.hasNextLine()){
-			String line = scan.nextLine().trim();
-			if(line.charAt(0) == '#'){
-				continue;
-			}
-			if(line.length()==0){
-				continue;
-			}
-			list.add(line);
-		}
-		scan.close();
-
-		return list;
-	}
-
-	/** Adds file names from a directory into a given list. <b>This will not enter/visit directories inside the given directory.</b>
-	 * @param directory directory with all file names
-	 * @param list list to add the file names to.
-	 * @param addDirectories true if the directories inside 'directory' should be added to the list
-	 * @return the same list passed in the arguments
-	 */
-	public static List<String> appendFileNamesToList(File directory, List<String> list, boolean addDirectories){
-		if(!directory.isDirectory()){
-			throw new IllegalArgumentException("directory argument must be a directory");
-		}
-		File[] files = directory.listFiles();
-		for(int i = 0; i < files.length; i++){
-			if(!files[i].isDirectory() || addDirectories){
-				list.add(files[i].getName());
-			}
+			throw new RuntimeException("Couldn't read stream. Reason: " + e.getMessage());
 		}
 
 		return list;
 	}
+
 }

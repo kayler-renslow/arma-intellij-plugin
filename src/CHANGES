@@ -1,12 +1,11 @@
 plugin
-	none
+	replaced some api code (specifically api that was reading files inside jar) that was broken when used inside jar with new code that works inside jar
 
 shared between languages
 	none
 
 SQF
-	fixed getting documentation for sqf psi files
-	added #include to sqf grammar file
+	none
 
 Header
     none
