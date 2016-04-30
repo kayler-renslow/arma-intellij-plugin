@@ -1,7 +1,5 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.contributors;
 
-import com.intellij.ide.actions.CreateTemplateInPackageAction;
-import com.intellij.ide.fileTemplates.FileTemplateUtil;
 import com.intellij.openapi.actionSystem.CommonDataKeys;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
@@ -9,7 +7,6 @@ import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.util.Pair;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -20,26 +17,35 @@ import com.kaylerrenslow.a3plugin.dialog.Dialog_ConfigFunctionRename;
 import com.kaylerrenslow.a3plugin.dialog.SQFConfigFunctionInformationHolder;
 import com.kaylerrenslow.a3plugin.dialog.SimpleMessageDialog;
 import com.kaylerrenslow.a3plugin.dialog.actions.SimpleGuiAction;
-import com.kaylerrenslow.a3plugin.lang.header.exception.*;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderFileEntry;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFFile;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
-import com.kaylerrenslow.a3plugin.util.Attribute;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
-import java.util.ArrayList;
 
 /**
- * Created by Kayler on 04/27/2016.
+ * @author Kayler
+ * Provides custom renaming for SQF config functions.
+ * Created on 04/27/2016.
  */
 public class SQFRenameHandler implements RenameHandler {
 	@Override
 	public boolean isAvailableOnDataContext(DataContext dataContext) {
-		return dataContext.getData(CommonDataKeys.PSI_FILE.getName()) instanceof SQFFile;
+		if(!(dataContext.getData(CommonDataKeys.PSI_FILE.getName()) instanceof SQFFile)){
+			return false;
+		}
+		PsiElement psiElement = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
+		if(psiElement instanceof SQFVariable){
+			SQFVariable var = (SQFVariable) psiElement;
+			if(SQFStatic.followsSQFFunctionNameRules(var.getVarName())){
+				return true;
+			}
+		}
+		return false; //use default rename method
 	}
 
 	@Override
@@ -49,11 +55,11 @@ public class SQFRenameHandler implements RenameHandler {
 
 	@Override
 	public void invoke(@NotNull Project project, Editor editor, PsiFile file, DataContext dataContext) {
-		PsiElement element = (PsiElement) dataContext.getData(CommonDataKeys.PSI_ELEMENT.getName());
-		if (!(element instanceof SQFVariable)) {
+		PsiElement psiElement = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
+		if (!(psiElement instanceof SQFVariable)) {
 			return;
 		}
-		SQFVariable variable = (SQFVariable) element;
+		SQFVariable variable = (SQFVariable) psiElement;
 		if (!variable.followsSQFFunctionNameRules()) {
 			return;
 		}

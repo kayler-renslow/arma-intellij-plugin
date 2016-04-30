@@ -22,6 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Kayler
@@ -45,17 +46,7 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 	public ItemPresentation getPresentation() {
 		if(this.myVariableElementType == SQFTypes.GLOBAL_VAR){
 			if(SQFStatic.followsSQFFunctionNameRules(this.getVarName())){
-				if(SQFStatic.isBisFunction(this.getVarName())){
-					return new SQFFunctionItemPresentation(this.getVarName(), this.getContainingFile());
-				}
-				try{
-					HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(this.getContainingFile(), this.getVarName());
-					if(function != null){
-						return new SQFFunctionItemPresentation(function.getCallableName(), function.getClassDeclaration().getContainingFile());
-					}
-				}catch (GenericConfigException e) {
-					System.out.println("SQFVariableNamedElementMixin.getPresentation: " + e.getMessage());
-				}
+				return new SQFFunctionItemPresentation(this.getVarName(), this.getContainingFile());
 			}
 		}
 		return new SQFVariableItemPresentation((SQFVariable) this);
@@ -64,10 +55,6 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 	@NotNull
 	@Override
 	public PsiReference[] getReferences() {
-		if (myVariableElementType == SQFTypes.GLOBAL_VAR) {
-			return ReferenceProvidersRegistry.getReferencesFromProviders(this);
-		}
-
 		SQFVariable me = ((SQFVariable) this);
 		SQFScope myVarScope = me.getDeclarationScope();
 

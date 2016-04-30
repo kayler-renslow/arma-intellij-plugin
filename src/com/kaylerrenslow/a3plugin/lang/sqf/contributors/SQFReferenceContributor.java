@@ -1,7 +1,8 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.contributors;
 
 import com.intellij.patterns.PlatformPatterns;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiReferenceContributor;
+import com.intellij.psi.PsiReferenceRegistrar;
 import com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFReferenceProvider;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;

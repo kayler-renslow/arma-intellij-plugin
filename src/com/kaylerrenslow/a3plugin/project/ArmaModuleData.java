@@ -1,10 +1,13 @@
 package com.kaylerrenslow.a3plugin.project;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
+import com.intellij.openapi.module.ModuleUtilCore;
 import com.intellij.openapi.project.ProjectManager;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -35,6 +38,7 @@ public class ArmaModuleData{
 		this.module = module;
 	}
 
+	@NotNull
 	public Module getModule() {
 		return module;
 	}
@@ -61,6 +65,7 @@ public class ArmaModuleData{
 	/** Get's the root mission directory file (description.ext's parent directory)
 	 * @return directory, or null if the description.ext isn't defined
 	 */
+	@NotNull
 	public VirtualFile getRootMissionDirectory() throws DescriptionExtNotDefinedException {
 		getDescriptionExt();
 		return this.descriptionExtVF.getParent();
@@ -70,6 +75,7 @@ public class ArmaModuleData{
 	 * @return Stringtable instance
 	 * @throws FileNotFoundException if stringtable.xml doesn't exist
 	 */
+	@NotNull
 	public Stringtable getStringtable() throws FileNotFoundException{
 		if(this.stringtable != null && this.stringtable.getVirtualFile().exists()){
 			return this.stringtable;

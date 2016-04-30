@@ -12,9 +12,9 @@ public class Plugin{
 
 	public static final ResourceBundle resources = new ResourceBundle("/com/kaylerrenslow/a3plugin/plugin.properties");
 
-	public static final String APP_DATA_FOLDER_NAME = resources.getString("plugin.appdata.folderName");
+	private static final String APP_DATA_FOLDER_NAME = resources.getString("plugin.appdata.folderName");
 
-	public static final File APPDATA_FOLDER = new File(System.getenv().get("APPDATA") + "/" + APP_DATA_FOLDER_NAME);
+	private static final File APPDATA_FOLDER = new File(System.getenv().get("APPDATA") + "/" + APP_DATA_FOLDER_NAME);
 
 	public static final PluginUserProperties pluginProps = new PluginUserProperties(APPDATA_FOLDER);
 
@@ -22,7 +22,8 @@ public class Plugin{
 	private static final String f = "false";
 
 	public enum UserPropertiesKey{
-		VERSION("version", "Version of the instance of when this file was created. (Please don't change this.)", resources.getString("plugin.version"), null);
+		VERSION("version", "Version of the instance of when this file was created. (Please don't change this.)", resources.getString("plugin.version"), null),
+		SHOW_MM_ARMA_PLUGIN("show_mm_arma_plugin", "Show \"Arma Plugin\" in main menu all the time (true)\nor only when inside Arma Module (false)", t, f);
 
 		public final String[] possibleVals;
 		public final String keyName;

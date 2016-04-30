@@ -2,6 +2,7 @@ package com.kaylerrenslow.a3plugin.util;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -9,6 +10,7 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.util.indexing.FileBasedIndex;
+import com.kaylerrenslow.a3plugin.wizards.ArmaModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,6 +30,16 @@ import java.util.jar.JarInputStream;
  */
 public class PluginUtil {
 
+	/**Test to see if the given module is an Arma module
+	 * @param module module
+	 * @return true if the module is an Arma module, false otherwise
+	 */
+	public static boolean moduleIsArmaType(@Nullable Module module){
+		if(module == null){
+			return false;
+		}
+		return ModuleUtil.getModuleType(module) == ArmaModuleType.getInstance();
+	}
 
 	/**
 	 * Finds the filePath inside the given module

@@ -24,6 +24,7 @@ import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 
 import javax.swing.*;
 import java.io.IOException;
@@ -50,7 +51,7 @@ public class Action_NewSQFFunction extends AnAction {
 		PsiDirectory psiDirectory = PsiManager.getInstance(module.getProject()).findDirectory(directory);
 
 		String functionDirectoryPath;
-		if(psiDirectory == null || missionDirectoryRoot == null){
+		if(psiDirectory == null || missionDirectoryRoot == null || missionDirectoryRoot.equals(directory)){
 			functionDirectoryPath = null;
 		}else{
 			PsiDirectory cur = psiDirectory;
@@ -69,26 +70,20 @@ public class Action_NewSQFFunction extends AnAction {
 
 	@Override
 	public void update(AnActionEvent e) {
-		boolean disable = false;
-		if(e.getProject() == null){
-			disable = true;
-		}
+		boolean enable = e.getProject() == null;
 		VirtualFile directory = e.getData(CommonDataKeys.VIRTUAL_FILE);
-		if(directory == null){
-			disable = true;
-		}
+		enable = enable || directory != null;
+
 		Module module = e.getData(DataKeys.MODULE);
-		if(module == null){
-			disable = true;
-		}
-		if(!disable){
+		enable = enable || PluginUtil.moduleIsArmaType(module);
+		if(enable){
 			try {
 				ArmaProjectDataManager.getInstance().getDataForModule(module).getRootMissionDirectory();
 			} catch (DescriptionExtNotDefinedException e1) {
-				disable = true;
+				enable = false;
 			}
 		}
-		e.getPresentation().setVisible(!disable);
+		e.getPresentation().setVisible(enable);
 	}
 
 	private class CreateNewSQFFunction implements SimpleGuiAction<SQFConfigFunctionInformationHolder> {

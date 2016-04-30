@@ -1,11 +1,15 @@
 plugin
-	replaced some api code (specifically api that was reading files inside jar) that was broken when used inside jar with new code that works inside jar
+	none
 
 shared between languages
 	none
 
 SQF
-	none
+	fixed performance issues with finding references for global variables
+	fixed creating new functions with the wrong default directory
+	made the arma plugin menu on main menu only show if the module is arma module or plugin properties forces it to always show
+	fixed a bug related to not being able to rename global variables
+	fixed bug for when creating a new SQF file shouldn't be showing but was anyways
 
 Header
     none
