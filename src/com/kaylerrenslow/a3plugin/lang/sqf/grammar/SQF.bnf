@@ -27,8 +27,8 @@
 // @formatter:off
 sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
 
-file_scope ::= item_* return_statement? (comment | BAD_CHARACTER)* {extends("file_scope")=local_scope}
-local_scope ::= item_* return_statement? (comment | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars]}
+file_scope ::= return_statement | item_+ return_statement? (comment | BAD_CHARACTER)* {extends("file_scope")=local_scope}
+local_scope ::= return_statement | item_+ return_statement? (comment | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars]}
 
 private item_ ::= comment | statement | BAD_CHARACTER
 

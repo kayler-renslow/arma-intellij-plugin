@@ -5,11 +5,7 @@ shared between languages
 	none
 
 SQF
-	fixed performance issues with finding references for global variables
-	fixed creating new functions with the wrong default directory
-	made the arma plugin menu on main menu only show if the module is arma module or plugin properties forces it to always show
-	fixed a bug related to not being able to rename global variables
-	fixed bug for when creating a new SQF file shouldn't be showing but was anyways
+	fixed grammar bug for when return statement was never made
 
 Header
     none

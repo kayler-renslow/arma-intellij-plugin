@@ -22,15 +22,15 @@ public class Plugin{
 	private static final String f = "false";
 
 	public enum UserPropertiesKey{
-		VERSION("version", "Version of the instance of when this file was created. (Please don't change this.)", resources.getString("plugin.version"), null),
-		SHOW_MM_ARMA_PLUGIN("show_mm_arma_plugin", "Show \"Arma Plugin\" in main menu all the time (true)\nor only when inside Arma Module (false)", t, f);
+		VERSION("Version of the instance of when this file was created. (Please don't change this.)", resources.getString("plugin.version"), null),
+		SHOW_MM_ARMA_PLUGIN("Show \"Arma Plugin\" in main menu all the time (true)\nor only when inside Arma Module (false)", t, f);
 
 		public final String[] possibleVals;
 		public final String keyName;
 		public final String defaultValue;
 		public final String doc;
-		UserPropertiesKey(String keyName, String doc, String defaultVal, String ... possibleVals) {
-			this.keyName = keyName;
+		UserPropertiesKey(String doc, String defaultVal, String ... possibleVals) {
+			this.keyName = this.name();
 			this.defaultValue = defaultVal;
 			this.doc = doc;
 			this.possibleVals = possibleVals;
