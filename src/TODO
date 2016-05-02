@@ -1,4 +1,9 @@
-fix renaming config function variables
+features:
+    add tag renaming for functions
+    check if function exists when doing call or spawn
+    provide support for private _var
+    renaming files will rename them in includes
+
 
 
 fix this scenario: (but maybe not because it will mess up private declarations?)

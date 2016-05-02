@@ -73,8 +73,10 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 		super.visitLoopForFrom(o);
 	}
 
-	private void visitForLoop(@NotNull SQFForLoopBase forLoop){
-		forLoop.getLoopScope().putUserData(SQFScope.KEY_ITERATION_VARS, forLoop.getIterationVariables());
+	private void visitForLoop(@NotNull SQFForLoopBase forLoop) {
+		if(forLoop.getLoopScope() != null){
+			forLoop.getLoopScope().putUserData(SQFScope.KEY_ITERATION_VARS, forLoop.getIterationVariables());
+		}
 	}
 
 	@Override
@@ -91,21 +93,21 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 		int numAssignments = 0;
 		SQFScope containingScope;
 		boolean isUsedOverride = false;
-		for(PsiReference reference : references){
+		for (PsiReference reference : references) {
 			PsiElement resolve = reference.resolve();
-			if(resolve == null){
+			if (resolve == null) {
 				continue;
 			}
-			if(resolve.getParent() instanceof SQFAssignment){
-				if(resolve.getParent().getParent() instanceof SQFStatement){ //check if the variable is left hand side of assignment (left = right)
+			if (resolve.getParent() instanceof SQFAssignment) {
+				if (resolve.getParent().getParent() instanceof SQFStatement) { //check if the variable is left hand side of assignment (left = right)
 					numAssignments++;
 				}
 			}
 			containingScope = SQFPsiUtil.getContainingScope(resolve);
 			String[] iterVars = containingScope.getUserData(SQFScope.KEY_ITERATION_VARS);
-			if(iterVars != null){
-				for(String iterVar : iterVars){
-					if(iterVar.equals(resolve.getText())){
+			if (iterVars != null) {
+				for (String iterVar : iterVars) {
+					if (iterVar.equals(resolve.getText())) {
 						numAssignments++;
 						isUsedOverride = true;
 					}
@@ -113,10 +115,10 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 			}
 		}
 
-		if(numAssignments == references.length && !isUsedOverride){
+		if (numAssignments == references.length && !isUsedOverride) {
 			annotator.createWeakWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
 		}
-		if(numAssignments == 0){
+		if (numAssignments == 0) {
 			annotator.createWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_uninitialized"));
 		}
 
@@ -160,59 +162,60 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 		}
 	}
 
+	private class SQFAnnotatorFixNotPrivate extends IntentionAndQuickFixAction {
+		private final SmartPsiElementPointer<SQFScope> varScopePointer;
+		private final SmartPsiElementPointer<SQFVariable> fixVarPointer;
 
-}
+		public SQFAnnotatorFixNotPrivate(SQFVariable var, SQFScope declScope) {
+			this.fixVarPointer = SmartPointerManager.getInstance(var.getProject()).createSmartPsiElementPointer(var, var.getContainingFile());
+			this.varScopePointer = SmartPointerManager.getInstance(var.getProject()).createSmartPsiElementPointer(declScope, declScope.getContainingFile());
+		}
 
-class SQFAnnotatorFixNotPrivate extends IntentionAndQuickFixAction {
-	private final SmartPsiElementPointer<SQFScope> varScopePointer;
-	private final SmartPsiElementPointer<SQFVariable> fixVarPointer;
+		@NotNull
+		@Override
+		public String getName() {
+			return Plugin.resources.getString("lang.sqf.annotator.variable_not_private.quick_fix");
+		}
 
-	public SQFAnnotatorFixNotPrivate(SQFVariable var, SQFScope declScope) {
-		this.fixVarPointer = SmartPointerManager.getInstance(var.getProject()).createSmartPsiElementPointer(var, var.getContainingFile());
-		this.varScopePointer = SmartPointerManager.getInstance(var.getProject()).createSmartPsiElementPointer(declScope, declScope.getContainingFile());
-	}
+		@NotNull
+		@Override
+		public String getFamilyName() {
+			return "";
+		}
 
-	@NotNull
-	@Override
-	public String getName() {
-		return Plugin.resources.getString("lang.sqf.annotator.variable_not_private.quick_fix");
-	}
+		@Override
+		public void applyFix(@NotNull Project project, PsiFile file, @Nullable Editor editor) {
+			Runnable runnable = new Runnable() {
+				@Override
+				public void run() {
+					SQFScope varScope = varScopePointer.getElement();
+					SQFVariable fixVar = fixVarPointer.getElement();
+					ASTNode[] statements = varScope.getNode().getChildren(TokenSet.create(SQFTypes.STATEMENT));
+					SQFStatement statement;
+					SQFPrivateDecl decl;
+					for (ASTNode nodeStatement : statements) {
+						statement = (SQFStatement) nodeStatement.getPsi();
+						if (statement.getPrivateDecl() != null) {
+							decl = statement.getPrivateDecl();
+							SQFPrivateDecl newDecl = SQFPsiUtil.createPrivateDeclFromExisting(project, decl, fixVar.getVarName());
+							decl.replace(newDecl);
+							return;
+						}
+					}
 
-	@NotNull
-	@Override
-	public String getFamilyName() {
-		return "";
-	}
-
-	@Override
-	public void applyFix(@NotNull Project project, PsiFile file, @Nullable Editor editor) {
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				SQFScope varScope = varScopePointer.getElement();
-				SQFVariable fixVar = fixVarPointer.getElement();
-				ASTNode[] statements = varScope.getNode().getChildren(TokenSet.create(SQFTypes.STATEMENT));
-				SQFStatement statement;
-				SQFPrivateDecl decl;
-				for (ASTNode nodeStatement : statements) {
-					statement = (SQFStatement) nodeStatement.getPsi();
-					if (statement.getPrivateDecl() != null) {
-						decl = statement.getPrivateDecl();
-						SQFPrivateDecl newDecl = SQFPsiUtil.createPrivateDeclFromExisting(project, decl, fixVar.getVarName());
-						decl.replace(newDecl);
-						return;
+					PsiElement declStatement = SQFPsiUtil.createElement(project, String.format("private[\"%s\"];", fixVar.getVarName()), SQFTypes.STATEMENT);
+					if (varScope.getFirstChild() != null) {
+						varScope.addBefore(declStatement, varScope.getFirstChild());
+					} else {
+						varScope.add(declStatement);
 					}
 				}
+			};
+			WriteCommandAction.runWriteCommandAction(project, runnable);
 
-				PsiElement declStatement = SQFPsiUtil.createElement(project, String.format("private[\"%s\"];", fixVar.getVarName()), SQFTypes.STATEMENT);
-				if (varScope.getFirstChild() != null) {
-					varScope.addBefore(declStatement, varScope.getFirstChild());
-				} else {
-					varScope.add(declStatement);
-				}
-			}
-		};
-		WriteCommandAction.runWriteCommandAction(project, runnable);
-
+		}
 	}
+
+
 }
+

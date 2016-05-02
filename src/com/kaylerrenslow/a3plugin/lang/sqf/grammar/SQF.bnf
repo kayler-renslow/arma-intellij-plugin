@@ -37,6 +37,7 @@ variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugi
 
 
 statement ::= ( assignment
+                | params_statement
 				| private_decl
 				| scope_manager
 				| control_struct_
@@ -99,12 +100,17 @@ macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 
 
-code_block ::= LBRACE local_scope RBRACE
+code_block ::= LBRACE local_scope? RBRACE
 
 /*control structures and other things*/
     private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET) {methods=[getPrivateDeclVars]}//do not allow private[]
+
+    params_statement ::= array_val? PARAMS LBRACKET (params_param_ (COMMA params_param_)*) RBRACKET
+    private params_param_ ::= LBRACKET private_decl_var (COMMA expression)* RBRACKET | private_decl_var
+
+	//DO NOT CHANGE STRING_LITERAL IN private_decl_var to string
 	private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclNamedElement" methods=[toString]}
-    //DO NOT CHANGE STRING_LITERAL IN private_decl_var to string
+	//private_decl_var is a variable that designates the variable as private
 
 
     scope_manager ::= GOTO COLON string
@@ -122,17 +128,19 @@ code_block ::= LBRACE local_scope RBRACE
 			      )
 
     switch_statement ::= SWITCH (LPAREN expression RPAREN | expression) DO LBRACE (switch_case)* RBRACE
-    switch_case ::= (CASE expression COLON code_block SEMICOLON)
+    switch_case ::= (CASE expression (COLON code_block)? SEMICOLON)
 				  | (DEFAULT code_block SEMICOLON)
 
     private loop_ ::= loop_while | for_loops_
-    loop_while    ::= WHILE LBRACE statement+ RBRACE DO code_block
+    loop_while    ::= WHILE LBRACE assignments_or_exppresion_ RBRACE DO code_block
     private for_loops_ ::= loop_for | loop_for_from | loop_for_each
     loop_for  ::= FOR LBRACKET LBRACE (for_loop_iter_var_init)* RBRACE COMMA LBRACE expression RBRACE COMMA LBRACE (statement)* RBRACE RBRACKET DO code_block {methods=[getIterationVariables getLoopScope] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
     loop_for_from ::= FOR string FROM expression TO expression (STEP expression)? DO code_block {methods=[getIterationVariables getLoopScope] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
     loop_for_each ::= code_block FOR_EACH expression  {methods=[getIterationVariables getLoopScope] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
 
     for_loop_iter_var_init ::= statement
+
+    private assignments_or_exppresion_ ::= (assignment SEMICOLON)* expression?
 
     quest_statement ::= QUEST expression COLON exp
 

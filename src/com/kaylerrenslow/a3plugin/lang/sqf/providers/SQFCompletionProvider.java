@@ -38,15 +38,18 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 	protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
 		PsiElement cursor = parameters.getOriginalPosition(); //cursor is on a word
 
-		if (cursor == null) {
+		boolean originalPositionNull = cursor == null;
+		if (originalPositionNull) {
 			cursor = parameters.getPosition(); //cursor is after a word
 		}
 
 		ASTNode prevSiblingNotWhitespace;
 
 		if (PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.LOCAL_VAR) || PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.GLOBAL_VAR)) {
+//			System.out.println("SQFCompletionProvider.addCompletions originalPositionNull:" + originalPositionNull);
 			prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode().getTreeParent()); //get parent because local_var and global_var is inside SQFTypes.VARIABLE
 		} else {
+//			System.out.println("SQFCompletionProvider.addCompletions originalPositionNull:" + originalPositionNull);
 			prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode());
 		}
 

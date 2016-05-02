@@ -1,6 +1,8 @@
 package com.kaylerrenslow.a3plugin.lang.sqf;
 
+import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.Plugin;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.util.FileReader;
 import com.kaylerrenslow.a3plugin.util.ResourceGetter;
 import com.kaylerrenslow.a3plugin.util.TextFileListToList;
@@ -18,14 +20,14 @@ import java.util.List;
  * Created on 12/28/2015.
  */
 public class SQFStatic{
-	public static final String NAME = "Arma.SQF";
+	static final String NAME = "Arma.SQF";
 	public static final String NAME_FOR_DISPLAY = Plugin.resources.getString("lang.sqf.name_for_display");
 	public static final String DESCRIPTION = Plugin.resources.getString("lang.sqf.description");
 	static final String FILE_EXTENSION = Plugin.resources.getString("lang.sqf.file_extension");
 	static final String FILE_EXTENSION_DEFAULT = Plugin.resources.getString("lang.sqf.file_extension_default");
 
-	public static final String COMMANDS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/commands-doc/";
-	public static final String BIS_FUNCTIONS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/bis-functions-doc/";
+	private static final String COMMANDS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/commands-doc/";
+	private static final String BIS_FUNCTIONS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/bis-functions-doc/";
 
 	private static final String COMMANDS_DOC_FILE_LOOKUP = COMMANDS_DOC_FILE_DIR + "lookup.list";
 	private static final String BIS_FUNCTIONS_DOC_FILE_LOOKUP = BIS_FUNCTIONS_DOC_FILE_DIR + "lookup.list";
@@ -37,10 +39,25 @@ public class SQFStatic{
 
 	private static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
 
+	public static final IElementType[] KEYWORDS = {SQFTypes.WITH, SQFTypes.TRUE, SQFTypes.FALSE, SQFTypes.NOT, SQFTypes.AND, SQFTypes.OR, SQFTypes.MOD, SQFTypes.NIL, SQFTypes.TYPE_NULL, SQFTypes.PRIVATE, SQFTypes.SCOPE_NAME,
+			SQFTypes.BREAK, SQFTypes.BREAK_TO, SQFTypes.BREAK_OUT, SQFTypes.CONTINUE, SQFTypes.FOR, SQFTypes.TO, SQFTypes.STEP, SQFTypes.FOR_EACH, SQFTypes.FROM, SQFTypes.WHILE, SQFTypes.GOTO, SQFTypes.ASSERT, SQFTypes.IF,
+			SQFTypes.THEN, SQFTypes.ELSE, SQFTypes.SWITCH, SQFTypes.CASE, SQFTypes.DEFAULT, SQFTypes.DO, SQFTypes.WAIT_UNTIL, SQFTypes.EXIT_WITH, SQFTypes.PARAMS};
 
-	static{
+	static {
 		Collections.sort(LIST_COMMANDS);
 		Collections.sort(LIST_BIS_FUNCTIONS);
+	}
+
+	public static boolean isCommandOrKeyword(IElementType type){
+		if(type == SQFTypes.COMMAND){
+			return true;
+		}
+		for(IElementType keywordType : KEYWORDS){
+			if(keywordType == type){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/** Fetch command syntax for given command. This method will fetch the syntax and params from file and make it readable. Example: "paramName COMMAND paramName2" to "paramName:Number COMMAND paramName2:Number"
@@ -133,6 +150,18 @@ public class SQFStatic{
 	public static boolean isMaybeBISFunction(String varName) {
 		String bis = "BIS_";
 		return varName.startsWith(bis);
+	}
+
+	public static String getCommandDocumentation(String commandName) {
+		return FileReader.getText(getDocumentationFilePath(commandName));
+	}
+
+	private static String getDocumentationFilePath(String commandName) {
+		return COMMANDS_DOC_FILE_DIR + commandName;
+	}
+
+	public static String getBISFunctionDocumentation(String bisFunction) {
+		return FileReader.getText(BIS_FUNCTIONS_DOC_FILE_DIR + bisFunction);
 	}
 
 	public static class SQFFunctionTagAndName{

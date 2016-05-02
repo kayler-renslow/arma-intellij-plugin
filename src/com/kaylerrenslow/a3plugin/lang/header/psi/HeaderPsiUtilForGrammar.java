@@ -3,21 +3,19 @@ package com.kaylerrenslow.a3plugin.lang.header.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.util.indexing.FileBasedIndex;
-import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
-import com.kaylerrenslow.a3plugin.lang.header.editor.HeaderAnnotator;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.util.Attribute;
+import com.kaylerrenslow.a3plugin.util.FilePath;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import com.kaylerrenslow.a3plugin.util.TraversalObjectFinder;
+import org.apache.xmlbeans.impl.piccolo.io.FileFormatException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -135,7 +133,7 @@ public class HeaderPsiUtilForGrammar {
 				if (assignment.getAssigningVariable().equals(attribute)) {
 					this.stopped = true;
 					Project project = headerFileEntry.getProject();
-					IElementType type = assignment.getText().contains("[]") ? HeaderTypes.ARRAY_ASSIGNMENT :HeaderTypes.BASIC_ASSIGNMENT;
+					IElementType type = assignment.getText().contains("[]") ? HeaderTypes.ARRAY_ASSIGNMENT : HeaderTypes.BASIC_ASSIGNMENT;
 
 					assignment.getParent().getNode().replaceChild(assignment.getNode(), HeaderPsiUtil.createElement(project, attribute + "=" + newValue + ";", type).getNode());
 				}
@@ -178,8 +176,8 @@ public class HeaderPsiUtilForGrammar {
 				List<HeaderPreprocessor> processors = entry.getPreprocessorGroup().getPreprocessorList();
 				for (HeaderPreprocessor preprocessor : processors) {
 					if (preprocessor instanceof HeaderPreInclude) {
-						HeaderFile includedFile = ((HeaderPreInclude) preprocessor).getHeaderFileFromInclude();
-						if (includedFile != null) {
+						PsiFile includedFile = ((HeaderPreInclude) preprocessor).getHeaderFileFromInclude();
+						if (includedFile instanceof HeaderFile) {
 							HeaderClassDeclaration firstClass = (HeaderClassDeclaration) PsiUtil.findFirstDescendantElement(includedFile, HeaderClassDeclaration.class);
 							if (firstClass.getClassContent() != null) {
 								if (entryFinder.stopped()) {
@@ -201,20 +199,13 @@ public class HeaderPsiUtilForGrammar {
 	}
 
 	/**
-	 * Fetches the HeaderFile inside the include.
+	 * Fetches the PsiFile inside the include.
 	 *
 	 * @param include HeaderPreInclude instance
-	 * @return HeaderFile that points to the file included, or null if the include's file path doesn't point to an existing file
+	 * @return PsiFile that points to the file included, or null if the include's file path doesn't point to an existing file
 	 */
 	@Nullable
-	public static HeaderFile getHeaderFileFromInclude(HeaderPreInclude include) {
-		Project project = include.getProject();
-		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, HeaderFileType.INSTANCE, PluginUtil.getModuleForPsiFile(include.getContainingFile()).getModuleContentScope());
-		for (VirtualFile file : files) {
-			if (file.getPath().contains(include.getPathString())) {
-				return (HeaderFile) PsiManager.getInstance(project).findFile(file);
-			}
-		}
-		return null;
+	public static PsiFile getHeaderFileFromInclude(HeaderPreInclude include) {
+		return PluginUtil.findFileByPath(FilePath.getFilePathFromString(include.getPathString(), '\\'), include.getContainingFile().getContainingDirectory(), include.getProject());
 	}
 }

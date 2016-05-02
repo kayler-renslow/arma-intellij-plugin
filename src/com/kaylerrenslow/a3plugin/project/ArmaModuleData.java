@@ -8,6 +8,7 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.openapi.vfs.VirtualFileSystem;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
@@ -66,10 +67,12 @@ public class ArmaModuleData{
 	 * @return directory, or null if the description.ext isn't defined
 	 */
 	@NotNull
-	public VirtualFile getRootMissionDirectory() throws DescriptionExtNotDefinedException {
+	public PsiDirectory getRootMissionDirectory() throws DescriptionExtNotDefinedException {
 		getDescriptionExt();
-		return this.descriptionExtVF.getParent();
+		return this.descriptionExt.getContainingDirectory();
 	}
+
+
 
 	/** Get the stringtable.xml for this module
 	 * @return Stringtable instance

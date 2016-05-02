@@ -3,10 +3,11 @@ package com.kaylerrenslow.a3plugin.util;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.roots.ContentIterator;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.util.indexing.FileBasedIndex;
@@ -14,54 +15,76 @@ import com.kaylerrenslow.a3plugin.wizards.ArmaModuleType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.jar.JarEntry;
-import java.util.jar.JarInputStream;
+import java.util.*;
 
 /**
  * Created on 01/02/2016.
  */
 public class PluginUtil {
 
-	/**Test to see if the given module is an Arma module
+	/**
+	 * Test to see if the given module is an Arma module
+	 *
 	 * @param module module
 	 * @return true if the module is an Arma module, false otherwise
 	 */
-	public static boolean moduleIsArmaType(@Nullable Module module){
-		if(module == null){
+	public static boolean moduleIsArmaType(@Nullable Module module) {
+		if (module == null) {
 			return false;
 		}
 		return ModuleUtil.getModuleType(module) == ArmaModuleType.getInstance();
 	}
 
+
 	/**
-	 * Finds the filePath inside the given module
+	 * Finds the file (specified by filePath) inside the given root directory. The search does not include the root directory itself. For instance, filePath could be equal to root directory ("exampleRootName" and return null)
 	 *
-	 * @param filePath         file path to find
-	 * @param module           module
-	 * @param fileTypeInstance file type
-	 * @return the found file, or null if none could be found
+	 * @param filePath      FilePath object
+	 * @param rootDirectory the root directory to beging the search
+	 * @return the VirtualFile that was found, or null if the given file path points to nothing at the given root directory
 	 */
-	public static VirtualFile findFileInModule(@NotNull String filePath, Module module, @NotNull final LanguageFileType fileTypeInstance) {
-		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, fileTypeInstance, module.getModuleContentScope());
-		for (VirtualFile file : files) {
-			if (file.getPath().endsWith(filePath)) {
-				return file;
+	@Nullable
+	public static PsiFile findFileByPath(@NotNull FilePath filePath, @NotNull PsiDirectory rootDirectory, @NotNull Project project) {
+		if (filePath.getFileName().matches("[a-zA-Z]+:")) { //starts with drive. example  d:/file/file2.txt
+			while (rootDirectory.getParent() != null) {
+				rootDirectory = rootDirectory.getParent();
+			}
+			filePath = filePath.getChild();
+			if (filePath == null) {
+				return null;
+			}
+		} else {
+			while (filePath.fileNameIsDotDot()) {
+				if (rootDirectory.getParent() == null) {
+					return null;
+				}
+				rootDirectory = rootDirectory.getParent();
+				filePath = filePath.getChild();
+				if (filePath == null) { //just simply a ../
+					return null;
+				}
 			}
 		}
+		PsiDirectory matched = rootDirectory.findSubdirectory(filePath.getFileName());
+
+		if (matched != null) {
+			if (filePath.getChild() == null) {
+				return rootDirectory.findFile(filePath.getFileName());
+			} else {
+				return findFileByPath(filePath.getChild(), matched, project);
+			}
+		} else {
+			if (filePath.getChild() == null) {
+				return rootDirectory.findFile(filePath.getFileName());
+			}
+		}
+
 		return null;
 	}
 
 
 	/**
-	 * Finds a file by the given name in the given module
+	 * Finds the first file with the given name in the given module
 	 *
 	 * @param name             file name to search for
 	 * @param module           module
@@ -85,10 +108,8 @@ public class PluginUtil {
 
 		if (file.getVirtualFile() == null) {
 			file = file.getOriginalFile();
-			//			return null;
 		}
-		final Module module = index.getModuleForFile(file.getVirtualFile());
-		return module;
+		return index.getModuleForFile(file.getVirtualFile());
 	}
 
 }

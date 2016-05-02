@@ -4,6 +4,7 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderSyntaxHighlighter;
 import com.kaylerrenslow.a3plugin.lang.header.psi.*;
@@ -63,6 +64,21 @@ public class HeaderAnnotatorVisitor extends HeaderVisitor {
 					a.setTextAttributes(HeaderSyntaxHighlighter.PREPROCESSOR);
 				}
 			}
+		}
+	}
+
+	@Override
+	public void visitPreInclude(@NotNull HeaderPreInclude include) {
+		super.visitPreInclude(include);
+		if(!include.getPathString().startsWith("\\")){ //make sure it isn't \something\somethingElse
+			PsiFile includedFile = include.getHeaderFileFromInclude();
+			if(includedFile == null){
+				holder.createWarningAnnotation(include.getTextRange(), Plugin.resources.getString("lang.header.annotator.include_file_dne"));
+			}
+			if(!(includedFile instanceof HeaderFile)){
+				holder.createWeakWarningAnnotation(include.getTextRange(), Plugin.resources.getString("lang.header.annotator.include_file_not_header"));
+			}
+
 		}
 	}
 

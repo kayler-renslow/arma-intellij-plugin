@@ -19,6 +19,14 @@ import java.util.List;
  */
 public class PsiUtil {
 
+	public static ASTNode getFirstDescendantNode(PsiElement element){
+		ASTNode cursor = element.getNode();
+		while(cursor.getFirstChildNode() != null){
+			cursor = cursor.getFirstChildNode();
+		}
+		return cursor;
+	}
+
 	/**Traverses the entire ast tree with BFS, starting from start. Each node that is found will be sent to finder. It is also possible to stop the traversal at any time with finder
 	 * @param start starting ASTNode
 	 * @param finder TraversalObjectFinder

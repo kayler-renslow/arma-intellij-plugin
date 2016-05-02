@@ -70,6 +70,7 @@ INCLUDE = "#include" [ ]+ {INPUT_CHARACTER}+
 <YYINITIAL> "teamMemberNull" { return SQFTypes.TYPE_NULL; }
 
 <YYINITIAL> "private" { return SQFTypes.PRIVATE; }
+<YYINITIAL> "params" { return SQFTypes.PARAMS; }
 
 <YYINITIAL> "scopeName" { return SQFTypes.SCOPE_NAME; }
 <YYINITIAL> "break" { return SQFTypes.BREAK; }
@@ -83,7 +84,7 @@ INCLUDE = "#include" [ ]+ {INPUT_CHARACTER}+
 <YYINITIAL> "while" { return SQFTypes.WHILE; }
 <YYINITIAL> "goto" { return SQFTypes.GOTO; }
 <YYINITIAL> "assert" { return SQFTypes.ASSERT; }
-<YYINITIAL> "wizardStep" { return SQFTypes.STEP; }
+<YYINITIAL> "step" { return SQFTypes.STEP; }
 
 <YYINITIAL> "if" { return SQFTypes.IF; }
 <YYINITIAL> "then" { return SQFTypes.THEN; }
@@ -1233,7 +1234,6 @@ INCLUDE = "#include" [ ]+ {INPUT_CHARACTER}+
 <YYINITIAL> "overcastForecast" { return SQFTypes.COMMAND; }
 <YYINITIAL> "owner" { return SQFTypes.COMMAND; }
 <YYINITIAL> "param" { return SQFTypes.COMMAND; }
-<YYINITIAL> "params" { return SQFTypes.COMMAND; }
 <YYINITIAL> "parseNumber" { return SQFTypes.COMMAND; }
 <YYINITIAL> "parseText" { return SQFTypes.COMMAND; }
 <YYINITIAL> "particlesQuality" { return SQFTypes.COMMAND; }

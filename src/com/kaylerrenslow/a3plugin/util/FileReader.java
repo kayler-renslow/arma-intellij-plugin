@@ -21,11 +21,10 @@ public class FileReader{
 	public static String getText(String path) {
 		BufferedInputStream bis = new BufferedInputStream(INSTANCE.getClass().getResourceAsStream(path));
 		int size = 0;
-		int in;
 		byte[] data;
 		String s;
 		try{
-			while((in=bis.read()) != -1){
+			while(bis.read() != -1){
 				size++;
 			}
 			bis.close();
@@ -38,8 +37,9 @@ public class FileReader{
 			s = new String(data);
 
 		}catch (Exception e){
-			s = INSTANCE.getClass() + ">> error occurred retrieving file " + path;
+			s = "" + INSTANCE.getClass() + ">> error occurred retrieving file " + path;
 		}
 		return s.replaceAll("\r\n","\n"); //required or Intellij will flip out
 	}
+
 }

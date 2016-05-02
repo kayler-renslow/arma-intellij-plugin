@@ -20,23 +20,23 @@ import java.util.List;
  */
 public class SQFPsiImplUtilForGrammar {
 
-	public static SQFScope getLoopScope(SQFForLoopBase loop){
-		SQFCodeBlock  codeBlock = (SQFCodeBlock)loop.getNode().getChildren(TokenSet.create(SQFTypes.CODE_BLOCK))[0].getPsi();
+	public static SQFScope getLoopScope(SQFForLoopBase loop) {
+		SQFCodeBlock codeBlock = (SQFCodeBlock) loop.getNode().getChildren(TokenSet.create(SQFTypes.CODE_BLOCK))[0].getPsi();
 		return codeBlock.getLocalScope();
 	}
 
 	@Nullable
-	public static String[] getIterationVariables(SQFForLoopBase forLoop){
-		if(forLoop instanceof SQFLoopFor){
-			SQFLoopFor loop = (SQFLoopFor)forLoop;
+	public static String[] getIterationVariables(SQFForLoopBase forLoop) {
+		if (forLoop instanceof SQFLoopFor) {
+			SQFLoopFor loop = (SQFLoopFor) forLoop;
 			List<SQFForLoopIterVarInit> vars = loop.getForLoopIterVarInitList();
 			if (vars.size() == 0) {
 				return null;
 			}
 			String[] varNames = new String[vars.size()];
 			int i = 0;
-			for(SQFForLoopIterVarInit iterVarInit : vars){
-				if(iterVarInit.getStatement().getAssignment() == null){
+			for (SQFForLoopIterVarInit iterVarInit : vars) {
+				if (iterVarInit.getStatement().getAssignment() == null) {
 					varNames[i] = "";
 					i++;
 				}
@@ -45,11 +45,11 @@ public class SQFPsiImplUtilForGrammar {
 			}
 			return varNames;
 		}
-		if(forLoop instanceof SQFLoopForFrom){
-			SQFLoopForFrom loop = (SQFLoopForFrom)forLoop;
+		if (forLoop instanceof SQFLoopForFrom) {
+			SQFLoopForFrom loop = (SQFLoopForFrom) forLoop;
 			return new String[]{loop.getString().getNonQuoteText()};
 		}
-		if(forLoop instanceof SQFLoopForEach){
+		if (forLoop instanceof SQFLoopForEach) {
 			return new String[]{"_x"};
 		}
 
@@ -180,7 +180,7 @@ public class SQFPsiImplUtilForGrammar {
 		@Override
 		public void found(@NotNull ASTNode astNode) {
 			//check to make sure that the found variable comes BEFORE this.var
-			if(astNode.getStartOffset() > this.var.getNode().getStartOffset()){
+			if (astNode.getStartOffset() > this.var.getNode().getStartOffset()) {
 				this.traverseFoundChildren = false; //no need to go deeper on this node since it comes after this.var
 				return;
 			}
@@ -239,14 +239,10 @@ public class SQFPsiImplUtilForGrammar {
 	 * @return list of all private variables for the given scope
 	 */
 	public static List<SQFPrivateDeclVar> getPrivateDeclaredVars(SQFScope scope) {
-		ASTNode[] statements = scope.getNode().getChildren(TokenSet.create(SQFTypes.STATEMENT));
+		ArrayList<ASTNode> declVarNodes = PsiUtil.findDescendantElements(scope, SQFTypes.PRIVATE_DECL_VAR, null);
 		List<SQFPrivateDeclVar> ret = new ArrayList<>();
-		SQFStatement statement;
-		for (int i = 0; i < statements.length; i++) {
-			statement = (SQFStatement) statements[i].getPsi();
-			if (statement.getPrivateDecl() != null) {
-				ret.addAll(statement.getPrivateDecl().getPrivateDeclVars());
-			}
+		for (int i = 0; i < declVarNodes.size(); i++) {
+			ret.add((SQFPrivateDeclVar) declVarNodes.get(i).getPsi());
 		}
 		return ret;
 	}

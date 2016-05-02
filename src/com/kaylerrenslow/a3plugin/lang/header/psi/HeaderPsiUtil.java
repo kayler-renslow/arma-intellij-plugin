@@ -167,23 +167,19 @@ public class HeaderPsiUtil {
 						getClassDeclarationsWithEntriesEqual(classDecl.getClassContent(), className, attributes, traverseIncludes, matchedClasses, minDepth, maxDepth, currentDepth + 1);
 					}
 				}
-			} else if (traverseIncludes && child instanceof HeaderPreprocessorGroup) {
-				HeaderPreprocessorGroup group = (HeaderPreprocessorGroup) child;
-				List<HeaderPreprocessor> preprocessors = group.getPreprocessorList();
-				for (HeaderPreprocessor preprocessor : preprocessors) {
-					if (preprocessor instanceof HeaderPreInclude) {
-						include = (HeaderPreInclude) preprocessor;
-						HeaderFile f = include.getHeaderFileFromInclude();
-						if (f != null) {
-							getClassDeclarationsWithEntriesEqual(f, className, attributes, true, matchedClasses, minDepth, maxDepth, currentDepth);
-						}
-					}
+			} else if (traverseIncludes && child instanceof HeaderPreInclude) {
+				include = (HeaderPreInclude) child;
+				PsiFile f = include.getHeaderFileFromInclude();
+				if (f != null && f instanceof HeaderFile) {
+					getClassDeclarationsWithEntriesEqual(f, className, attributes, true, matchedClasses, minDepth, maxDepth, currentDepth);
 				}
+
 			} else {
 				getClassDeclarationsWithEntriesEqual(child, className, attributes, traverseIncludes, matchedClasses, minDepth, maxDepth, currentDepth);
 			}
 			child = child.getNextSibling();
 		}
+
 	}
 
 

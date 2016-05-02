@@ -5,6 +5,7 @@ import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 
@@ -23,7 +24,7 @@ public final class ArmaProjectDataManager {
 	}
 
 
-	public ArmaModuleData getDataForModule(Module module){
+	public ArmaModuleData getDataForModule(@NotNull Module module){
 		for(ArmaModuleData moduleData : moduleDataList){
 			if(moduleData.getModule() == module){
 				return moduleData;

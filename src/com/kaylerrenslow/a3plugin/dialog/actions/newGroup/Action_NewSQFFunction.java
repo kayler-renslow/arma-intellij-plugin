@@ -39,7 +39,7 @@ public class Action_NewSQFFunction extends AnAction {
 	public void actionPerformed(AnActionEvent e) {
 		Module module = e.getData(DataKeys.MODULE);
 		VirtualFile directory = e.getData(CommonDataKeys.VIRTUAL_FILE);
-		VirtualFile missionDirectoryRoot;
+		PsiDirectory missionDirectoryRoot;
 		try {
 			missionDirectoryRoot = ArmaProjectDataManager.getInstance().getDataForModule(module).getRootMissionDirectory();
 		} catch (DescriptionExtNotDefinedException e1) {
@@ -51,7 +51,7 @@ public class Action_NewSQFFunction extends AnAction {
 		PsiDirectory psiDirectory = PsiManager.getInstance(module.getProject()).findDirectory(directory);
 
 		String functionDirectoryPath;
-		if(psiDirectory == null || missionDirectoryRoot == null || missionDirectoryRoot.equals(directory)){
+		if(psiDirectory == null || missionDirectoryRoot.equals(directory)){
 			functionDirectoryPath = null;
 		}else{
 			PsiDirectory cur = psiDirectory;
