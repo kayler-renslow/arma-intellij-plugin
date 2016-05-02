@@ -1,0 +1,42 @@
+Version: 1.0.1
+
+Plugin
+	ADDED:
+        none
+    CHANGED:
+        none
+    FIXED:
+        none
+
+Shared between languages
+	ADDED:
+        none
+    CHANGED:
+        color of error text text attribute
+    FIXED:
+        none
+
+SQF
+	ADDED:
+        variables inside params[] array will now be marked as private
+        private declaration to variable assignment (private _var=1)
+    CHANGED:
+        while loops no longer always require semicolon in condition
+        documentation is available for EVERYTHING :D
+    FIXED:
+        fixed BIS function documentation links not working inside documentation window
+        an issue with return statements
+        fixed grammar file to allow for empty switch cases
+            switch (_part) do {
+                case "head";
+                case "body": { };
+            };
+        fixed "step" keyword not getting recognized
+
+Header
+    ADDED:
+        checks to see if included file exists
+    CHANGED:
+        rewrote how include files work
+    FIXED:
+        an issue where CfgFunctions couldn't be found in description.ext when included

@@ -20,6 +20,29 @@ import java.util.List;
  */
 public class SQFPsiImplUtilForGrammar {
 
+	public static SQFAssignment getMyAssignment(SQFVariable var){
+		if (var.getParent() instanceof SQFAssignment) {
+			if (var.getParent().getParent() instanceof SQFStatement) { //check if the variable is left hand side of assignment (left = right)
+				return (SQFAssignment) var.getParent();
+			}
+		}
+		return null;
+	}
+
+	public static boolean isAssigningVariable(SQFVariable var){
+		SQFAssignment assignment = var.getMyAssignment();
+		if (assignment != null) {
+			if (assignment.getParent() instanceof SQFStatement) { //check if the variable is left hand side of assignment (left = right)
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static boolean isDeclaredPrivate(SQFAssignment assignment){
+		return assignment.getNode().getFirstChildNode().getElementType() == SQFTypes.PRIVATE;
+	}
+
 	public static SQFScope getLoopScope(SQFForLoopBase loop) {
 		SQFCodeBlock codeBlock = (SQFCodeBlock) loop.getNode().getChildren(TokenSet.create(SQFTypes.CODE_BLOCK))[0].getPsi();
 		return codeBlock.getLocalScope();
@@ -117,6 +140,12 @@ public class SQFPsiImplUtilForGrammar {
 
 
 		//find where the variable is declared private
+		if(var.isAssigningVariable()){
+			if(var.getMyAssignment().isDeclaredPrivate()){
+				return containingScope;
+			}
+		}
+
 		List<SQFPrivateDeclVar> privateDeclaredVarsForScope = containingScope.getPrivateDeclaredVars();
 		SQFScope privatizedScope = containingScope;
 

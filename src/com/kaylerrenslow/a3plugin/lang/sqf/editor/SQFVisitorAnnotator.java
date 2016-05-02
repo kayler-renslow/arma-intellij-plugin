@@ -98,8 +98,9 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 			if (resolve == null) {
 				continue;
 			}
-			if (resolve.getParent() instanceof SQFAssignment) {
-				if (resolve.getParent().getParent() instanceof SQFStatement) { //check if the variable is left hand side of assignment (left = right)
+			if(resolve instanceof SQFVariable){
+				SQFVariable resolveVar = (SQFVariable) resolve;
+				if(resolveVar.isAssigningVariable()){
 					numAssignments++;
 				}
 			}

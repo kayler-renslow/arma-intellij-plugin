@@ -63,13 +63,6 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 
 	private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
-	private static final IElementType[] OPERATORS = {SQFTypes.EQEQ, SQFTypes.EQ, SQFTypes.ASTERISK, SQFTypes.NE, SQFTypes.PERC, SQFTypes.PLUS, SQFTypes.MINUS, SQFTypes.FSLASH, SQFTypes.CARET, SQFTypes.GTGT, SQFTypes.GT, SQFTypes.GE,
-			SQFTypes.LT, SQFTypes.LE, SQFTypes.EXCL, SQFTypes.AMPAMP, SQFTypes.BARBAR, SQFTypes.QUEST, SQFTypes.COLON};
-
-	private static final IElementType[] CONSTANTS = {SQFTypes.NAMESPACE, SQFTypes.CONFIG};
-
-	private static final IElementType[] COMMANDS = {SQFTypes.COMMAND};
-
 	@NotNull
 	@Override
 	public Lexer getHighlightingLexer() {
@@ -110,7 +103,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(SQFTypes.LANG_VAR)){
 			return MAGIC_VAR_KEYS;
 		}
-		for(IElementType e: COMMANDS){
+		for(IElementType e: SQFStatic.COMMANDS){
 			if(tokenType.equals(e)){
 				return COMMAND_KEYS;
 			}
@@ -120,12 +113,12 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 				return KEYWORD_KEYS;
 			}
 		}
-		for(IElementType e: OPERATORS){
+		for(IElementType e: SQFStatic.OPERATORS){
 			if(tokenType.equals(e)){
 				return OPERATOR_KEYS;
 			}
 		}
-		for(IElementType e: CONSTANTS){
+		for(IElementType e: SQFStatic.CONSTANTS){
 			if(tokenType.equals(e)){
 				return CONSTANT_KEYS;
 			}

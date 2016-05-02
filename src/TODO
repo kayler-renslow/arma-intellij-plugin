@@ -1,12 +1,11 @@
 features:
     add tag renaming for functions
     check if function exists when doing call or spawn
-    provide support for private _var
     renaming files will rename them in includes
 
 
 
-fix this scenario: (but maybe not because it will mess up private declarations?)
+fix this scenario
 _i = 100;
 for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
 hint str _i; // 100

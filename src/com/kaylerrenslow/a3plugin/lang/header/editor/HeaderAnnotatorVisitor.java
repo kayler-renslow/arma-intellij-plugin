@@ -92,7 +92,7 @@ public class HeaderAnnotatorVisitor extends HeaderVisitor {
 		ArrayList<String> classDeclarationNames = new ArrayList<>();
 		for (HeaderClassDeclaration classDeclaration : declarations) {
 			int index = classDeclarationNames.indexOf(classDeclaration.getClassName());
-			if (index > 0) {
+			if (index >= 0) {
 				classDeclarationMatch = declarations.get(index);
 				Annotation a = holder.createErrorAnnotation(classDeclarationMatch.getClassNameNode(), Plugin.resources.getString("lang.header.annotator.class_already_defined"));
 				a.setTextAttributes(SharedSyntaxHighlighterColors.RED_WORD);
