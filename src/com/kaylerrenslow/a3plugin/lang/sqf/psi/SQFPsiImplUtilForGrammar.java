@@ -5,7 +5,9 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.misc.SQFPrivatization;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivatizer;
 import com.kaylerrenslow.a3plugin.util.TraversalObjectFinder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,6 +21,17 @@ import java.util.List;
  *         Created on 03/19/2016.
  */
 public class SQFPsiImplUtilForGrammar {
+
+	public static SQFPrivatizer getPrivateDeclarationElement(SQFPrivateDeclVar privateDeclVar){
+		PsiElement cursor = privateDeclVar;
+		while(cursor.getParent() != null){
+			if(cursor instanceof SQFPrivatizer){
+				return (SQFPrivatizer) cursor;
+			}
+			cursor = cursor.getParent();
+		}
+		return null;
+	}
 
 	public static SQFAssignment getMyAssignment(SQFVariable var){
 		if (var.getParent() instanceof SQFAssignment) {
@@ -110,61 +123,13 @@ public class SQFPsiImplUtilForGrammar {
 	 * @return scope
 	 */
 	public static SQFScope getDeclarationScope(SQFVariable var) {
-		SQFScope containingScope = SQFPsiUtil.getContainingScope(var);
-
-		if (containingScope instanceof SQFFileScope) {
-			return containingScope; //no need to do anything special
-		}
-
-		boolean _this = false; //true if var's name = _this
-		if (var.getVariableType() == SQFTypes.LANG_VAR) {
-			if (var.getVarName().equals("_this")) { //_this is either file scope or spawn's statement scope
-				_this = true;
-			} else {
-				return containingScope;
-			}
-		}
-		if (var.getVariableType() == SQFTypes.GLOBAL_VAR) {
+		if(var.isGlobalVariable()){
 			return SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile());
 		}
-
-		SQFScope spawnScope = SQFPsiUtil.checkIfInsideSpawn(var);
-		boolean insideSpawn = spawnScope != null;
-
-		if (_this) {
-			if (insideSpawn) {
-				return spawnScope;
-			}
-			return SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile());
+		SQFPrivatization privatization = getPrivatization(var);
+		if(privatization != null){
+			return privatization.getDeclarationScope();
 		}
-
-
-		//find where the variable is declared private
-		if(var.isAssigningVariable()){
-			if(var.getMyAssignment().isDeclaredPrivate()){
-				return containingScope;
-			}
-		}
-
-		List<SQFPrivateDeclVar> privateDeclaredVarsForScope = containingScope.getPrivateDeclaredVars();
-		SQFScope privatizedScope = containingScope;
-
-		while (privatizedScope != null) {
-			if (insideSpawn && privatizedScope == spawnScope) {
-				return spawnScope; //can't escape the spawn's environment
-			}
-			for (SQFPrivateDeclVar varInScope : privateDeclaredVarsForScope) {
-				if (varInScope.getVarName().equals(var.getVarName())) {
-					return privatizedScope; //declared private
-				}
-			}
-			if (privatizedScope instanceof SQFFileScope) {
-				break;
-			}
-			privatizedScope = SQFPsiUtil.getContainingScope(privatizedScope.getParent());
-			privateDeclaredVarsForScope = privatizedScope.getPrivateDeclaredVars();
-		}
-
 		//at this point, the variable hasn't been declared private and isn't inside spawn{}
 		//That leaves it to where it was first declared. We must be careful and check that the first use isn't inside a spawn and that the scope is no lower than the method parameter var's scope
 
@@ -178,87 +143,125 @@ public class SQFPsiImplUtilForGrammar {
 				var = 3; //assume this is where this method's parameter 'var' is.
 			};
 		};
-
 		*/
-
-
-		//use breadth first search to find the first use
-		GetLocalVarDeclarationTraversal traversal = new GetLocalVarDeclarationTraversal(var);
-		PsiUtil.traverseBreadthFirstSearch(var.getContainingFile().getNode(), traversal);
-		SQFVariable firstDeclaration = traversal.getFirstDeclaration();
-		if (firstDeclaration == var) {
-			return containingScope;
-		}
-		if (firstDeclaration == null) {
-			return containingScope;
-		}
-
-		return SQFPsiUtil.getContainingScope(firstDeclaration);
+		return null; //TODO
+//		GetLocalVarDeclarationTraversal traversal = new GetLocalVarDeclarationTraversal(var);
+//		PsiUtil.traverseBreadthFirstSearch(var.getContainingFile().getNode(), traversal);
+//		SQFScope firstDeclarationScope = traversal.getFirstDeclarationScope();
+//		if(firstDeclarationScope == null){
+//			return SQFPsiUtil.getContainingScope(var);
+//		}
+//		return firstDeclarationScope;
 	}
 
-	private static class GetLocalVarDeclarationTraversal implements TraversalObjectFinder<ASTNode> {
-		private final SQFVariable var;
-		private boolean stopped = false;
-		private boolean traverseFoundChildren = true;
-		private SQFVariable firstDeclaration;
+	/** Gets privatization instance for the given variable. Essentially, this is getting where and how the variable is declared private.
+	 * @param var the variable
+	 * @return new instance, or returns <b>null</b> if on of the following is met: <ul><li>not declared private</li><li>global variable</li></ul>
+	 */
+	public static SQFPrivatization getPrivatization(SQFVariable var){
+		if (var.isGlobalVariable()) {
+			return null;
+		}
+		SQFScope containingScope = SQFPsiUtil.getContainingScope(var);
 
-		GetLocalVarDeclarationTraversal(SQFVariable var) {
-			this.var = var;
+		boolean _this = false; //true if var's name = _this
+		if (var.getVariableType() == SQFTypes.LANG_VAR) {
+			if (var.getVarName().equals("_this")) { //_this is either file scope or spawn's statement scope
+				_this = true;
+			} else {
+				return new SQFPrivatization.SQFVarInheritedPrivatization(var, containingScope);
+			}
 		}
 
-		@Override
-		public void found(@NotNull ASTNode astNode) {
-			//check to make sure that the found variable comes BEFORE this.var
-			if (astNode.getStartOffset() > this.var.getNode().getStartOffset()) {
-				this.traverseFoundChildren = false; //no need to go deeper on this node since it comes after this.var
-				return;
+		SQFScope spawnScope = SQFPsiUtil.checkIfInsideSpawn(var);
+		boolean insideSpawn = spawnScope != null;
+
+		if (_this) {
+			if (insideSpawn) {
+				return new SQFPrivatization.SQFVarInheritedPrivatization(var, spawnScope);
 			}
-			if (astNode.getElementType() == SQFTypes.CODE_BLOCK) {
-				ASTNode previous = PsiUtil.getPrevSiblingNotWhitespace(astNode);
-				if (PsiUtil.isOfElementType(previous, SQFTypes.COMMAND)) {
-					if (previous.getText().equals("spawn")) {
-						this.traverseFoundChildren = false; //don't traverse spawn statements
-					}
+			return new SQFPrivatization.SQFVarInheritedPrivatization(var, SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile()));
+		}
+
+
+		//find where the variable is declared private
+		if(var.isAssigningVariable()){
+			if(var.getMyAssignment().isDeclaredPrivate()){ //private var = 1;
+				return new SQFPrivatization.SQFVarInheritedPrivatization(var, containingScope);
+			}
+		}
+
+		List<SQFPrivateDeclVar> privateDeclaredVarsForScope = containingScope.getPrivateDeclaredVars();
+		SQFScope privatizedScope = containingScope;
+
+		while (privatizedScope != null) {
+			if (insideSpawn && privatizedScope == spawnScope) {
+				return new SQFPrivatization.SQFVarInheritedPrivatization(var, spawnScope); //can't escape the spawn's environment
+			}
+			for (SQFPrivateDeclVar varInScope : privateDeclaredVarsForScope) {
+				if (varInScope.getVarName().equals(var.getVarName())) {
+					return SQFPrivatization.getPrivatization(var, varInScope.getPrivateDeclarationElement()); //declared private
 				}
 			}
-			if (astNode.getElementType() == SQFTypes.LOCAL_VAR) {
-				if (astNode.getText().equals(var.getVarName())) {
-					//now check if found variable's scope is a container for this.var's scope
-					ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(SQFPsiUtil.getContainingScope(astNode.getPsi()), SQFTypes.VARIABLE, astNode, var.getVarName());
-					for (ASTNode node : nodes) {
-						if (node == this.var.getNode()) {
-							//yes. the found variable's scope is a container for this.var's scope
-							stopped = true;
-							if (astNode.getPsi() instanceof SQFVariable) {
-								firstDeclaration = (SQFVariable) astNode.getPsi();
-							} else if (astNode.getPsi().getParent() instanceof SQFVariable) {
-								firstDeclaration = (SQFVariable) astNode.getPsi().getParent();
-							} else {
-								throw new RuntimeException("this shouldn't happen");
-							}
-
-						}
-					}
-				}
+			if (privatizedScope instanceof SQFFileScope) {
+				break;
 			}
+			privatizedScope = SQFPsiUtil.getContainingScope(privatizedScope.getParent());
+			privateDeclaredVarsForScope = privatizedScope.getPrivateDeclaredVars();
 		}
 
-		@Override
-		public boolean traverseFoundNodesChildren() {
-			boolean temp = traverseFoundChildren; //reset for each node
-			traverseFoundChildren = true;
-			return temp;
-		}
-
-		@Override
-		public boolean stopped() {
-			return this.stopped;
-		}
-
-		public SQFVariable getFirstDeclaration() {
-			return firstDeclaration;
-		}
+		return null;
 	}
+
+//	private static class GetLocalVarDeclarationTraversal implements TraversalObjectFinder<ASTNode> {
+//		private final SQFVariable var;
+//		private boolean stopped = false;
+//		private boolean traverseFoundChildren = true;
+//		private SQFVariable firstDeclaration;
+//
+//		GetLocalVarDeclarationTraversal(SQFVariable var) {
+//			this.var = var;
+//		}
+//
+//		@Override
+//		public void found(@NotNull ASTNode astNode) {
+//			//check to make sure that the found variable comes BEFORE this.var
+//			if (astNode.getStartOffset() > this.var.getNode().getStartOffset()) {
+//				this.traverseFoundChildren = false; //no need to go deeper on this node since it comes after this.var
+//				return;
+//			}
+//			if (astNode.getElementType() == SQFTypes.CODE_BLOCK) {
+//				ASTNode previous = PsiUtil.getPrevSiblingNotWhitespace(astNode);
+//				if (PsiUtil.isOfElementType(previous, SQFTypes.COMMAND)) {
+//					if (previous.getText().equals("spawn")) {
+//						this.traverseFoundChildren = false; //don't traverse spawn statements
+//					}
+//				}
+//			}
+//			if (astNode.getElementType() == SQFTypes.LOCAL_VAR) {
+//				if (astNode.getText().equals(var.getVarName())) {
+//					//now check if found variable's scope is a container for this.var's scope
+//
+//				}
+//			}
+//		}
+//
+//		@Override
+//		public boolean traverseFoundNodesChildren() {
+//			boolean temp = traverseFoundChildren; //reset for each node
+//			traverseFoundChildren = true;
+//			return temp;
+//		}
+//
+//		@Override
+//		public boolean stopped() {
+//			return this.stopped;
+//		}
+//
+//		public SQFScope getFirstDeclarationScope() {
+//			return firstDeclarationScope;
+//		}
+//	}
 
 
 	/**

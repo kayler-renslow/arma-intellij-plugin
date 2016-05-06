@@ -1,13 +1,15 @@
 <idea-plugin version="2">
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<!--<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>-->
 	<description>
 		Plugin to offer smart editing of Arma games' mission files.
 	</description>
 
-	<change-notes></change-notes>
+	<change-notes>
+		changelog is available at the github page
+	</change-notes>
 
 
 	<idea-version since-build="131"/>

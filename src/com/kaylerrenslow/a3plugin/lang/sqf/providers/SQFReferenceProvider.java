@@ -5,8 +5,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.psi.PsiReferenceProvider;
 import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTokenType;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +26,7 @@ public class SQFReferenceProvider extends PsiReferenceProvider{
 		}
 		SQFVariable var = (SQFVariable) element;
 
-		if(var.getVariableType() == SQFTypes.GLOBAL_VAR){
+		if(var.isGlobalVariable()){
 			List<SQFVariable> vars = SQFPsiUtil.findGlobalVariables(element.getProject(), var);
 			PsiReference[] references = new PsiReference[vars.size()];
 			for (int i = 0; i < vars.size(); i++){

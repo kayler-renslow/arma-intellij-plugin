@@ -17,6 +17,7 @@ import com.intellij.psi.impl.source.tree.JavaDocElementType;
     return;
 %eof}
 
+
 LOCAL_VAR = [_][:jletterdigit:]*
 GLOBAL_VAR = [:jletter:] [:jletterdigit:]*
 
@@ -37,7 +38,11 @@ ESCAPE_SEQUENCE = \\[^\r\n]
 
 STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 
-BLOCK_COMMENT = "/*" [^*] ~"*/" | "/*" "*"+ "/"
+BLOCK_COMMENT = \/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/
+
+COMMENT_CONTENT = ( [^*] | \*+ [^/*] )*
+BLOCK_COMMENT = "/*" [^*] ~"*/" | "/*" "*"+ "/" | "/*" {COMMENT_CONTENT} "*"+ "/"
+
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 
 INCLUDE = "#include" [ ]+ {INPUT_CHARACTER}+
@@ -47,6 +52,8 @@ INCLUDE = "#include" [ ]+ {INPUT_CHARACTER}+
 <YYINITIAL> {WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
 
 <YYINITIAL> {BLOCK_COMMENT} { return SQFTypes.BLOCK_COMMENT; }
+
+
 <YYINITIAL> {INLINE_COMMENT} { return SQFTypes.INLINE_COMMENT; }
 
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }

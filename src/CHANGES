@@ -16,11 +16,13 @@ Shared between languages
 
 SQF
 	ADDED:
-        private declaration to variable assignment (private _var=1)
+        none
     CHANGED:
         none
     FIXED:
-        an issue with return statements
+        ? statement being broken
+        block comments
+        {code}count 1;
 
 
 Header

@@ -4,6 +4,10 @@ features:
     renaming files will rename them in includes
 
 
+step up the scopes and list all variables. we should have utility method that will search for descendant elements without going deeper than the given scope.
+    be careful to not go inside or escape spawn statements
+
+for annotating if a variable is private, use the new method getPrivatization()
 
 fix this scenario
 _i = 100;

@@ -84,6 +84,14 @@ public class SQFLocalVarInStringReference implements PsiReference {
 	}
 
 	@Override
+	public String toString() {
+		return "SQFLocalVarInStringReference{" +
+				"targetVar=" + targetVar +
+				", string=" + string +
+				'}';
+	}
+
+	@Override
 	public boolean isSoft() {
 		return false;
 	}

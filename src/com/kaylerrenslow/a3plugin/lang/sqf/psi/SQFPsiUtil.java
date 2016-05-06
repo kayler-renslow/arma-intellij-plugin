@@ -7,12 +7,9 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.indexing.FileBasedIndex;
-import com.intellij.util.xml.ModuleContentRootSearchScope;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
@@ -117,8 +114,7 @@ public class SQFPsiUtil {
 				continue;
 			}
 			for (SQFVariable var : vars) {
-				IElementType type = var.getVariableType();
-				if (type != SQFTypes.GLOBAL_VAR) {
+				if (!var.isGlobalVariable()) {
 					continue;
 				}
 				if (findVar.getVarName().equals(var.getVarName())) {

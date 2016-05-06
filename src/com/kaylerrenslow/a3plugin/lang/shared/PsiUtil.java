@@ -131,7 +131,7 @@ public class PsiUtil {
 	}
 
 	/**
-	 * Checks if the given node is an ancestor of the given IElementType. If it is, this method will return that ancestor. Otherwise, it will return null.<br>
+	 * Checks if the given node has an ancestor of the given IElementType. If there is one, this method will return that ancestor. Otherwise, it will return null.<br>
 	 * If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
 	 *
 	 * @param node        node to check if has a parent of IElementType type

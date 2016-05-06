@@ -1,4 +1,4 @@
-Version: 1.0.1
+Version: tbd
 
 Plugin
 	ADDED:
@@ -12,31 +12,24 @@ Shared between languages
 	ADDED:
         none
     CHANGED:
-        color of error text text attribute
+        none
     FIXED:
         none
 
 SQF
 	ADDED:
-        variables inside params[] array will now be marked as private
-        private declaration to variable assignment (private _var=1)
+        none
     CHANGED:
-        while loops no longer always require semicolon in condition
-        documentation is available for EVERYTHING :D
+        none
     FIXED:
-        fixed BIS function documentation links not working inside documentation window
-        an issue with return statements
-        fixed grammar file to allow for empty switch cases
-            switch (_part) do {
-                case "head";
-                case "body": { };
-            };
-        fixed "step" keyword not getting recognized
+        ? statement being broken
+        block comments
+        {code}count 1;
 
 Header
     ADDED:
-        checks to see if included file exists
+        none
     CHANGED:
-        rewrote how include files work
+        none
     FIXED:
-        an issue where CfgFunctions couldn't be found in description.ext when included
+        none

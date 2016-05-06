@@ -3,12 +3,9 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi.references;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -62,13 +59,15 @@ public class SQFVariableReference implements PsiReference {
 		if (!(element instanceof SQFVariable)) {
 			return false;
 		}
-		SQFVariable other = (SQFVariable) element;
 		PsiElement selfResolve = resolve();
+		if(selfResolve == element || selfResolve == null){
+			return false;
+		}
+		SQFVariable other = (SQFVariable) element;
 
 		boolean referenceTo = other.getVarName().equals(target.getVarName());
 
-		IElementType myVariableElementType = var.getVariableType();
-		if (myVariableElementType != SQFTypes.GLOBAL_VAR) {
+		if (!var.isGlobalVariable()) {
 			SQFScope myScope = ((SQFVariable) selfResolve).getDeclarationScope();
 			SQFScope otherScope = ((SQFVariable) element).getDeclarationScope();
 			referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == selfResolve.getContainingFile();
@@ -81,6 +80,14 @@ public class SQFVariableReference implements PsiReference {
 	@Override
 	public Object[] getVariants() {
 		return new Object[0];
+	}
+
+	@Override
+	public String toString() {
+		return "SQFVariableReference{" +
+				"target=" + target +
+				", var=" + var +
+				'}';
 	}
 
 	@Override

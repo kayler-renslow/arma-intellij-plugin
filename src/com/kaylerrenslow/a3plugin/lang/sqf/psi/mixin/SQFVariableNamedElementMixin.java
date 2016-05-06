@@ -5,12 +5,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
@@ -22,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author Kayler
@@ -43,8 +38,13 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 	}
 
 	@Override
+	public boolean isGlobalVariable(){
+		return this.myVariableElementType == SQFTypes.GLOBAL_VAR;
+	}
+
+	@Override
 	public ItemPresentation getPresentation() {
-		if(this.myVariableElementType == SQFTypes.GLOBAL_VAR){
+		if(this.isGlobalVariable()){
 			if(SQFStatic.followsSQFFunctionNameRules(this.getVarName())){
 				return new SQFFunctionItemPresentation(this.getVarName(), this.getContainingFile());
 			}

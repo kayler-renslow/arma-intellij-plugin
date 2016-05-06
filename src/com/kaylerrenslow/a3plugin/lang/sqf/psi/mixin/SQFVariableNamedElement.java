@@ -13,4 +13,7 @@ public interface SQFVariableNamedElement extends PsiNameIdentifierOwner, SQFVari
 	 * Get IElementType of the SQFVariable PsiElement
 	 */
 	IElementType getVariableType();
+
+	/**Return true if the variable is a global variable, false otherwise*/
+	boolean isGlobalVariable();
 }

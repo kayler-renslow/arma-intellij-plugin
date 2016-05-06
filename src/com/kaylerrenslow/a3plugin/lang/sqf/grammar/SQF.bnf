@@ -40,6 +40,7 @@ statement ::= ( assignment
                 | params_statement
 				| private_decl
 				| scope_manager
+                | codeblock_expression
 				| control_struct_
 				| try_catch
 				| expression
@@ -103,15 +104,19 @@ array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
 code_block ::= LBRACE local_scope? RBRACE
 
 /*control structures and other things*/
-    private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET) {methods=[getPrivateDeclVars]}//do not allow private[]
+    codeblock_expression ::= code_block expression
 
-    params_statement ::= array_val? PARAMS LBRACKET (params_param_ (COMMA params_param_)*) RBRACKET
-    private params_param_ ::= LBRACKET private_decl_var (COMMA expression)* RBRACKET | private_decl_var
+    /*privatizers*/
+        //DO NOT CHANGE STRING_LITERAL IN private_decl_var to string
+        private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclNamedElement" methods=[toString getPrivateDeclarationElement]}
+        //private_decl_var is a variable that designates the variable as private
+        //anywhere that private_decl_var is used, that rule must implement SQFPrivatizer
 
-	//DO NOT CHANGE STRING_LITERAL IN private_decl_var to string
-	private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclNamedElement" methods=[toString]}
-	//private_decl_var is a variable that designates the variable as private
+        private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET) {methods=[getPrivateDeclVars] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivatizer"}//do not allow private[]
 
+        params_statement ::= array_val? PARAMS LBRACKET (params_param_ (COMMA params_param_)*) RBRACKET { implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivatizer"}
+        private params_param_ ::= LBRACKET private_decl_var (COMMA expression)* RBRACKET | private_decl_var
+    /**/
 
     scope_manager ::= GOTO COLON string
 				    | BREAK_TO string
@@ -142,7 +147,7 @@ code_block ::= LBRACE local_scope? RBRACE
 
     private assignments_or_exppresion_ ::= (assignment SEMICOLON)* expression?
 
-    quest_statement ::= QUEST expression COLON exp
+    quest_statement ::= QUEST expression COLON expression
 
     try_catch ::= TRY code_block CATCH code_block
 
