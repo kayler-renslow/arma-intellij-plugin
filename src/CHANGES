@@ -16,14 +16,12 @@ Shared between languages
 
 SQF
 	ADDED:
-        none
+        support for custom live templates
     CHANGED:
-        none
+        some previous auto completion elements were converted into live templates
     FIXED:
-        ? statement being broken
-        block comments
-        {code}count 1;
-
+        variables being defined inside params[] not being marked as defined in annotator
+        finding scope of variables
 
 Header
     ADDED:

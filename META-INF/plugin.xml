@@ -54,9 +54,14 @@
 		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/a3plugin/armaPluginColorSchemes.xml" />
 		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/a3plugin/armaPluginColorSchemes.xml" />
 		<lang.documentationProvider language="XML" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.XMLDocumentationProvider"/>
+		<!--<languageInjector implementation="com.kaylerrenslow.a3plugin.lang.shared.HeaderInSQFInjector" />-->
 
 		<!-- File Templates-->
 		<!--<internalFileTemplate name="sqfFileTemplate" />-->
+
+		<!-- Live Templates-->
+		<liveTemplateContext implementation="com.kaylerrenslow.a3plugin.liveTemplates.SQFLiveTemplateContext" />
+		<defaultLiveTemplatesProvider implementation="com.kaylerrenslow.a3plugin.liveTemplates.SQFLiveTemplatesProvider" />
 
 		<!-- Stringtable-->
 		<dom.fileDescription implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.StringtableDomFileDescription" />

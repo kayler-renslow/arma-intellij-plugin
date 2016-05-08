@@ -14,7 +14,9 @@ import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighter;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.misc.SQFPrivatization;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivatizer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -93,6 +95,8 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 		int numAssignments = 0;
 		SQFScope containingScope;
 		boolean isUsedOverride = false;
+		boolean isDefinedByParams = false;
+
 		for (PsiReference reference : references) {
 			PsiElement resolve = reference.resolve();
 			if (resolve == null) {
@@ -115,28 +119,22 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 				}
 			}
 		}
-
+		SQFPrivatization privatization = var.getPrivatization();
+		if(privatization instanceof SQFPrivatization.SQFPrivateDeclParams){
+			SQFParamsStatement paramsStatement = ((SQFPrivatization.SQFPrivateDeclParams)privatization).getDeclarationElement();
+			if(paramsStatement.varIsDefined(var.getVarName())){
+				isDefinedByParams = true;
+			}
+		}
 		if (numAssignments == references.length && !isUsedOverride) {
 			annotator.createWeakWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
 		}
-		if (numAssignments == 0) {
+		if (numAssignments == 0 && !isDefinedByParams) {
 			annotator.createWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_uninitialized"));
 		}
 
 		SQFScope declScope = var.getDeclarationScope();
-		boolean declarationNeeded = true;
-		if (declScope != SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile())) {
-			//local variables don't need to be declared private inside control structures or code blocks
-			//https://community.bistudio.com/wiki/Variables#Local_Variables
-			declarationNeeded = false;
-		}
-		List<SQFPrivateDeclVar> vars = declScope.getPrivateDeclaredVars();
-		for (SQFPrivateDeclVar declVar : vars) {
-			if (declVar.getVarName().equals(var.getVarName())) {
-				return;
-			}
-		}
-		if (!declarationNeeded) {
+		if (privatization != null) {
 			return;
 		}
 		Annotation a = annotator.createWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_not_private"));

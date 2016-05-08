@@ -31,7 +31,8 @@ public class SQFPsiUtil {
 
 	/**
 	 * Check if the given element is inside a [] spawn {}. For spawn, all variables are created in a different environment
-	 * We must iterate over all upper code blocks and see if they are part of a spawn statement
+	 * We must iterate over all upper code blocks and see if they are part of a spawn statement. Unlike scope.checkIfSpawn(), this will traverse the tree upwards to the file scope to make sure that the element isn't inside the spawn scope
+	 * @return the scope that starts the spawn scope ([] spawn {}), or null if not inside spawn
 	 */
 	@Nullable
 	public static SQFScope checkIfInsideSpawn(@NotNull PsiElement element) {
@@ -87,6 +88,9 @@ public class SQFPsiUtil {
 		PsiElement parent = element.getParent();
 		while (parent != null && !(parent instanceof SQFScope)) {
 			parent = parent.getParent();
+		}
+		if(parent == null){
+			return getFileScope((SQFFile)element.getContainingFile());
 		}
 		return (SQFScope) parent;
 	}

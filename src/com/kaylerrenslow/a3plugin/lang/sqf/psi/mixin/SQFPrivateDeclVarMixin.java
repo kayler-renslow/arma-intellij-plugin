@@ -17,7 +17,7 @@ import java.util.ArrayList;
  *         PsiElement mixin for SQF grammar file. This mixin is meant for PrivateDeclVar PsiElements. (variables in strings next to private keyword)
  *         Created on 03/23/2016.
  */
-public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement implements SQFPrivateDeclNamedElement {
+public abstract class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement implements SQFPrivateDeclNamedElement, SQFPrivateDeclVar {
 
 	public SQFPrivateDeclVarMixin(@NotNull ASTNode node) {
 		super(node);
@@ -49,9 +49,5 @@ public class SQFPrivateDeclVarMixin extends ASTWrapperPsiElement implements SQFP
 		return references.toArray(new PsiReference[references.size()]);
 	}
 
-	@Override
-	public String getVarName() {
-		return super.getText().substring(1, this.getTextLength() - 1); //do not store it because when the text is changed, the stored value wouldn't be up to date
-	}
 
 }

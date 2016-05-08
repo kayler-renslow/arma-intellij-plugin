@@ -28,12 +28,12 @@
 sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
 
 file_scope ::= item_* return_statement? (comment | BAD_CHARACTER)* {extends("file_scope")=local_scope}
-local_scope ::= item_* return_statement? (comment | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars]}
+local_scope ::= item_* return_statement? (comment | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars getStatementsForScope checkIfSpawn]}
 
 private item_ ::= comment | statement | BAD_CHARACTER
 
 comment ::= INLINE_COMMENT | BLOCK_COMMENT | COMMENT_COMMAND
-variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope isAssigningVariable getMyAssignment]}
+variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope isAssigningVariable getMyAssignment getPrivatization varNameMatches]}
 
 
 statement ::= ( assignment
@@ -46,9 +46,9 @@ statement ::= ( assignment
 				| expression
 			  ) SEMICOLON
 
-return_statement ::= expression SEMICOLON?
+return_statement ::= expression SEMICOLON? {extends("return_statement") = statement}
 
-assignment ::= (PRIVATE? variable) EQ (expression | switch_statement | if_statement | code_block) {methods=[getAssigningVariable isDeclaredPrivate]}
+assignment ::= (PRIVATE? variable) EQ (expression | params_statement | switch_statement | if_statement | code_block) {methods=[getAssigningVariable isDeclaredPrivate]}
 
 expression::= exp_operand_ exp_operator_ expression | exp_operand_
 private exp_operand_ ::= (PLUS | MINUS | NOT | EXCL)? (macro_call | terminal_ COMMAND exp_operand_? | COMMAND exp_operand_ | COMMAND | terminal_)
@@ -108,14 +108,15 @@ code_block ::= LBRACE local_scope? RBRACE
 
     /*privatizers*/
         //DO NOT CHANGE STRING_LITERAL IN private_decl_var to string
-        private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclNamedElement" methods=[toString getPrivateDeclarationElement]}
+        private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclNamedElement" methods=[toString getPrivateDeclarationElement varNameMatches getVarName]}
         //private_decl_var is a variable that designates the variable as private
         //anywhere that private_decl_var is used, that rule must implement SQFPrivatizer
 
         private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET) {methods=[getPrivateDeclVars] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivatizer"}//do not allow private[]
 
-        params_statement ::= array_val? PARAMS LBRACKET (params_param_ (COMMA params_param_)*) RBRACKET { implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivatizer"}
-        private params_param_ ::= LBRACKET private_decl_var (COMMA expression)* RBRACKET | private_decl_var
+        params_statement ::= params_argument? PARAMS LBRACKET (params_param (COMMA params_param)*) RBRACKET { implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivatizer" methods=[getVarsDefined varIsDefined]}
+        params_argument ::= expression;
+        params_param ::= LBRACKET private_decl_var (COMMA expression)* RBRACKET | private_decl_var
     /**/
 
     scope_manager ::= GOTO COLON string

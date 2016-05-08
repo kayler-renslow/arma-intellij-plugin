@@ -1,0 +1,9 @@
+<templateSet group="SQF">
+  <template name="paramsd" value="params[[&quot;$PARAM_VAR$&quot;,$PARAM_DEF_VAL$]];$END$" description="Create params statement with defined vars" toReformat="false" toShortenFQNames="true">
+    <variable name="PARAM_VAR" expression="" defaultValue="_var" alwaysStopAt="true" />
+    <variable name="PARAM_DEF_VAL" expression="" defaultValue="0" alwaysStopAt="true" />
+    <context>
+      <option name="SQF_CONTEXT" value="true" />
+    </context>
+  </template>
+</templateSet>

@@ -111,10 +111,7 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 
 		result.addElement(new SQFCompInsertHandlerHintfln().getLookupElement(parameters, context, result));
 		result.addElement(new SQFCompInsertHandlerHintfo().getLookupElement(parameters, context, result));
-		result.addElement(new SQFCompInsertHandlerHintArg().getLookupElement(parameters, context, result));
-		result.addElement(new SQFCompInsertHandlerHintValue().getLookupElement(parameters, context, result));
-		result.addElement(new SQFCompInsertHandlerIfThen().getLookupElement(parameters, context, result));
-		result.addElement(new SQFCompInsertHandlerIfExitWith().getLookupElement(parameters, context, result));
+		result.addElement(new SQFCompInsertHandlerParams().getLookupElement(parameters, context, result));
 
 		addVariablesAndCommands(parameters, result, cursor, true);
 

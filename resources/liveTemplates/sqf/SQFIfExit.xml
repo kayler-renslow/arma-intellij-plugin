@@ -1,0 +1,8 @@
+<templateSet group="SQF">
+    <template name="ifexit" value="if ($COND$) exitWith {$END$};" description="if exitWith statement" toReformat="false" toShortenFQNames="true">
+        <variable name="COND" expression="" defaultValue="" alwaysStopAt="true" />
+        <context>
+            <option name="SQF_CONTEXT" value="true" />
+        </context>
+    </template>
+</templateSet>

@@ -28,31 +28,6 @@ public class SQFCompletionElementTextReplace{
 		}
 	}
 
-	/**
-	 * Auto completion for if then statement.
-	 * Created on 03/28/2016.
-	 */
-	public static class SQFCompInsertHandlerIfThen extends CompletionElementWithTextReplace{
-		public SQFCompInsertHandlerIfThen() {
-			super("ifthen", "if () then {\n};", 4, " if then statement");
-		}
-
-		@Override
-		public void handleInsert(InsertionContext context, LookupElement item) {
-			super.handleInsert(context, item);
-		}
-	}
-
-	/**
-	 * Auto completion for: if exitWith statement.
-	 * Created on 03/28/2016.
-	 */
-	public static class SQFCompInsertHandlerIfExitWith extends CompletionElementWithTextReplace{
-		public SQFCompInsertHandlerIfExitWith() {
-			super("ifexit", "if () exitWith {};", 4, " if exitWith statement");
-		}
-
-	}
 
 	/**
 	 * Auto completion for hintarg.
@@ -75,19 +50,10 @@ public class SQFCompletionElementTextReplace{
 		}
 	}
 
-	public static class SQFCompInsertHandlerHintArg extends CompletionElementWithTextReplace{
-		public SQFCompInsertHandlerHintArg() {
-			super("hintarg", "hint format[\"%1\", (_this select )];", 32, "hint a function argument");
-		}
-	}
 
-	/**
-	 * Auto completion for hintvalue.
-	 * Created on 04/10/2016.
-	 */
-	public static class SQFCompInsertHandlerHintValue extends CompletionElementWithTextReplace{
-		public SQFCompInsertHandlerHintValue() {
-			super("hintvalue", "hint format[\"%1\", ];", 18, "hint format a value");
+	public static class SQFCompInsertHandlerParams extends CompletionElementWithTextReplace{
+		public SQFCompInsertHandlerParams() {
+			super("params", "params[\"\"];", 8, "set up a params[] statement");
 		}
 	}
 

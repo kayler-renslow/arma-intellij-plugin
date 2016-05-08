@@ -17,7 +17,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends PsiElemen
 	 * A private declaration is something that can be declared private inside a given scope. Example is a variable
 	 *
 	 * @param privateElement     the element that is being declared private
-	 * @param declarationElement the element that actually specifies the privatization (for instance private ["_hi"];)
+	 * @param declarationElement the element that actually specifies the privatization (for instance private ["_hi"];) (can be null)
 	 */
 	private SQFPrivatization(@NotNull E privateElement, @Nullable T declarationElement) {
 		this.privateElement = privateElement;
@@ -57,7 +57,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends PsiElemen
 	 * @return new instance
 	 * @throws IllegalArgumentException when the privatizer couldn't be matched to a SQFPrivatization class
 	 */
-	public static SQFPrivatization getPrivatization(SQFVariable variable, SQFPrivatizer privatizer){
+	public static SQFPrivatization getPrivatization(@NotNull SQFVariable variable, @NotNull SQFPrivatizer privatizer){
 		if(privatizer instanceof SQFPrivateDecl){
 			return new SQFPrivateDeclClassic(variable, (SQFPrivateDecl) privatizer);
 		}
@@ -77,7 +77,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends PsiElemen
 		 * @param privateElement   the element that is being declared private
 		 * @param declarationScope the scope in which it is declared private in
 		 */
-		public SQFVarInheritedPrivatization(SQFVariable privateElement, SQFScope declarationScope) {
+		public SQFVarInheritedPrivatization(@NotNull SQFVariable privateElement, @NotNull SQFScope declarationScope) {
 			super(privateElement, null);
 			this.declarationScope = declarationScope;
 		}
@@ -97,7 +97,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends PsiElemen
 		 * @param privateVariable    the element that is being declared private
 		 * @param declarationElement the element that actually specifies the privatization
 		 */
-		public SQFPrivateDeclClassic(SQFVariable privateVariable, SQFPrivateDecl declarationElement) {
+		public SQFPrivateDeclClassic(@NotNull SQFVariable privateVariable, @NotNull SQFPrivateDecl declarationElement) {
 			super(privateVariable, declarationElement);
 		}
 	}
@@ -111,8 +111,14 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends PsiElemen
 		 * @param privateVariable    the element that is being declared private
 		 * @param declarationElement the params statement that makes the variable private
 		 */
-		public SQFPrivateDeclParams(SQFVariable privateVariable, SQFParamsStatement declarationElement) {
+		public SQFPrivateDeclParams(@NotNull SQFVariable privateVariable, @NotNull SQFParamsStatement declarationElement) {
 			super(privateVariable, declarationElement);
+		}
+
+		@NotNull
+		@Override
+		public SQFParamsStatement getDeclarationElement() {
+			return super.getDeclarationElement();
 		}
 	}
 

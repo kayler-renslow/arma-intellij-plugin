@@ -24,7 +24,7 @@ import java.util.ArrayList;
  *         PsiElement mixin for SQF grammar file. This mixin is meant for SQFVariables
  *         Created on 03/19/2016.
  */
-public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implements SQFVariableNamedElement {
+public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implements SQFVariableNamedElement, SQFVariable {
 	private final IElementType myVariableElementType;
 
 	public SQFVariableNamedElementMixin(@NotNull ASTNode node) {
@@ -49,13 +49,13 @@ public class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implement
 				return new SQFFunctionItemPresentation(this.getVarName(), this.getContainingFile());
 			}
 		}
-		return new SQFVariableItemPresentation((SQFVariable) this);
+		return new SQFVariableItemPresentation(this);
 	}
 
 	@NotNull
 	@Override
 	public PsiReference[] getReferences() {
-		SQFVariable me = ((SQFVariable) this);
+		SQFVariable me = this;
 		SQFScope myVarScope = me.getDeclarationScope();
 
 		ArrayList<PsiReference> refs = new ArrayList<>();
