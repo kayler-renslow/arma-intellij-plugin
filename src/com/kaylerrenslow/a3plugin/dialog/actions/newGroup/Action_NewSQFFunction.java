@@ -1,24 +1,17 @@
 package com.kaylerrenslow.a3plugin.dialog.actions.newGroup;
 
-import com.intellij.notification.Notification;
-import com.intellij.notification.NotificationType;
-import com.intellij.notification.Notifications;
 import com.intellij.openapi.actionSystem.*;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.dialog.Dialog_NewSQFFunction;
-import com.kaylerrenslow.a3plugin.dialog.SQFConfigFunctionInformationHolder;
+import com.kaylerrenslow.a3plugin.dialog.newGroup.SQFConfigFunctionInformationHolder;
 import com.kaylerrenslow.a3plugin.dialog.SimpleMessageDialog;
-import com.kaylerrenslow.a3plugin.dialog.actions.SimpleGuiAction;
+import com.kaylerrenslow.a3plugin.dialog.newGroup.functionCreation.FunctionCreationDialog;
 import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
 import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
@@ -26,7 +19,7 @@ import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 
-import javax.swing.*;
+import java.awt.*;
 import java.io.IOException;
 
 /**
@@ -64,8 +57,47 @@ public class Action_NewSQFFunction extends AnAction {
 				functionDirectoryPath = cur.getName() + "\\" + functionDirectoryPath;
 			}
 		}
+		Component contextComponent = DataKeys.CONTEXT_COMPONENT.getData(e.getDataContext());
+		FunctionCreationDialog dialog = FunctionCreationDialog.showNewInstance(contextComponent, module, functionDirectoryPath);
+		createFunction(dialog.getNewFunctionDefinition(), module.getProject(), directory);
+	}
 
-		Dialog_NewSQFFunction.showNewInstance(e, module, functionDirectoryPath, new CreateNewSQFFunction(e.getProject(), directory));
+	private void createFunction(SQFConfigFunctionInformationHolder data, Project project, VirtualFile directoryFile){
+		WriteCommandAction.runWriteCommandAction(project, new Runnable() {
+			@Override
+			public void run() {
+				String fileName = SQFStatic.getConfigFunctionFileName(data.functionClassName);
+
+				VirtualFile created;
+
+				try {
+					created = directoryFile.createChildData(null, fileName);
+				} catch (IOException e) {
+					e.printStackTrace(System.out);
+					String title = Plugin.resources.getString("plugin.message.file_creation_error.title");
+					String message = String.format(Plugin.resources.getString("plugin.message.file_creation_error"), e.getMessage());
+					SimpleMessageDialog.newDialog(title, message).show();
+					return;
+				}
+
+				try{
+					HeaderPsiUtil.insertNewFunctionIntoCfgFunctions(data);
+				}catch(GenericConfigException e){
+					e.printStackTrace(System.out);
+					String message = String.format(Plugin.resources.getString("plugin.message.function_creation_error"), e.getMessage());
+					String title = Plugin.resources.getString("plugin.message.function_creation_error.title");
+					SimpleMessageDialog.newDialog(title, message).show();
+					return;
+				}
+
+				PsiFile psiFile = PsiManager.getInstance(data.module.getProject()).findFile(created);
+				if(psiFile == null){
+					throw new IllegalStateException("the file should exist");
+				}
+
+				//set view to new sqf file
+			}
+		});
 	}
 
 	@Override
@@ -86,54 +118,4 @@ public class Action_NewSQFFunction extends AnAction {
 		e.getPresentation().setVisible(enable);
 	}
 
-	private class CreateNewSQFFunction implements SimpleGuiAction<SQFConfigFunctionInformationHolder> {
-
-		private final Project project;
-		private final VirtualFile directoryFile;
-
-		CreateNewSQFFunction(Project project, VirtualFile directoryFile) {
-			this.project = project;
-			this.directoryFile = directoryFile;
-		}
-
-		@Override
-		public void actionPerformed(SQFConfigFunctionInformationHolder data) {
-			WriteCommandAction.runWriteCommandAction(project, new Runnable() {
-				@Override
-				public void run() {
-					String fileName = SQFStatic.getConfigFunctionFileName(data.functionClassName);
-
-					VirtualFile created;
-
-					try {
-						created = directoryFile.createChildData(null, fileName);
-					} catch (IOException e) {
-						e.printStackTrace(System.out);
-						String title = Plugin.resources.getString("plugin.message.file_creation_error.title");
-						String message = String.format(Plugin.resources.getString("plugin.message.file_creation_error"), e.getMessage());
-						SimpleMessageDialog.newDialog(title, message).show();
-						return;
-					}
-
-					try{
-						HeaderPsiUtil.insertNewFunctionIntoCfgFunctions(data);
-					}catch(GenericConfigException e){
-						e.printStackTrace(System.out);
-						String message = String.format(Plugin.resources.getString("plugin.message.function_creation_error"), e.getMessage());
-						String title = Plugin.resources.getString("plugin.message.function_creation_error.title");
-						SimpleMessageDialog.newDialog(title, message).show();
-						return;
-					}
-
-					PsiFile psiFile = PsiManager.getInstance(data.module.getProject()).findFile(created);
-					if(psiFile == null){
-						throw new IllegalStateException("the file should exist");
-					}
-
-					
-					//set view to new sqf file
-				}
-			});
-		}
-	}
 }

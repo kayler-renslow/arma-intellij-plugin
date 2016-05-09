@@ -178,6 +178,7 @@ public class SQFPsiImplUtilForGrammar {
 	 * @param var the variable
 	 * @return new instance, or returns <b>null</b> if on of the following is met: <ul><li>not declared private</li><li>global variable</li></ul>
 	 */
+	@Nullable
 	public static SQFPrivatization getPrivatization(SQFVariable var) {
 		if (var.isGlobalVariable()) {
 			return null;

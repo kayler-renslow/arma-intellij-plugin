@@ -1,7 +1,7 @@
 features:
     add tag renaming for functions
     check if function exists when doing call or spawn
-    renaming files will rename them in includes
+    renaming files will rename them in includes and if a SQF function, will rename the class decl
 
 
 

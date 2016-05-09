@@ -6,7 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.tree.IElementType;
-import com.kaylerrenslow.a3plugin.dialog.SQFConfigFunctionInformationHolder;
+import com.kaylerrenslow.a3plugin.dialog.newGroup.SQFConfigFunctionInformationHolder;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
 import com.kaylerrenslow.a3plugin.lang.header.exception.*;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
@@ -32,8 +32,6 @@ public class HeaderPsiUtil {
 	 * @throws GenericConfigException when class failed to be inserted
 	 */
 	public static void insertNewFunctionIntoCfgFunctions(@NotNull SQFConfigFunctionInformationHolder newFunction) throws GenericConfigException {
-		Project project = newFunction.module.getProject();
-
 		HeaderClassDeclaration cfgFunctions = getCfgFunctions(newFunction.module);
 
 		HeaderClassDeclaration definedTagClass = null; //class that contains the tag for the function
@@ -62,10 +60,8 @@ public class HeaderPsiUtil {
 		}
 		//tag hasn't been defined yet. create a new class
 		if (definedTagClass == null) {
-			definedTagClass = HeaderPsiUtil.createClassDeclaration(project, "Tag_Class_" + newFunction.functionTagName, tagAttribute);
-
 			//write new tag class to CfgFunctions
-			cfgFunctions.getClassContent().getFileEntries().getNode().addChild(createFileEntryForClass(project, definedTagClass).getNode());
+			definedTagClass = cfgFunctions.addClassDeclaration("Tag_Class_" + newFunction.functionTagName, tagAttribute);
 		}
 
 		//check if file path has been defined
@@ -80,17 +76,11 @@ public class HeaderPsiUtil {
 		// if there is no class with matching path, create new container class with path=location
 		if (definedContainerClass == null) {
 			String name = "Container_Class_" + System.currentTimeMillis();
-			definedContainerClass = createClassDeclaration(project, name, fileAttribute);
-			definedTagClass.getClassContent().getFileEntries().getNode().addChild(createFileEntryForClass(project, definedContainerClass).getNode()); //add the new container class to the defined tag class
+			definedContainerClass = definedTagClass.addClassDeclaration(name, fileAttribute); //add the new container class to the defined tag class
 		}
 
 		// insert function declaration class in containing class
-		HeaderClassDeclaration functionClass = createClassDeclaration(project, newFunction.functionClassName, newFunction.attributes); //new function class declaration
-
-		if (definedContainerClass.getClassContent() == null) {
-			definedContainerClass.getNode().addChild(createClassDeclaration(project, "t", null).getClassContent().getNode());
-		}
-		definedContainerClass.getClassContent().getFileEntries().getNode().addChild(createFileEntryForClass(project, functionClass).getNode());
+		definedContainerClass.addClassDeclaration(newFunction.functionClassName, newFunction.attributes);
 
 	}
 
@@ -479,15 +469,25 @@ public class HeaderPsiUtil {
 	 * @return new HeaderClassDeclaration PsiElement
 	 */
 	public static HeaderClassDeclaration createClassDeclaration(@NotNull Project project, @NotNull String className, @Nullable Attribute[] attributes) {
-		String class_decl_f = "class %s {%s};";
-		String attribute_f = "%s=%s;\n";
+		String text = createClassDeclarationText(className, attributes) + ";";
+		return (HeaderClassDeclaration) createElement(project, text, HeaderTypes.CLASS_DECLARATION);
+	}
+
+	/** Return the class declaration text (doesn't end with semicolon)
+	 * @param className class name
+	 * @param attributes attributes
+	 * @return class declaration text
+	 */
+	public static String createClassDeclarationText(String className, Attribute[] attributes){
+		String class_decl_f = "class %s {%s}";
+		String attribute_f = "%s=%s;";
 		String attributeText = "";
 		if (attributes != null) {
 			for (Attribute attribute : attributes) {
 				attributeText += String.format(attribute_f, attribute.name, attribute.value);
 			}
 		}
-		return (HeaderClassDeclaration) createElement(project, String.format(class_decl_f, className, attributeText), HeaderTypes.CLASS_DECLARATION);
+		return String.format(class_decl_f, className, attributeText);
 	}
 
 	@NotNull
@@ -496,9 +496,6 @@ public class HeaderPsiUtil {
 		return (HeaderFile) PsiFileFactory.getInstance(project).createFileFromText(fileName, HeaderFileType.INSTANCE, text);
 	}
 
-	public static HeaderFileEntry createFileEntryForClass(@NotNull Project project, @NotNull HeaderClassDeclaration classDeclaration) {
-		return (HeaderFileEntry) createElement(project, classDeclaration.getText() + ";", HeaderTypes.FILE_ENTRY);
-	}
 
 	@NotNull
 	public static PsiElement createElement(@NotNull Project project, @NotNull String text, @NotNull IElementType type) {

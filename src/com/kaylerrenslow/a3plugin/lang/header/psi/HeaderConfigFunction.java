@@ -77,6 +77,25 @@ public class HeaderConfigFunction {
 	}
 
 	/**
+	 * Returns true if the file name should be prefixed with 'fn_'. This is false only when the file path is explicity provided inside the function class declaration.<br>
+	 *     Example: myFunctionClass {file="hello.sqf";};
+	 */
+	public boolean appendFn(){
+		return this.appendFn_;
+	}
+
+	/**
+	 * Returns the SQF file name for this function. Can be something like: fn_function.sqf
+	 */
+	public String getFunctionFileName(){
+		return getFunctionFileName(appendFn_, getFunctionClassName(), functionFileExtension);
+	}
+
+	public static String getFunctionFileName(boolean appendFn_, String functionClassName, String functionFileExtension){
+		return ((appendFn_ ? "fn_" : "") + functionClassName + functionFileExtension);
+	}
+
+	/**
 	 * Get the full path to this function (\ will be converted to / and fn_ will be appended if required)
 	 */
 	@NotNull
@@ -86,7 +105,7 @@ public class HeaderConfigFunction {
 
 	@NotNull
 	public static String getFullRelativePath(String functionClassName, String functionFilePath, String functionFileExtension, boolean appendFn_){
-		return (functionFilePath + (functionFileExtension.length() > 0 ? "\\" : "") + (appendFn_ ? "fn_" : "") + functionClassName + functionFileExtension).replaceAll("\\\\", "/");
+		return (functionFilePath + (functionFileExtension.length() > 0 ? "\\" : "") + getFunctionFileName(appendFn_, functionClassName, functionFileExtension)).replaceAll("\\\\", "/");
 	}
 
 	@NotNull

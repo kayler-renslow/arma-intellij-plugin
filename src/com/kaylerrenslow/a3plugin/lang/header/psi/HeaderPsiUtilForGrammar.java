@@ -109,6 +109,29 @@ public class HeaderPsiUtilForGrammar {
 		return false;
 	}
 
+	public static HeaderClassDeclaration addClassDeclaration(HeaderClassDeclaration decl, String newClassDeclName, Attribute[] attributes) {
+		HeaderFileEntry fileEntry = decl.addFileEntry(HeaderPsiUtil.createClassDeclarationText(newClassDeclName, attributes));
+		return fileEntry.getClassDeclaration();
+	}
+
+	public static HeaderFileEntry addFileEntry(HeaderClassDeclaration decl, String textWithoutSemicolon) {
+		decl.createClassContent();
+		HeaderFileEntry fileEntry = (HeaderFileEntry)HeaderPsiUtil.createElement(decl.getProject(), textWithoutSemicolon + ";", HeaderTypes.FILE_ENTRY);
+		decl.getClassContent().getFileEntries().getNode().addChild(fileEntry.getNode());
+		return fileEntry;
+	}
+
+	public static void createClassContent(HeaderClassDeclaration decl) {
+		if (decl.getClassContent() != null) {
+			return;
+		}
+		decl.getNode().addChild(HeaderPsiUtil.createClassDeclaration(decl.getProject(), "temp", null).getClassContent().getNode());
+	}
+
+	public static void removeFromTree(HeaderClassDeclaration decl) {
+		decl.getParent().getParent().getNode().removeChild(decl.getParent().getNode());
+	}
+
 	/**
 	 * Get all attributes inside the class declaration. Attributes are any assignment inside the class. If traverseIncludes is true, it will traverse include statements
 	 *

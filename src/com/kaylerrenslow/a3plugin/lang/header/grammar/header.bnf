@@ -53,7 +53,7 @@ private term_ ::= (PLUS | MINUS)? (
 		  )
 
 
-class_declaration ::= class_stub class_content? {methods=[getClassName getExtendClassName getAttributes hasAttributes setAttribute getClassNameNode removeBracesIfEmpty bracesAreEmpty]}
+class_declaration ::= class_stub class_content? {methods=[getClassName getExtendClassName getAttributes hasAttributes setAttribute getClassNameNode removeBracesIfEmpty bracesAreEmpty removeFromTree createClassContent addFileEntry addClassDeclaration]}
 class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? {mixin="com.kaylerrenslow.a3plugin.lang.header.psi.mixin.HeaderClassStubMixin" implements="com.intellij.psi.PsiNamedElement" methods=[getClassName getExtendClassName getClassNameNode]}
 
 class_content ::= LBRACE file_entries RBRACE

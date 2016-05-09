@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.dialog;
+package com.kaylerrenslow.a3plugin.dialog.newGroup;
 
 import com.intellij.openapi.module.Module;
 import com.kaylerrenslow.a3plugin.util.Attribute;
@@ -21,6 +21,12 @@ public class SQFConfigFunctionInformationHolder {
 	 */
 	public final String functionClassName;
 
+
+	/**
+	 * Function file name (e.g. fn_function.sqf)
+	 */
+	public final String functionFileName;
+
 	/**
 	 * String containing path to the function. This will be something like 'folder\anotherFolder'
 	 */
@@ -31,15 +37,17 @@ public class SQFConfigFunctionInformationHolder {
 	 */
 	public final Module module;
 
+
 	/**
 	 * Special attributes about the function
 	 */
 	public final Attribute[] attributes;
 
-	public SQFConfigFunctionInformationHolder(@NotNull String functionTagName, @NotNull String functionClassName, @NotNull String functionLocation, @NotNull Module module, @Nullable Attribute[] attributes) {
+	public SQFConfigFunctionInformationHolder(@NotNull String functionTagName, @NotNull String functionClassName, @NotNull String functionLocation, @NotNull String functionFileName, @NotNull Module module, @Nullable Attribute[] attributes) {
 		this.functionTagName = functionTagName;
 		this.functionClassName = functionClassName;
 		this.functionLocation = functionLocation;
+		this.functionFileName = functionFileName;
 		this.module = module;
 		this.attributes = attributes;
 	}

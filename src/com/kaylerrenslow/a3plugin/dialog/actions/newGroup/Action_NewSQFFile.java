@@ -10,13 +10,15 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.Pair;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.dialog.Dialog_NewSQFFile;
+import com.kaylerrenslow.a3plugin.dialog.newGroup.sqfFileCreation.Dialog_NewSQFFile;
 import com.kaylerrenslow.a3plugin.dialog.SimpleMessageDialog;
-import com.kaylerrenslow.a3plugin.dialog.actions.SimpleGuiAction;
+import com.kaylerrenslow.a3plugin.dialog.newGroup.sqfFileCreation.SQFFileCreationDialog;
+import com.kaylerrenslow.a3plugin.dialog.util.SimpleGuiAction;
 import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 
+import java.awt.*;
 import java.io.IOException;
 
 /**
@@ -28,7 +30,30 @@ public class Action_NewSQFFile extends AnAction {
 
 	@Override
 	public void actionPerformed(AnActionEvent e) {
-		Dialog_NewSQFFile.showNewInstance(e, new CreateNewSQFFile(e.getProject()));
+		VirtualFile directory = e.getData(CommonDataKeys.VIRTUAL_FILE);
+		Component component = DataKeys.CONTEXT_COMPONENT.getData(e.getDataContext());
+		String newFileName = SQFFileCreationDialog.showNewInstance(component, directory).getFileName();
+		createNewFile(newFileName, directory, e.getProject());
+	}
+
+	private void createNewFile(String newFileName, VirtualFile directory, Project project) {
+		WriteCommandAction.runWriteCommandAction(project, new Runnable() {
+			@Override
+			public void run() {
+				String fileName = newFileName;
+				if (!fileName.endsWith(".sqf")) {
+					fileName = fileName + ".sqf";
+				}
+				try {
+					directory.createChildData(null, fileName);
+				} catch (IOException e) {
+					e.printStackTrace(System.out);
+					String title = Plugin.resources.getString("plugin.message.file_creation_error.title");
+					String message = String.format(Plugin.resources.getString("plugin.message.file_creation_error"), e.getMessage());
+					SimpleMessageDialog.newDialog(title, message).show();
+				}
+			}
+		});
 	}
 
 	@Override
@@ -49,34 +74,4 @@ public class Action_NewSQFFile extends AnAction {
 		e.getPresentation().setVisible(enable);
 	}
 
-	private class CreateNewSQFFile implements SimpleGuiAction<Pair<String, VirtualFile>> {
-
-		private final Project project;
-
-		CreateNewSQFFile(Project project) {
-			this.project = project;
-		}
-
-		@Override
-		public void actionPerformed(Pair<String, VirtualFile> data) {
-			WriteCommandAction.runWriteCommandAction(project, new Runnable() {
-				@Override
-				public void run() {
-					String fileName = data.first;
-					if (!fileName.endsWith(".sqf")) {
-						fileName = fileName + ".sqf";
-					}
-					try {
-						VirtualFile directory = data.second;
-						directory.createChildData(null, fileName);
-					} catch (IOException e) {
-						e.printStackTrace(System.out);
-						String title = Plugin.resources.getString("plugin.message.file_creation_error.title");
-						String message = String.format(Plugin.resources.getString("plugin.message.file_creation_error"), e.getMessage());
-						SimpleMessageDialog.newDialog(title, message).show();
-					}
-				}
-			});
-		}
-	}
 }

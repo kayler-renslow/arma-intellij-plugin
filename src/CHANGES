@@ -2,7 +2,7 @@ Plugin
 	ADDED:
         none
     CHANGED:
-        none
+        de-uglified the action system for creating a new function, renaming a function, and creating a new sqf file
     FIXED:
         none
 
@@ -16,12 +16,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        support for custom live templates
+        support for renaming the tag for function refactor renaming
     CHANGED:
-        some previous auto completion elements were converted into live templates
+        none
     FIXED:
-        variables being defined inside params[] not being marked as defined in annotator
-        finding scope of variables
+        renaming functions will rename the function file as well
 
 Header
     ADDED:

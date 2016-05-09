@@ -1,11 +1,7 @@
-package com.kaylerrenslow.a3plugin.dialog;
+package com.kaylerrenslow.a3plugin.dialog.newGroup.functionCreation;
 
-import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.module.Module;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.dialog.actions.SimpleGuiAction;
-import com.kaylerrenslow.a3plugin.dialog.util.DialogUtil;
 import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
@@ -17,32 +13,41 @@ import java.awt.event.*;
 import java.util.ArrayList;
 
 public class Dialog_NewSQFFunction extends JDialog {
-	private final Module module;
 	private JPanel contentPane;
 	private JButton buttonOK;
 	private JButton buttonCancel;
-	private JTextField tfFunctionName;
+
 	private JComboBox<String> cbKnownFunctionLocations;
 	private JComboBox<String> cbKnownTagNames;
-	private SimpleGuiAction<SQFConfigFunctionInformationHolder> okAction;
+	private JLabel lblError;
+
+	private JTextField tfFunctionName;
 	private JTextField tfFunctionTagName;
 	private JTextField tfFunctionLocation;
-	private JLabel lblError;
+
+	final Module module;
+
 
 	private ArrayList<HeaderConfigFunction> functions;
 
-	private Dialog_NewSQFFunction(@NotNull Module module, @Nullable String functionPath) {
+	Dialog_NewSQFFunction(@NotNull Module module, @Nullable String functionPath) {
 		setContentPane(contentPane);
 		setModal(true);
 		getRootPane().setDefaultButton(buttonOK);
 
-		if(functionPath != null){
+		if (functionPath != null) {
 			this.tfFunctionLocation.setText(functionPath);
 		}
 
 		this.module = module;
-		initializeChoiceboxes();
 
+		initializeChoiceboxes();
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
+		initializeListeners();
+	}
+
+	private void initializeListeners() {
 		buttonOK.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				onOK();
@@ -56,7 +61,7 @@ public class Dialog_NewSQFFunction extends JDialog {
 		});
 
 		// call onCancel() when cross is clicked
-		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+
 		addWindowListener(new WindowAdapter() {
 			public void windowClosing(WindowEvent e) {
 				onCancel();
@@ -120,29 +125,40 @@ public class Dialog_NewSQFFunction extends JDialog {
 		String tagName = this.tfFunctionTagName.getText().trim();
 		String functionName = this.tfFunctionName.getText().trim();
 		String location = this.tfFunctionLocation.getText().trim();
-		if(tagName.length() == 0){
+		if (tagName.length() == 0) {
 			error(this.tfFunctionTagName, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.tag_empty"));
 			return;
 		}
-		if(functionName.length() == 0){
+		if (functionName.length() == 0) {
 			error(this.tfFunctionName, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.function_name_empty"));
 			return;
 		}
-		if(location.length() == 0){
+		if (location.length() == 0) {
 			error(this.tfFunctionLocation, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.function_location_empty"));
 			return;
 		}
-		for(HeaderConfigFunction function : functions){
-			if(tagName.equals(function.getTagName()) && functionName.equals(function.getFunctionClassName())){
+		for (HeaderConfigFunction function : functions) {
+			if (tagName.equals(function.getTagName()) && functionName.equals(function.getFunctionClassName())) {
 				error(this.tfFunctionName, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.function_name_duplicate"));
 				return;
 			}
 		}
-		okAction.actionPerformed(new SQFConfigFunctionInformationHolder(this.tfFunctionTagName.getText(), this.tfFunctionName.getText(), this.tfFunctionLocation.getText(), this.module, null));
 		dispose();
 	}
 
-	private void error(JComponent component, String message){
+	String getTagName(){
+		return this.tfFunctionTagName.getText();
+	}
+
+	String getFunctionName(){
+		return this.tfFunctionName.getText();
+	}
+
+	String getFunctionLocation(){
+		return this.tfFunctionLocation.getText();
+	}
+
+	private void error(JComponent component, String message) {
 		component.requestFocus();
 		lblError.setText(message);
 	}
@@ -151,16 +167,5 @@ public class Dialog_NewSQFFunction extends JDialog {
 		dispose();
 	}
 
-	public static void showNewInstance(AnActionEvent e, Module module, String functionDirectoryPath, SimpleGuiAction<SQFConfigFunctionInformationHolder> okAction) {
-		Dialog_NewSQFFunction dialog = new Dialog_NewSQFFunction(module, functionDirectoryPath);
-		dialog.pack();
-
-		//center window
-		dialog.setLocationRelativeTo(DialogUtil.getHighestAncestor(e.getData(DataKeys.CONTEXT_COMPONENT)));
-
-		dialog.okAction = okAction;
-		dialog.setTitle(Plugin.resources.getString("plugin.dialog.new_sqf_function.title"));
-		dialog.setVisible(true);
-	}
 
 }

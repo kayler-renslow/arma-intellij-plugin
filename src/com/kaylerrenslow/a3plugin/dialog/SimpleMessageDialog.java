@@ -33,4 +33,15 @@ public class SimpleMessageDialog {
 		db.centerPanel(field);
 		return db;
 	}
+
+	/** Does the same thing as newDialog except that this will automatically show the dialog
+	 * @param title title of the title
+	 * @param message message to show
+	 * @return the dialog
+	 */
+	public static DialogBuilder showNewDialog(String title, String message){
+		DialogBuilder db = newDialog(title, message);
+		db.show();
+		return db;
+	}
 }

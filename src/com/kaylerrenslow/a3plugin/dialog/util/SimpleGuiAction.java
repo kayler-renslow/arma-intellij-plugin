@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.dialog.actions;
+package com.kaylerrenslow.a3plugin.dialog.util;
 
 /**
  * @author Kayler
@@ -6,5 +6,8 @@ package com.kaylerrenslow.a3plugin.dialog.actions;
  * Created on 04/05/2016.
  */
 public interface SimpleGuiAction<E> {
+	/**
+	 * An action was performed and has result data
+	 */
 	void actionPerformed(E actionData);
 }
