@@ -32,8 +32,10 @@ public class Action_NewSQFFile extends AnAction {
 	public void actionPerformed(AnActionEvent e) {
 		VirtualFile directory = e.getData(CommonDataKeys.VIRTUAL_FILE);
 		Component component = DataKeys.CONTEXT_COMPONENT.getData(e.getDataContext());
-		String newFileName = SQFFileCreationDialog.showNewInstance(component, directory).getFileName();
-		createNewFile(newFileName, directory, e.getProject());
+		SQFFileCreationDialog dialog = SQFFileCreationDialog.showNewInstance(component, directory);
+		if(dialog.dialogFinished()){
+			createNewFile(dialog.getFileName(), directory, e.getProject());
+		}
 	}
 
 	private void createNewFile(String newFileName, VirtualFile directory, Project project) {

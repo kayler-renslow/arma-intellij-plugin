@@ -24,7 +24,7 @@ GLOBAL_VAR = [:jletter:] [:jletterdigit:]*
 LINE_TERMINATOR = \r|\n|\r\n
 INPUT_CHARACTER = [^\r\n]
 
-WHITE_SPACE = {LINE_TERMINATOR} | [ \t\f]
+WHITE_SPACE = ({LINE_TERMINATOR} | [ \t\f])+
 
 DIGIT = [0-9]
 DIGITS = {DIGIT}+
@@ -45,22 +45,22 @@ BLOCK_COMMENT = "/*" [^*] ~"*/" | "/*" "*"+ "/" | "/*" {COMMENT_CONTENT} "*"+ "/
 
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 
-INCLUDE = "#include" [ ]+ {INPUT_CHARACTER}+
-
+MACRO_NEWLINE = (" \\\n" | " \\\r\n" | " \\\r") [ \t\f]*
+MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
+MACRO_TEXT = {MACRO_CHARACTER}+
+MACRO = "#" {MACRO_TEXT}
 %%
 
-<YYINITIAL> {WHITE_SPACE}+ { return TokenType.WHITE_SPACE; }
+<YYINITIAL> {WHITE_SPACE} { return TokenType.WHITE_SPACE; }
+<YYINITIAL> {MACRO} {return TokenType.WHITE_SPACE;}
 
 <YYINITIAL> {BLOCK_COMMENT} { return SQFTypes.BLOCK_COMMENT; }
-
-
 <YYINITIAL> {INLINE_COMMENT} { return SQFTypes.INLINE_COMMENT; }
 
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; }
 
-<YYINITIAL> {INCLUDE} {return TokenType.WHITE_SPACE;}
 
 <YYINITIAL> "true" { return SQFTypes.TRUE; }
 <YYINITIAL> "false" { return SQFTypes.FALSE; }

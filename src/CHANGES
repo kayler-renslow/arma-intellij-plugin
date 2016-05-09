@@ -2,7 +2,7 @@ Plugin
 	ADDED:
         none
     CHANGED:
-        de-uglified the action system for creating a new function, renaming a function, and creating a new sqf file
+        none
     FIXED:
         none
 
@@ -16,11 +16,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        support for renaming the tag for function refactor renaming
+        macros don't create syntax errors
     CHANGED:
-        none
+        for function creation and renaming, setting tag name is a choicebox only now. Same for file path
     FIXED:
-        renaming functions will rename the function file as well
+        creating a new function from alt+insert resulted in a wrong function file path
 
 Header
     ADDED:

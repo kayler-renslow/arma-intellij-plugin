@@ -90,7 +90,9 @@ public class SQFRenameHandler implements RenameHandler {
 		}
 
 		FunctionRenameDialog renameDialog = FunctionRenameDialog.showNewInstance(contextComponent, module, function);
-		rename(renameDialog.getNewFunctionDefinition(), renameDialog.getRenameRootTagValue(), variable, function, module);
+		if(renameDialog.dialogFinished()){
+			rename(renameDialog.getNewFunctionDefinition(), renameDialog.getRenameRootTagValue(), variable, function, module);
+		}
 	}
 
 	private void rename(SQFConfigFunctionInformationHolder neww, boolean renameRootTag, SQFVariable variable, HeaderConfigFunction old, Module module) {
@@ -108,13 +110,13 @@ public class SQFRenameHandler implements RenameHandler {
 				}
 
 				if (!old.getTagName().equals(neww.functionTagName)) {
-					if(renameRootTag){
+					if (renameRootTag) {
 						function.getClassWithTag().setAttribute("tag", "\"" + neww.functionTagName + "\"");
 						java.util.List<SQFVariable> vars = SQFPsiUtil.findConfigFunctionVariablesWithTag(module, old.getTagName());
 						//we don't need to update the references for each of the variables because ALL cases where the tag matches is returned
 
 						SQFStatic.SQFFunctionTagAndName tagAndName;
-						for(SQFVariable v : vars){
+						for (SQFVariable v : vars) {
 							tagAndName = SQFStatic.getFunctionTagAndName(v.getVarName());
 							v.setName(SQFStatic.getFullFunctionName(neww.functionTagName, tagAndName.functionClassName));
 						}
@@ -131,30 +133,31 @@ public class SQFRenameHandler implements RenameHandler {
 				}
 				if (!old.getFunctionFileName().equals(neww.functionFileName)) {
 					PsiDirectory rootMissionDirectory;
+					PsiFile sqfFile = null;
 					try {
 						rootMissionDirectory = ArmaProjectDataManager.getInstance().getDataForModule(module).getRootMissionDirectory();
+						sqfFile = PluginUtil.findFileByPath(FilePath.getFilePathFromString(function.getFullRelativePath(), '/'), rootMissionDirectory, module.getProject());
 					} catch (DescriptionExtNotDefinedException e) {
 						SimpleMessageDialog.showNewDialog("Error", e.getMessage());
-						return;
 					}
-					PsiFile sqfFile = PluginUtil.findFileByPath(FilePath.getFilePathFromString(function.getFullRelativePath(), '/'), rootMissionDirectory, module.getProject());
 					if (sqfFile == null) {
 						SimpleMessageDialog.showNewDialog("Error", "The SQF file doesn't exist for function: " + function.getCallableName());
-						return;
+					} else {
+						try {
+							sqfFile.setName(neww.functionFileName);
+						} catch (IncorrectOperationException e) {
+							SimpleMessageDialog.showNewDialog("Error", e.getMessage());
+						}
 					}
-					function.getClassDeclaration().setAttribute("file", neww.functionFileName);
-					try{
-						sqfFile.setName(neww.functionFileName);
-					}catch (IncorrectOperationException e){
-						SimpleMessageDialog.showNewDialog("Error", e.getMessage());
-					}
+					function.getClassDeclaration().setAttribute("file", "\""+neww.functionFileName+"\"");
+
 				}
 				if (!old.getFunctionClassName().equals(neww.functionClassName)) {
 					function.getClassDeclaration().getClassStub().setName(neww.functionClassName);
 					renameFunction = true;
 				}
 
-				if(renameFunction){
+				if (renameFunction) {
 					invokeRefactoring(createRenameProcessor(variable.getProject(), variable, newFunctionName));
 				}
 

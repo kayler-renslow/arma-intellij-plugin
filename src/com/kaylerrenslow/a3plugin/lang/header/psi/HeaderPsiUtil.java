@@ -310,24 +310,26 @@ public class HeaderPsiUtil {
 	 * @return the HeaderConfigFunction instance representing this function
 	 */
 	@NotNull
-	private static HeaderConfigFunction getHeaderConfigFunction(@NotNull HeaderClassDeclaration cfgFuncs, @NotNull String tagName, @NotNull HeaderClassDeclaration tagClass, @NotNull HeaderClassDeclaration functionClass) throws
-			MalformedConfigException,
-			FunctionNotDefinedInConfigException {
+	private static HeaderConfigFunction getHeaderConfigFunction(@NotNull HeaderClassDeclaration cfgFuncs, @NotNull String tagName, @NotNull HeaderClassDeclaration tagClass, @NotNull HeaderClassDeclaration functionClass) throws MalformedConfigException, FunctionNotDefinedInConfigException {
 		String containingDirectoryPath = null; //file path (directories)
 		String functionFileExtension = null; //file extension (.sqf, .fsm)
-		boolean appendFn_ = true; //append fn_ to file name
+		String functionFileName = null; //function file name (test.sqf) or null if determined by function class name
 
 		Attribute[] functionClassAttributes = functionClass.getAttributes(true); //inner attributes of the function's class declaration
 		for (Attribute attribute : functionClassAttributes) { //read the function's inner attributes
 			if (attribute.name.equals("file")) {
-				if (attribute.value.contains("\\")) {//file path includes a folder
-					containingDirectoryPath = attribute.value.substring(1, attribute.value.lastIndexOf('\\')); //has a folder (file='folder\test.sqf'). Also, substring must start at 1 to skip over first "
+				String fileAttr = stripOuterQuotes(attribute.value);
+				if (fileAttr.contains("\\")) {//file path includes a folder
+					int lastSlash = fileAttr.lastIndexOf('\\');
+					containingDirectoryPath = fileAttr.substring(0, lastSlash); //has a folder (file='folder\hello.sqf').
+					functionFileName = fileAttr.substring(lastSlash + 1);
 				} else { //just the file name is inside
 					containingDirectoryPath = ""; //no path defined, just the file name (file='test.sqf')
+					functionFileName = fileAttr.substring(0, fileAttr.lastIndexOf('.'));
 				}
-				appendFn_ = false;
-				if (isAllowedFunctionExtension(attribute.value, cfgFuncs, functionClass)) {
-					functionFileExtension = attribute.value.substring(attribute.value.lastIndexOf('.'), attribute.value.length() - 1); //must be length -1 because ending quote
+
+				if (isAllowedFunctionExtension(fileAttr, cfgFuncs, functionClass)) {
+					functionFileExtension = fileAttr.substring(fileAttr.lastIndexOf('.'));
 				}
 				break;
 			}
@@ -358,7 +360,7 @@ public class HeaderPsiUtil {
 			}
 		}
 
-		return new HeaderConfigFunction(functionClass, containingDirectoryPath, tagName, tagClass, functionFileExtension, appendFn_);
+		return new HeaderConfigFunction(functionClass, containingDirectoryPath, functionFileName, tagName, tagClass, functionFileExtension);
 	}
 
 

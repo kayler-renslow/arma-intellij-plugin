@@ -23,7 +23,7 @@ import java.awt.*;
 import java.io.IOException;
 
 /**
- * * @author Kayler
+ * @author Kayler
  * Action invoked when New->New SQF Function is called from main menu
  * Created on 04/05/2016.
  */
@@ -50,16 +50,18 @@ public class Action_NewSQFFunction extends AnAction {
 			PsiDirectory cur = psiDirectory;
 			functionDirectoryPath = cur.getName();
 			while(cur.getParentDirectory() != null){
-				cur = cur.getParentDirectory();
-				if(missionDirectoryRoot.equals(cur.getVirtualFile())){
+				if(missionDirectoryRoot.getVirtualFile().equals(cur.getParent().getVirtualFile())){
 					break;
 				}
+				cur = cur.getParentDirectory();
 				functionDirectoryPath = cur.getName() + "\\" + functionDirectoryPath;
 			}
 		}
 		Component contextComponent = DataKeys.CONTEXT_COMPONENT.getData(e.getDataContext());
 		FunctionCreationDialog dialog = FunctionCreationDialog.showNewInstance(contextComponent, module, functionDirectoryPath);
-		createFunction(dialog.getNewFunctionDefinition(), module.getProject(), directory);
+		if(dialog.dialogFinished()){
+			createFunction(dialog.getNewFunctionDefinition(), module.getProject(), directory);
+		}
 	}
 
 	private void createFunction(SQFConfigFunctionInformationHolder data, Project project, VirtualFile directoryFile){

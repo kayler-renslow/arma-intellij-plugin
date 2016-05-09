@@ -16,19 +16,17 @@ public class Dialog_NewSQFFunction extends JDialog {
 	private JPanel contentPane;
 	private JButton buttonOK;
 	private JButton buttonCancel;
-
-	private JComboBox<String> cbKnownFunctionLocations;
-	private JComboBox<String> cbKnownTagNames;
 	private JLabel lblError;
 
+	private JComboBox<String> cbTagName;
 	private JTextField tfFunctionName;
-	private JTextField tfFunctionTagName;
-	private JTextField tfFunctionLocation;
+	private JComboBox<String> cbFunctionLocation;
 
 	final Module module;
 
-
 	private ArrayList<HeaderConfigFunction> functions;
+
+	private boolean cancelled;
 
 	Dialog_NewSQFFunction(@NotNull Module module, @Nullable String functionPath) {
 		setContentPane(contentPane);
@@ -36,7 +34,7 @@ public class Dialog_NewSQFFunction extends JDialog {
 		getRootPane().setDefaultButton(buttonOK);
 
 		if (functionPath != null) {
-			this.tfFunctionLocation.setText(functionPath);
+			this.cbFunctionLocation.setSelectedItem(functionPath);
 		}
 
 		this.module = module;
@@ -83,15 +81,15 @@ public class Dialog_NewSQFFunction extends JDialog {
 			functions = new ArrayList<>();
 			return;
 		}
-		cbKnownTagNames.addItem("");
-		cbKnownFunctionLocations.addItem("");
+		cbTagName.addItem("");
+		cbFunctionLocation.addItem("");
 		String lastTag = ".";
 		String[] functionLocations = new String[functions.size()];
 		for (HeaderConfigFunction function : functions) {
 			for (int i = 0; i < functionLocations.length; i++) { //this loop must come before tag check
 				if (functionLocations[i] == null) {
 					functionLocations[i] = function.getContainingDirectoryPath();
-					cbKnownFunctionLocations.addItem(function.getContainingDirectoryPath());
+					cbFunctionLocation.addItem(function.getContainingDirectoryPath());
 					break;
 				}
 				if (functionLocations[i].equals(function.getContainingDirectoryPath())) { //don't add the file path more than once
@@ -103,30 +101,16 @@ public class Dialog_NewSQFFunction extends JDialog {
 				continue;
 			}
 			lastTag = function.getTagName();
-			cbKnownTagNames.addItem(function.getTagName());
+			cbTagName.addItem(function.getTagName());
 		}
-		cbKnownFunctionLocations.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tfFunctionLocation.setText(cbKnownFunctionLocations.getSelectedItem().toString());
-				buttonOK.requestFocus();
-			}
-		});
-		cbKnownTagNames.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				tfFunctionTagName.setText(cbKnownTagNames.getSelectedItem().toString());
-				tfFunctionName.requestFocus();
-			}
-		});
 	}
 
 	private void onOK() {
-		String tagName = this.tfFunctionTagName.getText().trim();
-		String functionName = this.tfFunctionName.getText().trim();
-		String location = this.tfFunctionLocation.getText().trim();
+		String tagName = getTagName();
+		String functionName = getFunctionName();
+		String location = getFunctionLocation();
 		if (tagName.length() == 0) {
-			error(this.tfFunctionTagName, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.tag_empty"));
+			error(this.cbTagName, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.tag_empty"));
 			return;
 		}
 		if (functionName.length() == 0) {
@@ -134,7 +118,7 @@ public class Dialog_NewSQFFunction extends JDialog {
 			return;
 		}
 		if (location.length() == 0) {
-			error(this.tfFunctionLocation, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.function_location_empty"));
+			error(this.cbFunctionLocation, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.function_location_empty"));
 			return;
 		}
 		for (HeaderConfigFunction function : functions) {
@@ -147,15 +131,15 @@ public class Dialog_NewSQFFunction extends JDialog {
 	}
 
 	String getTagName(){
-		return this.tfFunctionTagName.getText();
+		return this.cbTagName.getSelectedItem().toString().trim();
 	}
 
 	String getFunctionName(){
-		return this.tfFunctionName.getText();
+		return this.tfFunctionName.getText().trim();
 	}
 
 	String getFunctionLocation(){
-		return this.tfFunctionLocation.getText();
+		return this.cbFunctionLocation.getSelectedItem().toString().trim();
 	}
 
 	private void error(JComponent component, String message) {
@@ -165,7 +149,11 @@ public class Dialog_NewSQFFunction extends JDialog {
 
 	private void onCancel() {
 		dispose();
+		this.cancelled = true;
 	}
 
 
+	boolean cancelled() {
+		return this.cancelled;
+	}
 }

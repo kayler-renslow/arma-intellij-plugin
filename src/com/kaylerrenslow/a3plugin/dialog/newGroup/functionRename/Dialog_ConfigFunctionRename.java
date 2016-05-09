@@ -13,22 +13,23 @@ import java.util.ArrayList;
 
 public class Dialog_ConfigFunctionRename extends JDialog {
 	private JPanel contentPane;
-	private JComboBox<String> cbKnownTagNames;
 	private JLabel lblError;
 	private JButton btnPreview;
 	private JButton btnRefactor;
 	private JButton btnCancel;
 	private JLabel lblRenameDesc;
 
-	private JTextField tfFunctionTagName;
+	private JComboBox<String> cbTagName;
 	private JTextField tfFunctionName;
 	private JTextField tfNewFileName;
-	private JCheckBox cbRenameRootTagEle;
+	private JCheckBox chbRenameRootTagEle;
 
 	final Module module;
 
 	private ArrayList<HeaderConfigFunction> functions;
 	private SQFConfigFunctionInformationHolder oldData;
+
+	private boolean cancelled;
 
 	Dialog_ConfigFunctionRename(HeaderConfigFunction functionToRename, Module module) {
 		setContentPane(contentPane);
@@ -36,15 +37,15 @@ public class Dialog_ConfigFunctionRename extends JDialog {
 		getRootPane().setDefaultButton(btnRefactor);
 		this.module = module;
 
-		initializeComponents(functionToRename, module);
 		initializeListeners();
+		initializeComponents(functionToRename, module);
 
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	}
 
 	private void initializeComponents(HeaderConfigFunction functionToRename, Module module) {
 		String tip_f = Plugin.resources.getString("lang.sqf.refactoring.dialog.functions.rename_root_tag.tooltip");
-		this.cbRenameRootTagEle.setToolTipText(String.format(tip_f, functionToRename.getTagName()));
+		this.chbRenameRootTagEle.setToolTipText(String.format(tip_f, functionToRename.getTagName()));
 
 		ArrayList<HeaderConfigFunction> functions;
 		try {
@@ -53,27 +54,27 @@ public class Dialog_ConfigFunctionRename extends JDialog {
 			functions = new ArrayList<>();
 		}
 		this.functions = functions;
-		cbKnownTagNames.addItem("");
+		cbTagName.addItem("");
 		String lastTag = ".";
 		for (HeaderConfigFunction function : functions) {
 			if (function.getTagName().equals(lastTag)) {
 				continue;
 			}
 			lastTag = function.getTagName();
-			cbKnownTagNames.addItem(function.getTagName());
+			cbTagName.addItem(function.getTagName());
 		}
 
 		String desc = String.format(Plugin.resources.getString("lang.sqf.refactoring.dialog.functions.desc"), functionToRename.getCallableName());
 		this.lblRenameDesc.setText(desc);
 
-		this.tfFunctionTagName.setText(functionToRename.getTagName());
+		this.cbTagName.setSelectedItem(functionToRename.getTagName());
 		this.tfFunctionName.setText(functionToRename.getFunctionClassName());
 		if (functionToRename.appendFn()) {
 			this.tfNewFileName.setEditable(false);
 		}
 		this.tfNewFileName.setText(functionToRename.getFunctionFileName());
 
-		this.oldData = new SQFConfigFunctionInformationHolder(this.tfFunctionTagName.getText(), this.tfFunctionName.getText(), "", this.tfNewFileName.getText(), this.module, null);
+		this.oldData = new SQFConfigFunctionInformationHolder(this.cbTagName.getSelectedItem().toString(), this.tfFunctionName.getText(), "", this.tfNewFileName.getText(), this.module, null);
 
 		this.btnPreview.setVisible(false);
 	}
@@ -121,7 +122,7 @@ public class Dialog_ConfigFunctionRename extends JDialog {
 
 			private void updateText() {
 				if (!tfNewFileName.isEditable()) {
-					tfNewFileName.setText(HeaderConfigFunction.getFunctionFileName(true, tfFunctionName.getText(), ".sqf"));
+					tfNewFileName.setText(HeaderConfigFunction.getFunctionFileName(tfFunctionName.getText(), ".sqf"));
 				}
 			}
 		});
@@ -135,10 +136,10 @@ public class Dialog_ConfigFunctionRename extends JDialog {
 	}
 
 	private boolean validEntries() {
-		String tagName = this.tfFunctionTagName.getText().trim();
-		String functionName = this.tfFunctionName.getText().trim();
+		String tagName = getTagName();
+		String functionName = getFunctionName();
 		if (tagName.length() == 0) {
-			error(this.tfFunctionTagName, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.tag_empty"));
+			error(this.cbTagName, Plugin.resources.getString("lang.sqf.menu.new.sqf_file.tag_empty"));
 			return false;
 		}
 		if (functionName.length() == 0) {
@@ -163,21 +164,26 @@ public class Dialog_ConfigFunctionRename extends JDialog {
 
 	private void onCancel() {
 		dispose();
+		this.cancelled = true;
 	}
 
 	boolean getRenameRootEle() {
-		return this.cbRenameRootTagEle.isSelected();
+		return this.chbRenameRootTagEle.isSelected();
 	}
 
 	String getTagName() {
-		return this.tfFunctionTagName.getText();
+		return this.cbTagName.getSelectedItem().toString().trim();
 	}
 
 	String getFunctionName() {
-		return this.tfFunctionName.getText();
+		return this.tfFunctionName.getText().trim();
 	}
 
 	String getFunctionFileName() {
-		return this.tfNewFileName.getText();
+		return this.tfNewFileName.getText().trim();
+	}
+
+	public boolean cancelled() {
+		return this.cancelled;
 	}
 }

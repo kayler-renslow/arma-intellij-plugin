@@ -20,6 +20,7 @@ SQF
 	ADDED:
         support for custom live templates
         support for renaming the tag for function refactor renaming
+        macros don't create syntax errors
     CHANGED:
         some previous auto completion elements were converted into live templates
     FIXED:
@@ -29,6 +30,7 @@ SQF
         variables being defined inside params[] not being marked as defined in annotator
         finding scope of variables
         renaming functions will rename the function file as well
+        creating a new function from alt+insert resulted in a wrong function file path
 
 Header
     ADDED:

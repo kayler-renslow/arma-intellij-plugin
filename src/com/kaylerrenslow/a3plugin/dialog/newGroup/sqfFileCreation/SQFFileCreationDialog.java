@@ -30,7 +30,17 @@ public class SQFFileCreationDialog {
 		return new SQFFileCreationDialog(contextComponent, newFileDirectory);
 	}
 
+	/**
+	 * Returns true if the dialog was properly closed, false otherwise
+	 */
+	public boolean dialogFinished(){
+		return !this.dialog.cancelled();
+	}
+
 	public String getFileName() {
+		if(!dialogFinished()){
+			throw new IllegalStateException("Shouldn't access this when the dialog improperly closed");
+		}
 		return this.dialog.getFileName();
 	}
 }

@@ -32,7 +32,17 @@ public class FunctionCreationDialog {
 		return new FunctionCreationDialog(contextComponent, module, functionDirectoryPath);
 	}
 
+	/**
+	 * Returns true if the dialog was properly closed, false otherwise
+	 */
+	public boolean dialogFinished(){
+		return !this.dialog.cancelled();
+	}
+
 	public SQFConfigFunctionInformationHolder getNewFunctionDefinition() {
+		if(!dialogFinished()){
+			throw new IllegalStateException("Shouldn't access this when the dialog improperly closed");
+		}
 		return new SQFConfigFunctionInformationHolder(dialog.getTagName(), dialog.getFunctionName(), dialog.getFunctionLocation(), "", this.dialog.module, null);
 	}
 }

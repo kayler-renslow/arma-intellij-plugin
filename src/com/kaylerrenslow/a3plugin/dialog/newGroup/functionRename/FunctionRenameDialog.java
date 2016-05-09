@@ -39,11 +39,24 @@ public class FunctionRenameDialog {
 		return new FunctionRenameDialog(contextComponent, module, renameFunction);
 	}
 
+	/**
+	 * Returns true if the dialog was properly closed, false otherwise
+	 */
+	public boolean dialogFinished(){
+		return !this.dialog.cancelled();
+	}
+
 	public boolean getRenameRootTagValue() {
+		if(!dialogFinished()){
+			throw new IllegalStateException("Shouldn't access this when the dialog improperly closed");
+		}
 		return dialog.getRenameRootEle();
 	}
 
 	public SQFConfigFunctionInformationHolder getNewFunctionDefinition() {
+		if(!dialogFinished()){
+			throw new IllegalStateException("Shouldn't access this when the dialog improperly closed");
+		}
 		return new SQFConfigFunctionInformationHolder(dialog.getTagName(), dialog.getFunctionName(), this.renameFunction.getContainingDirectoryPath(), dialog.getFunctionFileName(), this.dialog.module, null);
 	}
 

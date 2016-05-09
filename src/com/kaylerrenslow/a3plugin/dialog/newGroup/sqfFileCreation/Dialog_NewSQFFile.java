@@ -10,6 +10,8 @@ public class Dialog_NewSQFFile extends JDialog {
 	private JTextField tfFileName;
 	private JLabel lblFolder;
 
+	private boolean cancelled;
+
 	Dialog_NewSQFFile(String newFileDirectory) {
 		setContentPane(contentPane);
 		setModal(true);
@@ -56,10 +58,14 @@ public class Dialog_NewSQFFile extends JDialog {
 
 	private void onCancel() {
 		dispose();
+		this.cancelled = true;
 	}
 
 	String getFileName(){
 		return this.tfFileName.getText();
 	}
 
+	public boolean cancelled() {
+		return this.cancelled;
+	}
 }
