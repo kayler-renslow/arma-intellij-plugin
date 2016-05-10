@@ -73,9 +73,8 @@ public class HeaderAnnotatorVisitor extends HeaderVisitor {
 		if(!include.getPathString().startsWith("\\")){ //make sure it isn't \something\somethingElse
 			PsiFile includedFile = include.getHeaderFileFromInclude();
 			if(includedFile == null){
-				holder.createWarningAnnotation(include.getTextRange(), Plugin.resources.getString("lang.header.annotator.include_file_dne"));
-			}
-			if(!(includedFile instanceof HeaderFile)){
+				holder.createErrorAnnotation(include.getTextRange(), Plugin.resources.getString("lang.header.annotator.include_file_dne"));
+			}else if(!(includedFile instanceof HeaderFile)){
 				holder.createWeakWarningAnnotation(include.getTextRange(), Plugin.resources.getString("lang.header.annotator.include_file_not_header"));
 			}
 

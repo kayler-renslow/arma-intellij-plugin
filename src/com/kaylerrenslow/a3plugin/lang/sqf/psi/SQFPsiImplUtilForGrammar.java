@@ -37,21 +37,14 @@ public class SQFPsiImplUtilForGrammar {
 
 	public static SQFAssignment getMyAssignment(SQFVariable var) {
 		if (var.getParent() instanceof SQFAssignment) {
-			if (var.getParent().getParent() instanceof SQFStatement) { //check if the variable is left hand side of assignment (left = right)
-				return (SQFAssignment) var.getParent();
-			}
+			return (SQFAssignment) var.getParent();
 		}
 		return null;
 	}
 
 	public static boolean isAssigningVariable(SQFVariable var) {
 		SQFAssignment assignment = var.getMyAssignment();
-		if (assignment != null) {
-			if (assignment.getParent() instanceof SQFStatement) { //check if the variable is left hand side of assignment (left = right)
-				return true;
-			}
-		}
-		return false;
+		return assignment != null;
 	}
 
 	public static boolean isDeclaredPrivate(SQFAssignment assignment) {
@@ -74,11 +67,7 @@ public class SQFPsiImplUtilForGrammar {
 			String[] varNames = new String[vars.size()];
 			int i = 0;
 			for (SQFForLoopIterVarInit iterVarInit : vars) {
-				if (iterVarInit.getStatement().getAssignment() == null) {
-					varNames[i] = "";
-					i++;
-				}
-				varNames[i] = iterVarInit.getStatement().getAssignment().getAssigningVariable().getVarName();
+				varNames[i] = iterVarInit.getAssignment().getAssigningVariable().getVarName();
 				i++;
 			}
 			return varNames;

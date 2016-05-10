@@ -1,4 +1,5 @@
-Version: tbd
+Version: 1.0.2
+Release date: May 10, 2016
 
 Plugin
 	ADDED:
@@ -23,13 +24,13 @@ SQF
         macros don't create syntax errors
     CHANGED:
         some previous auto completion elements were converted into live templates
+        renaming functions will rename the function file as well
     FIXED:
         ? statement being broken
         block comments
         {code}count 1;
         variables being defined inside params[] not being marked as defined in annotator
         finding scope of variables
-        renaming functions will rename the function file as well
         creating a new function from alt+insert resulted in a wrong function file path
 
 Header

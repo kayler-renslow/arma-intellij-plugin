@@ -16,11 +16,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        macros don't create syntax errors
+        none
     CHANGED:
-        for function creation and renaming, setting tag name is a choicebox only now. Same for file path
+        none
     FIXED:
-        creating a new function from alt+insert resulted in a wrong function file path
+        bug with grammar
 
 Header
     ADDED:
