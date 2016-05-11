@@ -1,6 +1,6 @@
 Plugin
 	ADDED:
-        none
+        automatic plugin update check
     CHANGED:
         none
     FIXED:
@@ -20,7 +20,7 @@ SQF
     CHANGED:
         none
     FIXED:
-        bug with grammar
+        none
 
 Header
     ADDED:

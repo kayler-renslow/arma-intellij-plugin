@@ -1,9 +1,9 @@
-Version: 1.0.2
-Release date: May 10, 2016
+Version: tbd
+Release date: tbd
 
 Plugin
 	ADDED:
-        none
+        automatic plugin update check
     CHANGED:
         none
     FIXED:
@@ -19,19 +19,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        support for custom live templates
-        support for renaming the tag for function refactor renaming
-        macros don't create syntax errors
+        none
     CHANGED:
-        some previous auto completion elements were converted into live templates
-        renaming functions will rename the function file as well
+        none
     FIXED:
-        ? statement being broken
-        block comments
-        {code}count 1;
-        variables being defined inside params[] not being marked as defined in annotator
-        finding scope of variables
-        creating a new function from alt+insert resulted in a wrong function file path
+        none
 
 Header
     ADDED:

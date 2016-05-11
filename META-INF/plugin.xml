@@ -8,9 +8,8 @@
 	</description>
 
 	<change-notes>
-		changelog is available at the github page
+		Changelog is available at the github page: https://github.com/kayler-renslow/arma-intellij-plugin/releases
 	</change-notes>
-
 
 	<idea-version since-build="131"/>
 	<extensions defaultExtensionNs="com.intellij">

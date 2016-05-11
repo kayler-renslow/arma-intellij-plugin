@@ -2,6 +2,8 @@ features:
     check if function exists when doing call or spawn
     renaming files will rename them in includes and if a SQF function, will rename the class decl
 
+change how the newest release is checked. It should be done when the editor is done loading and we need to get the project instance
+
 
 FIX THIS SCENARIO before release
 _i = 100;
