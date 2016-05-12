@@ -19,9 +19,9 @@ headerFile ::= file_entry*
 
 file_entries ::= file_entry*
 
-file_entry ::= INLINE_COMMENT | BLOCK_COMMENT | preprocessor_group | statement_ |  BAD_CHARACTER
+file_entry ::= INLINE_COMMENT | BLOCK_COMMENT | preprocessor_group | statement_ | BAD_CHARACTER
 
-private statement_ ::= (macro_function | assignment | class_declaration) SEMICOLON
+private statement_ ::= (assignment | class_declaration) SEMICOLON | macro_function SEMICOLON? | defined_text SEMICOLON?
 
 private number_ ::= NUMBER_LITERAL | HEX_LITERAL
 private value_ ::= STRING_LITERAL | number_ | IDENTIFIER | macro_function
@@ -73,3 +73,4 @@ pre_exec ::= PREPROCESS_EXEC
 pre_eval ::= PREPROCESS_EVAL
 
 macro_function ::= !(pre_exec) IDENTIFIER LPAREN ((value_ | array) (COMMA (value_ | array))*) RPAREN | pre_eval
+defined_text ::= IDENTIFIER
