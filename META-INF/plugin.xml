@@ -72,7 +72,11 @@
 
 	<application-components></application-components>
 
-	<project-components></project-components>
+	<project-components>
+		<component>
+			<implementation-class>com.kaylerrenslow.a3plugin.components.versionChecker.PluginVersionChecker</implementation-class>
+		</component>
+	</project-components>
 
 	<actions>
 		<group id="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.group" text="_Arma Plugin" description="Arma Plugin Menu" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.ArmaPluginGroup">

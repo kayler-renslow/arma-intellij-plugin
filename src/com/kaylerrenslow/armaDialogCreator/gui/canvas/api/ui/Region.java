@@ -3,27 +3,17 @@ package com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui;
 import javafx.scene.canvas.GraphicsContext;
 
 /**
- * Created by Kayler on 05/12/2016.
+ Created by Kayler on 05/12/2016.
  */
 public class Region {
 
 	protected int x1, y1, x2, y2;
-
-	private boolean canMove = true;
 
 	public Region(int x1, int y1, int x2, int y2) {
 		this.x1 = x1;
 		this.y1 = y1;
 		this.x2 = x2;
 		this.y2 = y2;
-	}
-
-	public boolean canMove() {
-		return this.canMove;
-	}
-
-	public void setCanMove(boolean canMove) {
-		this.canMove = canMove;
 	}
 
 	public int getLeftX() {
@@ -66,16 +56,12 @@ public class Region {
 		return Math.abs(y2 - y1);
 	}
 
-	/**
-	 * Set the position equal to the given region
-	 */
+	/** Set the position equal to the given region */
 	public void setPosition(Region r) {
 		setPosition(r.x1, r.y1, r.x2, r.y2);
 	}
 
-	/**
-	 * Sets the position based on min x,y values and max x,y values
-	 */
+	/** Sets the position based on min x,y values and max x,y values */
 	public void setPosition(int x1, int y1, int x2, int y2) {
 		this.x1 = x1;
 		this.y1 = y1;
@@ -83,11 +69,13 @@ public class Region {
 		this.y2 = y2;
 	}
 
-	/** Sets the position of the region based on the given top left corner with width and height values
-	 * @param x1 top left x coord
-	 * @param y1 top left y coord
-	 * @param width new width
-	 * @param height new height
+	/**
+	 Sets the position of the region based on the given top left corner with width and height values
+
+	 @param x1 top left x coord
+	 @param y1 top left y coord
+	 @param width new width
+	 @param height new height
 	 */
 	public void setPositionWH(int x1, int y1, int width, int height) {
 		this.x1 = x1;
@@ -120,16 +108,12 @@ public class Region {
 		return (getBottomY() - getTopY()) / 2;
 	}
 
-	/**
-	 * Draw this region as a rectangle without filling it
-	 */
+	/** Draw this region as a rectangle without filling it */
 	public void drawRectangle(GraphicsContext gc) {
 		drawRectangle(gc, getX1(), getY1(), getX2(), getY2());
 	}
 
-	/**
-	 * Draw the border of a rectangle without filling it
-	 */
+	/** Draw the border of a rectangle without filling it */
 	public static void drawRectangle(GraphicsContext gc, int x1, int y1, int x2, int y2) {
 		final double antiAlias = 0.5;
 		gc.beginPath();
@@ -143,10 +127,10 @@ public class Region {
 	}
 
 	/**
-	 * Translate the region's x and y coordinates relative to the given point. Even if this region isn't allowed to move, this method will work.
-	 *
-	 * @param dx change in x
-	 * @param dy change in y
+	 Translate the region's x and y coordinates relative to the given point. Even if this region isn't allowed to move, this method will work.
+
+	 @param dx change in x
+	 @param dy change in y
 	 */
 	public void translate(int dx, int dy) {
 		this.x1 += dx;
@@ -155,9 +139,7 @@ public class Region {
 		this.y2 += dy;
 	}
 
-	/**
-	 * Return true if the point is inside the region, false otherwise
-	 */
+	/** Return true if the point is inside the region, false otherwise */
 	public boolean containsPoint(int x, int y) {
 		if (getLeftX() <= x && getTopY() <= y) {
 			if (getRightX() >= x && getBottomY() >= y) {
@@ -167,9 +149,7 @@ public class Region {
 		return false;
 	}
 
-	/**
-	 * Check to see if this region is strictly bigger than the given region and if the given region is inside this one
-	 */
+	/** Check to see if this region is strictly bigger than the given region and if the given region is inside this one */
 	public boolean contains(Region r) {
 		if (getLeftX() < r.getLeftX() && getTopY() < r.getTopY()) {
 			if (getRightX() > r.getRightX() && getBottomY() > r.getBottomY()) {

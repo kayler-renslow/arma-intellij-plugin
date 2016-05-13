@@ -1,9 +1,8 @@
 package com.kaylerrenslow.armaDialogCreator.gui.fx.main;
 
-import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.action.ActionEvent;
-import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.action.ActionListener;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
-import com.kaylerrenslow.armaDialogCreator.gui.fx.control.contextMenu.CanvasContextMenu;
+import com.kaylerrenslow.armaDialogCreator.gui.canvas.UICanvas;
+import com.kaylerrenslow.armaDialogCreator.gui.fx.control.contextMenu.ComponentContextMenuCreator;
 import javafx.scene.Scene;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -21,6 +20,7 @@ public class ADCWindow {
 		this.primaryStage = primaryStage;
 		Scene scene = new Scene(rootElement);
 		this.primaryStage.setScene(scene);
+		canvas.setMenuCreator(new ComponentContextMenuCreator());
 
 		initialize();
 		show();
@@ -34,19 +34,9 @@ public class ADCWindow {
 		for (Color c : colors) {
 			Component component = new Component(x, 50, w, w);
 			component.setPaint(c);
-//			component.setOnRightClick(new ActionListener() {
-//				@Override
-//				public void actionPerformed(ActionEvent e) {
-//					if(e.getSource() instanceof Component){
-//						Component c = (Component)e.getSource();
-//						System.out.println(c + "c");
-//						canvas.setContextMenu(new CanvasContextMenu(c.getText()));
-//					}
-//				}
-//			});
 			component.setText(c.toString());
 			if(c == colors[0]){
-				component.setCanMove(false);
+				component.setEnabled(false);
 			}
 			canvas.addComponent(component);
 			x += w + 5;

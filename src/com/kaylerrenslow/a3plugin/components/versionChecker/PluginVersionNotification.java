@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.versionChecker;
+package com.kaylerrenslow.a3plugin.components.versionChecker;
 
 import com.intellij.notification.*;
 import org.jetbrains.annotations.NotNull;

@@ -2,15 +2,15 @@ Plugin
 	ADDED:
         none
     CHANGED:
-        none
+        plugin will now automatically check if there is an update
     FIXED:
         none
 
 Dialog Maker
 	ADDED:
-        none
+        context menu support for canvas components
     CHANGED:
-        restructured packages and have begun modularization
+        none
     FIXED:
         none
 

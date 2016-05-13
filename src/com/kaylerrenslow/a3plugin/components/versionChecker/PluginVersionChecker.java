@@ -1,5 +1,4 @@
-package com.kaylerrenslow.a3plugin.versionChecker;
-
+package com.kaylerrenslow.a3plugin.components.versionChecker;
 
 import com.intellij.ide.BrowserUtil;
 import com.intellij.json.JsonLanguage;
@@ -10,6 +9,7 @@ import com.intellij.json.psi.JsonStringLiteral;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationListener;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.components.ProjectComponent;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiFileFactory;
 import com.kaylerrenslow.a3plugin.Plugin;
@@ -27,16 +27,47 @@ import java.util.stream.Collectors;
 /**
  * @author Kayler
  *         Checks if the Arma Intellij Plugin has a new release available at the github repo.
- *         Created on 05/10/2016.
+ *         Created on 05/13/2016.
  */
-public class PluginVersionChecker {
+public class PluginVersionChecker implements ProjectComponent {
+	private final Project project;
+
+	public PluginVersionChecker(Project project) {
+		this.project = project;
+	}
+
+	@Override
+	public void initComponent() {
+
+	}
+
+	@Override
+	public void disposeComponent() {
+
+	}
+
+	@Override
+	@NotNull
+	public String getComponentName() {
+		return "ArmaPluginVersionCheckerComponent";
+	}
+
+	@Override
+	public void projectOpened() {
+		checkIfUpdate(this.project);
+	}
+
+	@Override
+	public void projectClosed() {
+
+	}
 
 	/**
 	 * Checks if the plugin has a new version available. If it does, a notification will popup telling the user. If at any point the check fails, an error notification will popup as well.
 	 *
 	 * @param project project instance
 	 */
-	public static void checkIfUpdate(@NotNull Project project) {
+	private static void checkIfUpdate(@NotNull Project project) {
 		String newPluginVersion;
 		try {
 			newPluginVersion = newPluginVersion(project);
@@ -63,7 +94,7 @@ public class PluginVersionChecker {
 		if (json == null) {
 			throw new Exception(couldntRead);
 		}
-		JsonFile jsonFile = null;
+		JsonFile jsonFile;
 		try {
 			jsonFile = (JsonFile) PsiFileFactory.getInstance(project).createFileFromText(JsonLanguage.INSTANCE, json);
 			if (jsonFile == null) {
@@ -119,5 +150,4 @@ public class PluginVersionChecker {
 		}
 		throw new Exception(apiChange);
 	}
-
 }

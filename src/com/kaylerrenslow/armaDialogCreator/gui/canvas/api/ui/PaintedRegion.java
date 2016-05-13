@@ -12,8 +12,8 @@ import org.jetbrains.annotations.Nullable;
  * Created by Kayler on 05/11/2016.
  */
 public class PaintedRegion extends Region {
-	private Paint myPaint;
-	private Color textColor = Color.BLACK;
+	protected Paint myPaint = Color.WHITE;
+	protected Color textColor = Color.BLACK;
 	private Border border;
 
 	private Text textObj = new Text();
