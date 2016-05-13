@@ -1,4 +1,4 @@
-package com.kaylerrenslow.armaDialogCreator.gui.lib.ui.api;
+package com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui;
 
 import javafx.scene.paint.Color;
 

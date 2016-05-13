@@ -8,9 +8,9 @@ Plugin
 
 Dialog Maker
 	ADDED:
-        basic functionality
-    CHANGED:
         none
+    CHANGED:
+        restructured packages and have begun modularization
     FIXED:
         none
 
