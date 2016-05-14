@@ -4,12 +4,12 @@ import com.kaylerrenslow.armaDialogCreator.MathUtil;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.PaintedRegion;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Region;
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Control;
-import javafx.scene.effect.DropShadow;
 import javafx.scene.input.MouseButton;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -37,6 +37,9 @@ public class UICanvas extends Control {
 	/** Color of the mouse selection box */
 	private Color selectionColor = Color.GREEN;
 
+	/** Color of the grid */
+	private Color gridColor = Color.GRAY;
+
 	/** All components added */
 	private ArrayList<Component> components = new ArrayList<>();
 
@@ -49,31 +52,49 @@ public class UICanvas extends Control {
 	private Point2D contextMenuPosition = new Point2D(-1, -1);
 
 	private int lastMouseX, lastMouseY; //last x and y positions of the mouse relative to the canvas
-	private boolean shiftDown = false;
-	private boolean ctrlDown = false;
+	private int dxAmount, dyAmount = 0; //amount of change that has happened since last snap
+
+	private boolean shiftDown, altDown, ctrlDown;
 
 	private IComponentContextMenuCreator menuCreator;
+	private IPositionCalculator calc;
 
-	public UICanvas(int width, int height) {
+
+	public UICanvas(int width, int height, IComponentContextMenuCreator contextMenuCreator, IPositionCalculator calculator) {
 		this.canvas = new Canvas(width, height);
 		this.cwidth = width;
 		this.cheight = height;
-		this.getChildren().add(this.canvas);
-
+		setMenuCreator(contextMenuCreator);
+		setPositionCalculator(calculator);
 		this.gc = this.canvas.getGraphicsContext2D();
+
+
+		this.getChildren().add(this.canvas);
 
 		this.setOnMousePressed(new CanvasMouseEvent(this));
 		this.setOnMouseReleased(new CanvasMouseEvent(this));
 		this.setOnMouseMoved(new CanvasMouseEvent(this));
 		this.setOnMouseDragged(new CanvasMouseEvent(this));
 
-		paint();
+		new AnimationTimer() {
+			@Override
+			public void handle(long now) {
+				paint();
+			}
+		}.start();
+	}
+
+	public int getCanvasWidth() {
+		return this.cwidth;
+	}
+
+	public int getCanvasHeight() {
+		return this.cheight;
 	}
 
 	/** Adds a component to the canvas */
 	public void addComponent(@NotNull Component component) {
 		this.components.add(component);
-		paint();
 	}
 
 	/**
@@ -84,10 +105,17 @@ public class UICanvas extends Control {
 	 */
 	public boolean removeComponent(@NotNull Component component) {
 		boolean removed = this.components.remove(component);
-		if (removed) {
-			paint();
-		}
 		return removed;
+	}
+
+
+	public void setPositionCalculator(@NotNull IPositionCalculator positionCalculator) {
+		this.calc = positionCalculator;
+	}
+
+	@NotNull
+	public IPositionCalculator getPositionCalculator() {
+		return this.calc;
 	}
 
 	/**
@@ -99,33 +127,64 @@ public class UICanvas extends Control {
 
 	/** Paint the canvas */
 	private void paint() {
+		gc.save();
 		gc.setFill(background);
 		gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
-		for (PaintedRegion paintedRegion : components) {
+		drawGrid();
+		for (Component component : components) {
 			boolean select = false;
-			for (PaintedRegion selected : selection.getSelected()) {
-				if (selected == paintedRegion) {
+			for (Component selected : selection.getSelected()) {
+				if (selected == component) {
 					select = true;
 					break;
 				}
 			}
-			paintRegion(paintedRegion, select);
+			paintComponent(component, select);
 		}
 
 		if (selection.isSelecting()) {
 			gc.save();
 			gc.setStroke(selectionColor);
+			gc.setLineWidth(2);
 			selection.drawRectangle(gc);
 			gc.restore();
 		}
+		gc.restore();
 	}
 
-	private void paintRegion(PaintedRegion region, boolean select) {
+	private void drawGrid() {
+		double spacing = calc.getGridScale() * calc.snapAmount();
+		if (spacing <= 0.001) {
+			return;
+		}
+		int numX = cwidth / (int) spacing;
+		int numY = cheight / (int) spacing;
+		double yy, xx;
+		double antiAlias = 0.5;
+		gc.save();
+		gc.setStroke(gridColor);
+		for (int y = 0; y < numY; y++) {
+			yy = y * spacing + antiAlias;
+			gc.strokeLine(0, yy, cwidth, yy);
+			for (int x = 0; x < numX; x++) {
+				xx = x * spacing + antiAlias;
+				gc.strokeLine(xx, 0, xx, cheight);
+			}
+		}
+		gc.restore();
+	}
+
+	private void paintComponent(Component component, boolean select) {
 		gc.save();
 		if (select) {
-			gc.setEffect(new DropShadow(region.getWidth() / 2, selectionColor));
+			gc.save();
+			gc.setGlobalAlpha(0.6);
+			gc.setStroke(selectionColor);
+			int offset = 4 + (component.getBorder() != null ? component.getBorder().getThickness() : 0);
+			Region.fillRectangle(gc, component.getLeftX() - offset, component.getTopY() - offset, component.getRightX() + offset, component.getBottomY() + offset);
+			gc.restore();
 		}
-		region.paint(gc);
+		component.paint(gc);
 		gc.restore();
 	}
 
@@ -162,6 +221,7 @@ public class UICanvas extends Control {
 	 @param mb mouse button that was pressed
 	 */
 	void mousePressed(int mousex, int mousey, @NotNull MouseButton mb) {
+		System.out.println("UICanvas.mousePressed");
 		selection.setSelecting(false);
 		this.mouseButtonDown = mb;
 
@@ -188,11 +248,14 @@ public class UICanvas extends Control {
 				}
 			}
 		}
+		if (mb == MouseButton.SECONDARY) {
+			return;
+		}
 		if (!clickedSelected) {
 			selection.clearSelected();
 			selection.beginSelecting(mousex, mousey);
 		}
-		paint();
+
 	}
 
 	/**
@@ -207,18 +270,18 @@ public class UICanvas extends Control {
 		selection.setSelecting(false);
 		setContextMenu(null);
 		boolean setContextMenu = false;
-		if (selection.getFirst() != null) {
-			if (selection.getFirst().containsPoint(mousex, mousey)) {
-				if (mb == MouseButton.SECONDARY) {
+		if (mb == MouseButton.SECONDARY) {
+			for (Component selected : selection.getSelected()) {
+				if (selected.containsPoint(mousex, mousey)) {
 					setContextMenu = true;
 					contextMenuPosition = new Point2D(mousex, mousey);
 					if (selection.numSelected() > 1) {
-						selection.clearAllButFirst();
+						selection.removeAllExcept(selected);
 					}
+					break;
 				}
 			}
 		}
-		paint();
 		if (setContextMenu) {
 			setContextMenu(menuCreator.initialize(selection.getFirst()));
 		}
@@ -256,19 +319,52 @@ public class UICanvas extends Control {
 					}
 				}
 			}
-			paint();
 			return;
 		}
-		int dx, dy;
+		int dx = mousex - lastMouseX; //change in x
+		int dy = mousey - lastMouseY; //change in y
+		int dx1 = 0;
+		int dy1 = 0; //change in x,y that will be used for translation
+		int ddx = dx < 0 ? -1 : 1; //change in direction for x
+		int ddy = dy < 0 ? -1 : 1; //change in direction for y
+		int snap = calc.snapAmount();
+
+		if (calc.snapEnabled() && !shiftDown) {
+			dxAmount += dx;
+			dyAmount += dy;
+			int dxAmountAbs = Math.abs(dxAmount);
+			int dyAmountAbs = Math.abs(dyAmount);
+			if (dxAmountAbs >= snap) {
+				dx1 = snap * ddx + snap * ddx * (dxAmountAbs / snap - 1);
+				dxAmount = dxAmountAbs % snap;
+			}
+			if (dyAmountAbs >= snap) {
+				dy1 = snap * ddy + snap * ddy * (dyAmountAbs / snap - 1);
+				dyAmount = dyAmountAbs % snap;
+			}
+		} else {
+			dxAmount = 0; //if snap is enabled later, we won't want to have the old data inside
+			dyAmount = 0;
+			dx1 = dx;
+			dy1 = dy;
+		}
+		int moveX, moveY, nearestGridX, nearestGridY;
 		for (PaintedRegion region : selection.getSelected()) {
 			//only moveable components should be inside selection
-			dx = mousex - lastMouseX;
-			dy = mousey - lastMouseY;
-			safeTranslate(region, dx, dy);
+			if (altDown) { //put this somewhere else so that the action makes sense
+				moveX = region.getLeftX();
+				moveY = region.getTopY();
+				nearestGridX = moveX - moveX % snap;
+				nearestGridY = moveY - moveY % snap;
+				dx1 = nearestGridX - moveX;
+				dy1 = nearestGridY - moveY;
+			}
+			safeTranslate(region, dx1, dy1);
 		}
-		lastMouseX = mousex;
-		lastMouseY = mousey;
-		paint();
+	}
+
+	private void printCoord(int x, int y) {
+		System.out.println(x + "," + y);
 	}
 
 	/**
@@ -276,10 +372,12 @@ public class UICanvas extends Control {
 
 	 @param shiftDown true if the shift key is down, false otherwise
 	 @param ctrlDown true if the ctrl key is down, false otherwise
+	 @param altDown true if alt key is down, false otherwise
 	 */
-	void mouseEvent(boolean shiftDown, boolean ctrlDown) {
+	void mouseEvent(boolean shiftDown, boolean ctrlDown, boolean altDown) {
 		this.shiftDown = shiftDown;
 		this.ctrlDown = ctrlDown;
+		this.altDown = altDown;
 	}
 
 	/** Get the position where the context menu was created, relative to canvas */

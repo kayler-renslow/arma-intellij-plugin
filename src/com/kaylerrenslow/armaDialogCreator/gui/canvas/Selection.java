@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaDialogCreator.gui.canvas;
 
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Region;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -87,11 +88,8 @@ class Selection extends Region {
 		this.isSelecting = selecting;
 	}
 
-	void clearAllButFirst() {
-		Component first = getFirst();
+	void removeAllExcept(@NotNull Component exception) {
 		clearSelected();
-		if (first != null) {
-			addToSelection(first);
-		}
+		this.selected.add(exception);
 	}
 }

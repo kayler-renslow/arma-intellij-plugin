@@ -113,17 +113,34 @@ public class Region {
 		drawRectangle(gc, getX1(), getY1(), getX2(), getY2());
 	}
 
+	public void fillRectangle(GraphicsContext gc) {
+		fillRectangle(gc, getX1(), getY1(), getX2(), getY2());
+	}
+
 	/** Draw the border of a rectangle without filling it */
 	public static void drawRectangle(GraphicsContext gc, int x1, int y1, int x2, int y2) {
-		final double antiAlias = 0.5;
-		gc.beginPath();
-		gc.moveTo(x1 + antiAlias, y1 + antiAlias);
-		gc.lineTo(x2 + antiAlias, y1 + antiAlias); // top right
-		gc.lineTo(x2 + antiAlias, y2 + antiAlias); // bottom right
-		gc.lineTo(x1 + antiAlias, y2 + antiAlias); // bottom left
-		gc.lineTo(x1 + antiAlias, y1 + antiAlias); // top left
-		gc.closePath();
-		gc.stroke();
+		final double antiAlias = gc.getLineWidth() % 2 != 0 ? 0.5 : 0;
+		double x1a = x1 + antiAlias;
+		double y1a = y1 + antiAlias;
+		double x2a = x2 + antiAlias;
+		double y2a = y2 + antiAlias;
+
+		gc.strokeLine(x1a, y1a, x2a, y1a); //top left to top right
+		gc.strokeLine(x2a, y1a, x2a, y2a); //top right to bottom right
+		gc.strokeLine(x2a, y2a, x1a, y2a); //bottom right to bottom left
+		gc.strokeLine(x1a, y2a, x1a, y1a); //bottom left to top left
+	}
+
+	public static void fillRectangle(GraphicsContext gc, int x1, int y1, int x2, int y2) {
+		final double antiAlias = gc.getLineWidth() % 2 != 0 ? 0.5 : 0;
+
+		double ya;
+		double x1a = x1 + antiAlias;
+		double x2a = x2 + antiAlias;
+		for (int y = y1; y <= y2; y++) {
+			ya = y + antiAlias;
+			gc.strokeLine(x1a, ya, x2a, ya);
+		}
 	}
 
 	/**

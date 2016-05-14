@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
  * Created by Kayler on 05/11/2016.
  */
 public class PaintedRegion extends Region {
-	protected Paint myPaint = Color.WHITE;
+	protected Color backgroundColor = Color.WHITE;
 	protected Color textColor = Color.BLACK;
 	private Border border;
 
@@ -37,12 +37,12 @@ public class PaintedRegion extends Region {
 			gc.save();
 			gc.setStroke(border.getColor());
 			gc.setLineWidth(border.getThickness());
-			paintRegion(gc);
+			drawRectangle(gc);
 			gc.restore();
 		}
-		gc.setFill(myPaint);
-		gc.setStroke(myPaint);
-		paintRegion(gc);
+		gc.setFill(backgroundColor);
+		gc.setStroke(backgroundColor);
+		fillRectangle(gc);
 		gc.setFont(getFont());
 		gc.setFill(textColor);
 		gc.fillText(getText(), getTextX(), getTextY());
@@ -64,13 +64,16 @@ public class PaintedRegion extends Region {
 		return this.textObj.getText();
 	}
 
-	private void paintRegion(GraphicsContext gc) {
-		drawRectangle(gc);
-		gc.fill();
+	public void setBackgroundColor(@NotNull Color paint) {
+		this.backgroundColor = paint;
 	}
 
-	public void setPaint(@NotNull Paint paint) {
-		this.myPaint = paint;
+	public Color getBackgroundColor() {
+		return backgroundColor;
+	}
+
+	public Border getBorder() {
+		return border;
 	}
 
 	public void setBorder(@Nullable Border border) {

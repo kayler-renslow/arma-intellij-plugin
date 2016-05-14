@@ -2,18 +2,18 @@ Plugin
 	ADDED:
         none
     CHANGED:
-        plugin will now automatically check if there is an update
+        none
     FIXED:
         none
 
 Dialog Maker
 	ADDED:
-        context menu support for canvas components
+        none
     CHANGED:
         none
     FIXED:
-        none
-
+        snapping issues
+        context menu issues
 
 Shared between languages
 	ADDED:

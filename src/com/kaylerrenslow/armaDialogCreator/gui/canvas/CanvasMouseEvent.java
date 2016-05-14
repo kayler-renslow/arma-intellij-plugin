@@ -25,11 +25,10 @@ class CanvasMouseEvent implements EventHandler<MouseEvent> {
 		if (!(event.getTarget() instanceof Canvas)) {
 			return;
 		}
-		canvas.mouseEvent(event.isShiftDown(), event.isControlDown());
+		canvas.mouseEvent(event.isShiftDown(), event.isControlDown(), event.isAltDown());
 		Point2D contextMenuPosition = canvas.getContextMenuPosition();
 		ContextMenu cm = canvas.getContextMenu();
 
-		UICanvas source = (UICanvas) event.getSource();
 		if (cm != null) {
 			if (cm.isShowing()) {
 				double x = contextMenuPosition.getX();
