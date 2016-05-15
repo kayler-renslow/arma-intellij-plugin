@@ -8,12 +8,13 @@ Plugin
 
 Dialog Maker
 	ADDED:
-        none
+        scaling of components
     CHANGED:
-        none
+        moved things around to better modularization of code. Promise I'm done now.
+        snap is always be on now. holding shift just sets the snap to lowest possible snap
+        how selecting is performed with mouse clicks.
     FIXED:
-        snapping issues
-        context menu issues
+        ctrl selection issue for when selecting an older component with a newer one and only the newer one gets selected instead of both
 
 Shared between languages
 	ADDED:

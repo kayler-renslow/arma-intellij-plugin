@@ -1,6 +1,7 @@
 package com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui;
 
 import javafx.scene.canvas.GraphicsContext;
+import org.jetbrains.annotations.NotNull;
 
 /**
  Created by Kayler on 05/12/2016.
@@ -156,6 +157,13 @@ public class Region {
 		this.y2 += dy;
 	}
 
+	public void scale(int dxl, int dxr, int dyt, int dyb){
+		this.x1 = getLeftX() + dxl;
+		this.x2 = getRightX() + dxr;
+		this.y1 = getTopY() + dyt;
+		this.y2 = getBottomY() + dyb;
+	}
+
 	/** Return true if the point is inside the region, false otherwise */
 	public boolean containsPoint(int x, int y) {
 		if (getLeftX() <= x && getTopY() <= y) {
@@ -164,6 +172,63 @@ public class Region {
 			}
 		}
 		return false;
+	}
+
+	/** Gets the edge(s) that the given point is closest to.
+	 @param x x coord relative to this's position
+	 @param y y coord relative to this's position
+	 @param leeway how close the point needs to be to get the edge (strictly positive)
+	 @return the edge the point is closest to
+	 */
+	@NotNull
+	public Edge getEdgeForPoint(int x, int y, int leeway) {
+		boolean top = false;
+		boolean right = false;
+		boolean bottom = false;
+		boolean left = false;
+
+		if (y >= getTopY() - leeway && y <= getTopY() + leeway) {
+			top = true;
+		}
+		if (x >= getRightX() - leeway && x <= getRightX() + leeway) {
+			right = true;
+		}
+		if (y >= getBottomY() - leeway && y <= getBottomY() + leeway) {
+			bottom = true;
+		}
+		if (x >= getLeftX() - leeway && x <= getLeftX() + leeway) {
+			left = true;
+		}
+
+		if (top && left) {
+			return Edge.TOP_LEFT;
+		}
+		if (top && right) {
+			return Edge.TOP_RIGHT;
+		}
+		if (bottom && left) {
+			return Edge.BOTTOM_LEFT;
+		}
+		if (bottom && right) {
+			return Edge.BOTTOM_RIGHT;
+		}
+
+		boolean xinside = x > getLeftX() && x < getRightX();
+		if (top && xinside) {
+			return Edge.TOP;
+		}
+		if (bottom && xinside) {
+			return Edge.BOTTOM;
+		}
+
+		boolean yinside = y > getTopY() && y < getBottomY();
+		if (right && yinside) {
+			return Edge.RIGHT;
+		}
+		if (left && yinside) {
+			return Edge.LEFT;
+		}
+		return Edge.NONE;
 	}
 
 	/** Check to see if this region is strictly bigger than the given region and if the given region is inside this one */

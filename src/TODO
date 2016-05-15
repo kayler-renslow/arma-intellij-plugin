@@ -3,7 +3,7 @@ features:
     renaming files will rename them in includes and if a SQF function, will rename the class decl
 
 for dialog maker:
-    have holding alt snap the component to the nearest grid snap (we may just need to divide position by snap, take that and multiply by snap)
+    snap should be in terms of percentage of canvas and not actual pixels
 
 FIX THIS SCENARIO before release
 _i = 100;

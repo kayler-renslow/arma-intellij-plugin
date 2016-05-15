@@ -1,6 +1,6 @@
 package com.kaylerrenslow.armaDialogCreator.gui.fx.control.contextMenu;
 
-import com.kaylerrenslow.armaDialogCreator.gui.canvas.IComponentContextMenuCreator;
+import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.IComponentContextMenuCreator;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;

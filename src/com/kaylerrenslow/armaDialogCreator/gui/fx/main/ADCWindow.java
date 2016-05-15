@@ -1,10 +1,12 @@
 package com.kaylerrenslow.armaDialogCreator.gui.fx.main;
 
-import com.kaylerrenslow.armaDialogCreator.gui.canvas.IPositionCalculator;
+import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.IPositionCalculator;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.UICanvas;
 import com.kaylerrenslow.armaDialogCreator.gui.fx.control.contextMenu.ComponentContextMenuCreator;
 import javafx.scene.Scene;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -15,7 +17,7 @@ import javafx.stage.Stage;
 public class ADCWindow {
 	private final Stage primaryStage;
 	private final VBox rootElement = new VBox();
-	private UICanvas canvas = new UICanvas(700, 700, new ComponentContextMenuCreator(), new IPositionCalculator() {
+	private UICanvas canvas = new UICanvas(700, 700, new IPositionCalculator() {
 
 		@Override
 		public double getGridScale() {
@@ -23,8 +25,8 @@ public class ADCWindow {
 		}
 
 		@Override
-		public boolean snapEnabled() {
-			return true;
+		public int smallestSnap() {
+			return 5;
 		}
 
 		@Override
@@ -37,13 +39,15 @@ public class ADCWindow {
 		this.primaryStage = primaryStage;
 		Scene scene = new Scene(rootElement);
 		this.primaryStage.setScene(scene);
+		canvas.setMenuCreator(new ComponentContextMenuCreator());
+		canvas.setCanvasContextMenu(new ContextMenu(new MenuItem("Canvas context menu")));
 		initialize();
 		show();
 	}
 
 	private void initialize() {
 		this.rootElement.getChildren().add(canvas);
-		Color[] colors = {Color.RED, Color.BLACK, Color.ORANGE};
+		Color[] colors = {Color.RED, Color.BLACK, Color.ORANGE, Color.PURPLE};
 		int w = 60;
 		int x = canvas.getPositionCalculator().snapAmount();
 		for (Color c : colors) {

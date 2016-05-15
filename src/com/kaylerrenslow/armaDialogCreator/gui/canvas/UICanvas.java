@@ -1,26 +1,41 @@
 package com.kaylerrenslow.armaDialogCreator.gui.canvas;
 
 import com.kaylerrenslow.armaDialogCreator.MathUtil;
+import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.IComponentContextMenuCreator;
+import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.IPositionCalculator;
+import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ISelection;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
-import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.PaintedRegion;
+import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Edge;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Region;
 import javafx.animation.AnimationTimer;
+import javafx.event.*;
+import javafx.event.Event;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.ContextMenu;
 import javafx.scene.control.Control;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  @author Kayler
  Created on 05/11/2016. */
 public class UICanvas extends Control {
+
+	/*** How many pixels the cursor can be off on a component's edge when choosing an edge for scaling */
+	private static final int COMPONENT_EDGE_LEEWAY = 3;
+	private static final long DOUBLE_CLICK_WAIT_TIME_MILLIS = 300;
 
 	/** javafx Canvas */
 	private final Canvas canvas;
@@ -54,17 +69,22 @@ public class UICanvas extends Control {
 	private int lastMouseX, lastMouseY; //last x and y positions of the mouse relative to the canvas
 	private int dxAmount, dyAmount = 0; //amount of change that has happened since last snap
 
-	private boolean shiftDown, altDown, ctrlDown;
+	private long lastMousePressTime;
 
 	private IComponentContextMenuCreator menuCreator;
 	private IPositionCalculator calc;
+	private ContextMenu canvasContextMenu; //context menu to show when user right clicks and no component is selected
 
+	private Component scaleComponent;
+	private Edge scaleEdge = Edge.NONE;
 
-	public UICanvas(int width, int height, IComponentContextMenuCreator contextMenuCreator, IPositionCalculator calculator) {
+	private Component mouseOverComponent; //component that the mouse is over, or null if not over any
+	private KeyMap keyMap = new KeyMap();
+
+	public UICanvas(int width, int height, IPositionCalculator calculator) {
 		this.canvas = new Canvas(width, height);
 		this.cwidth = width;
 		this.cheight = height;
-		setMenuCreator(contextMenuCreator);
 		setPositionCalculator(calculator);
 		this.gc = this.canvas.getGraphicsContext2D();
 
@@ -75,6 +95,8 @@ public class UICanvas extends Control {
 		this.setOnMouseReleased(new CanvasMouseEvent(this));
 		this.setOnMouseMoved(new CanvasMouseEvent(this));
 		this.setOnMouseDragged(new CanvasMouseEvent(this));
+		this.setOnKeyPressed(new CanvasKeyEvent(this));
+		this.setOnKeyReleased(new CanvasKeyEvent(this));
 
 		new AnimationTimer() {
 			@Override
@@ -108,7 +130,6 @@ public class UICanvas extends Control {
 		return removed;
 	}
 
-
 	public void setPositionCalculator(@NotNull IPositionCalculator positionCalculator) {
 		this.calc = positionCalculator;
 	}
@@ -118,11 +139,19 @@ public class UICanvas extends Control {
 		return this.calc;
 	}
 
+	public ISelection getSelection() {
+		return selection;
+	}
+
 	/**
 	 @param ccm the context menu creator that is used to give Components context menus
 	 */
-	public void setMenuCreator(@NotNull IComponentContextMenuCreator ccm) {
+	public void setMenuCreator(@Nullable IComponentContextMenuCreator ccm) {
 		this.menuCreator = ccm;
+	}
+
+	public void setCanvasContextMenu(@Nullable ContextMenu contextMenu) {
+		this.canvasContextMenu = contextMenu;
 	}
 
 	/** Paint the canvas */
@@ -132,15 +161,14 @@ public class UICanvas extends Control {
 		gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
 		drawGrid();
 		for (Component component : components) {
-			boolean select = false;
-			for (Component selected : selection.getSelected()) {
-				if (selected == component) {
-					select = true;
-					break;
-				}
-			}
-			paintComponent(component, select);
+			paintComponent(component, selection.isSelected(component));
 		}
+		gc.save();
+		for (Component component : selection.getSelected()) {
+			gc.setStroke(component.getBackgroundColor());
+			component.drawRectangle(gc);
+		}
+		gc.restore();
 
 		if (selection.isSelecting()) {
 			gc.save();
@@ -196,13 +224,30 @@ public class UICanvas extends Control {
 	 @param dy change in y
 	 */
 	private void safeTranslate(Region r, int dx, int dy) {
-		boolean outX = MathUtil.outOfBounds(r.getLeftX() + dx, 0, cwidth - r.getWidth()) || MathUtil.outOfBounds(r.getRightX() + dx, 0, cwidth);
+		if (boundUpdateSafe(r, dx, dx, dy, dy)) {
+			r.translate(dx, dy);
+		}
+	}
+
+	/**
+	 Check if the bound update will keep the boundaries inside the canvas
+
+	 @param r region to check bounds of
+	 @param dxLeft change in x on the left side
+	 @param dxRight change in x on the right side
+	 @param dyTop change in y on the top side
+	 @param dyBottom change in y on the bottom side
+	 @return true if the bounds can be updated, false otherwise
+	 */
+	private boolean boundUpdateSafe(Region r, int dxLeft, int dxRight, int dyTop, int dyBottom) {
+		boolean outX = MathUtil.outOfBounds(r.getLeftX() + dxLeft, 0, cwidth - r.getWidth()) || MathUtil.outOfBounds(r.getRightX() + dxRight, 0, cwidth);
 		if (!outX) {
-			boolean outY = MathUtil.outOfBounds(r.getTopY() + dy, 0, cheight - r.getHeight()) || MathUtil.outOfBounds(r.getBottomY() + dy, 0, cheight);
+			boolean outY = MathUtil.outOfBounds(r.getTopY() + dyTop, 0, cheight - r.getHeight()) || MathUtil.outOfBounds(r.getBottomY() + dyBottom, 0, cheight);
 			if (!outY) {
-				r.translate(dx, dy);
+				return true;
 			}
 		}
+		return false;
 	}
 
 	private void changeCursorToMove() {
@@ -213,49 +258,103 @@ public class UICanvas extends Control {
 		canvas.setCursor(Cursor.DEFAULT);
 	}
 
+	private void changeCursorToScale(Edge edge) {
+		if (edge == Edge.NONE) {
+			changeCursorToDefault();
+			return;
+		}
+		if (edge == Edge.TOP_LEFT || edge == Edge.BOTTOM_RIGHT) {
+			canvas.setCursor(Cursor.NW_RESIZE);
+			return;
+		}
+		if (edge == Edge.TOP_RIGHT || edge == Edge.BOTTOM_LEFT) {
+			canvas.setCursor(Cursor.NE_RESIZE);
+			return;
+		}
+		if (edge == Edge.TOP || edge == Edge.BOTTOM) {
+			canvas.setCursor(Cursor.N_RESIZE);
+			return;
+		}
+		if (edge == Edge.LEFT || edge == Edge.RIGHT) {
+			canvas.setCursor(Cursor.W_RESIZE);
+			return;
+		}
+		throw new IllegalStateException("couldn't find correct cursor for edge:" + edge.name());
+	}
+
 	/**
-	 This is called when the mouse listener is invoked and a mouse press was the event
+	 This is called when the mouse listener is invoked and a mouse press was the event.
+	 This method should be the only one dealing with adding and removing components from the selection, other than mouseMove which adds to the selection via the selection box
 
 	 @param mousex x position of mouse relative to canvas
 	 @param mousey y position of mouse relative to canvas
 	 @param mb mouse button that was pressed
 	 */
-	void mousePressed(int mousex, int mousey, @NotNull MouseButton mb) {
-		System.out.println("UICanvas.mousePressed");
+	private void mousePressed(int mousex, int mousey, @NotNull MouseButton mb) {
+		boolean doubleClick = System.currentTimeMillis() - lastMousePressTime <= DOUBLE_CLICK_WAIT_TIME_MILLIS;
+		lastMousePressTime = System.currentTimeMillis();
 		selection.setSelecting(false);
 		this.mouseButtonDown = mb;
 
-		boolean clickedSelected = false;
-		if (mb == MouseButton.PRIMARY) {
-			for (Component component : components) {
+		if (scaleComponent != null && mb == MouseButton.PRIMARY) { //only select component that is being scaled to prevent multiple scaling
+			selection.removeAllAndAdd(scaleComponent);
+			return;
+		}
+		if (selection.numSelected() == 0 && mouseOverComponent != null) { //nothing is selected, however, mouse is over a component so we need to select that
+			selection.addToSelection(mouseOverComponent);
+			return;
+		}
+		if (selection.numSelected() > 0 && mb == MouseButton.SECONDARY) { //check to see if right click is over a selected component
+			Component component;
+			for (int i = selection.numSelected() - 1; i >= 0; i--) {
+				component = selection.getSelected().get(i);
+				if (component.containsPoint(mousex, mousey)) {
+					selection.removeAllAndAdd(component); //only 1 can be selected
+					return;
+				}
+			}
+			for (int i = components.size() - 1; i >= 0; i--) {
+				component = components.get(i);
 				if (!component.isEnabled()) {
 					continue;
 				}
 				if (component.containsPoint(mousex, mousey)) {
-					clickedSelected = true;
-					if (ctrlDown) {
-						selection.toggleFromSelection(component);
-					} else {
-						if (selection.numSelected() > 0) {
-							if (selection.isSelected(component)) {
-								break;
-							} else {
-								selection.clearSelected();
-							}
-						}
-						selection.addToSelection(component);
-					}
+					selection.removeAllAndAdd(component);
+					return;
 				}
 			}
-		}
-		if (mb == MouseButton.SECONDARY) {
+			selection.clearSelected();
 			return;
 		}
-		if (!clickedSelected) {
-			selection.clearSelected();
-			selection.beginSelecting(mousex, mousey);
+		if (mouseOverComponent != null) {
+			if (keyMap.ctrlDown) {
+				selection.toggleFromSelection(mouseOverComponent);
+				return;
+			} else {
+				if (selection.numSelected() > 0) {
+					if (selection.isSelected(mouseOverComponent)) {
+						if (doubleClick) {
+							selection.removeAllAndAdd(mouseOverComponent);
+						}
+						return;
+					}
+					if (!keyMap.spaceDown()) { //if space is down, mouse over component should be selected
+						Component component;
+						for (int i = selection.numSelected() - 1; i >= 0; i--) {
+							component = selection.getSelected().get(i);
+							if (component.containsPoint(mousex, mousey)) { //allow this one to stay selected despite the mouse not being over it
+								return;
+							}
+						}
+					}
+				}
+				selection.removeAllAndAdd(mouseOverComponent);
+				return;
+			}
 		}
 
+		selection.clearSelected();
+		selection.beginSelecting(mousex, mousey);
 	}
 
 	/**
@@ -265,25 +364,19 @@ public class UICanvas extends Control {
 	 @param mousey y position of mouse relative to canvas
 	 @param mb mouse button that was released
 	 */
-	void mouseReleased(int mousex, int mousey, @NotNull MouseButton mb) {
+	private void mouseReleased(int mousex, int mousey, @NotNull MouseButton mb) {
 		this.mouseButtonDown = MouseButton.NONE;
 		selection.setSelecting(false);
 		setContextMenu(null);
 		boolean setContextMenu = false;
-		if (mb == MouseButton.SECONDARY) {
-			for (Component selected : selection.getSelected()) {
-				if (selected.containsPoint(mousex, mousey)) {
-					setContextMenu = true;
-					contextMenuPosition = new Point2D(mousex, mousey);
-					if (selection.numSelected() > 1) {
-						selection.removeAllExcept(selected);
-					}
-					break;
-				}
-			}
+		if (mb == MouseButton.SECONDARY && selection.getFirst() != null) {
+			setContextMenu = true;
+			contextMenuPosition = new Point2D(mousex, mousey);
 		}
-		if (setContextMenu) {
+		if (setContextMenu && menuCreator != null) {
 			setContextMenu(menuCreator.initialize(selection.getFirst()));
+		} else if (canvasContextMenu != null) {
+			setContextMenu(canvasContextMenu);
 		}
 	}
 
@@ -293,17 +386,35 @@ public class UICanvas extends Control {
 	 @param mousex x position of mouse relative to canvas
 	 @param mousey y position of mouse relative to canvas
 	 */
-	void mouseMoved(int mousex, int mousey) {
-		changeCursorToDefault();
-		for (Component component : components) {
-			if (component.isEnabled()) {
-				if (component.containsPoint(mousex, mousey)) {
-					changeCursorToMove();
-					break;
+	private void mouseMoved(int mousex, int mousey) {
+		mouseOverComponent = null;
+		{
+			Component component;
+			for (int i = components.size() - 1; i >= 0; i--) {
+				component = components.get(i);
+				if (component.isEnabled()) {
+					if (component.containsPoint(mousex, mousey)) {
+						mouseOverComponent = component;
+						break;
+					}
+				}
+			}
+		}
+		if (scaleComponent == null) {
+			changeCursorToDefault();
+			for (Component component : components) {
+				if (component.isEnabled()) {
+					if (component.containsPoint(mousex, mousey)) {
+						changeCursorToMove();
+						break;
+					}
 				}
 			}
 		}
 		if (mouseButtonDown == MouseButton.NONE) {
+			if (selection.numSelected() > 0) {
+				checkForScaling(mousex, mousey);
+			}
 			return;
 		}
 		if (mouseButtonDown == MouseButton.MIDDLE || (mouseButtonDown == MouseButton.SECONDARY && !selection.isSelecting())) {
@@ -321,6 +432,7 @@ public class UICanvas extends Control {
 			}
 			return;
 		}
+
 		int dx = mousex - lastMouseX; //change in x
 		int dy = mousey - lastMouseY; //change in y
 		int dx1 = 0;
@@ -328,43 +440,124 @@ public class UICanvas extends Control {
 		int ddx = dx < 0 ? -1 : 1; //change in direction for x
 		int ddy = dy < 0 ? -1 : 1; //change in direction for y
 		int snap = calc.snapAmount();
+		if (keyMap.shiftDown) {
+			snap = calc.smallestSnap();
+		}
 
-		if (calc.snapEnabled() && !shiftDown) {
-			dxAmount += dx;
-			dyAmount += dy;
-			int dxAmountAbs = Math.abs(dxAmount);
-			int dyAmountAbs = Math.abs(dyAmount);
-			if (dxAmountAbs >= snap) {
-				dx1 = snap * ddx + snap * ddx * (dxAmountAbs / snap - 1);
-				dxAmount = dxAmountAbs % snap;
+		dxAmount += dx;
+		dyAmount += dy;
+		int dxAmountAbs = Math.abs(dxAmount);
+		int dyAmountAbs = Math.abs(dyAmount);
+		if (dxAmountAbs >= snap) {
+			dx1 = snap * ddx + snap * ddx * (dxAmountAbs / snap - 1);
+			dxAmount = dxAmountAbs % snap;
+		}
+		if (dyAmountAbs >= snap) {
+			dy1 = snap * ddy + snap * ddy * (dyAmountAbs / snap - 1);
+			dyAmount = dyAmountAbs % snap;
+		}
+
+		if (scaleComponent != null) {
+			int dxl = 0; //change in x left
+			int dxr = 0; //change in x right
+			int dyt = 0; //change in y top
+			int dyb = 0; //change in y bottom
+			if (scaleEdge == Edge.TOP_LEFT) {
+				dyt = dy1;
+				dxl = dx1;
+			} else if (scaleEdge == Edge.TOP_RIGHT) {
+				dyt = dy1;
+				dxr = dx1;
+			} else if (scaleEdge == Edge.BOTTOM_LEFT) {
+				dyb = dy1;
+				dxl = dx1;
+			} else if (scaleEdge == Edge.BOTTOM_RIGHT) {
+				dyb = dy1;
+				dxr = dx1;
+			} else if (scaleEdge == Edge.TOP) {
+				dyt = dy1;
+			} else if (scaleEdge == Edge.RIGHT) {
+				dxr = dx1;
+			} else if (scaleEdge == Edge.BOTTOM) {
+				dyb = dy1;
+			} else if (scaleEdge == Edge.LEFT) {
+				dxl = dx1;
 			}
-			if (dyAmountAbs >= snap) {
-				dy1 = snap * ddy + snap * ddy * (dyAmountAbs / snap - 1);
-				dyAmount = dyAmountAbs % snap;
+			if (keyMap.altDown) { //scale only to the nearest grid size
+				int leftX = scaleComponent.getLeftX();
+				int rightX = scaleComponent.getRightX();
+				int topY = scaleComponent.getTopY();
+				int botY = scaleComponent.getBottomY();
+				if (dxl != 0) {
+					int p = leftX + dxl;
+					int nearestGridLeftX = p - p % snap;
+					dxl = nearestGridLeftX - p;
+				}
+				if (dxr != 0) {
+					int p = rightX + dxr;
+					int nearestGridRightX = p - p % snap;
+					dxr = nearestGridRightX - p;
+				}
+				if (dyt != 0) {
+					int p = topY + dyt;
+					int nearestGridTopY = p - p % snap;
+					dyt = nearestGridTopY - p;
+				}
+				if (dyb != 0) {
+					int p = botY + dyb;
+					int nearestGridBotY = p - p % snap;
+					dyb = nearestGridBotY - p;
+				}
 			}
-		} else {
-			dxAmount = 0; //if snap is enabled later, we won't want to have the old data inside
-			dyAmount = 0;
-			dx1 = dx;
-			dy1 = dy;
+			scaleComponent.scale(dxl, dxr, dyt, dyb);
+			return;
 		}
 		int moveX, moveY, nearestGridX, nearestGridY;
-		for (PaintedRegion region : selection.getSelected()) {
+		for (Component component : selection.getSelected()) {
 			//only moveable components should be inside selection
-			if (altDown) { //put this somewhere else so that the action makes sense
-				moveX = region.getLeftX();
-				moveY = region.getTopY();
+			if (keyMap.altDown) {
+				moveX = component.getLeftX();
+				moveY = component.getTopY();
 				nearestGridX = moveX - moveX % snap;
 				nearestGridY = moveY - moveY % snap;
 				dx1 = nearestGridX - moveX;
 				dy1 = nearestGridY - moveY;
 			}
-			safeTranslate(region, dx1, dy1);
+			safeTranslate(component, dx1, dy1);
 		}
 	}
 
-	private void printCoord(int x, int y) {
-		System.out.println(x + "," + y);
+	/** Called from mouseMove. Checks to see if the given mouse position is near a component edge. If it is, it will store the component as well as the edge. */
+	private void checkForScaling(int mousex, int mousey) {
+		Edge edge;
+		setReadyForScale(null, Edge.NONE);
+		Component component;
+		for (int i = selection.numSelected() - 1; i >= 0; i--) {
+			component = selection.getSelected().get(i);
+			if (!component.isEnabled()) {
+				continue;
+			}
+			edge = component.getEdgeForPoint(mousex, mousey, COMPONENT_EDGE_LEEWAY);
+			if (edge == Edge.NONE) {
+				continue;
+			}
+			setReadyForScale(component, edge);
+			changeCursorToScale(edge);
+			return;
+		}
+	}
+
+	private void setReadyForScale(@Nullable Component toScale, @NotNull Edge scaleEdge) {
+		this.scaleComponent = toScale;
+		this.scaleEdge = scaleEdge;
+	}
+
+	private void printValues(Object... values) {
+		String s = "";
+		for (Object v : values) {
+			s += v.toString() + ", ";
+		}
+		System.out.println(s.substring(0, s.length() - 2));
 	}
 
 	/**
@@ -374,21 +567,203 @@ public class UICanvas extends Control {
 	 @param ctrlDown true if the ctrl key is down, false otherwise
 	 @param altDown true if alt key is down, false otherwise
 	 */
-	void mouseEvent(boolean shiftDown, boolean ctrlDown, boolean altDown) {
-		this.shiftDown = shiftDown;
-		this.ctrlDown = ctrlDown;
-		this.altDown = altDown;
+	private void keyEvent(String key, boolean keyIsDown, boolean shiftDown, boolean ctrlDown, boolean altDown) {
+		keyMap.update(key, keyIsDown, shiftDown, ctrlDown, altDown);
 	}
 
 	/** Get the position where the context menu was created, relative to canvas */
 	@NotNull
-	Point2D getContextMenuPosition() {
+	private Point2D getContextMenuPosition() {
 		return contextMenuPosition;
 	}
 
 	/** This is called after mouseMove is called. This will ensure that no matter how mouse move exits, the last mouse position will be updated */
-	void setLastMousePosition(int mousex, int mousey) {
+	private void setLastMousePosition(int mousex, int mousey) {
 		this.lastMouseX = mousex;
 		this.lastMouseY = mousey;
+	}
+
+	/**
+	 @author Kayler
+	 Created on 05/13/2016.
+	 */
+	private static class Selection extends Region implements ISelection {
+		private ArrayList<Component> selected = new ArrayList<>();
+		private boolean isSelecting;
+
+		@Override
+		@NotNull
+		public ArrayList<Component> getSelected() {
+			return selected;
+		}
+
+		@Nullable
+		@Override
+		public Component getFirst() {
+			if (selected.size() == 0) {
+				return null;
+			}
+			return selected.get(0);
+		}
+
+		@Override
+		public void toggleFromSelection(Component component) {
+			if (isSelected(component)) {
+				selected.remove(component);
+			} else {
+				this.selected.add(component);
+			}
+		}
+
+		@Override
+		public void addToSelection(Component component) {
+			if (!isSelected(component)) {
+				this.selected.add(component);
+			}
+		}
+
+		@Override
+		public boolean isSelected(@Nullable Component component) {
+			if (component == null) {
+				return false;
+			}
+			for (Component c : selected) {
+				if (c == component) {
+					return true;
+				}
+			}
+			return false;
+		}
+
+		@Override
+		public boolean removeFromSelection(Component component) {
+			return this.selected.remove(component);
+		}
+
+		@Override
+		public void clearSelected() {
+			this.selected.clear();
+		}
+
+		@Override
+		public int numSelected() {
+			return this.selected.size();
+		}
+
+		boolean isSelecting() {
+			return this.isSelecting;
+		}
+
+		void setSelecting(boolean selecting) {
+			this.isSelecting = selecting;
+		}
+
+		void removeAllAndAdd(@NotNull Component toAdd) {
+			clearSelected();
+			this.selected.add(toAdd);
+		}
+
+		Selection() {
+			super(0, 0, 0, 0);
+		}
+
+		void beginSelecting(int x, int y) {
+			this.x1 = x;
+			this.y1 = y;
+			this.x2 = x;
+			this.y2 = y;
+			this.isSelecting = true;
+		}
+
+		void selectTo(int x, int y) {
+			this.x2 = x;
+			this.y2 = y;
+		}
+	}
+
+	/**
+	 Created by Kayler on 05/13/2016.
+	 */
+	private static class CanvasMouseEvent implements EventHandler<MouseEvent> {
+		private final UICanvas canvas;
+
+		CanvasMouseEvent(UICanvas canvas) {
+			this.canvas = canvas;
+		}
+
+		@Override
+		public void handle(MouseEvent event) {
+			MouseButton btn = event.getButton();
+			if (!(event.getTarget() instanceof Canvas)) {
+				return;
+			}
+			Point2D contextMenuPosition = canvas.getContextMenuPosition();
+			ContextMenu cm = canvas.getContextMenu();
+
+			if (cm != null) {
+				if (cm.isShowing()) {
+					double x = contextMenuPosition.getX();
+					double y = contextMenuPosition.getY();
+					int distance = (int) Point.distance(x, y, event.getX(), event.getY());
+					if (distance > 10) {
+						cm.hide();
+					}
+				}
+			}
+			Canvas c = (Canvas) event.getTarget();
+			Point2D p = c.sceneToLocal(event.getSceneX(), event.getSceneY());
+			int mousex = (int) p.getX();
+			int mousey = (int) p.getY();
+
+			if (event.getEventType() == MouseEvent.MOUSE_MOVED || event.getEventType() == MouseEvent.MOUSE_DRAGGED) {
+				canvas.mouseMoved(mousex, mousey);
+				canvas.setLastMousePosition(mousex, mousey);
+			} else {
+				if (event.getEventType() == MouseEvent.MOUSE_PRESSED) {
+					canvas.mousePressed(mousex, mousey, btn);
+				} else if (event.getEventType() == MouseEvent.MOUSE_RELEASED) {
+					canvas.mouseReleased(mousex, mousey, btn);
+				}
+			}
+		}
+
+	}
+
+	private class CanvasKeyEvent implements EventHandler<KeyEvent> {
+		private final UICanvas canvas;
+
+		CanvasKeyEvent(UICanvas canvas) {
+			this.canvas = canvas;
+		}
+
+		@Override
+		public void handle(KeyEvent event) {
+			canvas.keyEvent(event.getText().toLowerCase(), event.getEventType() == KeyEvent.KEY_PRESSED, event.isShiftDown(), event.isControlDown(), event.isAltDown());
+		}
+	}
+
+	private class KeyMap {
+		private HashMap<String, Boolean> map = new HashMap<>();
+		private boolean shiftDown, ctrlDown, altDown;
+
+		public void update(String key, boolean keyIsDown, boolean shiftDown, boolean ctrlDown, boolean altDown) {
+			this.map.put(key, keyIsDown);
+			this.shiftDown = shiftDown;
+			this.ctrlDown = ctrlDown;
+			this.altDown = altDown;
+		}
+
+		boolean spaceDown() {
+			return keyIsDown(" ");
+		}
+
+		boolean keyIsDown(char k) {
+			return keyIsDown(k + "");
+		}
+
+		boolean keyIsDown(String k) {
+			Boolean b = map.get(k);
+			return b != null && b;
+		}
 	}
 }

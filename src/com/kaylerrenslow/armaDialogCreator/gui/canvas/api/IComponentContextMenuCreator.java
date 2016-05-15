@@ -1,11 +1,11 @@
-package com.kaylerrenslow.armaDialogCreator.gui.canvas;
+package com.kaylerrenslow.armaDialogCreator.gui.canvas.api;
 
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import javafx.scene.control.ContextMenu;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 05/13/2016.
+ Created by Kayler on 05/13/2016.
  */
 public interface IComponentContextMenuCreator {
 	@NotNull
