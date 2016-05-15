@@ -9,7 +9,6 @@ import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Edge;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Region;
 import javafx.animation.AnimationTimer;
 import javafx.event.*;
-import javafx.event.Event;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
@@ -34,14 +33,14 @@ import java.util.HashMap;
 public class UICanvas extends Control {
 
 	/*** How many pixels the cursor can be off on a component's edge when choosing an edge for scaling */
-	private static final int COMPONENT_EDGE_LEEWAY = 3;
+	private static final int COMPONENT_EDGE_LEEWAY = 5;
 	private static final long DOUBLE_CLICK_WAIT_TIME_MILLIS = 300;
 
 	/** javafx Canvas */
 	private final Canvas canvas;
 	private final GraphicsContext gc;
 
-	/** width of canvas */
+	/** Width of canvas */
 	private final int cwidth,
 	/** Height of canvas */
 	cheight;
@@ -68,18 +67,23 @@ public class UICanvas extends Control {
 
 	private int lastMouseX, lastMouseY; //last x and y positions of the mouse relative to the canvas
 	private int dxAmount, dyAmount = 0; //amount of change that has happened since last snap
-
 	private long lastMousePressTime;
+
+	private Keys keys = new Keys();
+	private KeyMap keyMap = new KeyMap();
+
+	/** Component that is ready to be scaled, null if none is ready to be scaled */
+	private Component scaleComponent;
+	/** Edge that the scaling will be conducted, or Edge.NONE is no scaling is being done */
+	private Edge scaleEdge = Edge.NONE;
+
+	/** Component that the mouse is over, or null if not over any component */
+	private Component mouseOverComponent;
 
 	private IComponentContextMenuCreator menuCreator;
 	private IPositionCalculator calc;
-	private ContextMenu canvasContextMenu; //context menu to show when user right clicks and no component is selected
-
-	private Component scaleComponent;
-	private Edge scaleEdge = Edge.NONE;
-
-	private Component mouseOverComponent; //component that the mouse is over, or null if not over any
-	private KeyMap keyMap = new KeyMap();
+	/** Context menu to show when user right clicks and no component is selected */
+	private ContextMenu canvasContextMenu;
 
 	public UICanvas(int width, int height, IPositionCalculator calculator) {
 		this.canvas = new Canvas(width, height);
@@ -120,13 +124,16 @@ public class UICanvas extends Control {
 	}
 
 	/**
-	 Removes the given component from the canvas render and user interaction
+	 Removes the given component from the canvas render and user interaction.
 
 	 @param component component to remove
 	 @return true if the component was removed, false if nothing was removed
 	 */
 	public boolean removeComponent(@NotNull Component component) {
 		boolean removed = this.components.remove(component);
+		if (removed) {
+			this.selection.removeFromSelection(component);
+		}
 		return removed;
 	}
 
@@ -161,7 +168,23 @@ public class UICanvas extends Control {
 		gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
 		drawGrid();
 		for (Component component : components) {
-			paintComponent(component, selection.isSelected(component));
+			boolean selected = selection.isSelected(component);
+			if (selected) {
+				gc.save();
+				gc.setLineWidth(2);
+				if (keys.keyIsDown(keyMap.PREVENT_VERTICAL_MOVEMENT)) {
+					int centerx = component.getCenterX();
+					gc.setStroke(selectionColor);
+					gc.strokeLine(centerx, 0, centerx, cheight);
+				}
+				if (keys.keyIsDown(keyMap.PREVENT_HORIZONTAL_MOVEMENT)) {
+					int centery = component.getCenterY();
+					gc.setStroke(selectionColor);
+					gc.strokeLine(0, centery, cwidth, centery);
+				}
+				gc.restore();
+			}
+			paintComponent(component, selected);
 		}
 		gc.save();
 		for (Component component : selection.getSelected()) {
@@ -181,7 +204,7 @@ public class UICanvas extends Control {
 	}
 
 	private void drawGrid() {
-		double spacing = calc.getGridScale() * calc.snapAmount();
+		double spacing = calc.getGridScale() * (getSnapPixels(calc.snapPercentage()));
 		if (spacing <= 0.001) {
 			return;
 		}
@@ -191,10 +214,10 @@ public class UICanvas extends Control {
 		double antiAlias = 0.5;
 		gc.save();
 		gc.setStroke(gridColor);
-		for (int y = 0; y < numY; y++) {
+		for (int y = 0; y <= numY; y++) {
 			yy = y * spacing + antiAlias;
 			gc.strokeLine(0, yy, cwidth, yy);
-			for (int x = 0; x < numX; x++) {
+			for (int x = 0; x <= numX; x++) {
 				xx = x * spacing + antiAlias;
 				gc.strokeLine(xx, 0, xx, cheight);
 			}
@@ -212,7 +235,9 @@ public class UICanvas extends Control {
 			Region.fillRectangle(gc, component.getLeftX() - offset, component.getTopY() - offset, component.getRightX() + offset, component.getBottomY() + offset);
 			gc.restore();
 		}
-		component.paint(gc);
+		if (!component.isGhost()) {
+			component.paint(gc);
+		}
 		gc.restore();
 	}
 
@@ -327,7 +352,7 @@ public class UICanvas extends Control {
 			return;
 		}
 		if (mouseOverComponent != null) {
-			if (keyMap.ctrlDown) {
+			if (keys.ctrlDown) {
 				selection.toggleFromSelection(mouseOverComponent);
 				return;
 			} else {
@@ -338,7 +363,7 @@ public class UICanvas extends Control {
 						}
 						return;
 					}
-					if (!keyMap.spaceDown()) { //if space is down, mouse over component should be selected
+					if (!keys.spaceDown()) { //if space is down, mouse over component should be selected
 						Component component;
 						for (int i = selection.numSelected() - 1; i >= 0; i--) {
 							component = selection.getSelected().get(i);
@@ -435,14 +460,17 @@ public class UICanvas extends Control {
 
 		int dx = mousex - lastMouseX; //change in x
 		int dy = mousey - lastMouseY; //change in y
+		if (keys.keyIsDown(keyMap.PREVENT_HORIZONTAL_MOVEMENT)) {
+			dy = 0;
+		}
+		if (keys.keyIsDown(keyMap.PREVENT_VERTICAL_MOVEMENT)) {
+			dx = 0;
+		}
 		int dx1 = 0;
 		int dy1 = 0; //change in x,y that will be used for translation
 		int ddx = dx < 0 ? -1 : 1; //change in direction for x
 		int ddy = dy < 0 ? -1 : 1; //change in direction for y
-		int snap = calc.snapAmount();
-		if (keyMap.shiftDown) {
-			snap = calc.smallestSnap();
-		}
+		int snap = getSnapPixels(keys.shiftDown ? calc.smallestSnapPercentage() : calc.snapPercentage());
 
 		dxAmount += dx;
 		dyAmount += dy;
@@ -483,7 +511,7 @@ public class UICanvas extends Control {
 			} else if (scaleEdge == Edge.LEFT) {
 				dxl = dx1;
 			}
-			if (keyMap.altDown) { //scale only to the nearest grid size
+			if (keys.altDown) { //scale only to the nearest grid size
 				int leftX = scaleComponent.getLeftX();
 				int rightX = scaleComponent.getRightX();
 				int topY = scaleComponent.getTopY();
@@ -515,7 +543,7 @@ public class UICanvas extends Control {
 		int moveX, moveY, nearestGridX, nearestGridY;
 		for (Component component : selection.getSelected()) {
 			//only moveable components should be inside selection
-			if (keyMap.altDown) {
+			if (keys.altDown) {
 				moveX = component.getLeftX();
 				moveY = component.getTopY();
 				nearestGridX = moveX - moveX % snap;
@@ -552,12 +580,9 @@ public class UICanvas extends Control {
 		this.scaleEdge = scaleEdge;
 	}
 
-	private void printValues(Object... values) {
-		String s = "";
-		for (Object v : values) {
-			s += v.toString() + ", ";
-		}
-		System.out.println(s.substring(0, s.length() - 2));
+	private int getSnapPixels(int percentage) {
+		double p = percentage / 100.0;
+		return (int) (cwidth * p);
 	}
 
 	/**
@@ -568,7 +593,7 @@ public class UICanvas extends Control {
 	 @param altDown true if alt key is down, false otherwise
 	 */
 	private void keyEvent(String key, boolean keyIsDown, boolean shiftDown, boolean ctrlDown, boolean altDown) {
-		keyMap.update(key, keyIsDown, shiftDown, ctrlDown, altDown);
+		keys.update(key, keyIsDown, shiftDown, ctrlDown, altDown);
 	}
 
 	/** Get the position where the context menu was created, relative to canvas */
@@ -729,7 +754,7 @@ public class UICanvas extends Control {
 
 	}
 
-	private class CanvasKeyEvent implements EventHandler<KeyEvent> {
+	private static class CanvasKeyEvent implements EventHandler<KeyEvent> {
 		private final UICanvas canvas;
 
 		CanvasKeyEvent(UICanvas canvas) {
@@ -742,7 +767,7 @@ public class UICanvas extends Control {
 		}
 	}
 
-	private class KeyMap {
+	private static class Keys {
 		private HashMap<String, Boolean> map = new HashMap<>();
 		private boolean shiftDown, ctrlDown, altDown;
 
@@ -757,13 +782,14 @@ public class UICanvas extends Control {
 			return keyIsDown(" ");
 		}
 
-		boolean keyIsDown(char k) {
-			return keyIsDown(k + "");
-		}
-
 		boolean keyIsDown(String k) {
 			Boolean b = map.get(k);
 			return b != null && b;
 		}
+	}
+
+	private static class KeyMap {
+		String PREVENT_VERTICAL_MOVEMENT = "x";
+		String PREVENT_HORIZONTAL_MOVEMENT = "z";
 	}
 }

@@ -25,13 +25,13 @@ public class ADCWindow {
 		}
 
 		@Override
-		public int smallestSnap() {
-			return 5;
+		public int smallestSnapPercentage() {
+			return 1;
 		}
 
 		@Override
-		public int snapAmount() {
-			return 20;
+		public int snapPercentage() {
+			return 3;
 		}
 	});
 
@@ -49,7 +49,7 @@ public class ADCWindow {
 		this.rootElement.getChildren().add(canvas);
 		Color[] colors = {Color.RED, Color.BLACK, Color.ORANGE, Color.PURPLE};
 		int w = 60;
-		int x = canvas.getPositionCalculator().snapAmount();
+		int x = canvas.getPositionCalculator().snapPercentage();
 		for (Color c : colors) {
 			Component component = new Component(x, 50, w, w);
 			component.setBackgroundColor(c);
@@ -57,8 +57,11 @@ public class ADCWindow {
 			if(c == colors[0]){
 				component.setEnabled(false);
 			}
+			if(c == colors[2]){
+//				component.setGhost(true);
+			}
 			canvas.addComponent(component);
-			x += canvas.getPositionCalculator().snapAmount();
+			x += canvas.getPositionCalculator().snapPercentage() * 20;
 		}
 	}
 

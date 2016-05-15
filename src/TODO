@@ -2,8 +2,6 @@ features:
     check if function exists when doing call or spawn
     renaming files will rename them in includes and if a SQF function, will rename the class decl
 
-for dialog maker:
-    snap should be in terms of percentage of canvas and not actual pixels
 
 FIX THIS SCENARIO before release
 _i = 100;

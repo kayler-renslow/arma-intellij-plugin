@@ -102,11 +102,13 @@ public class Region {
 	}
 
 	public int getCenterX() {
-		return (getLeftX() - getRightX()) / 2;
+		int left = getLeftX();
+		return left + (getRightX() - left) / 2;
 	}
 
 	public int getCenterY() {
-		return (getBottomY() - getTopY()) / 2;
+		int top = getTopY();
+		return top + (getBottomY() - top) / 2;
 	}
 
 	/** Draw this region as a rectangle without filling it */

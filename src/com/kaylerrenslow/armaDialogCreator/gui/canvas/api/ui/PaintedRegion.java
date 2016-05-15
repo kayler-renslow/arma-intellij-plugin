@@ -28,7 +28,7 @@ public class PaintedRegion extends Region {
 	}
 
 	private int getTextY() {
-		int textHeight = (int) textObj.getLayoutBounds().getHeight();
+		int textHeight = (int) (textObj.getLayoutBounds().getHeight() * 0.25);
 		return getTopY() + (getHeight() - textHeight) / 2;
 	}
 
