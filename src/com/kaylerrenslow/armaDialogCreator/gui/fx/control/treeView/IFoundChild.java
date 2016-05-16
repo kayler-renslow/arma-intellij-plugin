@@ -8,6 +8,6 @@ public interface IFoundChild {
 
 	 @param found the child that was found
 	 */
-	void found(TreeItem<MoveableTreeNode> found);
+	<E>void found(TreeItem<TreeItemData<E>> found);
 
 }

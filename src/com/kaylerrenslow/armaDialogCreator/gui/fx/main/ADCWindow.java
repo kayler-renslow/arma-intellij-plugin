@@ -27,7 +27,7 @@ public class ADCWindow {
 
 	private void initialize(Scene scene) {
 		rootElement.getChildren().addAll(mainMenuBar, canvasView);
-		primaryStage.setWidth(700);
+		primaryStage.setWidth(1000);
 		primaryStage.setHeight(700);
 		EventHandler<KeyEvent> keyEvent = new EventHandler<KeyEvent>() {
 			@Override

@@ -2,22 +2,15 @@ package com.kaylerrenslow.armaDialogCreator.gui.fx.control.treeView;
 
 
 import javafx.event.EventHandler;
-import javafx.scene.control.ContextMenu;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeCell;
 import javafx.scene.control.TreeItem;
 import javafx.scene.effect.InnerShadow;
-import javafx.scene.input.ClipboardContent;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.Dragboard;
-import javafx.scene.input.KeyCode;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.TransferMode;
+import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import org.jetbrains.annotations.Nullable;
 
-class EditableTreeCellFactory extends TreeCell<MoveableTreeNode> {
+class EditableTreeCellFactory<E> extends TreeCell<TreeItemData<?>> {
 	/** How long it takes for the current hovered tree item that is expandable for it to expand and show its children. Value is in milliseconds. */
 	private static final long WAIT_DURATION_TREE_VIEW_FOLDER = 500;
 	private static final Color COLOR_TREE_VIEW_DRAG = Color.ORANGE;
@@ -28,21 +21,26 @@ class EditableTreeCellFactory extends TreeCell<MoveableTreeNode> {
 
 	private long waitStartTime = 0;
 
-	private TreeItem<MoveableTreeNode> dragging;
+	private static TreeItem<TreeItemData<?>> dragging; //must be static since the factory is created for each cell and dragging takes place over more than once cell
 
 	EditableTreeCellFactory(@Nullable ITreeCellSelectionUpdate treeCellSelectionUpdate) {
 		this.treeCellSelectionUpdate = treeCellSelectionUpdate;
 		this.setEditable(true);
+
 		// first method called when the user clicks and drags a tree item
 		this.setOnDragDetected(new EventHandler<MouseEvent>() {
 
 			@Override
 			public void handle(MouseEvent event) {
+				//				// a child of root element. since the treeview has a hidden real root element, the 'fake' root element has the real root element as its parent
+				//				// So we need to call getParent() twice to check if the user is trying to drag and drop a 'fake' root element
+				//				if (getTreeItem().getParent().getParent() == null) {
+				//					getTreeItem().setExpanded(true);
+				//					event.consume();
+				//					return;
+				//				}
 
-				// a 'fake' root element. since the treeview has a hidden real root element, the 'fake' root element has the real root element as its parent
-				// So we need to call getParent() twice to check if the user is trying to drag and drop a 'fake' root element
-				if (getTreeItem().getParent().getParent() == null) {
-					getTreeItem().setExpanded(true);
+				if (getTreeItem().getValue().isPlaceholder()) {
 					event.consume();
 					return;
 				}
@@ -90,30 +88,6 @@ class EditableTreeCellFactory extends TreeCell<MoveableTreeNode> {
 					}
 				}
 
-				// checks if the hovered tree item is a root and if the current dragged object's root is the same as the hovered tree item's root
-				// if the hovered tree item is a root, it will automatically expand it if the dragged object is allowed multiple roots
-				// if the dragged object is not allowed multiple roots, the hovered tree item doesn't expand
-				// the dragged object can only be placed in it's original root if it is not allowed multiple roots
-				if (!dragging.getValue().isAllowedDifferentRoot() || getTreeItem().getParent().getParent() == null) {
-					if (!dragging.getValue().isAllowedDifferentRoot()) {
-
-						TreeItem<MoveableTreeNode> draggingRoot = TreeUtil.getRoot(dragging, true);
-						TreeItem<MoveableTreeNode> hoverRoot = TreeUtil.getRoot(getTreeItem(), true);
-
-						if (!draggingRoot.equals(hoverRoot)) {
-							event.consume();
-							return;
-						}
-
-					}
-					if (getTreeItem().getParent().getParent() == null) {
-						getTreeItem().setExpanded(true);
-						event.consume();
-						return;
-					}
-				}
-
-
 				// auto expands the hovered tree item if it has children after a period of time.
 				// timer is reset when the mouse moves away from the current hovered item
 				if (!getTreeItem().isLeaf() || getTreeItem().getValue().isFolder()) {
@@ -145,7 +119,7 @@ class EditableTreeCellFactory extends TreeCell<MoveableTreeNode> {
 
 				// add a placeholder treeitem to the dragging's parent if it is a folder that will be empty after the move
 				if (dragging.getParent().getValue().isFolder() && dragging.getParent().getChildren().size() == 1) {
-					dragging.getParent().getChildren().add(new TreeItem<>());
+					dragging.getParent().getChildren().add(new MoveableTreeItem());
 				}
 
 				// remove the dragging item's last position and add it to the new parent
@@ -160,7 +134,7 @@ class EditableTreeCellFactory extends TreeCell<MoveableTreeNode> {
 				}
 
 				dragging = null;
-
+				getTreeView().getSelectionModel().clearSelection();
 				event.consume();
 			}
 
@@ -190,10 +164,7 @@ class EditableTreeCellFactory extends TreeCell<MoveableTreeNode> {
 
 	@Override
 	public void startEdit() {
-		if (getTreeItem() == null || getTreeItem().getParent() == null) {
-			return;
-		}
-		if (getTreeItem().getParent().getParent() == null) {
+		if (getTreeItem() == null || getTreeItem().getValue().isPlaceholder()) {
 			return;
 		}
 		super.startEdit();
@@ -213,7 +184,7 @@ class EditableTreeCellFactory extends TreeCell<MoveableTreeNode> {
 	}
 
 	@Override
-	protected void updateItem(MoveableTreeNode node, boolean empty) {
+	protected void updateItem(TreeItemData node, boolean empty) {
 		super.updateItem(node, empty);
 		// this adds a textfield to the tree item to get a new name
 		if (empty) {
@@ -253,26 +224,6 @@ class EditableTreeCellFactory extends TreeCell<MoveableTreeNode> {
 			}
 		});
 
-	}
-
-	@Override
-	public void updateSelected(boolean selected) {
-		super.updateSelected(selected);
-		// loads the context menu given in this EditableTreeCellFactory if the user right clicked on a tree item
-		if (getTreeItem() == null) {
-			return;
-		}
-		if (treeCellSelectionUpdate != null) {
-			if (getTreeItem().getParent().getParent() == null) {
-				treeCellSelectionUpdate.selectionUpdate(CellType.ROOT);
-			} else if (getTreeItem().getValue().isPlaceholder()) {
-				treeCellSelectionUpdate.selectionUpdate(CellType.PLACE_HOLDER);
-			} else if (getTreeItem().isLeaf()) {
-				treeCellSelectionUpdate.selectionUpdate(CellType.LEAF);
-			} else if (getTreeItem().getValue().isFolder()) {
-				treeCellSelectionUpdate.selectionUpdate(CellType.FOLDER);
-			}
-		}
 	}
 
 	private String getString() {

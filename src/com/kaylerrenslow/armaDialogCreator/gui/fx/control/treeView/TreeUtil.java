@@ -9,7 +9,7 @@ public class TreeUtil {
 	 * @param node node to get the root of
 	 * @param treeViewRootHidden true if the treeView the given node is in has a hidden root
 	 * @return root of the given node or node if node is a root */
-	public static TreeItem<MoveableTreeNode> getRoot(TreeItem<MoveableTreeNode> node, boolean treeViewRootHidden) {
+	public static TreeItem<TreeItemData> getRoot(TreeItem<TreeItemData> node, boolean treeViewRootHidden) {
 		if (node == null) {
 			throw new NullPointerException("The TreeItem given can't possibly have a root because it is null.");
 		}
@@ -49,7 +49,7 @@ public class TreeUtil {
 	 * @param startItem where to start searching
 	 * @param searchingFor TreeItem to look for
 	 * @return if startItem has the child searchingFor */
-	public static boolean hasChild(TreeItem<MoveableTreeNode> startItem, TreeItem<MoveableTreeNode> searchingFor) {
+	public static boolean hasChild(TreeItem<TreeItemData<?>> startItem, TreeItem<TreeItemData<?>> searchingFor) {
 		if (startItem == null) {
 			throw new NullPointerException("startItem is null.");
 		}
@@ -62,7 +62,7 @@ public class TreeUtil {
 		if (startItem.getChildren().size() == 0) {
 			return false;
 		}
-		for (TreeItem<MoveableTreeNode> item : startItem.getChildren()) {
+		for (TreeItem<TreeItemData<?>> item : startItem.getChildren()) {
 			boolean contains = hasChild(item, searchingFor);
 			if (contains) {
 				return true;
@@ -77,14 +77,14 @@ public class TreeUtil {
 	 *
 	 * @param startItem where to start the stepping
 	 * @param foundAction action to run for each child */
-	public static void stepThroughChildren(TreeItem<MoveableTreeNode> startItem, IFoundChild foundAction) {
+	public static<E> void stepThroughChildren(TreeItem<TreeItemData<E>> startItem, IFoundChild foundAction) {
 		if (startItem == null) {
 			throw new NullPointerException("startItem is null.");
 		}
 		if (foundAction == null) {
 			throw new NullPointerException("foundAction is null.");
 		}
-		for (TreeItem<MoveableTreeNode> item : startItem.getChildren()) {
+		for (TreeItem<TreeItemData<E>> item : startItem.getChildren()) {
 			foundAction.found(item);
 			stepThroughChildren(item, foundAction);
 		}
