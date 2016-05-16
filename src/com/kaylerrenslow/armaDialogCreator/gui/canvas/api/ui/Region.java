@@ -33,6 +33,10 @@ public class Region {
 		return Math.max(y1, y2);
 	}
 
+	public int getArea(){
+		return getWidth() * getHeight();
+	}
+
 	public int getX1() {
 		return x1;
 	}

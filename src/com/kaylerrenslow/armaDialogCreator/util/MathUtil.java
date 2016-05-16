@@ -1,4 +1,4 @@
-package com.kaylerrenslow.armaDialogCreator;
+package com.kaylerrenslow.armaDialogCreator.util;
 
 /**
  Created by Kayler on 05/12/2016.

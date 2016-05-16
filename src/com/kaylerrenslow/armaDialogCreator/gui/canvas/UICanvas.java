@@ -1,36 +1,37 @@
 package com.kaylerrenslow.armaDialogCreator.gui.canvas;
 
-import com.kaylerrenslow.armaDialogCreator.MathUtil;
+import com.kaylerrenslow.armaDialogCreator.util.MathUtil;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.IComponentContextMenuCreator;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.IPositionCalculator;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ISelection;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Edge;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Region;
-import javafx.animation.AnimationTimer;
-import javafx.event.*;
+import com.kaylerrenslow.armaDialogCreator.util.Point;
+import javafx.event.EventHandler;
+import javafx.event.EventTarget;
 import javafx.geometry.Point2D;
+import javafx.geometry.VPos;
 import javafx.scene.Cursor;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ContextMenu;
-import javafx.scene.control.Control;
-import javafx.scene.input.KeyEvent;
+import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
  @author Kayler
  Created on 05/11/2016. */
-public class UICanvas extends Control {
+public class UICanvas extends AnchorPane {
 
 	/*** How many pixels the cursor can be off on a component's edge when choosing an edge for scaling */
 	private static final int COMPONENT_EDGE_LEEWAY = 5;
@@ -41,7 +42,7 @@ public class UICanvas extends Control {
 	private final GraphicsContext gc;
 
 	/** Width of canvas */
-	private final int cwidth,
+	private int cwidth,
 	/** Height of canvas */
 	cheight;
 
@@ -61,13 +62,10 @@ public class UICanvas extends Control {
 
 	/** Mouse button that is currently down */
 	private MouseButton mouseButtonDown = MouseButton.NONE;
-
-	/** Position of where the component context menu was created, relative to the canvas */
-	private Point2D contextMenuPosition = new Point2D(-1, -1);
-
-	private int lastMouseX, lastMouseY; //last x and y positions of the mouse relative to the canvas
-	private int dxAmount, dyAmount = 0; //amount of change that has happened since last snap
+	private final Point lastMousePosition = new Point(-1,-1);//last x and y positions of the mouse relative to the canvas
 	private long lastMousePressTime;
+
+	private int dxAmount, dyAmount = 0; //amount of change that has happened since last snap
 
 	private Keys keys = new Keys();
 	private KeyMap keyMap = new KeyMap();
@@ -76,14 +74,20 @@ public class UICanvas extends Control {
 	private Component scaleComponent;
 	/** Edge that the scaling will be conducted, or Edge.NONE is no scaling is being done */
 	private Edge scaleEdge = Edge.NONE;
-
 	/** Component that the mouse is over, or null if not over any component */
 	private Component mouseOverComponent;
+	/** Component that the component context menu was created on, or null if the component context menu isn't open */
+	private Component contextMenuComponent;
 
 	private IComponentContextMenuCreator menuCreator;
 	private IPositionCalculator calc;
 	/** Context menu to show when user right clicks and no component is selected */
 	private ContextMenu canvasContextMenu;
+
+	/** The context menu that wants to be shown */
+	private ContextMenu contextMenu;
+	private final Point contextMenuPosition = new Point(-1, -1);
+
 
 	public UICanvas(int width, int height, IPositionCalculator calculator) {
 		this.canvas = new Canvas(width, height);
@@ -91,23 +95,25 @@ public class UICanvas extends Control {
 		this.cheight = height;
 		setPositionCalculator(calculator);
 		this.gc = this.canvas.getGraphicsContext2D();
-
+		gc.setTextBaseline(VPos.CENTER);
 
 		this.getChildren().add(this.canvas);
+		CanvasMouseEvent mouseEvent = new CanvasMouseEvent(this);
 
-		this.setOnMousePressed(new CanvasMouseEvent(this));
-		this.setOnMouseReleased(new CanvasMouseEvent(this));
-		this.setOnMouseMoved(new CanvasMouseEvent(this));
-		this.setOnMouseDragged(new CanvasMouseEvent(this));
-		this.setOnKeyPressed(new CanvasKeyEvent(this));
-		this.setOnKeyReleased(new CanvasKeyEvent(this));
-
-		new AnimationTimer() {
+		this.setOnMousePressed(mouseEvent);
+		this.setOnMouseReleased(mouseEvent);
+		this.setOnMouseMoved(mouseEvent);
+		this.setOnMouseDragged(mouseEvent);
+		this.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
 			@Override
-			public void handle(long now) {
-				paint();
+			public void handle(ContextMenuEvent event) {
+				if (contextMenu != null) {
+					Point2D p = canvas.localToScreen(contextMenuPosition.getX(), contextMenuPosition.getY());
+					contextMenu.show(canvas, p.getX(), p.getY());
+				}
 			}
-		}.start();
+		});
+
 	}
 
 	public int getCanvasWidth() {
@@ -118,9 +124,17 @@ public class UICanvas extends Control {
 		return this.cheight;
 	}
 
+	public void setCanvasSize(int width, int height) {
+		this.cwidth = width;
+		this.cheight = height;
+		this.canvas.setWidth(width);
+		this.canvas.setHeight(height);
+	}
+
 	/** Adds a component to the canvas */
 	public void addComponent(@NotNull Component component) {
 		this.components.add(component);
+		paint();
 	}
 
 	/**
@@ -134,6 +148,7 @@ public class UICanvas extends Control {
 		if (removed) {
 			this.selection.removeFromSelection(component);
 		}
+		paint();
 		return removed;
 	}
 
@@ -161,6 +176,7 @@ public class UICanvas extends Control {
 		this.canvasContextMenu = contextMenu;
 	}
 
+
 	/** Paint the canvas */
 	private void paint() {
 		gc.save();
@@ -168,21 +184,30 @@ public class UICanvas extends Control {
 		gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
 		drawGrid();
 		for (Component component : components) {
+			if (component.isGhost()) {
+				continue;
+			}
 			boolean selected = selection.isSelected(component);
 			if (selected) {
 				gc.save();
-				gc.setLineWidth(2);
-				if (keys.keyIsDown(keyMap.PREVENT_VERTICAL_MOVEMENT)) {
-					int centerx = component.getCenterX();
+				int centerx = component.getCenterX();
+				int centery = component.getCenterY();
+				boolean noHoriz = keys.keyIsDown(keyMap.PREVENT_HORIZONTAL_MOVEMENT);
+				boolean noVert = keys.keyIsDown(keyMap.PREVENT_VERTICAL_MOVEMENT);
+				if (noHoriz) {
 					gc.setStroke(selectionColor);
+					gc.setLineWidth(4);
 					gc.strokeLine(centerx, 0, centerx, cheight);
 				}
-				if (keys.keyIsDown(keyMap.PREVENT_HORIZONTAL_MOVEMENT)) {
-					int centery = component.getCenterY();
+				if (noVert) {
 					gc.setStroke(selectionColor);
+					gc.setLineWidth(4);
 					gc.strokeLine(0, centery, cwidth, centery);
 				}
 				gc.restore();
+			}
+			if (selection.isSelecting() && !component.isEnabled() && selection.getArea() > 10) {
+				continue;
 			}
 			paintComponent(component, selected);
 		}
@@ -329,6 +354,10 @@ public class UICanvas extends Control {
 			selection.addToSelection(mouseOverComponent);
 			return;
 		}
+		if (selection.numSelected() == 0 && mouseOverComponent == null && mb == MouseButton.SECONDARY) { //nothing is selected and right clicking the canvas
+			selection.clearSelected();
+			return;
+		}
 		if (selection.numSelected() > 0 && mb == MouseButton.SECONDARY) { //check to see if right click is over a selected component
 			Component component;
 			for (int i = selection.numSelected() - 1; i >= 0; i--) {
@@ -392,16 +421,15 @@ public class UICanvas extends Control {
 	private void mouseReleased(int mousex, int mousey, @NotNull MouseButton mb) {
 		this.mouseButtonDown = MouseButton.NONE;
 		selection.setSelecting(false);
-		setContextMenu(null);
-		boolean setContextMenu = false;
-		if (mb == MouseButton.SECONDARY && selection.getFirst() != null) {
-			setContextMenu = true;
-			contextMenuPosition = new Point2D(mousex, mousey);
-		}
-		if (setContextMenu && menuCreator != null) {
-			setContextMenu(menuCreator.initialize(selection.getFirst()));
-		} else if (canvasContextMenu != null) {
-			setContextMenu(canvasContextMenu);
+		setContextMenu(null, mousex, mousey);
+		contextMenuComponent = null;
+		if (mb == MouseButton.SECONDARY) {
+			if (menuCreator != null && selection.getFirst() != null) {
+				contextMenuComponent = selection.getFirst();
+				setContextMenu(menuCreator.initialize(contextMenuComponent), mousex, mousey);
+			} else if (canvasContextMenu != null) {
+				setContextMenu(canvasContextMenu, mousex, mousey);
+			}
 		}
 	}
 
@@ -427,13 +455,8 @@ public class UICanvas extends Control {
 		}
 		if (scaleComponent == null) {
 			changeCursorToDefault();
-			for (Component component : components) {
-				if (component.isEnabled()) {
-					if (component.containsPoint(mousex, mousey)) {
-						changeCursorToMove();
-						break;
-					}
-				}
+			if (!selection.isSelecting() && mouseOverComponent != null) {
+				changeCursorToMove();
 			}
 		}
 		if (mouseButtonDown == MouseButton.NONE) {
@@ -458,16 +481,16 @@ public class UICanvas extends Control {
 			return;
 		}
 
-		int dx = mousex - lastMouseX; //change in x
-		int dy = mousey - lastMouseY; //change in y
-		if (keys.keyIsDown(keyMap.PREVENT_HORIZONTAL_MOVEMENT)) {
+		int dx = mousex - lastMousePosition.getX(); //change in x
+		int dy = mousey - lastMousePosition.getY(); //change in y
+		if (keys.keyIsDown(keyMap.PREVENT_VERTICAL_MOVEMENT)) {
 			dy = 0;
 		}
-		if (keys.keyIsDown(keyMap.PREVENT_VERTICAL_MOVEMENT)) {
+		if (keys.keyIsDown(keyMap.PREVENT_HORIZONTAL_MOVEMENT)) {
 			dx = 0;
 		}
-		int dx1 = 0;
-		int dy1 = 0; //change in x,y that will be used for translation
+		int dx1 = 0; //change in x that will be used for translation or scaling
+		int dy1 = 0; //change in y that will be used for translation or scaling
 		int ddx = dx < 0 ? -1 : 1; //change in direction for x
 		int ddy = dy < 0 ? -1 : 1; //change in direction for y
 		int snap = getSnapPixels(keys.shiftDown ? calc.smallestSnapPercentage() : calc.snapPercentage());
@@ -477,15 +500,15 @@ public class UICanvas extends Control {
 		int dxAmountAbs = Math.abs(dxAmount);
 		int dyAmountAbs = Math.abs(dyAmount);
 		if (dxAmountAbs >= snap) {
-			dx1 = snap * ddx + snap * ddx * (dxAmountAbs / snap - 1);
+			dx1 = snap * ddx * (dxAmountAbs / snap);
 			dxAmount = dxAmountAbs % snap;
 		}
 		if (dyAmountAbs >= snap) {
-			dy1 = snap * ddy + snap * ddy * (dyAmountAbs / snap - 1);
+			dy1 = snap * ddy * (dyAmountAbs / snap);
 			dyAmount = dyAmountAbs % snap;
 		}
 
-		if (scaleComponent != null) {
+		if (scaleComponent != null) { //scaling
 			int dxl = 0; //change in x left
 			int dxr = 0; //change in x right
 			int dyt = 0; //change in y top
@@ -540,6 +563,7 @@ public class UICanvas extends Control {
 			scaleComponent.scale(dxl, dxr, dyt, dyb);
 			return;
 		}
+		//not scaling and simply translating (moving)
 		int moveX, moveY, nearestGridX, nearestGridY;
 		for (Component component : selection.getSelected()) {
 			//only moveable components should be inside selection
@@ -592,21 +616,60 @@ public class UICanvas extends Control {
 	 @param ctrlDown true if the ctrl key is down, false otherwise
 	 @param altDown true if alt key is down, false otherwise
 	 */
-	private void keyEvent(String key, boolean keyIsDown, boolean shiftDown, boolean ctrlDown, boolean altDown) {
+	public void keyEvent(String key, boolean keyIsDown, boolean shiftDown, boolean ctrlDown, boolean altDown) {
 		keys.update(key, keyIsDown, shiftDown, ctrlDown, altDown);
+		paint();
 	}
 
-	/** Get the position where the context menu was created, relative to canvas */
-	@NotNull
-	private Point2D getContextMenuPosition() {
-		return contextMenuPosition;
-	}
 
 	/** This is called after mouseMove is called. This will ensure that no matter how mouse move exits, the last mouse position will be updated */
 	private void setLastMousePosition(int mousex, int mousey) {
-		this.lastMouseX = mousex;
-		this.lastMouseY = mousey;
+		lastMousePosition.set(mousex, mousey);
 	}
+
+	private void setContextMenu(@Nullable ContextMenu contextMenu, int xpos, int ypos) {
+		this.contextMenu = contextMenu;
+		contextMenuPosition.set(xpos, ypos);
+	}
+
+	private ContextMenu getContextMenu() {
+		return contextMenu;
+	}
+
+	@Override
+	protected double computeMinWidth(double height) {
+		return getCanvasWidth();
+	}
+
+	@Override
+	protected double computeMinHeight(double width) {
+		return getCanvasHeight();
+	}
+
+	@Override
+	protected double computePrefWidth(double height) {
+		return getCanvasWidth();
+	}
+
+	@Override
+	protected double computePrefHeight(double width) {
+		return getCanvasHeight();
+	}
+
+	@Override
+	protected double computeMaxWidth(double height) {
+		return super.computeMaxWidth(height);
+	}
+
+	@Override
+	protected double computeMaxHeight(double width) {
+		return super.computeMaxHeight(width);
+	}
+
+	public Canvas getCanvas() {
+		return canvas;
+	}
+
 
 	/**
 	 @author Kayler
@@ -722,17 +785,13 @@ public class UICanvas extends Control {
 			if (!(event.getTarget() instanceof Canvas)) {
 				return;
 			}
-			Point2D contextMenuPosition = canvas.getContextMenuPosition();
 			ContextMenu cm = canvas.getContextMenu();
 
-			if (cm != null) {
-				if (cm.isShowing()) {
-					double x = contextMenuPosition.getX();
-					double y = contextMenuPosition.getY();
-					int distance = (int) Point.distance(x, y, event.getX(), event.getY());
-					if (distance > 10) {
-						cm.hide();
-					}
+			if (cm != null && cm.isShowing()) {
+				if (canvas.mouseOverComponent != canvas.contextMenuComponent && cm != canvas.canvasContextMenu) {
+					cm.hide();
+				} else if (cm == canvas.canvasContextMenu && canvas.mouseOverComponent != null) {
+					cm.hide();
 				}
 			}
 			Canvas c = (Canvas) event.getTarget();
@@ -750,21 +809,10 @@ public class UICanvas extends Control {
 					canvas.mouseReleased(mousex, mousey, btn);
 				}
 			}
+			canvas.paint();
+
 		}
 
-	}
-
-	private static class CanvasKeyEvent implements EventHandler<KeyEvent> {
-		private final UICanvas canvas;
-
-		CanvasKeyEvent(UICanvas canvas) {
-			this.canvas = canvas;
-		}
-
-		@Override
-		public void handle(KeyEvent event) {
-			canvas.keyEvent(event.getText().toLowerCase(), event.getEventType() == KeyEvent.KEY_PRESSED, event.isShiftDown(), event.isControlDown(), event.isAltDown());
-		}
 	}
 
 	private static class Keys {

@@ -8,9 +8,9 @@ Plugin
 
 Dialog Maker
 	ADDED:
-        preventing x movement and y movement with key bindings
+        a mess of a fx gui so far
     CHANGED:
-        snap is now in terms of percentage of canvas width and not actual pixels
+        none
     FIXED:
         none
 
