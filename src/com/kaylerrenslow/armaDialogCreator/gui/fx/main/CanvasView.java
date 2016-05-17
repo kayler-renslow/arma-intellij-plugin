@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
  */
 class CanvasView extends HBox {
 	private final UICanvas uiCanvas;
-	private final CanvasControls canvasControls = new CanvasControls();
+	private final CanvasControls canvasControls = new CanvasControls(this);
 
 	CanvasView(int canvasWidth, int canvasHeight) {
 		this.uiCanvas = new UICanvas(canvasWidth, canvasHeight, canvasControls);
@@ -32,6 +32,11 @@ class CanvasView extends HBox {
 		focusToCanvas(true);
 	}
 
+
+	public void repaintCanvas() {
+		uiCanvas.paint();
+	}
+
 	private void focusToCanvas(boolean focusToCanvas) {
 		canvasControls.setFocusTraversable(!focusToCanvas);
 		uiCanvas.setFocusTraversable(focusToCanvas);
@@ -43,7 +48,7 @@ class CanvasView extends HBox {
 	private void addRandomThings() {
 		Color[] colors = {Color.RED, Color.BLACK, Color.ORANGE, Color.PURPLE};
 		int w = 100;
-		int x = uiCanvas.getPositionCalculator().smallestSnapPercentage() * 100;
+		int x = uiCanvas.getPositionCalculator().alternateSnapPercentage() * 100;
 		for (Color c : colors) {
 			Component component = new Component(x, 50, w, w);
 			component.setBackgroundColor(c);
@@ -55,7 +60,7 @@ class CanvasView extends HBox {
 				//				component.setGhost(true);
 			}
 			uiCanvas.addComponent(component);
-			x += uiCanvas.getPositionCalculator().smallestSnapPercentage() * 30;
+			x += uiCanvas.getPositionCalculator().alternateSnapPercentage() * 30;
 		}
 	}
 
@@ -68,6 +73,7 @@ class CanvasView extends HBox {
 	void keyEvent(String text, boolean keyDown, boolean shiftDown, boolean controlDown, boolean altDown) {
 		uiCanvas.keyEvent(text, keyDown, shiftDown, controlDown, altDown);
 	}
+
 
 	private static class CanvasViewMouseEvent implements EventHandler<MouseEvent> {
 

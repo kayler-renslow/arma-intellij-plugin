@@ -5,5 +5,5 @@ package com.kaylerrenslow.armaDialogCreator.gui.fx.control.treeView;
  */
 public interface ITreeCellSelectionUpdate {
 
-	void selectionUpdate(CellType cellType);
+	void selectionUpdate(CellType selectedType, CellType parentCellType);
 }

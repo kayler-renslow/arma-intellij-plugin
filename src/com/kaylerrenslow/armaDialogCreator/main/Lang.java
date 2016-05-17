@@ -4,6 +4,15 @@ package com.kaylerrenslow.armaDialogCreator.main;
  Created by Kayler on 05/15/2016.
  */
 public class Lang {
+	public static class CanvasControls{
+		public static final String BACKGROUND_COLOR = "Background Color:";
+		public static final String TEXT_COLOR = "Text Color:";
+		public static final String OPACITY = "Opacity:";
+		public static final String LOCATE_BACKGROUND_IMAGE = "Locate Background Image";
+		public static final String ALT_STEP = "Alternate Step:";
+		public static final String STEP = "Step:";
+	}
+
 	public static class MainMenuBar {
 		public static final String FILE = "File";
 		public static final String FILE_NEW = "New";

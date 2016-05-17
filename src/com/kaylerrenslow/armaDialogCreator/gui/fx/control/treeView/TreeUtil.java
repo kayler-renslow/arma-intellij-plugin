@@ -28,7 +28,7 @@ public class TreeUtil {
 			}
 		}
 
-		// go up the node's parent chain to get the parent.
+		// go up the node's parent chain to get the root.
 		// if the treeView has a hidden root, the children of the hidden root need to be checked to see if they are roots.
 		if (treeViewRootHidden) {
 			while (node.getParent().getParent() != null) {
@@ -44,12 +44,12 @@ public class TreeUtil {
 		}
 	}
 
-	/** Checks if the given start TreeItem contains the searchingFor TreeItem as a child. Checks are done recursively.
+	/** Checks if the given start TreeItem contains the searchingFor TreeItem as a descendant. Checks are done recursively.
 	 *
 	 * @param startItem where to start searching
 	 * @param searchingFor TreeItem to look for
-	 * @return if startItem has the child searchingFor */
-	public static boolean hasChild(TreeItem<TreeItemData<?>> startItem, TreeItem<TreeItemData<?>> searchingFor) {
+	 * @return if startItem has the descendant searchingFor */
+	public static boolean hasDescendant(TreeItem<TreeItemData<?>> startItem, TreeItem<TreeItemData<?>> searchingFor) {
 		if (startItem == null) {
 			throw new NullPointerException("startItem is null.");
 		}
@@ -63,7 +63,7 @@ public class TreeUtil {
 			return false;
 		}
 		for (TreeItem<TreeItemData<?>> item : startItem.getChildren()) {
-			boolean contains = hasChild(item, searchingFor);
+			boolean contains = hasDescendant(item, searchingFor);
 			if (contains) {
 				return true;
 			}
@@ -73,11 +73,11 @@ public class TreeUtil {
 		return false;
 	}
 
-	/** Goes through all the children of startItem and for each child it calls foundAction.found with the child as its parameter.
+	/** Goes through all the descendants of startItem and for each descendant it calls foundAction.found with the descendant as its parameter.
 	 *
 	 * @param startItem where to start the stepping
-	 * @param foundAction action to run for each child */
-	public static<E> void stepThroughChildren(TreeItem<TreeItemData<E>> startItem, IFoundChild foundAction) {
+	 * @param foundAction action to run for each descendant */
+	public static<E> void stepThroughDescendants(TreeItem<TreeItemData<E>> startItem, IFoundChild foundAction) {
 		if (startItem == null) {
 			throw new NullPointerException("startItem is null.");
 		}
@@ -86,7 +86,7 @@ public class TreeUtil {
 		}
 		for (TreeItem<TreeItemData<E>> item : startItem.getChildren()) {
 			foundAction.found(item);
-			stepThroughChildren(item, foundAction);
+			stepThroughDescendants(item, foundAction);
 		}
 	}
 }

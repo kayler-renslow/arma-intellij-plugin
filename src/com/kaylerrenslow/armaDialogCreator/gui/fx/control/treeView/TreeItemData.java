@@ -1,6 +1,10 @@
 package com.kaylerrenslow.armaDialogCreator.gui.fx.control.treeView;
 
 
+import com.kaylerrenslow.armaDialogCreator.gui.fx.control.IGraphicCreator;
+import javafx.scene.Node;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontPosture;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -8,13 +12,14 @@ public class TreeItemData<E> {
 
 	private static int lastId = 0;
 
-	private final long ID = lastId++;
+	private final int ID = lastId++;
 
 	private final E data;
 	private final CellType cellType;
 	private final ITreeNodeUpdateListener updateListener;
 
 	private final boolean isPlaceholder;
+	private final Node graphic;
 
 	private String text;
 
@@ -27,15 +32,20 @@ public class TreeItemData<E> {
 		return new TreeItemData();
 	}
 
-	private TreeItemData(){
+	private TreeItemData() {
 		this.isPlaceholder = true;
 		data = null;
 		cellType = null;
 		updateListener = null;
+		javafx.scene.control.Label lbl = new javafx.scene.control.Label("empty");
+		lbl.setFont(Font.font(Font.getDefault().getFamily(), FontPosture.ITALIC, Font.getDefault().getSize()));
+		lbl.setOpacity(0.5);
+		this.graphic = lbl;
 	}
 
-	public TreeItemData(@NotNull String text, @NotNull CellType cellType, @NotNull E data, @Nullable ITreeNodeUpdateListener updateListener) {
+	public TreeItemData(@NotNull String text, @NotNull CellType cellType, @NotNull E data, @Nullable IGraphicCreator creator, @Nullable ITreeNodeUpdateListener updateListener) {
 		this.isPlaceholder = false;
+		this.graphic = (creator != null ? creator.createGraphic() : null);
 		this.text = text;
 		this.cellType = cellType;
 		this.data = data;
@@ -43,12 +53,16 @@ public class TreeItemData<E> {
 	}
 
 
-	public TreeItemData(@NotNull String text, @NotNull CellType cellType, @NotNull E data) {
-		this(text, cellType, data, null);
+	public TreeItemData(@NotNull String text, @NotNull CellType cellType, @NotNull E data, @Nullable IGraphicCreator creator) {
+		this(text, cellType, data, creator, null);
 	}
 
 	public ITreeNodeUpdateListener getUpdateListener() {
 		return updateListener;
+	}
+
+	public Node getGraphic() {
+		return graphic;
 	}
 
 	public E getData() {
@@ -59,8 +73,17 @@ public class TreeItemData<E> {
 		return cellType;
 	}
 
+	public final boolean canHaveChildren() {
+		return cellType == CellType.FOLDER || cellType == CellType.COMPOSITE;
+	}
+
+
 	public final boolean isFolder() {
 		return cellType == CellType.FOLDER;
+	}
+
+	public final boolean isComposite() {
+		return cellType == CellType.COMPOSITE;
 	}
 
 	boolean isPlaceholder() {
@@ -96,5 +119,4 @@ public class TreeItemData<E> {
 			this.updateListener.delete();
 		}
 	}
-
 }

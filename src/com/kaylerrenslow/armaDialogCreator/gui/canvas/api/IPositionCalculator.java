@@ -8,7 +8,7 @@ public interface IPositionCalculator {
 	double getGridScale();
 
 	/** The smallest possible snap percentage possible. Must be > 0 */
-	int smallestSnapPercentage();
+	int alternateSnapPercentage();
 
 	/** How much snap there is (in percent). Should be > 0 */
 	int snapPercentage();

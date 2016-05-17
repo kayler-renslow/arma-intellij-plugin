@@ -1,10 +1,13 @@
 package com.kaylerrenslow.armaDialogCreator.gui.fx.main;
 
+import com.kaylerrenslow.armaDialogCreator.util.Constants;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.awt.*;
 
 /**
  Created by Kayler on 05/11/2016.
@@ -13,7 +16,8 @@ public class ADCWindow {
 	private final Stage primaryStage;
 	private final VBox rootElement = new VBox();
 	private final ADCMenuBar mainMenuBar = new ADCMenuBar();
-	private final CanvasView canvasView = new CanvasView(700, 700);
+	private Constants.CanvasDimension canvasDimension = Constants.CanvasDimension.D1366;
+	private final CanvasView canvasView = new CanvasView(canvasDimension.width, canvasDimension.height);
 
 	public ADCWindow(Stage primaryStage) {
 		this.primaryStage = primaryStage;
@@ -27,8 +31,8 @@ public class ADCWindow {
 
 	private void initialize(Scene scene) {
 		rootElement.getChildren().addAll(mainMenuBar, canvasView);
-		primaryStage.setWidth(1000);
-		primaryStage.setHeight(700);
+		rootElement.minWidth(canvasDimension.width + 250.0);
+		rootElement.minHeight(canvasDimension.height + 50.0);
 		EventHandler<KeyEvent> keyEvent = new EventHandler<KeyEvent>() {
 			@Override
 			public void handle(KeyEvent event) {

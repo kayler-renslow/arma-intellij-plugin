@@ -8,11 +8,12 @@ Plugin
 
 Dialog Maker
 	ADDED:
-        none
+        choosing steps from gui
+        support for tree items to have any graphic
     CHANGED:
         none
     FIXED:
-        made the tree view actually useful by fixing the bugs
+        none
 
 Shared between languages
 	ADDED:

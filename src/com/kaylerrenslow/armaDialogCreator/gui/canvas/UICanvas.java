@@ -9,7 +9,6 @@ import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Edge;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Region;
 import com.kaylerrenslow.armaDialogCreator.util.Point;
 import javafx.event.EventHandler;
-import javafx.event.EventTarget;
 import javafx.geometry.Point2D;
 import javafx.geometry.VPos;
 import javafx.scene.Cursor;
@@ -62,7 +61,7 @@ public class UICanvas extends AnchorPane {
 
 	/** Mouse button that is currently down */
 	private MouseButton mouseButtonDown = MouseButton.NONE;
-	private final Point lastMousePosition = new Point(-1,-1);//last x and y positions of the mouse relative to the canvas
+	private final Point lastMousePosition = new Point(-1, -1);//last x and y positions of the mouse relative to the canvas
 	private long lastMousePressTime;
 
 	private int dxAmount, dyAmount = 0; //amount of change that has happened since last snap
@@ -88,6 +87,8 @@ public class UICanvas extends AnchorPane {
 	private ContextMenu contextMenu;
 	private final Point contextMenuPosition = new Point(-1, -1);
 
+	/** If true, scaling and translating components will only work when the actions don't put their bounds outside the canvas. If false, all scaling and translating is allowed. */
+	private boolean safeMovement = false;
 
 	public UICanvas(int width, int height, IPositionCalculator calculator) {
 		this.canvas = new Canvas(width, height);
@@ -176,9 +177,19 @@ public class UICanvas extends AnchorPane {
 		this.canvasContextMenu = contextMenu;
 	}
 
+	/**see getSafeMovement for more information*/
+	public void setSafeMovement(boolean safe) {
+		this.safeMovement = safe;
+	}
+
+	/** If true, scaling and translating components will only work when the actions don't put their bounds outside the canvas. If false, all scaling and translating is allowed. */
+	public boolean getSafeMovement() {
+		return this.safeMovement;
+	}
+
 
 	/** Paint the canvas */
-	private void paint() {
+	public void paint() {
 		gc.save();
 		gc.setFill(background);
 		gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
@@ -341,6 +352,9 @@ public class UICanvas extends AnchorPane {
 	 @param mb mouse button that was pressed
 	 */
 	private void mousePressed(int mousex, int mousey, @NotNull MouseButton mb) {
+		if (getContextMenu() != null) {
+			getContextMenu().hide();
+		}
 		boolean doubleClick = System.currentTimeMillis() - lastMousePressTime <= DOUBLE_CLICK_WAIT_TIME_MILLIS;
 		lastMousePressTime = System.currentTimeMillis();
 		selection.setSelecting(false);
@@ -493,7 +507,7 @@ public class UICanvas extends AnchorPane {
 		int dy1 = 0; //change in y that will be used for translation or scaling
 		int ddx = dx < 0 ? -1 : 1; //change in direction for x
 		int ddy = dy < 0 ? -1 : 1; //change in direction for y
-		int snap = getSnapPixels(keys.shiftDown ? calc.smallestSnapPercentage() : calc.snapPercentage());
+		int snap = getSnapPixels(keys.shiftDown ? calc.alternateSnapPercentage() : calc.snapPercentage());
 
 		dxAmount += dx;
 		dyAmount += dy;
@@ -560,7 +574,9 @@ public class UICanvas extends AnchorPane {
 					dyb = nearestGridBotY - p;
 				}
 			}
-			scaleComponent.scale(dxl, dxr, dyt, dyb);
+			if (!safeMovement || boundUpdateSafe(scaleComponent, dxl, dxr, dyt, dyb)) {
+				scaleComponent.scale(dxl, dxr, dyt, dyb);
+			}
 			return;
 		}
 		//not scaling and simply translating (moving)
@@ -575,7 +591,11 @@ public class UICanvas extends AnchorPane {
 				dx1 = nearestGridX - moveX;
 				dy1 = nearestGridY - moveY;
 			}
-			safeTranslate(component, dx1, dy1);
+			if (!safeMovement) {
+				component.translate(dx1, dy1);
+			} else {
+				safeTranslate(component, dx1, dy1);
+			}
 		}
 	}
 

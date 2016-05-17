@@ -26,20 +26,15 @@ class EditableTreeCellFactory<E> extends TreeCell<TreeItemData<?>> {
 	EditableTreeCellFactory(@Nullable ITreeCellSelectionUpdate treeCellSelectionUpdate) {
 		this.treeCellSelectionUpdate = treeCellSelectionUpdate;
 		this.setEditable(true);
-
 		// first method called when the user clicks and drags a tree item
 		this.setOnDragDetected(new EventHandler<MouseEvent>() {
 
 			@Override
 			public void handle(MouseEvent event) {
-				//				// a child of root element. since the treeview has a hidden real root element, the 'fake' root element has the real root element as its parent
-				//				// So we need to call getParent() twice to check if the user is trying to drag and drop a 'fake' root element
-				//				if (getTreeItem().getParent().getParent() == null) {
-				//					getTreeItem().setExpanded(true);
-				//					event.consume();
-				//					return;
-				//				}
-
+				if (getTreeItem() == null) {
+					event.consume();
+					return;
+				}
 				if (getTreeItem().getValue().isPlaceholder()) {
 					event.consume();
 					return;
@@ -81,8 +76,8 @@ class EditableTreeCellFactory<E> extends TreeCell<TreeItemData<?>> {
 				}
 
 				// if it's a folder, we need to make sure it doesn't drag itself into its children
-				if (dragging.getValue().isFolder()) {
-					if (TreeUtil.hasChild(dragging, getTreeItem())) {
+				if (dragging.getValue().canHaveChildren()) {
+					if (TreeUtil.hasDescendant(dragging, getTreeItem())) {
 						event.consume();
 						return;
 					}
@@ -90,7 +85,7 @@ class EditableTreeCellFactory<E> extends TreeCell<TreeItemData<?>> {
 
 				// auto expands the hovered tree item if it has children after a period of time.
 				// timer is reset when the mouse moves away from the current hovered item
-				if (!getTreeItem().isLeaf() || getTreeItem().getValue().isFolder()) {
+				if (!getTreeItem().isLeaf() || getTreeItem().getValue().canHaveChildren()) {
 					if (!getTreeItem().isExpanded()) {
 						if (waitStartTime == 0) {
 							waitStartTime = System.currentTimeMillis();
@@ -118,7 +113,7 @@ class EditableTreeCellFactory<E> extends TreeCell<TreeItemData<?>> {
 				event.acceptTransferModes(TransferMode.MOVE);
 
 				// add a placeholder treeitem to the dragging's parent if it is a folder that will be empty after the move
-				if (dragging.getParent().getValue().isFolder() && dragging.getParent().getChildren().size() == 1) {
+				if (dragging.getParent().getValue().canHaveChildren() && dragging.getParent().getChildren().size() == 1) {
 					dragging.getParent().getChildren().add(new MoveableTreeItem());
 				}
 
@@ -129,7 +124,7 @@ class EditableTreeCellFactory<E> extends TreeCell<TreeItemData<?>> {
 				getTreeView().getSelectionModel().select(index + 1);
 
 				// if the location where dragging was dropped was into a folder, remove the placeholder item in that folder if there is one
-				if (getTreeItem().getParent().getValue().isFolder() && getTreeItem().getParent().getChildren().size() == 2 && getTreeItem().getParent().getChildren().get(1).getValue().isPlaceholder()) {
+				if (getTreeItem().getParent().getValue().canHaveChildren() && getTreeItem().getParent().getChildren().size() == 2 && getTreeItem().getParent().getChildren().get(1).getValue().isPlaceholder()) {
 					getTreeItem().getParent().getChildren().remove(1);
 				}
 
@@ -224,6 +219,29 @@ class EditableTreeCellFactory<E> extends TreeCell<TreeItemData<?>> {
 			}
 		});
 
+	}
+
+	@Override
+	public void updateSelected(boolean selected) {
+		super.updateSelected(selected);
+		if (getTreeItem() == null) {
+			if (treeCellSelectionUpdate != null) {
+				treeCellSelectionUpdate.selectionUpdate(null, null);
+			}
+			return;
+		}
+		if (treeCellSelectionUpdate != null) {
+			CellType parentType = (getTreeItem().getParent() != null ? getTreeItem().getParent().getValue().getCellType() : null);
+			if (getTreeItem().isLeaf() && !getTreeItem().getValue().isPlaceholder()) {
+				treeCellSelectionUpdate.selectionUpdate(CellType.LEAF, parentType);
+			} else if (getTreeItem().getValue().isFolder()) {
+				treeCellSelectionUpdate.selectionUpdate(CellType.FOLDER, parentType);
+			} else if (getTreeItem().getValue().isComposite()) {
+				treeCellSelectionUpdate.selectionUpdate(CellType.COMPOSITE, parentType);
+			} else {
+				treeCellSelectionUpdate.selectionUpdate(null, parentType);
+			}
+		}
 	}
 
 	private String getString() {

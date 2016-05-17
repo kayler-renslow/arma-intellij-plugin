@@ -2,20 +2,17 @@ package com.kaylerrenslow.armaDialogCreator.gui.fx.control.treeView;
 
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
-import javafx.scene.image.ImageView;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /** Creates a new EditableTreeView with a root node already in place. This class extends javafx.scene.control.TreeView of type TreeItemData */
 public class EditableTreeView<E> extends javafx.scene.control.TreeView<TreeItemData<E>> {
-	private final String folderIconURL;
 
-	public EditableTreeView(@Nullable ITreeCellSelectionUpdate selectionUpdate, @Nullable String url) {
+	public EditableTreeView(@Nullable ITreeCellSelectionUpdate selectionUpdate) {
 		super(new MoveableTreeItem());
 		this.showRootProperty().set(false);
 
 		this.setEditable(true);
-		this.folderIconURL = url;
 		getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 		setCellSelectionUpdate(selectionUpdate);
 	}
@@ -34,6 +31,8 @@ public class EditableTreeView<E> extends javafx.scene.control.TreeView<TreeItemD
 		TreeItem<TreeItemData<E>> item;
 		if (data.getCellType() == CellType.FOLDER) {
 			item = createFolder(data);
+		} else if (data.getCellType() == CellType.COMPOSITE) {
+			item = createComposite(data);
 		} else {
 			item = new MoveableTreeItem<E>(data);
 		}
@@ -52,7 +51,13 @@ public class EditableTreeView<E> extends javafx.scene.control.TreeView<TreeItemD
 			addChildToRoot(data);
 			return;
 		}
-		getRoot().getChildren().add(index, new MoveableTreeItem<>(data));
+		if (data.getCellType() == CellType.FOLDER) {
+			addChildToRoot(index, createFolder(data));
+		} else if (data.getCellType() == CellType.COMPOSITE) {
+			addChildToRoot(index, createComposite(data));
+		} else {
+			addChildToRoot(index, new MoveableTreeItem<>(data));
+		}
 	}
 
 
@@ -64,16 +69,6 @@ public class EditableTreeView<E> extends javafx.scene.control.TreeView<TreeItemD
 		return getRoot().getChildren().get(index).getValue();
 	}
 
-
-	/**
-	 Removes a child at the given index of the given root
-
-	 @param i index of the child
-	 */
-	void removeChild(@NotNull TreeItem<TreeItemData<E>> parent, int i) {
-		removeChild(parent, parent.getChildren().get(i));
-	}
-
 	/**
 	 Removes the specified child from the tree of the given parent.
 
@@ -81,19 +76,19 @@ public class EditableTreeView<E> extends javafx.scene.control.TreeView<TreeItemD
 	 @param toRemove item to remove
 	 */
 	void removeChild(@NotNull TreeItem<TreeItemData<E>> parent, @NotNull TreeItem<TreeItemData<E>> toRemove) {
-		for (TreeItem<TreeItemData<E>> item : parent.getChildren()) {
-			TreeUtil.<E>stepThroughChildren(item, new IFoundChild() {
-				@Override
-				public <E> void found(TreeItem<TreeItemData<E>> found) {
-					found.getValue().delete();
-				}
-			});
-
+		IFoundChild found = new IFoundChild() {
+			@Override
+			public <E> void found(TreeItem<TreeItemData<E>> found) {
+				found.getValue().delete();
+			}
+		};
+		for (TreeItem<TreeItemData<E>> item : toRemove.getChildren()) {
+			TreeUtil.stepThroughDescendants(item, found);
 		}
 		toRemove.getValue().delete();
 		parent.getChildren().remove(toRemove);
 		// if the parent is a folder, add a placeholder item in it if the folder is not empty
-		if (parent.getValue().isFolder() && parent.getChildren().size() == 0) {
+		if (parent.getValue().canHaveChildren() && parent.getChildren().size() == 0) {
 			parent.getChildren().add(new TreeItem<>());
 		}
 	}
@@ -107,12 +102,28 @@ public class EditableTreeView<E> extends javafx.scene.control.TreeView<TreeItemD
 	 */
 	void addChildToParent(@NotNull TreeItem<TreeItemData<E>> parent, @NotNull TreeItem<TreeItemData<E>> child) {
 		// if the parent is a folder, remove the placeholder item in that folder if there is one
-		if (parent.getValue().isFolder() && parent.getChildren().size() == 1 && parent.getChildren().get(0).getValue().isPlaceholder()) {
+		if (parent.getValue().canHaveChildren() && parent.getChildren().size() == 1 && parent.getChildren().get(0).getValue().isPlaceholder()) {
 			parent.getChildren().remove(0);
 		}
 		parent.getChildren().add(child);
 	}
 
+	/**
+	 Adds a child to a designated parent.
+
+	 @param parent parent node
+	 @param childData node to be made the child of parent
+	 */
+	void addChildToParent(@NotNull TreeItem<TreeItemData<E>> parent, @NotNull TreeItemData<E> childData) {
+		// if the parent is a folder, remove the placeholder item in that folder if there is one
+		if (childData.getCellType() == CellType.FOLDER) {
+			addChildToParent(parent, createFolder(childData));
+		} else if (childData.getCellType() == CellType.COMPOSITE) {
+			addChildToParent(parent, createComposite(childData));
+		} else {
+			addChildToParent(parent, new TreeItem<>(childData));
+		}
+	}
 
 	/**
 	 Adds a child to the root
@@ -121,6 +132,20 @@ public class EditableTreeView<E> extends javafx.scene.control.TreeView<TreeItemD
 	 */
 	void addChildToRoot(@NotNull TreeItem<TreeItemData<E>> item) {
 		getRoot().getChildren().add(item);
+	}
+
+	/**
+	 Adds a new TreeItem to the tree.
+
+	 @param index where to add the child at
+	 @param item tree item to add
+	 */
+	void addChildToRoot(int index, @NotNull TreeItem<TreeItemData<E>> item) {
+		if (index < 0) {
+			addChildToRoot(item);
+			return;
+		}
+		getRoot().getChildren().add(index, item);
 	}
 
 	void addFolderToParent(@NotNull TreeItem<TreeItemData<E>> parent, @NotNull TreeItemData<E> data) {
@@ -135,13 +160,16 @@ public class EditableTreeView<E> extends javafx.scene.control.TreeView<TreeItemD
 	}
 
 	private TreeItem<TreeItemData<E>> createFolder(@NotNull TreeItemData<E> data) {
-		MoveableTreeItem<E> folder = new MoveableTreeItem<E>(data, getFolderIcon());
+		MoveableTreeItem<E> folder = new MoveableTreeItem<E>(data);
 		folder.getChildren().add(new MoveableTreeItem());
 		return folder;
 	}
 
-	private ImageView getFolderIcon() {
-		return this.folderIconURL != null ? new ImageView(this.folderIconURL) : null;
+	private TreeItem<TreeItemData<E>> createComposite(@NotNull TreeItemData<E> data) {
+		MoveableTreeItem<E> comp = new MoveableTreeItem<E>(data);
+		comp.getChildren().add(new MoveableTreeItem());
+		return comp;
 	}
+
 
 }
