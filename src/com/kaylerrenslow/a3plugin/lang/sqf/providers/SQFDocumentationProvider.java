@@ -45,7 +45,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	@Override
 	public List<String> getUrlFor(PsiElement element, PsiElement originalElement) {
 		List<String> lst = new ArrayList<>();
-		if (SQFStatic.isCommandOrKeyword(element.getNode().getElementType()) || SQFStatic.isBisFunction(element.getText())) {
+		if (SQFStatic.hasDocumentation(element.getNode().getElementType()) || SQFStatic.isBisFunction(element.getText())) {
 			lst.add(getWikiUrl(element.getText()));
 			return lst;
 		}
@@ -58,7 +58,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		if (element instanceof XmlTag) {
 			return Stringtable.getKeyDoc((XmlTag) element);
 		}
-		if (SQFStatic.isCommandOrKeyword(element.getNode().getElementType())) {
+		if (SQFStatic.hasDocumentation(element.getNode().getElementType())) {
 			return generateCommandDoc(element.getText());
 		}
 		if (SQFStatic.isBisFunction(element.getText())) {
@@ -89,7 +89,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		if (object instanceof StringtableLookupElementDataObject) {
 			return ((StringtableLookupElementDataObject) object).getTargetTag();
 		}
-		if (SQFStatic.isCommandOrKeyword(element.getNode().getElementType())) {
+		if (SQFStatic.hasDocumentation(element.getNode().getElementType())) {
 			return element;
 		}
 		if (element instanceof PsiFile) {
@@ -136,7 +136,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		if(contextElement == null){
 			return null;
 		}
-		if (SQFStatic.isCommandOrKeyword(contextElement.getNode().getElementType())) {
+		if (SQFStatic.hasDocumentation(contextElement.getNode().getElementType())) {
 			return contextElement;
 		}
 

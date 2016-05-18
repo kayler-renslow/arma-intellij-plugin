@@ -141,11 +141,17 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		}
 
 		if (!lookForLocalVars && allowCommands) { //add all commands
-			String commandName;
+			String name;
 			String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.command");
 			for (int i = 0; i < SQFStatic.LIST_COMMANDS.size(); i++) {
-				commandName = SQFStatic.LIST_COMMANDS.get(i);
-				result.addElement(LookupElementBuilder.createWithSmartPointer(commandName, SQFPsiUtil.createElement(project, commandName, SQFTypes.COMMAND)).withIcon(PluginIcons.ICON_SQF_COMMAND).appendTailText(" " + trailText, true));
+				name = SQFStatic.LIST_COMMANDS.get(i);
+				result.addElement(LookupElementBuilder.createWithSmartPointer(name, SQFPsiUtil.createElement(project, name, SQFTypes.COMMAND)).withIcon(PluginIcons.ICON_SQF_COMMAND).appendTailText(" " + trailText, true));
+			}
+			PsiElement element;
+			for (int i = 0; i < SQFStatic.VALS.length; i++) {
+				name = SQFStatic.VALS[i];
+				element = PsiUtil.getFirstDescendantNode(SQFPsiUtil.createFile(project, name)).getPsi();
+				result.addElement(LookupElementBuilder.createWithSmartPointer(name, element).withIcon(PluginIcons.ICON_SQF_COMMAND).appendTailText(" " + trailText, true));
 			}
 		}
 	}

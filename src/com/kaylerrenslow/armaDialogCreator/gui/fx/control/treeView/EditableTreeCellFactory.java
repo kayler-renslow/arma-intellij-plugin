@@ -159,6 +159,9 @@ class EditableTreeCellFactory<E> extends TreeCell<TreeItemData<?>> {
 
 	@Override
 	public void startEdit() {
+		if(true){
+			return;
+		}
 		if (getTreeItem() == null || getTreeItem().getValue().isPlaceholder()) {
 			return;
 		}

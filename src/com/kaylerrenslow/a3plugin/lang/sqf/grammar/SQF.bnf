@@ -88,11 +88,15 @@ private terminal_ ::= string
 					| DEC_LITERAL
 					| TRUE
 					| FALSE
-					| CONFIG
-					| TYPE_NULL
 					| NIL
-					| NAMESPACE
+					| config_
+					| null_
+					| namespace_
 					| LPAREN expression RPAREN
+
+private config_ ::=CONFIG_FILE | CAMPAIGN_CONFIG_FILE | MISSION_CONFIG_FILE
+private null_ ::= CONFIG_NULL | CONTROL_NULL | DISPLAY_NULL | GRP_NULL | OBJ_NULL | SCRIPT_NULL | LOCATION_NULL | NET_OBJ_NULL | TASK_NULL | TEAM_MEMBER_NULL
+private namespace_ ::= PARSING_NAMESPACE | CURRENT_NAMESPACE | MISSION_NAMESPACE | PROFILE_NAMESPACE | SAVE_PROFILE_NAMESPACE | UI_NAMESPACE
 
 string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFStringMixin" methods=[getNonQuoteText]}
 
@@ -155,4 +159,4 @@ code_block ::= LBRACE local_scope? RBRACE
 
     wait_until_statement ::= WAIT_UNTIL code_block
 
-    with_statement ::= WITH NAMESPACE DO code_block
+    with_statement ::= WITH namespace_ DO code_block

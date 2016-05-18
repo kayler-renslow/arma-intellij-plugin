@@ -31,10 +31,6 @@ public class PluginUserProperties{
 	}
 
 	private void load(){
-		loadPluginProps();
-	}
-
-	private void loadPluginProps() {
 		if(!appdataFolder.exists()){
 			appdataFolder.mkdir();
 		}

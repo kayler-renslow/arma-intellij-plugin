@@ -1,17 +1,16 @@
 Plugin
 	ADDED:
-        none
+        view version in about
     CHANGED:
         none
     FIXED:
         none
 
-Dialog Maker
+Dialog Creator
 	ADDED:
-        choosing steps from gui
-        support for tree items to have any graphic
+        ability to change background image/color, selection color, and grid color
     CHANGED:
-        none
+        made UICanvas abstract and left only basic, universally needed functionality and moved editor-based implementation to different class
     FIXED:
         none
 
@@ -29,7 +28,8 @@ SQF
     CHANGED:
         none
     FIXED:
-        none
+        documentation not showing up for some commands
+        auto completion for config files and other things
 
 Header
     ADDED:

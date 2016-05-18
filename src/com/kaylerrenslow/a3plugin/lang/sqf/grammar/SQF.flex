@@ -65,16 +65,16 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "true" { return SQFTypes.TRUE; }
 <YYINITIAL> "false" { return SQFTypes.FALSE; }
 <YYINITIAL> "nil" { return SQFTypes.NIL; }
-<YYINITIAL> "configNull" { return SQFTypes.TYPE_NULL; }
-<YYINITIAL> "controlNull" { return SQFTypes.TYPE_NULL; }
-<YYINITIAL> "displayNull" { return SQFTypes.TYPE_NULL; }
-<YYINITIAL> "grpNull" { return SQFTypes.TYPE_NULL; }
-<YYINITIAL> "objNull" { return SQFTypes.TYPE_NULL; }
-<YYINITIAL> "scriptNull" { return SQFTypes.TYPE_NULL; }
-<YYINITIAL> "locationNull" { return SQFTypes.TYPE_NULL; }
-<YYINITIAL> "netObjNull" { return SQFTypes.TYPE_NULL; }
-<YYINITIAL> "taskNull" { return SQFTypes.TYPE_NULL; }
-<YYINITIAL> "teamMemberNull" { return SQFTypes.TYPE_NULL; }
+<YYINITIAL> "configNull" { return SQFTypes.CONFIG_NULL; }
+<YYINITIAL> "controlNull" { return SQFTypes.CONTROL_NULL; }
+<YYINITIAL> "displayNull" { return SQFTypes.DISPLAY_NULL; }
+<YYINITIAL> "grpNull" { return SQFTypes.GRP_NULL; }
+<YYINITIAL> "objNull" { return SQFTypes.OBJ_NULL; }
+<YYINITIAL> "scriptNull" { return SQFTypes.SCRIPT_NULL; }
+<YYINITIAL> "locationNull" { return SQFTypes.LOCATION_NULL; }
+<YYINITIAL> "netObjNull" { return SQFTypes.NET_OBJ_NULL; }
+<YYINITIAL> "taskNull" { return SQFTypes.TASK_NULL; }
+<YYINITIAL> "teamMemberNull" { return SQFTypes.TEAM_MEMBER_NULL; }
 
 <YYINITIAL> "private" { return SQFTypes.PRIVATE; }
 <YYINITIAL> "params" { return SQFTypes.PARAMS; }
@@ -110,12 +110,12 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "_exception" { return SQFTypes.LANG_VAR; }
 
 <YYINITIAL> "with" { return SQFTypes.WITH; }
-<YYINITIAL> "parsingNamespace" { return SQFTypes.NAMESPACE; }
-<YYINITIAL> "currentNamespace" { return SQFTypes.NAMESPACE; }
-<YYINITIAL> "missionNamespace" { return SQFTypes.NAMESPACE; }
-<YYINITIAL> "profileNamespace" { return SQFTypes.NAMESPACE; }
-<YYINITIAL> "saveProfileNamespace" { return SQFTypes.NAMESPACE; }
-<YYINITIAL> "uiNamespace" { return SQFTypes.NAMESPACE; }
+<YYINITIAL> "parsingNamespace" { return SQFTypes.PARSING_NAMESPACE; }
+<YYINITIAL> "currentNamespace" { return SQFTypes.CURRENT_NAMESPACE; }
+<YYINITIAL> "missionNamespace" { return SQFTypes.MISSION_NAMESPACE; }
+<YYINITIAL> "profileNamespace" { return SQFTypes.PROFILE_NAMESPACE; }
+<YYINITIAL> "saveProfileNamespace" { return SQFTypes.SAVE_PROFILE_NAMESPACE; }
+<YYINITIAL> "uiNamespace" { return SQFTypes.UI_NAMESPACE; }
 
 <YYINITIAL> "mod" { return SQFTypes.MOD; }
 <YYINITIAL> "not" { return SQFTypes.NOT; }
@@ -126,9 +126,9 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "catch" { return SQFTypes.CATCH; }
 <YYINITIAL> "throw" { return SQFTypes.THROW; }
 
-<YYINITIAL> "configFile" { return SQFTypes.CONFIG; }
-<YYINITIAL> "campaignConfigFile" { return SQFTypes.CONFIG; }
-<YYINITIAL> "missionConfigFile" { return SQFTypes.CONFIG; }
+<YYINITIAL> "configFile" { return SQFTypes.CONFIG_FILE; }
+<YYINITIAL> "campaignConfigFile" { return SQFTypes.CAMPAIGN_CONFIG_FILE; }
+<YYINITIAL> "missionConfigFile" { return SQFTypes.MISSION_CONFIG_FILE; }
 
 <YYINITIAL> "abs" { return SQFTypes.COMMAND; }
 <YYINITIAL> "accTime" { return SQFTypes.COMMAND; }

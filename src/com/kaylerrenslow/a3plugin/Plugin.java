@@ -21,9 +21,11 @@ public class Plugin{
 	private static final String t = "true";
 	private static final String f = "false";
 
+	public static final String VERSION = resources.getString("plugin.version");
+
 	public enum UserPropertiesKey{
-		VERSION("Version of the instance of when this file was created. (Please don't change this.)", resources.getString("plugin.version"), null),
-		SHOW_MM_ARMA_PLUGIN("Show \"Arma Plugin\" in main menu all the time (true)\nor only when inside Arma Module (false)", t, f);
+		SHOW_MM_ARMA_PLUGIN("Show \"Arma Plugin\" in main menu all the time (true)\nor only when inside Arma Module (false)", t, f),
+		SHOW_SCRIPT_ERRORS("Show script errors at the top of the file for SQF and Header files (true)\nor still have error checking but not mark it at the top of the file (false).", t, f);
 
 		public final String[] possibleVals;
 		public final String keyName;

@@ -11,7 +11,7 @@ Plugin
 
 Shared between languages
 	ADDED:
-        none
+        ability to disable the error notification at the top of files for SQF and Header (Go to main menu > Arma Plugin > Plugin Properties)
     CHANGED:
         none
     FIXED:
@@ -23,7 +23,8 @@ SQF
     CHANGED:
         none
     FIXED:
-        none
+        documentation not showing up for some commands
+        auto completion for config files and other things
 
 Header
     ADDED:

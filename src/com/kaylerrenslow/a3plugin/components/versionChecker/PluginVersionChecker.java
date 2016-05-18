@@ -132,13 +132,12 @@ public class PluginVersionChecker implements ProjectComponent {
 			throw new Exception(apiChange);
 		}
 		String searchProperty = "tag_name";
-		String currentVersion = Plugin.UserPropertiesKey.VERSION.defaultValue; //get current plugin version
 		List<JsonProperty> propertyList = object.getPropertyList();
 		for (JsonProperty property : propertyList) {
 			if (property.getName().equals(searchProperty)) {
 				if (property.getValue() instanceof JsonStringLiteral) {
 					String releasedVersion = ((JsonStringLiteral) property.getValue()).getValue();
-					if (!releasedVersion.equals(currentVersion)) {
+					if (!releasedVersion.equals(Plugin.VERSION)) {
 						return releasedVersion;
 					} else {
 						return null;

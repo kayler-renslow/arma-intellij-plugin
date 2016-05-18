@@ -5,20 +5,22 @@ import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 
 /**
  Created by Kayler on 05/15/2016.
  */
 class CanvasView extends HBox {
-	private final UICanvas uiCanvas;
+	private final UICanvasEditor uiCanvas;
 	private final CanvasControls canvasControls = new CanvasControls(this);
 
 	CanvasView(int canvasWidth, int canvasHeight) {
-		this.uiCanvas = new UICanvas(canvasWidth, canvasHeight, canvasControls);
+		this.uiCanvas = new UICanvasEditor(canvasWidth, canvasHeight, canvasControls);
 //		this.uiCanvas.setMenuCreator(new ComponentContextMenuCreator());
 		this.uiCanvas.setCanvasContextMenu(new ContextMenu(new MenuItem("Canvas Context Menu")));
 
@@ -72,6 +74,22 @@ class CanvasView extends HBox {
 
 	void keyEvent(String text, boolean keyDown, boolean shiftDown, boolean controlDown, boolean altDown) {
 		uiCanvas.keyEvent(text, keyDown, shiftDown, controlDown, altDown);
+	}
+
+	void showGrid(boolean showGrid) {
+		uiCanvas.showGrid(showGrid);
+	}
+
+	void setCanvasBackgroundToImage(String imgPath) {
+		uiCanvas.setCanvasBackground(new ImagePattern(new ImageView(imgPath).getImage()));
+	}
+
+	void setCanvasBackgroundToColor(Color value) {
+		uiCanvas.setCanvasBackground(value);
+	}
+
+	void updateCanvasUIColors(Color gridColor, Color selectionColor) {
+		uiCanvas.updateCanvasUIColors(gridColor, selectionColor);
 	}
 
 

@@ -2,6 +2,9 @@ features:
     check if function exists when doing call or spawn
     renaming files will rename them in includes and if a SQF function, will rename the class decl
 
+for dialog maker:
+    instead of having tabs, have a window of the data that has an update linker to the designer
+    add absolute positioning boundary box. we will need to have a method in the canvas api to add in painted regions
 
 FIX THIS SCENARIO before release
 _i = 100;

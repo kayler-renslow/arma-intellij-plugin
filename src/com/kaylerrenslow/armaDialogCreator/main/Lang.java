@@ -28,6 +28,14 @@ public class Lang {
 		public static final String EDIT_REDO_F = "Redo %s";
 
 		public static final String VIEW = "View";
-		public static final String VIEW_TOGGLE_CANVAS_CONTROLS = "Show/Hide Canvas Controls";
+		public static final String VIEW_SHOW_GRID = "Show Grid";
+		public static final String VIEW_COLORS = "Colors";
+		public static final String VIEW_COLORS_SELECTION = "Selection";
+		public static final String VIEW_COLORS_GRID = "Grid";
+		public static final String VIEW_CHANGE_BACKGROUND = "Change Background";
+		public static final String VIEW_CHANGE_BACKGROUND_IMAGE1 = "Image 1";
+		public static final String VIEW_CHANGE_BACKGROUND_IMAGE2 = "Image 2";
+		public static final String VIEW_CHANGE_BACKGROUND_IMAGE3 = "Image 3";
+		public static final String VIEW_CHANGE_BACKGROUND_COLOR = "Color";
 	}
 }

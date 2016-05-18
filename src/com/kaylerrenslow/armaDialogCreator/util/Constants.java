@@ -15,7 +15,8 @@ public class Constants {
 		D960(960, 540),
 		D1024(1024, 576),
 		D1280(1280, 720),
-		D1366(1366, 768);
+		D1366(1366, 768),
+		D1600(1600, 900);
 
 		public final int width;
 		public final int height;

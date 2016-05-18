@@ -7,6 +7,7 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiFile;
+import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,7 +31,9 @@ public class SharedExternalAnnotator extends ExternalAnnotator {
 	@Override
 	public Object collectInformation(@NotNull PsiFile file, @NotNull Editor editor, boolean hasErrors) {
 		if(hasErrors){
-			return new AnnotationInformation(Information.FILE_ERROR, "There is a syntax error.");
+			if(Plugin.pluginProps.propertyIsTrue(Plugin.UserPropertiesKey.SHOW_SCRIPT_ERRORS)){
+				return new AnnotationInformation(Information.FILE_ERROR, "There is a syntax error.");
+			}
 		}
 		return null;
 	}

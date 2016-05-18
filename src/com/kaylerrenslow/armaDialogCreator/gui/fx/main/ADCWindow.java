@@ -15,9 +15,9 @@ import java.awt.*;
 public class ADCWindow {
 	private final Stage primaryStage;
 	private final VBox rootElement = new VBox();
-	private final ADCMenuBar mainMenuBar = new ADCMenuBar();
-	private Constants.CanvasDimension canvasDimension = Constants.CanvasDimension.D1366;
+	private Constants.CanvasDimension canvasDimension = Constants.CanvasDimension.D1600;
 	private final CanvasView canvasView = new CanvasView(canvasDimension.width, canvasDimension.height);
+	private final ADCMenuBar mainMenuBar = new ADCMenuBar(canvasView);
 
 	public ADCWindow(Stage primaryStage) {
 		this.primaryStage = primaryStage;
