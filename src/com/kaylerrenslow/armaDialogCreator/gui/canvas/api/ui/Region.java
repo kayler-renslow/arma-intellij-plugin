@@ -129,8 +129,8 @@ public class Region {
 		final double antiAlias = gc.getLineWidth() % 2 != 0 ? 0.5 : 0;
 		double x1a = x1 + antiAlias;
 		double y1a = y1 + antiAlias;
-		double x2a = x2 + antiAlias;
-		double y2a = y2 + antiAlias;
+		double x2a = x2 - antiAlias;
+		double y2a = y2 - antiAlias;
 
 		gc.strokeLine(x1a, y1a, x2a, y1a); //top left to top right
 		gc.strokeLine(x2a, y1a, x2a, y2a); //top right to bottom right
@@ -140,13 +140,8 @@ public class Region {
 
 	public static void fillRectangle(GraphicsContext gc, int x1, int y1, int x2, int y2) {
 		final double antiAlias = gc.getLineWidth() % 2 != 0 ? 0.5 : 0;
-
-		double ya;
-		double x1a = x1 + antiAlias;
-		double x2a = x2 + antiAlias;
-		for (int y = y1; y <= y2; y++) {
-			ya = y + antiAlias;
-			gc.strokeLine(x1a, ya, x2a, ya);
+		for (int y = y1; y < y2; y++) {
+			gc.strokeLine(x1 + antiAlias, y + antiAlias, x2 - antiAlias, y + antiAlias);
 		}
 	}
 

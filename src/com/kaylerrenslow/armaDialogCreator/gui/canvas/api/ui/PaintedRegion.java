@@ -9,12 +9,14 @@ import javafx.scene.text.TextAlignment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Comparator;
+
 /**
- * Created by Kayler on 05/11/2016.
+ Created by Kayler on 05/11/2016.
  */
 public class PaintedRegion extends Region {
-	protected Color backgroundColor = Color.WHITE;
-	protected Color textColor = Color.BLACK;
+	protected Color backgroundColor = Color.ORANGE;
+	protected Color textColor = Color.WHITE;
 	private Border border;
 
 	private Text textObj = new Text();
@@ -84,4 +86,23 @@ public class PaintedRegion extends Region {
 	public void setTextColor(@NotNull Color color) {
 		this.textColor = color;
 	}
+
+	public int getRenderPriority() {
+		return 0;
+	}
+
+	public static final Comparator<PaintedRegion> RENDER_PRIORITY_COMPARATOR = new Comparator<PaintedRegion>() {
+		@Override
+		public int compare(PaintedRegion o1, PaintedRegion o2) {
+			if (o1.getRenderPriority() < o2.getRenderPriority()) {
+				return -1;
+			}
+			if (o1.getRenderPriority() > o2.getRenderPriority()) {
+				return 1;
+			}
+			return 0;
+		}
+
+	};
+
 }

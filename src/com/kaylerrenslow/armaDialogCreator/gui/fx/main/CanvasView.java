@@ -1,7 +1,10 @@
 package com.kaylerrenslow.armaDialogCreator.gui.fx.main;
 
-import com.kaylerrenslow.armaDialogCreator.gui.canvas.UICanvas;
+import com.kaylerrenslow.armaDialogCreator.arma.util.screen.PositionCalculator;
+import com.kaylerrenslow.armaDialogCreator.arma.util.screen.Resolution;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
+import com.kaylerrenslow.armaDialogCreator.gui.fx.main.editor.ArmaAbsoluteBoxComponent;
+import com.kaylerrenslow.armaDialogCreator.gui.fx.main.editor.UICanvasEditor;
 import javafx.event.EventHandler;
 import javafx.scene.control.ContextMenu;
 import javafx.scene.control.MenuItem;
@@ -16,41 +19,50 @@ import javafx.scene.paint.ImagePattern;
  Created by Kayler on 05/15/2016.
  */
 class CanvasView extends HBox {
-	private final UICanvasEditor uiCanvas;
+	private UICanvasEditor uiCanvasEditor;
 	private final CanvasControls canvasControls = new CanvasControls(this);
+	private Resolution r;
+	private ArmaAbsoluteBoxComponent absRegionComponent;
 
-	CanvasView(int canvasWidth, int canvasHeight) {
-		this.uiCanvas = new UICanvasEditor(canvasWidth, canvasHeight, canvasControls);
-//		this.uiCanvas.setMenuCreator(new ComponentContextMenuCreator());
-		this.uiCanvas.setCanvasContextMenu(new ContextMenu(new MenuItem("Canvas Context Menu")));
+	CanvasView(Resolution r) {
+		initializeUICanvasEditor(r);
 
-		this.getChildren().addAll(uiCanvas, canvasControls);
-
+		this.getChildren().addAll(uiCanvasEditor, canvasControls);
 		HBox.setHgrow(canvasControls, Priority.ALWAYS);
 
 		setOnMouseMoved(new CanvasViewMouseEvent(this));
 
-		addRandomThings();
 		focusToCanvas(true);
+	}
+
+	private void initializeUICanvasEditor(Resolution r) {
+		this.uiCanvasEditor = new UICanvasEditor(r.getScreenWidth(), r.getScreenHeight(), canvasControls);
+		absRegionComponent = new ArmaAbsoluteBoxComponent(r);
+
+		this.uiCanvasEditor.setCanvasContextMenu(new ContextMenu(new MenuItem("Canvas Context Menu")));
+		uiCanvasEditor.addComponent(absRegionComponent);
+		uiCanvasEditor.addComponent(new Component(PositionCalculator.getScreenX(r, 0), PositionCalculator.getScreenY(r, r.getSafeZoneY()+0.1), PositionCalculator.getScreenWidth(r, 0.5), PositionCalculator.getScreenHeight(r, 0.5)));
+		System.out.println(r.toArmaFormattedString());
+		addRandomThings();
 	}
 
 
 	public void repaintCanvas() {
-		uiCanvas.paint();
+		uiCanvasEditor.paint();
 	}
 
 	private void focusToCanvas(boolean focusToCanvas) {
 		canvasControls.setFocusTraversable(!focusToCanvas);
-		uiCanvas.setFocusTraversable(focusToCanvas);
+		uiCanvasEditor.setFocusTraversable(focusToCanvas);
 		if (focusToCanvas) {
-			uiCanvas.requestFocus();
+			uiCanvasEditor.requestFocus();
 		}
 	}
 
 	private void addRandomThings() {
 		Color[] colors = {Color.RED, Color.BLACK, Color.ORANGE, Color.PURPLE};
 		int w = 100;
-		int x = uiCanvas.getPositionCalculator().alternateSnapPercentage() * 100;
+		int x = (int) uiCanvasEditor.getPositionCalculator().alternateSnapPercentage() * 100;
 		for (Color c : colors) {
 			Component component = new Component(x, 50, w, w);
 			component.setBackgroundColor(c);
@@ -61,37 +73,52 @@ class CanvasView extends HBox {
 			if (c == colors[2]) {
 				//				component.setGhost(true);
 			}
-			uiCanvas.addComponent(component);
-			x += uiCanvas.getPositionCalculator().alternateSnapPercentage() * 30;
+			uiCanvasEditor.addComponent(component);
+			x += uiCanvasEditor.getPositionCalculator().alternateSnapPercentage() * 30;
 		}
 	}
 
 
 	void setCanvasSize(int width, int height) {
-		this.uiCanvas.setCanvasSize(width, height);
+		this.uiCanvasEditor.setCanvasSize(width, height);
 	}
 
 
 	void keyEvent(String text, boolean keyDown, boolean shiftDown, boolean controlDown, boolean altDown) {
-		uiCanvas.keyEvent(text, keyDown, shiftDown, controlDown, altDown);
+		uiCanvasEditor.keyEvent(text, keyDown, shiftDown, controlDown, altDown);
 	}
 
 	void showGrid(boolean showGrid) {
-		uiCanvas.showGrid(showGrid);
+		uiCanvasEditor.showGrid(showGrid);
 	}
 
 	void setCanvasBackgroundToImage(String imgPath) {
-		uiCanvas.setCanvasBackground(new ImagePattern(new ImageView(imgPath).getImage()));
+		uiCanvasEditor.setCanvasBackground(new ImagePattern(new ImageView(imgPath).getImage()));
 	}
 
 	void setCanvasBackgroundToColor(Color value) {
-		uiCanvas.setCanvasBackground(value);
+		uiCanvasEditor.setCanvasBackground(value);
 	}
 
 	void updateCanvasUIColors(Color gridColor, Color selectionColor) {
-		uiCanvas.updateCanvasUIColors(gridColor, selectionColor);
+		uiCanvasEditor.updateCanvasUIColors(gridColor, selectionColor);
 	}
 
+	void updateAbsRegion(boolean alwaysFront, boolean showing){
+		absRegionComponent.setAlwaysRenderAtFront(alwaysFront);
+		absRegionComponent.setGhost(!showing);
+		uiCanvasEditor.paint();
+	}
+
+	void updateAbsRegionColor(Color c){
+		absRegionComponent.setBackgroundColor(c);
+		uiCanvasEditor.paint();
+	}
+
+
+	public UICanvasEditor getUiCanvasEditor() {
+		return uiCanvasEditor;
+	}
 
 	private static class CanvasViewMouseEvent implements EventHandler<MouseEvent> {
 
@@ -103,7 +130,7 @@ class CanvasView extends HBox {
 
 		@Override
 		public void handle(MouseEvent event) {
-			canvasView.focusToCanvas(event.getTarget() == canvasView.uiCanvas.getCanvas());
+			canvasView.focusToCanvas(event.getTarget() == canvasView.uiCanvasEditor.getCanvas());
 		}
 	}
 }

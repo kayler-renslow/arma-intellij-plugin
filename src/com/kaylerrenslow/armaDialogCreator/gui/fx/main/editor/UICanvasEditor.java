@@ -1,10 +1,8 @@
-package com.kaylerrenslow.armaDialogCreator.gui.fx.main;
+package com.kaylerrenslow.armaDialogCreator.gui.fx.main.editor;
 
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.UICanvas;
+import com.kaylerrenslow.armaDialogCreator.gui.fx.main.DefaultColors;
 import com.kaylerrenslow.armaDialogCreator.util.MathUtil;
-import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.IComponentContextMenuCreator;
-import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.IPositionCalculator;
-import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ISelection;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Edge;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Region;
@@ -25,20 +23,20 @@ import java.util.ArrayList;
 /**
  @author Kayler
  Created on 05/11/2016. */
-class UICanvasEditor extends UICanvas {
+public class UICanvasEditor extends UICanvas {
 
 	/*** How many pixels the cursor can be off on a component's edge when choosing an edge for scaling */
 	private static final int COMPONENT_EDGE_LEEWAY = 5;
 	private static final long DOUBLE_CLICK_WAIT_TIME_MILLIS = 300;
 
 	/** Color of the mouse selection box */
-	private Color selectionColor = Color.GREEN;
+	private Color selectionColor = DefaultColors.UICanvasEditor.SELECTION;
 
 	/** Color of the grid */
-	private Color gridColor = Color.GRAY;
+	private Color gridColor = DefaultColors.UICanvasEditor.GRID;
 
 	/** True if grid is being shown, false otherwise */
-	private boolean showGrid;
+	private boolean showGrid = true;
 
 	private Selection selection = new Selection();
 
@@ -59,7 +57,7 @@ class UICanvasEditor extends UICanvas {
 	/** Component that the component context menu was created on, or null if the component context menu isn't open */
 	private Component contextMenuComponent;
 
-	private IPositionCalculator calc;
+	private ISnapConfiguration calc;
 
 	/** Class that generates context menus for the components */
 	private IComponentContextMenuCreator menuCreator;
@@ -72,7 +70,7 @@ class UICanvasEditor extends UICanvas {
 	/** If true, scaling and translating components will only work when the actions don't put their bounds outside the canvas. If false, all scaling and translating is allowed. */
 	private boolean safeMovement = false;
 
-	UICanvasEditor(int width, int height, IPositionCalculator calculator) {
+	public UICanvasEditor(int width, int height, ISnapConfiguration calculator) {
 		super(width, height);
 		setPositionCalculator(calculator);
 		gc.setTextBaseline(VPos.CENTER);
@@ -102,12 +100,12 @@ class UICanvasEditor extends UICanvas {
 		return removed;
 	}
 
-	public void setPositionCalculator(@NotNull IPositionCalculator positionCalculator) {
+	public void setPositionCalculator(@NotNull ISnapConfiguration positionCalculator) {
 		this.calc = positionCalculator;
 	}
 
 	@NotNull
-	public IPositionCalculator getPositionCalculator() {
+	public ISnapConfiguration getPositionCalculator() {
 		return this.calc;
 	}
 
@@ -218,6 +216,7 @@ class UICanvasEditor extends UICanvas {
 		gc.restore();
 	}
 
+
 	/**
 	 Translates the given region by dx and dy only if the given dx and dy won't put the region out of bounds with the canvas. If either put the region out of bounds, the translate won't occur
 
@@ -232,7 +231,7 @@ class UICanvasEditor extends UICanvas {
 	}
 
 	/**
-	 Check if the bound update will keep the boundaries inside the canvas
+	 Check if the bound updateToNewResolution will keep the boundaries inside the canvas
 
 	 @param r region to check bounds of
 	 @param dxLeft change in x on the left side
@@ -420,96 +419,15 @@ class UICanvasEditor extends UICanvas {
 		int dyAmountAbs = Math.abs(dyAmount);
 		if (dxAmountAbs >= snap) {
 			dx1 = snap * ddx * (dxAmountAbs / snap);
-			dxAmount = dxAmountAbs % snap;
+			dxAmount = (dxAmountAbs - Math.abs(dx1)) * ddx;
 		}
 		if (dyAmountAbs >= snap) {
 			dy1 = snap * ddy * (dyAmountAbs / snap);
-			dyAmount = dyAmountAbs % snap;
+			dyAmount = (dyAmountAbs - Math.abs(dy1)) * ddy;
 		}
 
 		if (scaleComponent != null) { //scaling
-			int dxl = 0; //change in x left
-			int dxr = 0; //change in x right
-			int dyt = 0; //change in y top
-			int dyb = 0; //change in y bottom
-			if (scaleEdge == Edge.TOP_LEFT) {
-				dyt = dy1;
-				dxl = dx1;
-				if (keys.isCtrlDown()) {
-					dyb = -dy1;
-					dxr = -dx1;
-				}
-			} else if (scaleEdge == Edge.TOP_RIGHT) {
-				dyt = dy1;
-				dxr = dx1;
-				if (keys.isCtrlDown()) {
-					dyb = -dy1;
-					dxl = -dx1;
-				}
-			} else if (scaleEdge == Edge.BOTTOM_LEFT) {
-				dyb = dy1;
-				dxl = dx1;
-				if (keys.isCtrlDown()) {
-					dyt = -dy1;
-					dxr = -dx1;
-				}
-			} else if (scaleEdge == Edge.BOTTOM_RIGHT) {
-				dyb = dy1;
-				dxr = dx1;
-				if (keys.isCtrlDown()) {
-					dyt = -dy1;
-					dxl = -dx1;
-				}
-			} else if (scaleEdge == Edge.TOP) {
-				dyt = dy1;
-				if (keys.isCtrlDown()) {
-					dyb = -dy1;
-				}
-			} else if (scaleEdge == Edge.RIGHT) {
-				dxr = dx1;
-				if (keys.isCtrlDown()) {
-					dxl = -dx1;
-				}
-			} else if (scaleEdge == Edge.BOTTOM) {
-				dyb = dy1;
-				if (keys.isCtrlDown()) {
-					dyt = -dy1;
-				}
-			} else if (scaleEdge == Edge.LEFT) {
-				dxl = dx1;
-				if (keys.isCtrlDown()) {
-					dxr = -dx1;
-				}
-			}
-			if (keys.isAltDown()) { //scale only to the nearest grid size
-				int leftX = scaleComponent.getLeftX();
-				int rightX = scaleComponent.getRightX();
-				int topY = scaleComponent.getTopY();
-				int botY = scaleComponent.getBottomY();
-				if (dxl != 0) {
-					int p = leftX + dxl;
-					int nearestGridLeftX = p - p % snap;
-					dxl = nearestGridLeftX - p;
-				}
-				if (dxr != 0) {
-					int p = rightX + dxr;
-					int nearestGridRightX = p - p % snap;
-					dxr = nearestGridRightX - p;
-				}
-				if (dyt != 0) {
-					int p = topY + dyt;
-					int nearestGridTopY = p - p % snap;
-					dyt = nearestGridTopY - p;
-				}
-				if (dyb != 0) {
-					int p = botY + dyb;
-					int nearestGridBotY = p - p % snap;
-					dyb = nearestGridBotY - p;
-				}
-			}
-			if (!safeMovement || boundUpdateSafe(scaleComponent, dxl, dxr, dyt, dyb)) {
-				scaleComponent.scale(dxl, dxr, dyt, dyb);
-			}
+			doScaleOnComponent(dx1, dy1, snap);
 			return;
 		}
 		//not scaling and simply translating (moving)
@@ -529,6 +447,91 @@ class UICanvasEditor extends UICanvas {
 			} else {
 				safeTranslate(component, dx1, dy1);
 			}
+		}
+	}
+
+	private void doScaleOnComponent(int dx1, int dy1, int snap) {
+		int dxl = 0; //change in x left
+		int dxr = 0; //change in x right
+		int dyt = 0; //change in y top
+		int dyb = 0; //change in y bottom
+		if (scaleEdge == Edge.TOP_LEFT) {
+			dyt = dy1;
+			dxl = dx1;
+			if (keys.isCtrlDown()) {
+				dyb = -dy1;
+				dxr = -dx1;
+			}
+		} else if (scaleEdge == Edge.TOP_RIGHT) {
+			dyt = dy1;
+			dxr = dx1;
+			if (keys.isCtrlDown()) {
+				dyb = -dy1;
+				dxl = -dx1;
+			}
+		} else if (scaleEdge == Edge.BOTTOM_LEFT) {
+			dyb = dy1;
+			dxl = dx1;
+			if (keys.isCtrlDown()) {
+				dyt = -dy1;
+				dxr = -dx1;
+			}
+		} else if (scaleEdge == Edge.BOTTOM_RIGHT) {
+			dyb = dy1;
+			dxr = dx1;
+			if (keys.isCtrlDown()) {
+				dyt = -dy1;
+				dxl = -dx1;
+			}
+		} else if (scaleEdge == Edge.TOP) {
+			dyt = dy1;
+			if (keys.isCtrlDown()) {
+				dyb = -dy1;
+			}
+		} else if (scaleEdge == Edge.RIGHT) {
+			dxr = dx1;
+			if (keys.isCtrlDown()) {
+				dxl = -dx1;
+			}
+		} else if (scaleEdge == Edge.BOTTOM) {
+			dyb = dy1;
+			if (keys.isCtrlDown()) {
+				dyt = -dy1;
+			}
+		} else if (scaleEdge == Edge.LEFT) {
+			dxl = dx1;
+			if (keys.isCtrlDown()) {
+				dxr = -dx1;
+			}
+		}
+		if (keys.isAltDown()) { //scale only to the nearest grid size
+			int leftX = scaleComponent.getLeftX();
+			int rightX = scaleComponent.getRightX();
+			int topY = scaleComponent.getTopY();
+			int botY = scaleComponent.getBottomY();
+			if (dxl != 0) {
+				int p = leftX + dxl;
+				int nearestGridLeftX = p - p % snap;
+				dxl = nearestGridLeftX - p;
+			}
+			if (dxr != 0) {
+				int p = rightX + dxr;
+				int nearestGridRightX = p - p % snap;
+				dxr = nearestGridRightX - p;
+			}
+			if (dyt != 0) {
+				int p = topY + dyt;
+				int nearestGridTopY = p - p % snap;
+				dyt = nearestGridTopY - p;
+			}
+			if (dyb != 0) {
+				int p = botY + dyb;
+				int nearestGridBotY = p - p % snap;
+				dyb = nearestGridBotY - p;
+			}
+		}
+		if (!safeMovement || boundUpdateSafe(scaleComponent, dxl, dxr, dyt, dyb)) {
+			scaleComponent.scale(dxl, dxr, dyt, dyb);
 		}
 	}
 
@@ -614,7 +617,7 @@ class UICanvasEditor extends UICanvas {
 		this.scaleEdge = scaleEdge;
 	}
 
-	private int getSnapPixels(int percentage) {
+	private int getSnapPixels(double percentage) {
 		double p = percentage / 100.0;
 		return (int) (getCanvasWidth() * p);
 	}
@@ -632,16 +635,18 @@ class UICanvasEditor extends UICanvas {
 	/**
 	 Sets whether or not the grid should be shown. When this method is invoked, the canvas is repainted.
 	 */
-	void showGrid(boolean showGrid) {
+	public void showGrid(boolean showGrid) {
 		this.showGrid = showGrid;
 		paint();
 	}
 
-	/** Update the grid color and selection color and then repaint
+	/**
+	 Update the grid color and selection color and then repaint
+
 	 @param gridColor new grid color
 	 @param selectionColor new selection color
 	 */
-	void updateCanvasUIColors(Color gridColor, Color selectionColor) {
+	public void updateCanvasUIColors(Color gridColor, Color selectionColor) {
 		this.gridColor = gridColor;
 		this.selectionColor = selectionColor;
 		paint();

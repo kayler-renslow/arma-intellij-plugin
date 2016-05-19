@@ -4,6 +4,7 @@ Release date: tbd
 Plugin
 	ADDED:
         automatic plugin update check
+        view version in about
     CHANGED:
         none
     FIXED:

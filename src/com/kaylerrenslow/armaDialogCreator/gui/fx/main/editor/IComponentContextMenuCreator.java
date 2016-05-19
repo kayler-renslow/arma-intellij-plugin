@@ -1,4 +1,4 @@
-package com.kaylerrenslow.armaDialogCreator.gui.canvas.api;
+package com.kaylerrenslow.armaDialogCreator.gui.fx.main.editor;
 
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import javafx.scene.control.ContextMenu;

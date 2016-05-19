@@ -1,6 +1,7 @@
 package com.kaylerrenslow.armaDialogCreator.gui.canvas;
 
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
+import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.PaintedRegion;
 import com.kaylerrenslow.armaDialogCreator.util.Point;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -96,6 +97,7 @@ public abstract class UICanvas extends AnchorPane {
 	public void paint() {
 		gc.save();
 		paintBackground();
+		this.components.sort(PaintedRegion.RENDER_PRIORITY_COMPARATOR);
 		for (Component component : components) {
 			if (component.isGhost()) {
 				continue;
