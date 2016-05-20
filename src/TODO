@@ -4,7 +4,8 @@ features:
 
 for dialog maker:
     instead of having tabs, have a window of the data that has an update linker to the designer
-    add absolute positioning boundary box. we will need to have a method in the canvas api to add in painted regions
+    select many things in tree view and drag into folder
+    fix "custom color" null pointer for main menu > colors (possibly put all of them into a separate window?)
 
 FIX THIS SCENARIO before release
 _i = 100;

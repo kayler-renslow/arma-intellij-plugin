@@ -15,7 +15,7 @@ import javafx.stage.Stage;
 public class ADCWindow {
 	private final Stage primaryStage;
 	private final VBox rootElement = new VBox();
-	private Resolution resolution = new Resolution(ScreenDimension.D1600, UIScale.SMALL);
+	private Resolution resolution = new Resolution(ScreenDimension.D1920, UIScale.SMALL);
 	private final CanvasView canvasView = new CanvasView(resolution);
 	private final ADCMenuBar mainMenuBar = new ADCMenuBar(canvasView);
 

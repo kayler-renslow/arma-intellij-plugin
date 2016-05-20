@@ -1,5 +1,6 @@
 package com.kaylerrenslow.armaDialogCreator.gui.fx.main.editor;
 
+import com.kaylerrenslow.armaDialogCreator.arma.util.screen.Resolution;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.UICanvas;
 import com.kaylerrenslow.armaDialogCreator.gui.fx.main.DefaultColors;
 import com.kaylerrenslow.armaDialogCreator.util.MathUtil;
@@ -70,8 +71,11 @@ public class UICanvasEditor extends UICanvas {
 	/** If true, scaling and translating components will only work when the actions don't put their bounds outside the canvas. If false, all scaling and translating is allowed. */
 	private boolean safeMovement = false;
 
-	public UICanvasEditor(int width, int height, ISnapConfiguration calculator) {
-		super(width, height);
+	private final Resolution resolution;
+
+	public UICanvasEditor(Resolution resolution, ISnapConfiguration calculator) {
+		super(resolution.getScreenWidth(), resolution.getScreenHeight());
+		this.resolution = resolution;
 		setPositionCalculator(calculator);
 		gc.setTextBaseline(VPos.CENTER);
 		this.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
@@ -105,7 +109,7 @@ public class UICanvasEditor extends UICanvas {
 	}
 
 	@NotNull
-	public ISnapConfiguration getPositionCalculator() {
+	public ISnapConfiguration getSnapConfig() {
 		return this.calc;
 	}
 
@@ -132,6 +136,13 @@ public class UICanvasEditor extends UICanvas {
 	/** If true, scaling and translating components will only work when the actions don't put their bounds outside the canvas. If false, all scaling and translating is allowed. */
 	public boolean getSafeMovement() {
 		return this.safeMovement;
+	}
+
+	/**
+	 Updates the resolution of this canvas.
+	 */
+	public void updateResolution(Resolution r) {
+		this.resolution.setTo(r);
 	}
 
 
@@ -195,22 +206,28 @@ public class UICanvasEditor extends UICanvas {
 	}
 
 	private void drawGrid() {
-		double spacing = calc.getGridScale() * (getSnapPixels(calc.snapPercentage()));
-		if (spacing <= 0.001) {
+		int vx = resolution.getViewportX();
+		int vy = resolution.getViewportY();
+		int vw = resolution.getViewportWidth();
+		int vh = resolution.getViewportHeight();
+		int spacingX = getSnapPixelsWidth(calc.snapPercentage());
+		int spacingY = getSnapPixelsHeight(calc.snapPercentage());
+		if (spacingX <= 0 || spacingY <= 0) {
 			return;
 		}
-		int numX = getCanvasWidth() / (int) spacing;
-		int numY = getCanvasHeight() / (int) spacing;
-		double yy, xx;
+		int numX = vw / spacingX;
+		int numY = vh / spacingY;
+		double ys, xs;
 		double antiAlias = 0.5;
 		gc.save();
 		gc.setStroke(gridColor);
+		gc.translate(vx, vy);
 		for (int y = 0; y <= numY; y++) {
-			yy = y * spacing + antiAlias;
-			gc.strokeLine(0, yy, getCanvasWidth(), yy);
+			ys = y * spacingY;
+			gc.strokeLine(0 + antiAlias, ys + antiAlias, vw - antiAlias, ys + antiAlias);
 			for (int x = 0; x <= numX; x++) {
-				xx = x * spacing + antiAlias;
-				gc.strokeLine(xx, 0, xx, getCanvasHeight());
+				xs = x * spacingX;
+				gc.strokeLine(xs + antiAlias, 0 + antiAlias, xs + antiAlias, vh + antiAlias);
 			}
 		}
 		gc.restore();
@@ -411,23 +428,24 @@ public class UICanvasEditor extends UICanvas {
 		int dy1 = 0; //change in y that will be used for translation or scaling
 		int ddx = dx < 0 ? -1 : 1; //change in direction for x
 		int ddy = dy < 0 ? -1 : 1; //change in direction for y
-		int snap = getSnapPixels(keys.isShiftDown() ? calc.alternateSnapPercentage() : calc.snapPercentage());
+		int snapX = getSnapPixelsWidth(keys.isShiftDown() ? calc.alternateSnapPercentage() : calc.snapPercentage());
+		int snapY = getSnapPixelsHeight(keys.isShiftDown() ? calc.alternateSnapPercentage() : calc.snapPercentage());
 
 		dxAmount += dx;
 		dyAmount += dy;
 		int dxAmountAbs = Math.abs(dxAmount);
 		int dyAmountAbs = Math.abs(dyAmount);
-		if (dxAmountAbs >= snap) {
-			dx1 = snap * ddx * (dxAmountAbs / snap);
+		if (dxAmountAbs >= snapX) {
+			dx1 = snapX * ddx * (dxAmountAbs / snapX);
 			dxAmount = (dxAmountAbs - Math.abs(dx1)) * ddx;
 		}
-		if (dyAmountAbs >= snap) {
-			dy1 = snap * ddy * (dyAmountAbs / snap);
+		if (dyAmountAbs >= snapY) {
+			dy1 = snapY * ddy * (dyAmountAbs / snapY);
 			dyAmount = (dyAmountAbs - Math.abs(dy1)) * ddy;
 		}
 
 		if (scaleComponent != null) { //scaling
-			doScaleOnComponent(dx1, dy1, snap);
+			doScaleOnComponent(dx1, dy1, snapX, snapY);
 			return;
 		}
 		//not scaling and simply translating (moving)
@@ -437,8 +455,8 @@ public class UICanvasEditor extends UICanvas {
 			if (keys.isAltDown()) {
 				moveX = component.getLeftX();
 				moveY = component.getTopY();
-				nearestGridX = moveX - moveX % snap;
-				nearestGridY = moveY - moveY % snap;
+				nearestGridX = moveX - moveX % snapX;
+				nearestGridY = moveY - moveY % snapY;
 				dx1 = nearestGridX - moveX;
 				dy1 = nearestGridY - moveY;
 			}
@@ -450,7 +468,7 @@ public class UICanvasEditor extends UICanvas {
 		}
 	}
 
-	private void doScaleOnComponent(int dx1, int dy1, int snap) {
+	private void doScaleOnComponent(int dx1, int dy1, int snapX, int snapY) {
 		int dxl = 0; //change in x left
 		int dxr = 0; //change in x right
 		int dyt = 0; //change in y top
@@ -511,22 +529,22 @@ public class UICanvasEditor extends UICanvas {
 			int botY = scaleComponent.getBottomY();
 			if (dxl != 0) {
 				int p = leftX + dxl;
-				int nearestGridLeftX = p - p % snap;
+				int nearestGridLeftX = p - p % snapX;
 				dxl = nearestGridLeftX - p;
 			}
 			if (dxr != 0) {
 				int p = rightX + dxr;
-				int nearestGridRightX = p - p % snap;
+				int nearestGridRightX = p - p % snapX;
 				dxr = nearestGridRightX - p;
 			}
 			if (dyt != 0) {
 				int p = topY + dyt;
-				int nearestGridTopY = p - p % snap;
+				int nearestGridTopY = p - p % snapY;
 				dyt = nearestGridTopY - p;
 			}
 			if (dyb != 0) {
 				int p = botY + dyb;
-				int nearestGridBotY = p - p % snap;
+				int nearestGridBotY = p - p % snapY;
 				dyb = nearestGridBotY - p;
 			}
 		}
@@ -617,9 +635,14 @@ public class UICanvasEditor extends UICanvas {
 		this.scaleEdge = scaleEdge;
 	}
 
-	private int getSnapPixels(double percentage) {
+	private int getSnapPixelsWidth(double percentage) {
 		double p = percentage / 100.0;
-		return (int) (getCanvasWidth() * p);
+		return (int) (resolution.getViewportWidth() * p);
+	}
+
+	private int getSnapPixelsHeight(double percentage) {
+		double p = percentage / 100.0;
+		return (int) (resolution.getViewportHeight() * p);
 	}
 
 

@@ -118,11 +118,6 @@ class CanvasControls extends VBox implements ISnapConfiguration {
 	}
 
 	@Override
-	public double getGridScale() {
-		return 1;
-	}
-
-	@Override
 	public double alternateSnapPercentage() {
 		return cbAltStep.getSelectionModel().getSelectedItem().value;
 	}

@@ -8,15 +8,11 @@ Plugin
 
 Dialog Creator
 	ADDED:
-        arma position calculating as well as safeZone calculating
-        absolute region box
-        render prioritizing
-
-    CHANGED:
         none
+    CHANGED:
+        caching resolution values
     FIXED:
-        issue where dx,dy was lost for translation and scaling
-        ui elements being a pixel off
+        snapping errors
 
 Shared between languages
 	ADDED:

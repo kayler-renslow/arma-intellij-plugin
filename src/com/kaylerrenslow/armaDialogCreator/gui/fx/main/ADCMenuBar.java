@@ -5,12 +5,11 @@ import com.kaylerrenslow.armaDialogCreator.gui.fx.control.PopupColorPicker;
 import com.kaylerrenslow.armaDialogCreator.gui.fx.control.PresetCheckMenuItem;
 import com.kaylerrenslow.armaDialogCreator.gui.img.ImagePaths;
 import com.kaylerrenslow.armaDialogCreator.main.Lang.MainMenuBar;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import com.kaylerrenslow.armaDialogCreator.gui.fx.control.Label;
 import javafx.scene.control.*;
 import javafx.scene.paint.Color;
 
@@ -57,12 +56,12 @@ class ADCMenuBar extends MenuBar implements EventHandler<ActionEvent> {
 
 		static class Background {
 			static final ColorPicker backgroundColorPicker = new ColorPicker(DefaultColors.UICanvasEditor.EDITOR_BG);
-			static final Button backgroundColorPickerBtn = new Button();
+			static final Button backgroundColorPickerBtn = new Button(MainMenuBar.VIEW_CHANGE_BACKGROUND_COLOR);
 
-			static final MenuItem img1 = new MenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE1);
-			static final MenuItem img2 = new MenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE2);
-			static final MenuItem img3 = new MenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE3);
-			static final MenuItem color = new MenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_COLOR, backgroundColorPickerBtn);
+			static final MenuItem img1 = new MenuItem(null, Label.create(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE1, Color.BLACK));
+			static final MenuItem img2 = new MenuItem(null, Label.create(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE2, Color.BLACK));
+			static final MenuItem img3 = new MenuItem(null, Label.create(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE3, Color.BLACK));
+			static final MenuItem color = new MenuItem("", backgroundColorPickerBtn);
 			static final Menu all = new Menu(MainMenuBar.VIEW_CHANGE_BACKGROUND, null, img1, img2, img3, color);
 		}
 

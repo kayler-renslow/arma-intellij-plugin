@@ -36,12 +36,21 @@ class CanvasView extends HBox {
 	}
 
 	private void initializeUICanvasEditor(Resolution r) {
-		this.uiCanvasEditor = new UICanvasEditor(r.getScreenWidth(), r.getScreenHeight(), canvasControls);
+		this.uiCanvasEditor = new UICanvasEditor(r, canvasControls);
 		absRegionComponent = new ArmaAbsoluteBoxComponent(r);
 
 		this.uiCanvasEditor.setCanvasContextMenu(new ContextMenu(new MenuItem("Canvas Context Menu")));
 		uiCanvasEditor.addComponent(absRegionComponent);
-		uiCanvasEditor.addComponent(new Component(PositionCalculator.getScreenX(r, 0), PositionCalculator.getScreenY(r, r.getSafeZoneY()+0.1), PositionCalculator.getScreenWidth(r, 0.5), PositionCalculator.getScreenHeight(r, 0.5)));
+		double safeZoneX = r.getSafeZoneX();
+		double safeZoneY = r.getSafeZoneY();
+		double safeZoneW = r.getSafeZoneW();
+		double safeZoneH = r.getSafeZoneH();
+		System.out.println("x:"+safeZoneX + ", y:" + safeZoneY + ", w:" + safeZoneW + ", h:" + safeZoneH);
+		System.out.println("vx:"+r.getViewportX()+",vy:" + r.getViewportY());
+//		uiCanvasEditor.addComponent(new Component(PositionCalculator.getScreenX(r, safeZoneX), PositionCalculator.getScreenY(r, safeZoneY), PositionCalculator.getScreenWidth(r, safeZoneW), PositionCalculator.getScreenHeight(r, 0.5)));
+		Component c = new Component(PositionCalculator.getScreenX(r, 0), PositionCalculator.getScreenY(r, 0), PositionCalculator.getScreenWidth(r, 1), PositionCalculator.getScreenHeight(r, 1));
+		c.setBackgroundColor(Color.color(0,1,0,0.7));
+		uiCanvasEditor.addComponent(c);
 		System.out.println(r.toArmaFormattedString());
 		addRandomThings();
 	}
@@ -62,7 +71,7 @@ class CanvasView extends HBox {
 	private void addRandomThings() {
 		Color[] colors = {Color.RED, Color.BLACK, Color.ORANGE, Color.PURPLE};
 		int w = 100;
-		int x = (int) uiCanvasEditor.getPositionCalculator().alternateSnapPercentage() * 100;
+		int x = (int) uiCanvasEditor.getSnapConfig().alternateSnapPercentage() * 100;
 		for (Color c : colors) {
 			Component component = new Component(x, 50, w, w);
 			component.setBackgroundColor(c);
@@ -74,7 +83,7 @@ class CanvasView extends HBox {
 				//				component.setGhost(true);
 			}
 			uiCanvasEditor.addComponent(component);
-			x += uiCanvasEditor.getPositionCalculator().alternateSnapPercentage() * 30;
+			x += uiCanvasEditor.getSnapConfig().alternateSnapPercentage() * 30;
 		}
 	}
 
