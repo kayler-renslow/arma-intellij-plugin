@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaDialogCreator.gui.canvas;
 
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.PaintedRegion;
+import com.kaylerrenslow.armaDialogCreator.gui.fx.main.CanvasViewColors;
 import com.kaylerrenslow.armaDialogCreator.util.Point;
 import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
@@ -12,8 +13,9 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
+import javafx.scene.paint.ImagePattern;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -32,8 +34,11 @@ public abstract class UICanvas extends AnchorPane {
 	/** Height of canvas */
 	canvasHeight;
 
-	/** Background of the canvas */
-	protected Paint background = Color.WHITE;
+	/** Background image of the canvas */
+	protected ImagePattern backgroundImage = null;
+
+	/** Background color of the canvas */
+	protected Color backgroundColor = CanvasViewColors.EDITOR_BG;
 
 	/** All components added */
 	protected ArrayList<Component> components = new ArrayList<>();
@@ -108,7 +113,12 @@ public abstract class UICanvas extends AnchorPane {
 	}
 
 	protected void paintBackground() {
-		gc.setFill(background);
+		gc.setFill(backgroundColor);
+		gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+		if (backgroundImage == null) {
+			return;
+		}
+		gc.setFill(backgroundImage);
 		gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
 	}
 
@@ -120,10 +130,17 @@ public abstract class UICanvas extends AnchorPane {
 		gc.restore();
 	}
 
-	/**Sets canvas background and automatically repaints*/
-	public void setCanvasBackground(Paint background) {
-		this.background = background;
+	/** Sets canvas background image and automatically repaints */
+	public void setCanvasBackgroundImage(@Nullable ImagePattern background) {
+		this.backgroundImage = background;
 	}
+
+	/** Sets canvas background color and repaints the canvas*/
+	public void setCanvasBackgroundColor(@NotNull Color color) {
+		this.backgroundColor = color;
+		paint();
+	}
+
 
 	/**
 	 This is called when the mouse listener is invoked and a mouse press was the event.

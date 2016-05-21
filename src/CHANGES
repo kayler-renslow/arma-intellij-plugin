@@ -8,11 +8,11 @@ Plugin
 
 Dialog Creator
 	ADDED:
-        none
+        support for custom background images
     CHANGED:
-        caching resolution values
+        removed all the static classes for main menu bar because it was lame
     FIXED:
-        snapping errors
+        none
 
 Shared between languages
 	ADDED:

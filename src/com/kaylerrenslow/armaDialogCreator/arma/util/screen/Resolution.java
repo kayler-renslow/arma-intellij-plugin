@@ -9,6 +9,7 @@ public class Resolution {
 	private UIScale uiScale;
 
 	private int vw, vh, vx, vy;
+	private double vwd, vhd, vxd, vyd;
 	private double safeZoneX, safeZoneY, safeZoneW, safeZoneH;
 
 	/**
@@ -79,37 +80,67 @@ public class Resolution {
 		return vh;
 	}
 
-	/** Get the safe zone x value (percentage as decimal such that: safeZoneX = 0 screenX (also known as the left of the screen))
-	 <br> For more information, go to https://community.bistudio.com/wiki/SafeZone*/
+	/** Get the viewport screen x position as a floating point number */
+	public double getViewportXF() {
+		return vxd;
+	}
+
+	/** Get the viewport screen y position as a floating point number */
+	public double getViewportYF() {
+		return vyd;
+	}
+
+	/** Get the viewport screen width as a floating point number */
+	public double getViewportWidthF() {
+		return vwd;
+	}
+
+	/** Get the viewport screen height as a floating point number */
+	public double getViewportHeightF() {
+		return vhd;
+	}
+
+	/**
+	 Get the safe zone x value (percentage as decimal such that: safeZoneX = 0 screenX (also known as the left of the screen))
+	 <br> For more information, go to https://community.bistudio.com/wiki/SafeZone
+	 */
 	public double getSafeZoneX() {
 		return safeZoneX;
 	}
 
-	/** Get the safe zone y value (percentage as decimal such that: safeZoneY = 0 screenY (also known as the top of the screen))
-	 <br> For more information, go to https://community.bistudio.com/wiki/SafeZone*/
+	/**
+	 Get the safe zone y value (percentage as decimal such that: safeZoneY = 0 screenY (also known as the top of the screen))
+	 <br> For more information, go to https://community.bistudio.com/wiki/SafeZone
+	 */
 	public double getSafeZoneY() {
 		return safeZoneY;
 	}
 
-	/** Get the safe zone width value (percentage as decimal such that it equals the screen width)
-	 <br> For more information, go to https://community.bistudio.com/wiki/SafeZone*/
+	/**
+	 Get the safe zone width value (percentage as decimal such that it equals the screen width)
+	 <br> For more information, go to https://community.bistudio.com/wiki/SafeZone
+	 */
 	public double getSafeZoneW() {
 		return safeZoneW;
 	}
 
-	/** Get the safe zone height value  (percentage as decimal such that it equals the screen height)
-	 <br> For more information, go to https://community.bistudio.com/wiki/SafeZone*/
+	/**
+	 Get the safe zone height value  (percentage as decimal such that it equals the screen height)
+	 <br> For more information, go to https://community.bistudio.com/wiki/SafeZone
+	 */
 	public double getSafeZoneH() {
 		return safeZoneH;
 	}
 
-	/**Returns a string that is formatted like Arma's getResolution command.
-	 <br> For more information on the command, go to https://community.bistudio.com/wiki/getResolution*/
+	/**
+	 Returns a string that is formatted like Arma's getResolution command.
+	 <br> For more information on the command, go to https://community.bistudio.com/wiki/getResolution
+	 */
 	public String toArmaFormattedString() {
 		return String.format("[%d,%d,%d,%d,%f,%f]", getScreenWidth(), getScreenHeight(), getViewportWidth(), getViewportHeight(), (getScreenWidth() * 1.0 / getScreenHeight()), uiScale.value);
 	}
 
-	/**Recalculate and set the cached values*/
+	/** Recalculate and set the cached values */
 	private void recalc() {
 		//viewport width and height need to be calculated first
 		this.vw = calcViewportWidth();
@@ -117,6 +148,11 @@ public class Resolution {
 
 		this.vx = calcViewportX();
 		this.vy = calcViewportY();
+
+		this.vwd = vw;
+		this.vhd = vh;
+		this.vxd = vx;
+		this.vyd = vy;
 
 		//safe zone values need to be calculated last
 		this.safeZoneX = calcSafeZoneX();
@@ -150,10 +186,10 @@ public class Resolution {
 	}
 
 	private double calcSafeZoneW() {
-		return screenWidth *1.0 / getViewportWidth();
+		return screenWidth * 1.0 / getViewportWidth();
 	}
 
 	private double calcSafeZoneH() {
-		return screenHeight *1.0 / getViewportHeight();
+		return screenHeight * 1.0 / getViewportHeight();
 	}
 }

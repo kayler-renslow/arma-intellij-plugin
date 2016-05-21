@@ -2,7 +2,7 @@ package com.kaylerrenslow.armaDialogCreator.gui.fx.main.editor;
 
 import com.kaylerrenslow.armaDialogCreator.arma.util.screen.Resolution;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.UICanvas;
-import com.kaylerrenslow.armaDialogCreator.gui.fx.main.DefaultColors;
+import com.kaylerrenslow.armaDialogCreator.gui.fx.main.CanvasViewColors;
 import com.kaylerrenslow.armaDialogCreator.util.MathUtil;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Edge;
@@ -31,10 +31,10 @@ public class UICanvasEditor extends UICanvas {
 	private static final long DOUBLE_CLICK_WAIT_TIME_MILLIS = 300;
 
 	/** Color of the mouse selection box */
-	private Color selectionColor = DefaultColors.UICanvasEditor.SELECTION;
+	private Color selectionColor = CanvasViewColors.SELECTION;
 
 	/** Color of the grid */
-	private Color gridColor = DefaultColors.UICanvasEditor.GRID;
+	private Color gridColor = CanvasViewColors.GRID;
 
 	/** True if grid is being shown, false otherwise */
 	private boolean showGrid = true;
@@ -72,11 +72,14 @@ public class UICanvasEditor extends UICanvas {
 	private boolean safeMovement = false;
 
 	private final Resolution resolution;
+	private final ArmaAbsoluteBoxComponent absRegionComponent;
 
 	public UICanvasEditor(Resolution resolution, ISnapConfiguration calculator) {
 		super(resolution.getScreenWidth(), resolution.getScreenHeight());
 		this.resolution = resolution;
+
 		setPositionCalculator(calculator);
+
 		gc.setTextBaseline(VPos.CENTER);
 		this.setOnContextMenuRequested(new EventHandler<ContextMenuEvent>() {
 			@Override
@@ -88,6 +91,8 @@ public class UICanvasEditor extends UICanvas {
 			}
 		});
 
+		absRegionComponent = new ArmaAbsoluteBoxComponent(resolution);
+		addComponent(absRegionComponent);
 	}
 
 	/**
@@ -113,6 +118,7 @@ public class UICanvasEditor extends UICanvas {
 		return this.calc;
 	}
 
+	@NotNull
 	public ISelection getSelection() {
 		return selection;
 	}
@@ -143,6 +149,8 @@ public class UICanvasEditor extends UICanvas {
 	 */
 	public void updateResolution(Resolution r) {
 		this.resolution.setTo(r);
+		absRegionComponent.updateToNewResolution(r);
+		paint();
 	}
 
 
@@ -206,28 +214,25 @@ public class UICanvasEditor extends UICanvas {
 	}
 
 	private void drawGrid() {
-		int vx = resolution.getViewportX();
-		int vy = resolution.getViewportY();
-		int vw = resolution.getViewportWidth();
-		int vh = resolution.getViewportHeight();
+		int w = getCanvasWidth();
+		int h = getCanvasHeight();
 		int spacingX = getSnapPixelsWidth(calc.snapPercentage());
 		int spacingY = getSnapPixelsHeight(calc.snapPercentage());
 		if (spacingX <= 0 || spacingY <= 0) {
 			return;
 		}
-		int numX = vw / spacingX;
-		int numY = vh / spacingY;
+		int numX = w / spacingX;
+		int numY = h / spacingY;
 		double ys, xs;
 		double antiAlias = 0.5;
 		gc.save();
 		gc.setStroke(gridColor);
-		gc.translate(vx, vy);
 		for (int y = 0; y <= numY; y++) {
 			ys = y * spacingY;
-			gc.strokeLine(0 + antiAlias, ys + antiAlias, vw - antiAlias, ys + antiAlias);
+			gc.strokeLine(0 + antiAlias, ys + antiAlias, w - antiAlias, ys + antiAlias);
 			for (int x = 0; x <= numX; x++) {
 				xs = x * spacingX;
-				gc.strokeLine(xs + antiAlias, 0 + antiAlias, xs + antiAlias, vh + antiAlias);
+				gc.strokeLine(xs + antiAlias, 0 + antiAlias, xs + antiAlias, h - antiAlias);
 			}
 		}
 		gc.restore();
@@ -457,6 +462,7 @@ public class UICanvasEditor extends UICanvas {
 				moveY = component.getTopY();
 				nearestGridX = moveX - moveX % snapX;
 				nearestGridY = moveY - moveY % snapY;
+				System.out.println("nearest grid:" + nearestGridX + "," + nearestGridY);
 				dx1 = nearestGridX - moveX;
 				dy1 = nearestGridY - moveY;
 			}
@@ -637,20 +643,21 @@ public class UICanvasEditor extends UICanvas {
 
 	private int getSnapPixelsWidth(double percentage) {
 		double p = percentage / 100.0;
-		return (int) (resolution.getViewportWidth() * p);
+		return (int) (getCanvasWidth() * p);
 	}
 
 	private int getSnapPixelsHeight(double percentage) {
 		double p = percentage / 100.0;
-		return (int) (resolution.getViewportHeight() * p);
+		return (int) (getCanvasHeight() * p);
 	}
 
-
+	/** Set the context menu that should be shown */
 	private void setContextMenu(@Nullable ContextMenu contextMenu, int xpos, int ypos) {
 		this.contextMenu = contextMenu;
 		contextMenuPosition.set(xpos, ypos);
 	}
 
+	/** Get the context menu to be shown */
 	private ContextMenu getContextMenu() {
 		return contextMenu;
 	}
@@ -663,15 +670,27 @@ public class UICanvasEditor extends UICanvas {
 		paint();
 	}
 
-	/**
-	 Update the grid color and selection color and then repaint
+	/** Updates the UI colors like selection color, grid color, and bg color */
+	public void updateColors() {
+		this.gridColor = CanvasViewColors.GRID;
+		this.selectionColor = CanvasViewColors.SELECTION;
+		this.absRegionComponent.setBackgroundColor(CanvasViewColors.ABS_REGION);
+		this.setCanvasBackgroundColor(CanvasViewColors.EDITOR_BG);
+	}
 
-	 @param gridColor new grid color
-	 @param selectionColor new selection color
+	/**
+	 Update the Absolute region box. For each parameter: -1 to leave unchanged, 0 for false, 1 for true
+
+	 @param alwaysFront true if the region should always be rendered last, false if it should be rendered first
+	 @param showing true the region is showing, false if not
 	 */
-	public void updateCanvasUIColors(Color gridColor, Color selectionColor) {
-		this.gridColor = gridColor;
-		this.selectionColor = selectionColor;
+	public void updateAbsRegion(int alwaysFront, int showing) {
+		if (alwaysFront != -1) {
+			absRegionComponent.setAlwaysRenderAtFront(alwaysFront == 1);
+		}
+		if (showing != -1) {
+			absRegionComponent.setGhost(!(showing == 1));
+		}
 		paint();
 	}
 

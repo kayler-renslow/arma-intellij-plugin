@@ -15,12 +15,18 @@ import javafx.stage.Stage;
 public class ADCWindow {
 	private final Stage primaryStage;
 	private final VBox rootElement = new VBox();
-	private Resolution resolution = new Resolution(ScreenDimension.D1920, UIScale.SMALL);
+	private Resolution resolution = new Resolution(ScreenDimension.D1600, UIScale.SMALL);
 	private final CanvasView canvasView = new CanvasView(resolution);
-	private final ADCMenuBar mainMenuBar = new ADCMenuBar(canvasView);
+	private final ADCMenuBar mainMenuBar = new ADCMenuBar();
+
+	private boolean dontAddMenuBar;
 
 	public ADCWindow(Stage primaryStage) {
 		this.primaryStage = primaryStage;
+		if(resolution.getScreenWidth() == ScreenDimension.D1920.width){
+			primaryStage.setFullScreen(true);
+			dontAddMenuBar = true;
+		}
 
 		Scene scene = new Scene(rootElement);
 		this.primaryStage.setScene(scene);
@@ -30,7 +36,10 @@ public class ADCWindow {
 	}
 
 	private void initialize(Scene scene) {
-		rootElement.getChildren().addAll(mainMenuBar, canvasView);
+		if(!dontAddMenuBar){
+			rootElement.getChildren().add(mainMenuBar);
+		}
+		rootElement.getChildren().addAll(canvasView);
 		rootElement.minWidth(resolution.getScreenWidth() + 250.0);
 		rootElement.minHeight(resolution.getScreenHeight() + 50.0);
 		EventHandler<KeyEvent> keyEvent = new EventHandler<KeyEvent>() {
@@ -49,4 +58,7 @@ public class ADCWindow {
 		this.primaryStage.show();
 	}
 
+	public ICanvasView getCanvasView() {
+		return canvasView;
+	}
 }

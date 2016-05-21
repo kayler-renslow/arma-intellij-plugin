@@ -58,7 +58,7 @@ class CanvasControls extends VBox implements ISnapConfiguration {
 		hboxStep.getChildren().addAll(lblStep, cbStep, lblAltStep, cbAltStep);
 
 		getChildren().addAll(hboxStep, treeView);
-		doThings();
+		setupTreeViewContextMenu();
 		this.setPadding(new Insets(5, 5, 0, 5));
 
 		VBox.setVgrow(treeView, Priority.ALWAYS);
@@ -80,7 +80,7 @@ class CanvasControls extends VBox implements ISnapConfiguration {
 		});
 	}
 
-	private void doThings() {
+	private void setupTreeViewContextMenu() {
 		treeView.setContextMenu(cm);
 		TreeViewMenuItemBuilder.setNewFolderAction(treeView, newFolder, "New Folder", new Object(), new IGraphicCreator() {
 			@Nullable
@@ -93,24 +93,6 @@ class CanvasControls extends VBox implements ISnapConfiguration {
 			@Nullable
 			@Override
 			public Node createGraphic() {
-				//				HBox hBox = new HBox(3);
-				//				ImageView eye = new ImageView("/com/kaylerrenslow/armaDialogCreator/icons/eye.png");
-				//				eye.setOnMouseClicked(new EventHandler<MouseEvent>() {
-				//					boolean visible = true;
-				//					Image imgVisible = new ImageView("/com/kaylerrenslow/armaDialogCreator/icons/eye.png").getImage();
-				//					Image imgNotVisible = new ImageView("/com/kaylerrenslow/armaDialogCreator/icons/box.png").getImage();
-				//					@Override
-				//					public void handle(MouseEvent event) {
-				//						if(visible){
-				//							eye.setImage(imgVisible);
-				//						}else{
-				//							eye.setImage(imgNotVisible);
-				//						}
-				//						visible = !visible;
-				//					}
-				//				});
-				//				hBox.getChildren().addAll(eye, new CheckBox());
-				//				return hBox;
 				return new RadioButton(""/*, new ImageView("/com/kaylerrenslow/armaDialogCreator/icons/eye.png")*/);
 			}
 		});

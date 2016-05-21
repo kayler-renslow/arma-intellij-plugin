@@ -3,8 +3,7 @@ package com.kaylerrenslow.armaDialogCreator.arma.util.screen;
 /**
  @author Kayler
  Converts screen positions and width/height to viewport positions and width/height, and vice versa.
- Created on 05/18/2016.
- */
+ Created on 05/18/2016. */
 public class PositionCalculator {
 
 	/**
@@ -15,6 +14,7 @@ public class PositionCalculator {
 	 @return screen x position
 	 */
 	public static int getScreenX(Resolution resolution, double percentX) {
+		System.out.println("positionCalc, viewport::" + resolution.getViewportX() + ", " + resolution.getViewportY());
 		return (int) (resolution.getViewportX() + percentX * resolution.getViewportWidth());
 	}
 
@@ -59,8 +59,8 @@ public class PositionCalculator {
 	 @param screenX the screen x position
 	 @return percentage of viewport(as decimal)
 	 */
-	public static int getPercentX(Resolution resolution, int screenX) {
-		return (screenX - resolution.getViewportX()) / resolution.getViewportWidth();
+	public static double getPercentX(Resolution resolution, int screenX) {
+		return (screenX - resolution.getViewportXF()) / resolution.getViewportWidthF();
 	}
 
 	/**
@@ -70,8 +70,8 @@ public class PositionCalculator {
 	 @param screenY the screen y position
 	 @return percentage of viewport (as decimal)
 	 */
-	public static int getPercentY(Resolution resolution, int screenY) {
-		return (screenY - resolution.getViewportY()) / resolution.getViewportHeight();
+	public static double getPercentY(Resolution resolution, int screenY) {
+		return (screenY - resolution.getViewportYF()) / resolution.getViewportHeightF();
 	}
 
 	/**
@@ -81,8 +81,8 @@ public class PositionCalculator {
 	 @param screenW the width of the screen
 	 @return percentage of viewport width (as decimal)
 	 */
-	public static int getPercentWidth(Resolution resolution, int screenW) {
-		return screenW / resolution.getViewportWidth();
+	public static double getPercentWidth(Resolution resolution, int screenW) {
+		return screenW / resolution.getViewportWidthF();
 	}
 
 	/**
@@ -92,7 +92,7 @@ public class PositionCalculator {
 	 @param screenH the height of the screen
 	 @return percentage of viewport height (as decimal)
 	 */
-	public static int getPercentHeight(Resolution resolution, int screenH) {
-		return screenH / resolution.getViewportHeight();
+	public static double getPercentHeight(Resolution resolution, int screenH) {
+		return screenH / resolution.getViewportHeightF();
 	}
 }

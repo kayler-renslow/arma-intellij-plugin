@@ -2,18 +2,18 @@ package com.kaylerrenslow.armaDialogCreator.gui.fx.main.editor;
 
 import com.kaylerrenslow.armaDialogCreator.arma.util.screen.Resolution;
 import com.kaylerrenslow.armaDialogCreator.gui.canvas.api.ui.Component;
-import com.kaylerrenslow.armaDialogCreator.gui.fx.main.DefaultColors;
+import com.kaylerrenslow.armaDialogCreator.gui.fx.main.CanvasViewColors;
 import javafx.scene.canvas.GraphicsContext;
 
 /**
  Created by Kayler on 05/18/2016.
  */
-public class ArmaAbsoluteBoxComponent extends Component {
+class ArmaAbsoluteBoxComponent extends Component {
 	private boolean alwaysFront = true;
 
-	public ArmaAbsoluteBoxComponent(Resolution r) {
+	ArmaAbsoluteBoxComponent(Resolution r) {
 		super(r.getViewportX(), r.getViewportY(), r.getViewportWidth(), r.getViewportHeight());
-		super.setBackgroundColor(DefaultColors.UICanvasEditor.ABS_REGION);
+		super.setBackgroundColor(CanvasViewColors.ABS_REGION);
 	}
 
 	@Override
@@ -21,11 +21,11 @@ public class ArmaAbsoluteBoxComponent extends Component {
 		return false;
 	}
 
-	public void updateToNewResolution(Resolution newResolution) {
+	void updateToNewResolution(Resolution newResolution) {
 		this.setPositionWH(newResolution.getViewportX(), newResolution.getViewportY(), newResolution.getViewportWidth(), newResolution.getViewportHeight());
 	}
 
-	public void setAlwaysRenderAtFront(boolean alwaysFront) {
+	void setAlwaysRenderAtFront(boolean alwaysFront) {
 		this.alwaysFront = alwaysFront;
 	}
 
