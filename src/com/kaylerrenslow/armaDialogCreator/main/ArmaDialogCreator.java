@@ -2,7 +2,9 @@ package com.kaylerrenslow.armaDialogCreator.main;
 
 import com.kaylerrenslow.armaDialogCreator.gui.fx.main.ADCWindow;
 import com.kaylerrenslow.armaDialogCreator.gui.fx.main.ICanvasView;
+import com.kaylerrenslow.armaDialogCreator.gui.img.ImagePaths;
 import javafx.application.Application;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 /**
@@ -21,6 +23,7 @@ public class ArmaDialogCreator extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		mainWindow = new ADCWindow(primaryStage);
 		ArmaDialogCreator.primaryStage = primaryStage;
+		primaryStage.getIcons().add(new Image(ImagePaths.ICON_APP));
 		primaryStage.setTitle(Lang.Application.APPLICATION_TITLE);
 	}
 

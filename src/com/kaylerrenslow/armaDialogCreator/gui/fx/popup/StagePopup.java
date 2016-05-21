@@ -31,6 +31,7 @@ public abstract class StagePopup {
 		myStage.setScene(myScene);
 		myStage.setTitle(title);
 		myStage.initOwner(primaryStage);
+		myStage.getIcons().add(primaryStage.getIcons().get(0));
 
 		myStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
 			@Override

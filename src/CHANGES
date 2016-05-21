@@ -8,9 +8,11 @@ Plugin
 
 Dialog Creator
 	ADDED:
-        support for custom background images
+        new icon for application
+        base interfaces and classes for controls and dialogs
+        support for popup windows
     CHANGED:
-        removed all the static classes for main menu bar because it was lame
+        none
     FIXED:
         none
 
