@@ -5,6 +5,7 @@ import com.kaylerrenslow.armaDialogCreator.main.ArmaDialogCreator;
 import com.kaylerrenslow.armaDialogCreator.main.Lang;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.paint.ImagePattern;
 import javafx.stage.FileChooser;
@@ -15,13 +16,14 @@ import java.io.File;
  Created by Kayler on 05/20/2016.
  */
 public class ViewBackgroundAction implements EventHandler<ActionEvent> {
-	public static int NO_IMAGE = 0;
-	public static int IMAGE_1 = 1;
-	public static int IMAGE_2 = 2;
-	public static int IMAGE_3 = 3;
-	public static int IMAGE_CUSTOM = 4;
+	public static final int IMAGE_1 = 0;
+	public static final int IMAGE_2 = 1;
+	public static final int IMAGE_3 = 2;
+	public static final int IMAGE_CUSTOM = 3;
+	public static final int NO_IMAGE = 4;
 
 	private final int background;
+	private static int lastBackground = NO_IMAGE;
 
 	public ViewBackgroundAction(int background) {
 		this.background = background;
@@ -29,6 +31,11 @@ public class ViewBackgroundAction implements EventHandler<ActionEvent> {
 
 	@Override
 	public void handle(ActionEvent event) {
+		chooseBackground(this.background, event);
+		lastBackground = this.background;
+	}
+
+	private void chooseBackground(int background, ActionEvent event) {
 		if (background == IMAGE_1) {
 			ArmaDialogCreator.getCanvasView().setCanvasBackgroundToImage(ImagePaths.BG_1);
 		} else if (background == IMAGE_2) {
@@ -46,6 +53,9 @@ public class ViewBackgroundAction implements EventHandler<ActionEvent> {
 			File chosen = c.showOpenDialog(ArmaDialogCreator.getPrimaryStage());
 			if (chosen != null) {
 				ArmaDialogCreator.getCanvasView().setCanvasBackgroundToImage(chosen.toURI().toString());
+			} else {
+				RadioMenuItem target = (RadioMenuItem) event.getTarget();
+				target.getToggleGroup().selectToggle(target.getToggleGroup().getToggles().get(lastBackground));
 			}
 		}
 	}

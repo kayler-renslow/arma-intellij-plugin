@@ -8,11 +8,9 @@ Plugin
 
 Dialog Creator
 	ADDED:
-        new icon for application
-        base interfaces and classes for controls and dialogs
-        support for popup windows
-    CHANGED:
         none
+    CHANGED:
+        background menu items are now radio menu items and will show which background is chosen
     FIXED:
         none
 

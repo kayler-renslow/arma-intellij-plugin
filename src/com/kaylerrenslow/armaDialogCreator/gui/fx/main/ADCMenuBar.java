@@ -43,11 +43,21 @@ class ADCMenuBar extends MenuBar {
 	private final PresetCheckMenuItem view_absRegion_alwaysFront = (PresetCheckMenuItem) addOnAction(new PresetCheckMenuItem(MainMenuBar.VIEW_ABS_REGION_ALWAYS_FRONT, true), new ViewAbsRegionAlwaysFrontAction());
 	private final Menu view_absRegionAll = new Menu(MainMenuBar.VIEW_ABS_REGION, null, view_absRegion_show, view_absRegion_alwaysFront);
 	/*background*/
-	private final MenuItem view_bg_img1 = addOnAction(new MenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE1), new ViewBackgroundAction(ViewBackgroundAction.IMAGE_1));
-	private final MenuItem view_bg_img2 = addOnAction(new MenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE2), new ViewBackgroundAction(ViewBackgroundAction.IMAGE_2));
-	private final MenuItem view_bg_img3 = addOnAction(new MenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE3), new ViewBackgroundAction(ViewBackgroundAction.IMAGE_3));
-	private final MenuItem view_bg_custom = addOnAction(new MenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE_CUSTOM), new ViewBackgroundAction(ViewBackgroundAction.IMAGE_CUSTOM));
-	private final MenuItem view_bg_noImage = addOnAction(new MenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_NONE), new ViewBackgroundAction(ViewBackgroundAction.NO_IMAGE));
+	private final RadioMenuItem view_bg_img1 = (RadioMenuItem) addOnAction(new RadioMenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE1), new ViewBackgroundAction(ViewBackgroundAction.IMAGE_1));
+	private final RadioMenuItem view_bg_img2 = (RadioMenuItem) addOnAction(new RadioMenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE2), new ViewBackgroundAction(ViewBackgroundAction.IMAGE_2));
+	private final RadioMenuItem view_bg_img3 = (RadioMenuItem) addOnAction(new RadioMenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE3), new ViewBackgroundAction(ViewBackgroundAction.IMAGE_3));
+	private final RadioMenuItem view_bg_custom = (RadioMenuItem) addOnAction(new RadioMenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_IMAGE_CUSTOM), new ViewBackgroundAction(ViewBackgroundAction.IMAGE_CUSTOM));
+	private final RadioMenuItem view_bg_noImage = (RadioMenuItem) addOnAction(new RadioMenuItem(MainMenuBar.VIEW_CHANGE_BACKGROUND_NONE), new ViewBackgroundAction(ViewBackgroundAction.NO_IMAGE));
+	private final ToggleGroup view_bg_toggleGroup = new ToggleGroup();
+	{
+		view_bg_img1.setToggleGroup(view_bg_toggleGroup);
+		view_bg_img2.setToggleGroup(view_bg_toggleGroup);
+		view_bg_img3.setToggleGroup(view_bg_toggleGroup);
+		view_bg_custom.setToggleGroup(view_bg_toggleGroup);
+		view_bg_noImage.setToggleGroup(view_bg_toggleGroup);
+		view_bg_toggleGroup.selectToggle(view_bg_noImage);
+	}
+
 	private final Menu backgroundAll = new Menu(MainMenuBar.VIEW_BACKGROUND_IMAGE, null, view_bg_img1, view_bg_img2, view_bg_img3, view_bg_custom, view_bg_noImage);
 
 	private final Menu menuFile = new Menu(MainMenuBar.FILE, null, file_new, file_open, file_save, file_saveAs);
