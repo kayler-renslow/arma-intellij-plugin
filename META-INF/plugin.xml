@@ -1,10 +1,10 @@
 <idea-plugin version="2">
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
-	<version>1.0.1</version>
+	<version>1.0.3</version>
 	<!--<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>-->
 	<description>
-		Plugin to offer smart editing of Arma games' mission files.
+		Plugin that offers syntax checking of SQF files, syntax highlighting, find usages, refactor renaming, and more various features.
 	</description>
 
 	<change-notes>
@@ -69,8 +69,6 @@
 		<moduleBuilder builderClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleBuilder" />
 		<moduleType implementationClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleType" id="arma.moduleType" />
 	</extensions>
-
-	<application-components></application-components>
 
 	<project-components>
 		<component>
