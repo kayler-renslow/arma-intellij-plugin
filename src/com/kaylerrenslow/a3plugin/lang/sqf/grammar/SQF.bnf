@@ -15,14 +15,11 @@
   psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiImplUtilForGrammar"
 
   name("return_statement")="Return Statement"
-  name("try_catch")="try-catch block"
   name("macro_call")="Macro Call"
   name("assignment")="Assignment"
-  name("if_statement")="If Statement"
   name("expression")="Expression"
-  name("terminal_")="Terminal"
-  name("exp_operand_")="Terminal"
-
+  extends(".*expression")=expression
+  extends(".*_statement")=statement
 }
 // @formatter:off
 sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
@@ -35,128 +32,62 @@ private item_ ::= comment | statement | BAD_CHARACTER
 comment ::= INLINE_COMMENT | BLOCK_COMMENT | COMMENT_COMMAND
 variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope isAssigningVariable getMyAssignment getPrivatization varNameMatches]}
 
+statement ::= ( assignment | expression | quest_statement) SEMICOLON
 
-statement ::= ( assignment
-                | params_statement
-				| private_decl
-				| scope_manager
-                | codeblock_expression
-				| control_struct_
-				| try_catch
-				| expression
-			  ) SEMICOLON
+return_statement ::= expression SEMICOLON?
+quest_statement ::= QUEST expression COLON expression
 
-return_statement ::= expression SEMICOLON? {extends("return_statement") = statement}
+assignment ::= (COMMAND? variable) EQ (expression | code_block) {methods=[getAssigningVariable isDeclaredPrivate]}
 
-assignment ::= (PRIVATE? variable) EQ (expression | params_statement | switch_statement | if_statement | code_block) {methods=[getAssigningVariable isDeclaredPrivate]}
+expression ::= conditional_group_
+            | comparison_group_
+            | mul_group_
+            | unary_group_
+            | exponent_expression
+            | add_group_
+            | config_fetch_expression
+            | command_expression
+            | primary_group_
 
-expression::= exp_operand_ exp_operator_ expression | exp_operand_
-private exp_operand_ ::= (PLUS | MINUS | NOT | EXCL)? (macro_call | terminal_ COMMAND exp_operand_? | COMMAND exp_operand_ | COMMAND | terminal_)
-                       | code_block
-                       | ASSERT LPAREN expression RPAREN
+private add_group_ ::= add_expression | sub_expression
+private mul_group_ ::= mul_expression | div_expression | mod_expression
+private unary_group_ ::= unary_plus_expression | unary_min_expression
+private conditional_group_::= bool_and_expression | bool_or_expression | bool_not_expression
+private comparison_group_ ::= comp_expression
 
-private exp_operator_ ::= PLUS
-                        | MINUS
+private primary_group_ ::= string
+                         | macro_call
+                         | variable
+                         | INTEGER_LITERAL
+                         | array_val
+                         | DEC_LITERAL
 
-                        | ASTERISK
-                        | FSLASH
-                        | PERC
-                        | MOD
-                        | CARET
+add_expression ::= expression PLUS expression
+sub_expression ::= expression MINUS expression
+mul_expression ::= expression ASTERISK expression
+div_expression ::= expression FSLASH expression
+mod_expression ::= expression (PERC | MOD) expression
 
-                        | AND
-                        | AMPAMP
-                        | OR
-                        | BARBAR
+bool_and_expression ::= expression (AND | AMPAMP) expression
+bool_or_expression ::= expression (OR | BARBAR) expression
+bool_not_expression::= (NOT | EXCL) expression
 
-                        | EXCL
-                        | NOT
-                        | EQEQ
-                        | NE
-                        | LT
-                        | GT
-                        | LE
-                        | GE
+comp_expression ::= expression (EQEQ | NE | LT | LE | GT | GE) expression
 
-                        | GTGT
+config_fetch_expression ::= expression (FSLASH | GTGT) expression
 
+unary_plus_expression ::= PLUS expression
+unary_min_expression ::= MINUS expression
+exponent_expression ::= expression (CARET expression)+
+command_expression ::= command_operand_ COMMAND command_operand_? | COMMAND command_operand_ | COMMAND
+    private command_operand_ ::= unary_group_| primary_group_ | paren_expression | code_block
+paren_expression ::= LPAREN expression RPAREN
 
-private terminal_ ::= string
-					| variable
-					| INTEGER_LITERAL
-					| array_val
-					| DEC_LITERAL
-					| TRUE
-					| FALSE
-					| NIL
-					| config_
-					| null_
-					| namespace_
-					| LPAREN expression RPAREN
-
-private config_ ::=CONFIG_FILE | CAMPAIGN_CONFIG_FILE | MISSION_CONFIG_FILE
-private null_ ::= CONFIG_NULL | CONTROL_NULL | DISPLAY_NULL | GRP_NULL | OBJ_NULL | SCRIPT_NULL | LOCATION_NULL | NET_OBJ_NULL | TASK_NULL | TEAM_MEMBER_NULL
-private namespace_ ::= PARSING_NAMESPACE | CURRENT_NAMESPACE | MISSION_NAMESPACE | PROFILE_NAMESPACE | SAVE_PROFILE_NAMESPACE | UI_NAMESPACE
 
 string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFStringMixin" methods=[getNonQuoteText]}
 
 macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 
-array_val ::= LBRACKET (expression (COMMA expression)*)? RBRACKET
-
+array_val ::= LBRACKET (expression | code_block (COMMA expression | code_block)*)? RBRACKET
 
 code_block ::= LBRACE local_scope? RBRACE
-
-/*control structures and other things*/
-    codeblock_expression ::= code_block expression
-
-    /*privatizers*/
-        //DO NOT CHANGE STRING_LITERAL IN private_decl_var to string
-        private_decl_var ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclVarMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivateDeclNamedElement" methods=[toString getPrivateDeclarationElement varNameMatches getVarName]}
-        //private_decl_var is a variable that designates the variable as private
-        //anywhere that private_decl_var is used, that rule must implement SQFPrivatizer
-
-        private_decl ::= PRIVATE ( private_decl_var | LBRACKET (private_decl_var (COMMA private_decl_var)*) RBRACKET) {methods=[getPrivateDeclVars] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivatizer"}//do not allow private[]
-
-        params_statement ::= params_argument? PARAMS LBRACKET (params_param (COMMA params_param)*) RBRACKET { implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFPrivatizer" methods=[getVarsDefined varIsDefined]}
-        params_argument ::= expression;
-        params_param ::= LBRACKET private_decl_var (COMMA expression)* RBRACKET | private_decl_var
-    /**/
-
-    scope_manager ::= GOTO COLON string
-				    | BREAK_TO string
-				    | expression? BREAK_OUT string
-				    | CONTINUE
-				    | BREAK
-				    | SCOPE_NAME string
-
-    private control_struct_ ::= if_statement | switch_statement | loop_ | wait_until_statement | with_statement | quest_statement
-    if_statement ::= IF LPAREN expression RPAREN (
-				     THEN code_block (ELSE code_block)?
-				   | EXIT_WITH code_block
-				   | THROW expression
-			      )
-
-    switch_statement ::= SWITCH (LPAREN expression RPAREN | expression) DO LBRACE (switch_case)* RBRACE
-    switch_case ::= (CASE expression (COLON code_block)? SEMICOLON)
-				  | (DEFAULT code_block SEMICOLON)
-
-    private loop_ ::= loop_while | for_loops_
-    loop_while    ::= WHILE LBRACE (assignments_or_exppresion_)* expression? RBRACE DO code_block
-    private for_loops_ ::= loop_for | loop_for_from | loop_for_each
-    loop_for  ::= FOR LBRACKET LBRACE (for_loop_iter_var_init)* RBRACE COMMA LBRACE expression RBRACE COMMA LBRACE (assignment_semicolon_)* RBRACE RBRACKET DO code_block {methods=[getIterationVariables getLoopScope] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
-    loop_for_from ::= FOR string FROM expression TO expression (STEP expression)? DO code_block {methods=[getIterationVariables getLoopScope] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
-    loop_for_each ::= code_block FOR_EACH expression  {methods=[getIterationVariables getLoopScope] implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFForLoopBase" }
-
-    private assignment_semicolon_ ::= assignment SEMICOLON
-    private assignments_or_exppresion_ ::= (assignment SEMICOLON)* expression?
-
-    for_loop_iter_var_init ::= assignment_semicolon_
-
-    quest_statement ::= QUEST expression COLON expression
-
-    try_catch ::= TRY code_block CATCH code_block
-
-    wait_until_statement ::= WAIT_UNTIL code_block
-
-    with_statement ::= WITH namespace_ DO code_block

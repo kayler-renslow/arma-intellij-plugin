@@ -2,13 +2,10 @@ package com.kaylerrenslow.a3plugin.lang.shared.stringtable;
 
 import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.xml.XmlFile;
 import com.intellij.psi.xml.XmlTag;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.intellij.util.xml.DomManager;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.Container;
@@ -20,7 +17,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -47,6 +43,8 @@ public class Stringtable {
 		DomManager manager = DomManager.getDomManager(module.getProject());
 
 		StringtableProject stringtableProject = (StringtableProject) manager.getFileElement(xmlFile).getRootElement();
+		int a=0;
+		a=1;
 		return stringtableProject;
 	}
 

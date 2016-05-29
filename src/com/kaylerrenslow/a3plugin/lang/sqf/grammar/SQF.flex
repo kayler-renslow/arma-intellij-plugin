@@ -61,74 +61,12 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; }
 
-
-<YYINITIAL> "true" { return SQFTypes.TRUE; }
-<YYINITIAL> "false" { return SQFTypes.FALSE; }
-<YYINITIAL> "nil" { return SQFTypes.NIL; }
-<YYINITIAL> "configNull" { return SQFTypes.CONFIG_NULL; }
-<YYINITIAL> "controlNull" { return SQFTypes.CONTROL_NULL; }
-<YYINITIAL> "displayNull" { return SQFTypes.DISPLAY_NULL; }
-<YYINITIAL> "grpNull" { return SQFTypes.GRP_NULL; }
-<YYINITIAL> "objNull" { return SQFTypes.OBJ_NULL; }
-<YYINITIAL> "scriptNull" { return SQFTypes.SCRIPT_NULL; }
-<YYINITIAL> "locationNull" { return SQFTypes.LOCATION_NULL; }
-<YYINITIAL> "netObjNull" { return SQFTypes.NET_OBJ_NULL; }
-<YYINITIAL> "taskNull" { return SQFTypes.TASK_NULL; }
-<YYINITIAL> "teamMemberNull" { return SQFTypes.TEAM_MEMBER_NULL; }
-
-<YYINITIAL> "private" { return SQFTypes.PRIVATE; }
-<YYINITIAL> "params" { return SQFTypes.PARAMS; }
-
-<YYINITIAL> "scopeName" { return SQFTypes.SCOPE_NAME; }
-<YYINITIAL> "break" { return SQFTypes.BREAK; }
-<YYINITIAL> "breakTo" { return SQFTypes.BREAK_TO; }
-<YYINITIAL> "breakOut" { return SQFTypes.BREAK_OUT; }
-<YYINITIAL> "continue" { return SQFTypes.CONTINUE; }
-<YYINITIAL> "for" { return SQFTypes.FOR; }
-<YYINITIAL> "to" { return SQFTypes.TO; }
-<YYINITIAL> "forEach" { return SQFTypes.FOR_EACH; }
-<YYINITIAL> "from" { return SQFTypes.FROM; }
-<YYINITIAL> "while" { return SQFTypes.WHILE; }
-<YYINITIAL> "goto" { return SQFTypes.GOTO; }
-<YYINITIAL> "assert" { return SQFTypes.ASSERT; }
-<YYINITIAL> "step" { return SQFTypes.STEP; }
-
-<YYINITIAL> "if" { return SQFTypes.IF; }
-<YYINITIAL> "then" { return SQFTypes.THEN; }
-<YYINITIAL> "else" { return SQFTypes.ELSE; }
-<YYINITIAL> "switch" { return SQFTypes.SWITCH; }
-<YYINITIAL> "case" { return SQFTypes.CASE; }
-<YYINITIAL> "default" { return SQFTypes.DEFAULT; }
-<YYINITIAL> "do" { return SQFTypes.DO; }
-<YYINITIAL> "waitUntil" { return SQFTypes.WAIT_UNTIL; }
-<YYINITIAL> "exitWith" { return SQFTypes.EXIT_WITH; }
-
-
-<YYINITIAL> "this" { return SQFTypes.LANG_VAR; }
-<YYINITIAL> "_this" { return SQFTypes.LANG_VAR; }
-<YYINITIAL> "_x" { return SQFTypes.LANG_VAR; }
-<YYINITIAL> "_exception" { return SQFTypes.LANG_VAR; }
-
-<YYINITIAL> "with" { return SQFTypes.WITH; }
-<YYINITIAL> "parsingNamespace" { return SQFTypes.PARSING_NAMESPACE; }
-<YYINITIAL> "currentNamespace" { return SQFTypes.CURRENT_NAMESPACE; }
-<YYINITIAL> "missionNamespace" { return SQFTypes.MISSION_NAMESPACE; }
-<YYINITIAL> "profileNamespace" { return SQFTypes.PROFILE_NAMESPACE; }
-<YYINITIAL> "saveProfileNamespace" { return SQFTypes.SAVE_PROFILE_NAMESPACE; }
-<YYINITIAL> "uiNamespace" { return SQFTypes.UI_NAMESPACE; }
-
 <YYINITIAL> "mod" { return SQFTypes.MOD; }
 <YYINITIAL> "not" { return SQFTypes.NOT; }
 <YYINITIAL> "and" { return SQFTypes.AND; }
 <YYINITIAL> "or" { return SQFTypes.OR; }
 
-<YYINITIAL> "try" { return SQFTypes.TRY; }
-<YYINITIAL> "catch" { return SQFTypes.CATCH; }
-<YYINITIAL> "throw" { return SQFTypes.THROW; }
 
-<YYINITIAL> "configFile" { return SQFTypes.CONFIG_FILE; }
-<YYINITIAL> "campaignConfigFile" { return SQFTypes.CAMPAIGN_CONFIG_FILE; }
-<YYINITIAL> "missionConfigFile" { return SQFTypes.MISSION_CONFIG_FILE; }
 
 <YYINITIAL> "abs" { return SQFTypes.COMMAND; }
 <YYINITIAL> "accTime" { return SQFTypes.COMMAND; }
@@ -183,6 +121,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "addMissionEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "addMPEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "addMusicEventHandler" { return SQFTypes.COMMAND; }
+<YYINITIAL> "addOwnedMine" { return SQFTypes.COMMAND; }
 <YYINITIAL> "addPrimaryWeaponItem" { return SQFTypes.COMMAND; }
 <YYINITIAL> "addPublicVariableEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "addRating" { return SQFTypes.COMMAND; }
@@ -254,6 +193,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "asin" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ASLToAGL" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ASLToATL" { return SQFTypes.COMMAND; }
+<YYINITIAL> "assert" { return SQFTypes.COMMAND; }
 <YYINITIAL> "assignAsCargo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "assignAsCargoIndex" { return SQFTypes.COMMAND; }
 <YYINITIAL> "assignAsCommander" { return SQFTypes.COMMAND; }
@@ -296,6 +236,8 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "boundingBox" { return SQFTypes.COMMAND; }
 <YYINITIAL> "boundingBoxReal" { return SQFTypes.COMMAND; }
 <YYINITIAL> "boundingCenter" { return SQFTypes.COMMAND; }
+<YYINITIAL> "breakOut" { return SQFTypes.COMMAND; }
+<YYINITIAL> "breakTo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "briefingName" { return SQFTypes.COMMAND; }
 <YYINITIAL> "buildingExit" { return SQFTypes.COMMAND; }
 <YYINITIAL> "buildingPos" { return SQFTypes.COMMAND; }
@@ -316,6 +258,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "cameraInterest" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cameraOn" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cameraView" { return SQFTypes.COMMAND; }
+<YYINITIAL> "campaignConfigFile" { return SQFTypes.COMMAND; }
 <YYINITIAL> "camPreload" { return SQFTypes.COMMAND; }
 <YYINITIAL> "camPreloaded" { return SQFTypes.COMMAND; }
 <YYINITIAL> "camPrepareBank" { return SQFTypes.COMMAND; }
@@ -351,6 +294,8 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "canUnloadInCombat" { return SQFTypes.COMMAND; }
 <YYINITIAL> "captive" { return SQFTypes.COMMAND; }
 <YYINITIAL> "captiveNum" { return SQFTypes.COMMAND; }
+<YYINITIAL> "case" { return SQFTypes.COMMAND; }
+<YYINITIAL> "catch" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cbChecked" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cbSetChecked" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ceil" { return SQFTypes.COMMAND; }
@@ -393,6 +338,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "commandMove" { return SQFTypes.COMMAND; }
 <YYINITIAL> "commandRadio" { return SQFTypes.COMMAND; }
 <YYINITIAL> "commandStop" { return SQFTypes.COMMAND; }
+<YYINITIAL> "commandSuppressiveFire" { return SQFTypes.COMMAND; }
 <YYINITIAL> "commandTarget" { return SQFTypes.COMMAND; }
 <YYINITIAL> "commandWatch" { return SQFTypes.COMMAND; }
 <YYINITIAL> "comment" { return SQFTypes.COMMAND; }
@@ -402,12 +348,15 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "completedFSM" { return SQFTypes.COMMAND; }
 <YYINITIAL> "composeText" { return SQFTypes.COMMAND; }
 <YYINITIAL> "configClasses" { return SQFTypes.COMMAND; }
+<YYINITIAL> "configFile" { return SQFTypes.COMMAND; }
 <YYINITIAL> "configHierarchy" { return SQFTypes.COMMAND; }
 <YYINITIAL> "configName" { return SQFTypes.COMMAND; }
+<YYINITIAL> "configNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "configProperties" { return SQFTypes.COMMAND; }
 <YYINITIAL> "configSourceMod" { return SQFTypes.COMMAND; }
 <YYINITIAL> "configSourceModList" { return SQFTypes.COMMAND; }
 <YYINITIAL> "connectTerminalToUAV" { return SQFTypes.COMMAND; }
+<YYINITIAL> "controlNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "controlsGroupCtrl" { return SQFTypes.COMMAND; }
 <YYINITIAL> "copyFromClipboard" { return SQFTypes.COMMAND; }
 <YYINITIAL> "copyToClipboard" { return SQFTypes.COMMAND; }
@@ -437,6 +386,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "createMenu" { return SQFTypes.COMMAND; }
 <YYINITIAL> "createMine" { return SQFTypes.COMMAND; }
 <YYINITIAL> "createMissionDisplay" { return SQFTypes.COMMAND; }
+<YYINITIAL> "createSimpleObject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "createSimpleTask" { return SQFTypes.COMMAND; }
 <YYINITIAL> "createSite" { return SQFTypes.COMMAND; }
 <YYINITIAL> "createSoundSource" { return SQFTypes.COMMAND; }
@@ -479,6 +429,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "ctrlModelDirAndUp" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlModelScale" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlParent" { return SQFTypes.COMMAND; }
+<YYINITIAL> "ctrlParentControlsGroup" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlPosition" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlRemoveAllEventHandlers" { return SQFTypes.COMMAND; }
 <YYINITIAL> "ctrlRemoveEventHandler" { return SQFTypes.COMMAND; }
@@ -554,6 +505,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "currentMagazineDetailTurret" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentMagazineTurret" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentMuzzle" { return SQFTypes.COMMAND; }
+<YYINITIAL> "currentNamespace" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentTask" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentTasks" { return SQFTypes.COMMAND; }
 <YYINITIAL> "currentThrowable" { return SQFTypes.COMMAND; }
@@ -579,6 +531,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "debriefingText" { return SQFTypes.COMMAND; }
 <YYINITIAL> "debugFSM" { return SQFTypes.COMMAND; }
 <YYINITIAL> "debugLog" { return SQFTypes.COMMAND; }
+<YYINITIAL> "default" { return SQFTypes.COMMAND; }
 <YYINITIAL> "deg" { return SQFTypes.COMMAND; }
 <YYINITIAL> "delete3DENEntities" { return SQFTypes.COMMAND; }
 <YYINITIAL> "deleteAt" { return SQFTypes.COMMAND; }
@@ -634,6 +587,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "disableUserInput" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displayAddEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displayCtrl" { return SQFTypes.COMMAND; }
+<YYINITIAL> "displayNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displayParent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displayRemoveAllEventHandlers" { return SQFTypes.COMMAND; }
 <YYINITIAL> "displayRemoveEventHandler" { return SQFTypes.COMMAND; }
@@ -643,6 +597,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "distance2D" { return SQFTypes.COMMAND; }
 <YYINITIAL> "distanceSqr" { return SQFTypes.COMMAND; }
 <YYINITIAL> "distributionRegion" { return SQFTypes.COMMAND; }
+<YYINITIAL> "do" { return SQFTypes.COMMAND; }
 <YYINITIAL> "do3DENAction" { return SQFTypes.COMMAND; }
 <YYINITIAL> "doArtilleryFire" { return SQFTypes.COMMAND; }
 <YYINITIAL> "doFire" { return SQFTypes.COMMAND; }
@@ -652,6 +607,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "doMove" { return SQFTypes.COMMAND; }
 <YYINITIAL> "doorPhase" { return SQFTypes.COMMAND; }
 <YYINITIAL> "doStop" { return SQFTypes.COMMAND; }
+<YYINITIAL> "doSuppressiveFire" { return SQFTypes.COMMAND; }
 <YYINITIAL> "doTarget" { return SQFTypes.COMMAND; }
 <YYINITIAL> "doWatch" { return SQFTypes.COMMAND; }
 <YYINITIAL> "drawArrow" { return SQFTypes.COMMAND; }
@@ -672,6 +628,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "editObject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "editorSetEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "effectiveCommander" { return SQFTypes.COMMAND; }
+<YYINITIAL> "else" { return SQFTypes.COMMAND; }
 <YYINITIAL> "emptyPositions" { return SQFTypes.COMMAND; }
 <YYINITIAL> "enableAI" { return SQFTypes.COMMAND; }
 <YYINITIAL> "enableAIFeature" { return SQFTypes.COMMAND; }
@@ -720,6 +677,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "execFSM" { return SQFTypes.COMMAND; }
 <YYINITIAL> "execVM" { return SQFTypes.COMMAND; }
 <YYINITIAL> "exit" { return SQFTypes.COMMAND; }
+<YYINITIAL> "exitWith" { return SQFTypes.COMMAND; }
 <YYINITIAL> "exp" { return SQFTypes.COMMAND; }
 <YYINITIAL> "expectedDestination" { return SQFTypes.COMMAND; }
 <YYINITIAL> "exportJIPMessages" { return SQFTypes.COMMAND; }
@@ -732,6 +690,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "fadeSound" { return SQFTypes.COMMAND; }
 <YYINITIAL> "fadeSpeech" { return SQFTypes.COMMAND; }
 <YYINITIAL> "failMission" { return SQFTypes.COMMAND; }
+<YYINITIAL> "false" { return SQFTypes.COMMAND; }
 <YYINITIAL> "fillWeaponsFromPool" { return SQFTypes.COMMAND; }
 <YYINITIAL> "find" { return SQFTypes.COMMAND; }
 <YYINITIAL> "findCover" { return SQFTypes.COMMAND; }
@@ -755,6 +714,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "fog" { return SQFTypes.COMMAND; }
 <YYINITIAL> "fogForecast" { return SQFTypes.COMMAND; }
 <YYINITIAL> "fogParams" { return SQFTypes.COMMAND; }
+<YYINITIAL> "for" { return SQFTypes.COMMAND; }
 <YYINITIAL> "forceAddUniform" { return SQFTypes.COMMAND; }
 <YYINITIAL> "forceEnd" { return SQFTypes.COMMAND; }
 <YYINITIAL> "forceMap" { return SQFTypes.COMMAND; }
@@ -763,6 +723,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "forceWalk" { return SQFTypes.COMMAND; }
 <YYINITIAL> "forceWeaponFire" { return SQFTypes.COMMAND; }
 <YYINITIAL> "forceWeatherChange" { return SQFTypes.COMMAND; }
+<YYINITIAL> "forEach" { return SQFTypes.COMMAND; }
 <YYINITIAL> "forEachMember" { return SQFTypes.COMMAND; }
 <YYINITIAL> "forEachMemberAgent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "forEachMemberTeam" { return SQFTypes.COMMAND; }
@@ -776,6 +737,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "formatText" { return SQFTypes.COMMAND; }
 <YYINITIAL> "formLeader" { return SQFTypes.COMMAND; }
 <YYINITIAL> "freeLook" { return SQFTypes.COMMAND; }
+<YYINITIAL> "from" { return SQFTypes.COMMAND; }
 <YYINITIAL> "fromEditor" { return SQFTypes.COMMAND; }
 <YYINITIAL> "fuel" { return SQFTypes.COMMAND; }
 <YYINITIAL> "fullCrew" { return SQFTypes.COMMAND; }
@@ -795,6 +757,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "get3DENMouseOver" { return SQFTypes.COMMAND; }
 <YYINITIAL> "get3DENSelected" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getAllHitPointsDamage" { return SQFTypes.COMMAND; }
+<YYINITIAL> "getAllOwnedMines" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getAmmoCargo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getAnimAimPrecision" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getAnimSpeedCoef" { return SQFTypes.COMMAND; }
@@ -878,6 +841,8 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "getSuppression" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getTerrainHeightASL" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getText" { return SQFTypes.COMMAND; }
+<YYINITIAL> "getUnitLoadout" { return SQFTypes.COMMAND; }
+<YYINITIAL> "getUnitTrait" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getVariable" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getWeaponCargo" { return SQFTypes.COMMAND; }
 <YYINITIAL> "getWPPos" { return SQFTypes.COMMAND; }
@@ -885,6 +850,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "globalChat" { return SQFTypes.COMMAND; }
 <YYINITIAL> "globalRadio" { return SQFTypes.COMMAND; }
 <YYINITIAL> "goggles" { return SQFTypes.COMMAND; }
+<YYINITIAL> "goto" { return SQFTypes.COMMAND; }
 <YYINITIAL> "group" { return SQFTypes.COMMAND; }
 <YYINITIAL> "groupChat" { return SQFTypes.COMMAND; }
 <YYINITIAL> "groupFromNetId" { return SQFTypes.COMMAND; }
@@ -895,6 +861,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "groupRadio" { return SQFTypes.COMMAND; }
 <YYINITIAL> "groupSelectedUnits" { return SQFTypes.COMMAND; }
 <YYINITIAL> "groupSelectUnit" { return SQFTypes.COMMAND; }
+<YYINITIAL> "grpNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "gunner" { return SQFTypes.COMMAND; }
 <YYINITIAL> "gusts" { return SQFTypes.COMMAND; }
 <YYINITIAL> "halt" { return SQFTypes.COMMAND; }
@@ -918,6 +885,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "hideBody" { return SQFTypes.COMMAND; }
 <YYINITIAL> "hideObject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "hideObjectGlobal" { return SQFTypes.COMMAND; }
+<YYINITIAL> "hideSelection" { return SQFTypes.COMMAND; }
 <YYINITIAL> "hint" { return SQFTypes.COMMAND; }
 <YYINITIAL> "hintC" { return SQFTypes.COMMAND; }
 <YYINITIAL> "hintCadet" { return SQFTypes.COMMAND; }
@@ -927,6 +895,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "htmlLoad" { return SQFTypes.COMMAND; }
 <YYINITIAL> "HUDMovementLevels" { return SQFTypes.COMMAND; }
 <YYINITIAL> "humidity" { return SQFTypes.COMMAND; }
+<YYINITIAL> "if" { return SQFTypes.COMMAND; }
 <YYINITIAL> "image" { return SQFTypes.COMMAND; }
 <YYINITIAL> "importAllGroups" { return SQFTypes.COMMAND; }
 <YYINITIAL> "importance" { return SQFTypes.COMMAND; }
@@ -1114,6 +1083,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "loadVest" { return SQFTypes.COMMAND; }
 <YYINITIAL> "local" { return SQFTypes.COMMAND; }
 <YYINITIAL> "localize" { return SQFTypes.COMMAND; }
+<YYINITIAL> "locationNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "locationPosition" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lock" { return SQFTypes.COMMAND; }
 <YYINITIAL> "lockCameraTo" { return SQFTypes.COMMAND; }
@@ -1165,7 +1135,9 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "min" { return SQFTypes.COMMAND; }
 <YYINITIAL> "mineActive" { return SQFTypes.COMMAND; }
 <YYINITIAL> "mineDetectedBy" { return SQFTypes.COMMAND; }
+<YYINITIAL> "missionConfigFile" { return SQFTypes.COMMAND; }
 <YYINITIAL> "missionName" { return SQFTypes.COMMAND; }
+<YYINITIAL> "missionNamespace" { return SQFTypes.COMMAND; }
 <YYINITIAL> "missionStart" { return SQFTypes.COMMAND; }
 <YYINITIAL> "missionVersion" { return SQFTypes.COMMAND; }
 <YYINITIAL> "modelToWorld" { return SQFTypes.COMMAND; }
@@ -1205,14 +1177,17 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "nearTargets" { return SQFTypes.COMMAND; }
 <YYINITIAL> "needReload" { return SQFTypes.COMMAND; }
 <YYINITIAL> "netId" { return SQFTypes.COMMAND; }
+<YYINITIAL> "netObjNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "newOverlay" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nextMenuItemIndex" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nextWeatherChange" { return SQFTypes.COMMAND; }
+<YYINITIAL> "nil" { return SQFTypes.COMMAND; }
 <YYINITIAL> "nMenuItems" { return SQFTypes.COMMAND; }
 <YYINITIAL> "numberToDate" { return SQFTypes.COMMAND; }
 <YYINITIAL> "objectCurators" { return SQFTypes.COMMAND; }
 <YYINITIAL> "objectFromNetId" { return SQFTypes.COMMAND; }
 <YYINITIAL> "objectParent" { return SQFTypes.COMMAND; }
+<YYINITIAL> "objNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "objStatus" { return SQFTypes.COMMAND; }
 <YYINITIAL> "onBriefingGroup" { return SQFTypes.COMMAND; }
 <YYINITIAL> "onBriefingNotes" { return SQFTypes.COMMAND; }
@@ -1241,12 +1216,17 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "overcastForecast" { return SQFTypes.COMMAND; }
 <YYINITIAL> "owner" { return SQFTypes.COMMAND; }
 <YYINITIAL> "param" { return SQFTypes.COMMAND; }
+<YYINITIAL> "params" { return SQFTypes.COMMAND; }
 <YYINITIAL> "parseNumber" { return SQFTypes.COMMAND; }
 <YYINITIAL> "parseText" { return SQFTypes.COMMAND; }
+<YYINITIAL> "parsingNamespace" { return SQFTypes.COMMAND; }
 <YYINITIAL> "particlesQuality" { return SQFTypes.COMMAND; }
 <YYINITIAL> "pi" { return SQFTypes.COMMAND; }
 <YYINITIAL> "pickWeaponPool" { return SQFTypes.COMMAND; }
 <YYINITIAL> "pitch" { return SQFTypes.COMMAND; }
+<YYINITIAL> "pixelGrid" { return SQFTypes.COMMAND; }
+<YYINITIAL> "pixelH" { return SQFTypes.COMMAND; }
+<YYINITIAL> "pixelW" { return SQFTypes.COMMAND; }
 <YYINITIAL> "playableSlotsNumber" { return SQFTypes.COMMAND; }
 <YYINITIAL> "playableUnits" { return SQFTypes.COMMAND; }
 <YYINITIAL> "playAction" { return SQFTypes.COMMAND; }
@@ -1287,9 +1267,11 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "primaryWeaponItems" { return SQFTypes.COMMAND; }
 <YYINITIAL> "primaryWeaponMagazine" { return SQFTypes.COMMAND; }
 <YYINITIAL> "priority" { return SQFTypes.COMMAND; }
+<YYINITIAL> "private" { return SQFTypes.COMMAND; }
 <YYINITIAL> "processDiaryLink" { return SQFTypes.COMMAND; }
 <YYINITIAL> "productVersion" { return SQFTypes.COMMAND; }
 <YYINITIAL> "profileName" { return SQFTypes.COMMAND; }
+<YYINITIAL> "profileNamespace" { return SQFTypes.COMMAND; }
 <YYINITIAL> "profileNameSteam" { return SQFTypes.COMMAND; }
 <YYINITIAL> "progressLoadingScreen" { return SQFTypes.COMMAND; }
 <YYINITIAL> "progressPosition" { return SQFTypes.COMMAND; }
@@ -1342,6 +1324,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "removeAllMissionEventHandlers" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeAllMPEventHandlers" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeAllMusicEventHandlers" { return SQFTypes.COMMAND; }
+<YYINITIAL> "removeAllOwnedMines" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeAllPrimaryWeaponItems" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeAllWeapons" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeBackpack" { return SQFTypes.COMMAND; }
@@ -1372,6 +1355,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "removeMissionEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeMPEventHandler" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeMusicEventHandler" { return SQFTypes.COMMAND; }
+<YYINITIAL> "removeOwnedMine" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removePrimaryWeaponItem" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeSecondaryWeaponItem" { return SQFTypes.COMMAND; }
 <YYINITIAL> "removeSimpleTask" { return SQFTypes.COMMAND; }
@@ -1424,17 +1408,21 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "saveIdentity" { return SQFTypes.COMMAND; }
 <YYINITIAL> "saveJoysticks" { return SQFTypes.COMMAND; }
 <YYINITIAL> "saveOverlay" { return SQFTypes.COMMAND; }
+<YYINITIAL> "saveProfileNamespace" { return SQFTypes.COMMAND; }
 <YYINITIAL> "saveStatus" { return SQFTypes.COMMAND; }
 <YYINITIAL> "saveVar" { return SQFTypes.COMMAND; }
 <YYINITIAL> "savingEnabled" { return SQFTypes.COMMAND; }
 <YYINITIAL> "say" { return SQFTypes.COMMAND; }
 <YYINITIAL> "say2D" { return SQFTypes.COMMAND; }
 <YYINITIAL> "say3D" { return SQFTypes.COMMAND; }
+<YYINITIAL> "scopeName" { return SQFTypes.COMMAND; }
 <YYINITIAL> "score" { return SQFTypes.COMMAND; }
 <YYINITIAL> "scoreSide" { return SQFTypes.COMMAND; }
+<YYINITIAL> "screenshot" { return SQFTypes.COMMAND; }
 <YYINITIAL> "screenToWorld" { return SQFTypes.COMMAND; }
 <YYINITIAL> "scriptDone" { return SQFTypes.COMMAND; }
 <YYINITIAL> "scriptName" { return SQFTypes.COMMAND; }
+<YYINITIAL> "scriptNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "scudState" { return SQFTypes.COMMAND; }
 <YYINITIAL> "secondaryWeapon" { return SQFTypes.COMMAND; }
 <YYINITIAL> "secondaryWeaponItems" { return SQFTypes.COMMAND; }
@@ -1444,6 +1432,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "selectDiarySubject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "selectedEditorObjects" { return SQFTypes.COMMAND; }
 <YYINITIAL> "selectEditorObject" { return SQFTypes.COMMAND; }
+<YYINITIAL> "selectionNames" { return SQFTypes.COMMAND; }
 <YYINITIAL> "selectionPosition" { return SQFTypes.COMMAND; }
 <YYINITIAL> "selectLeader" { return SQFTypes.COMMAND; }
 <YYINITIAL> "selectNoPlayer" { return SQFTypes.COMMAND; }
@@ -1652,10 +1641,12 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "setType" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setUnconscious" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setUnitAbility" { return SQFTypes.COMMAND; }
+<YYINITIAL> "setUnitLoadout" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setUnitPos" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setUnitPosWeak" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setUnitRank" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setUnitRecoilCoefficient" { return SQFTypes.COMMAND; }
+<YYINITIAL> "setUnitTrait" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setUnloadInCombat" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setUserActionText" { return SQFTypes.COMMAND; }
 <YYINITIAL> "setVariable" { return SQFTypes.COMMAND; }
@@ -1769,6 +1760,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "squadParams" { return SQFTypes.COMMAND; }
 <YYINITIAL> "stance" { return SQFTypes.COMMAND; }
 <YYINITIAL> "startLoadingScreen" { return SQFTypes.COMMAND; }
+<YYINITIAL> "step" { return SQFTypes.COMMAND; }
 <YYINITIAL> "stop" { return SQFTypes.COMMAND; }
 <YYINITIAL> "stopped" { return SQFTypes.COMMAND; }
 <YYINITIAL> "str" { return SQFTypes.COMMAND; }
@@ -1779,6 +1771,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "surfaceNormal" { return SQFTypes.COMMAND; }
 <YYINITIAL> "surfaceType" { return SQFTypes.COMMAND; }
 <YYINITIAL> "swimInDepth" { return SQFTypes.COMMAND; }
+<YYINITIAL> "switch" { return SQFTypes.COMMAND; }
 <YYINITIAL> "switchableUnits" { return SQFTypes.COMMAND; }
 <YYINITIAL> "switchAction" { return SQFTypes.COMMAND; }
 <YYINITIAL> "switchCamera" { return SQFTypes.COMMAND; }
@@ -1805,11 +1798,13 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "taskDescription" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskDestination" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskHint" { return SQFTypes.COMMAND; }
+<YYINITIAL> "taskNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskParent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskResult" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskState" { return SQFTypes.COMMAND; }
 <YYINITIAL> "taskType" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teamMember" { return SQFTypes.COMMAND; }
+<YYINITIAL> "teamMemberNull" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teamName" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teams" { return SQFTypes.COMMAND; }
 <YYINITIAL> "teamSwitch" { return SQFTypes.COMMAND; }
@@ -1822,6 +1817,8 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "textLog" { return SQFTypes.COMMAND; }
 <YYINITIAL> "textLogFormat" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tg" { return SQFTypes.COMMAND; }
+<YYINITIAL> "then" { return SQFTypes.COMMAND; }
+<YYINITIAL> "throw" { return SQFTypes.COMMAND; }
 <YYINITIAL> "time" { return SQFTypes.COMMAND; }
 <YYINITIAL> "timeMultiplier" { return SQFTypes.COMMAND; }
 <YYINITIAL> "titleCut" { return SQFTypes.COMMAND; }
@@ -1829,6 +1826,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "titleObj" { return SQFTypes.COMMAND; }
 <YYINITIAL> "titleRsc" { return SQFTypes.COMMAND; }
 <YYINITIAL> "titleText" { return SQFTypes.COMMAND; }
+<YYINITIAL> "to" { return SQFTypes.COMMAND; }
 <YYINITIAL> "toArray" { return SQFTypes.COMMAND; }
 <YYINITIAL> "toLower" { return SQFTypes.COMMAND; }
 <YYINITIAL> "toString" { return SQFTypes.COMMAND; }
@@ -1844,6 +1842,8 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "triggerTimeout" { return SQFTypes.COMMAND; }
 <YYINITIAL> "triggerTimeoutCurrent" { return SQFTypes.COMMAND; }
 <YYINITIAL> "triggerType" { return SQFTypes.COMMAND; }
+<YYINITIAL> "true" { return SQFTypes.COMMAND; }
+<YYINITIAL> "try" { return SQFTypes.COMMAND; }
 <YYINITIAL> "turretLocal" { return SQFTypes.COMMAND; }
 <YYINITIAL> "turretOwner" { return SQFTypes.COMMAND; }
 <YYINITIAL> "turretUnit" { return SQFTypes.COMMAND; }
@@ -1860,6 +1860,12 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "tvSetData" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSetPicture" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSetPictureColor" { return SQFTypes.COMMAND; }
+<YYINITIAL> "tvSetPictureColorDisabled" { return SQFTypes.COMMAND; }
+<YYINITIAL> "tvSetPictureColorSelected" { return SQFTypes.COMMAND; }
+<YYINITIAL> "tvSetPictureRight" { return SQFTypes.COMMAND; }
+<YYINITIAL> "tvSetPictureRightColor" { return SQFTypes.COMMAND; }
+<YYINITIAL> "tvSetPictureRightColorDisabled" { return SQFTypes.COMMAND; }
+<YYINITIAL> "tvSetPictureRightColorSelected" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSetText" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSetTooltip" { return SQFTypes.COMMAND; }
 <YYINITIAL> "tvSetValue" { return SQFTypes.COMMAND; }
@@ -1871,6 +1877,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "typeName" { return SQFTypes.COMMAND; }
 <YYINITIAL> "typeOf" { return SQFTypes.COMMAND; }
 <YYINITIAL> "UAVControl" { return SQFTypes.COMMAND; }
+<YYINITIAL> "uiNamespace" { return SQFTypes.COMMAND; }
 <YYINITIAL> "uiSleep" { return SQFTypes.COMMAND; }
 <YYINITIAL> "unassignCurator" { return SQFTypes.COMMAND; }
 <YYINITIAL> "unassignItem" { return SQFTypes.COMMAND; }
@@ -1930,6 +1937,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "visiblePosition" { return SQFTypes.COMMAND; }
 <YYINITIAL> "visiblePositionASL" { return SQFTypes.COMMAND; }
 <YYINITIAL> "visibleWatch" { return SQFTypes.COMMAND; }
+<YYINITIAL> "waitUntil" { return SQFTypes.COMMAND; }
 <YYINITIAL> "waves" { return SQFTypes.COMMAND; }
 <YYINITIAL> "waypointAttachedObject" { return SQFTypes.COMMAND; }
 <YYINITIAL> "waypointAttachedVehicle" { return SQFTypes.COMMAND; }
@@ -1967,16 +1975,17 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "weightRTD" { return SQFTypes.COMMAND; }
 <YYINITIAL> "west" { return SQFTypes.COMMAND; }
 <YYINITIAL> "WFSideText" { return SQFTypes.COMMAND; }
+<YYINITIAL> "while" { return SQFTypes.COMMAND; }
 <YYINITIAL> "wind" { return SQFTypes.COMMAND; }
 <YYINITIAL> "windDir" { return SQFTypes.COMMAND; }
 <YYINITIAL> "windStr" { return SQFTypes.COMMAND; }
 <YYINITIAL> "wingsForcesRTD" { return SQFTypes.COMMAND; }
+<YYINITIAL> "with" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldName" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldSize" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldToModel" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldToModelVisual" { return SQFTypes.COMMAND; }
 <YYINITIAL> "worldToScreen" { return SQFTypes.COMMAND; }
-
 
 
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }

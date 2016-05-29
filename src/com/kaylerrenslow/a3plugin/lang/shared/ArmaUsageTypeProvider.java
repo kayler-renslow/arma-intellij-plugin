@@ -35,9 +35,9 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider{
 				return x;
 			}
 		}
-		if(PsiUtil.isOfElementType(element.getNode(), SQFTypes.PRIVATE_DECL_VAR)){
-			return TYPE_PRIVATE_DECL_VAR;
-		}
+//		if(PsiUtil.isOfElementType(element.getNode(), SQFTypes.PRIVATE_DECL_VAR)){
+//			return TYPE_PRIVATE_DECL_VAR;
+//		}
 
 		if (element.getContainingFile() instanceof SQFFile){
 			return TYPE_UNKNOWN_SQF_USAGE;

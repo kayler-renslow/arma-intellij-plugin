@@ -45,7 +45,6 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	private static final TextAttributesKey[] BAD_CHAR_KEYS = new TextAttributesKey[]{BAD_CHARACTER};
 	private static final TextAttributesKey[] COMMENT_KEYS = new TextAttributesKey[]{COMMENT};
 
-	private static final TextAttributesKey[] NAMESPACES_AND_CONFIGS_KEYS = new TextAttributesKey[]{CONSTANT};
 	private static final TextAttributesKey[] MAGIC_VAR_KEYS = new TextAttributesKey[]{MAGIC_VAR};
 
 	private static final TextAttributesKey[] COMMAND_KEYS = new TextAttributesKey[]{COMMAND};
@@ -116,11 +115,6 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		for(IElementType e: SQFStatic.OPERATORS){
 			if(tokenType.equals(e)){
 				return OPERATOR_KEYS;
-			}
-		}
-		for(IElementType e: SQFStatic.NAMESPACES_AND_CONFIGS){
-			if(tokenType.equals(e)){
-				return NAMESPACES_AND_CONFIGS_KEYS;
 			}
 		}
 		if (tokenType.equals(TokenType.BAD_CHARACTER)){

@@ -4,7 +4,10 @@ import com.intellij.lang.ASTNode;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiComment;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.tree.IElementType;
@@ -166,32 +169,32 @@ public class SQFPsiUtil {
 		return result;
 	}
 
-	/**
-	 * Creates a new SQFPrivateDecl with new vars appended and returns it
-	 *
-	 * @param project  project
-	 * @param decl     the private declaration to append to
-	 * @param varNames the names of the new variables to put inside the declaration
-	 * @return decl var
-	 */
-	@NotNull
-	public static SQFPrivateDecl createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
-		List<SQFPrivateDeclVar> declVars = decl.getPrivateDeclVars();
-		String text = "private [";
-		for (SQFPrivateDeclVar declVar : declVars) {
-			text += "\"" + declVar.getVarName() + "\",";
-		}
-		for (int i = 0; i < varNames.length; i++) {
-			text += "\"" + varNames[i] + (i != varNames.length - 1 ? "\"," : "\"];");
-		}
-		return (SQFPrivateDecl) createElement(project, text, SQFTypes.PRIVATE_DECL);
-	}
-
-	@NotNull
-	public static SQFPrivateDeclVar createPrivateDeclVarElement(@NotNull Project project, @NotNull String varName) {
-		SQFFile file = createFile(project, "private \"" + varName + "\";");
-		return (SQFPrivateDeclVar) PsiUtil.findDescendantElements(file, SQFTypes.PRIVATE_DECL_VAR, null).get(0).getPsi();
-	}
+//	/**
+//	 * Creates a new SQFPrivateDecl with new vars appended and returns it
+//	 *
+//	 * @param project  project
+//	 * @param decl     the private declaration to append to
+//	 * @param varNames the names of the new variables to put inside the declaration
+//	 * @return decl var
+//	 */
+//	@NotNull
+//	public static SQFPrivateDecl createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
+//		List<SQFPrivateDeclVar> declVars = decl.getPrivateDeclVars();
+//		String text = "private [";
+//		for (SQFPrivateDeclVar declVar : declVars) {
+//			text += "\"" + declVar.getVarName() + "\",";
+//		}
+//		for (int i = 0; i < varNames.length; i++) {
+//			text += "\"" + varNames[i] + (i != varNames.length - 1 ? "\"," : "\"];");
+//		}
+//		return (SQFPrivateDecl) createElement(project, text, SQFTypes.PRIVATE_DECL);
+//	}
+//
+//	@NotNull
+//	public static SQFPrivateDeclVar createPrivateDeclVarElement(@NotNull Project project, @NotNull String varName) {
+//		SQFFile file = createFile(project, "private \"" + varName + "\";");
+//		return (SQFPrivateDeclVar) PsiUtil.findDescendantElements(file, SQFTypes.PRIVATE_DECL_VAR, null).get(0).getPsi();
+//	}
 
 	@NotNull
 	public static SQFVariable createVariable(@NotNull Project project, @NotNull String text) {

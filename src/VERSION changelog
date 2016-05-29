@@ -1,10 +1,9 @@
-Version: 1.0.3
-Release date: May 22 2016
+Version: tbd
+Release date: tbd
 
 Plugin
 	ADDED:
-        automatic plugin update check
-        view version in about
+        none
     CHANGED:
         none
     FIXED:
@@ -12,7 +11,7 @@ Plugin
 
 Shared between languages
 	ADDED:
-        ability to disable the error notification at the top of files for SQF and Header (Go to main menu > Arma Plugin > Plugin Properties)
+        none
     CHANGED:
         none
     FIXED:
@@ -24,8 +23,7 @@ SQF
     CHANGED:
         none
     FIXED:
-        documentation not showing up for some commands
-        auto completion for config files and other things
+        none
 
 Header
     ADDED:
