@@ -11,13 +11,15 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.PluginIcons;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
-import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.*;
+import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.SQFCompInsertHandlerHintfln;
+import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.SQFCompInsertHandlerHintfo;
+import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.SQFCompInsertHandlerParams;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
@@ -59,7 +61,7 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		} else {
 			prevSibText = prevSiblingNotWhitespace.getText();
 		}
-
+		System.out.println("SQFCompletionProvider.addCompletions prevSibText=" + prevSibText);
 		boolean isFunctionCallExp = prevSibText.equals("call") || prevSibText.equals("spawn");
 
 		if (cursor.getText().contains("_fnc") || isFunctionCallExp) {

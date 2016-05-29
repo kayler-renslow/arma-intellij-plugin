@@ -41,7 +41,7 @@ public class SQFStatic {
 	public static final IElementType[] OPERATORS = {SQFTypes.EQEQ, SQFTypes.EQ, SQFTypes.ASTERISK, SQFTypes.NE, SQFTypes.PERC, SQFTypes.PLUS, SQFTypes.MINUS, SQFTypes.FSLASH, SQFTypes.CARET, SQFTypes.GTGT, SQFTypes.GT, SQFTypes.GE,
 			SQFTypes.LT, SQFTypes.LE, SQFTypes.EXCL, SQFTypes.AMPAMP, SQFTypes.BARBAR, SQFTypes.QUEST, SQFTypes.COLON};
 
-	public static final IElementType[] COMMANDS = {SQFTypes.COMMAND};
+	public static final IElementType[] COMMANDS = {SQFTypes.COMMAND, SQFTypes.CASE};
 
 	static {
 		Collections.sort(LIST_COMMANDS);

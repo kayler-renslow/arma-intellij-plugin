@@ -65,7 +65,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "not" { return SQFTypes.NOT; }
 <YYINITIAL> "and" { return SQFTypes.AND; }
 <YYINITIAL> "or" { return SQFTypes.OR; }
-
+<YYINITIAL> "case" { return SQFTypes.CASE; } //why sqf... why is this the only time a colon is required next to a command? (case 0: {};)
 
 
 <YYINITIAL> "abs" { return SQFTypes.COMMAND; }
@@ -294,7 +294,6 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "canUnloadInCombat" { return SQFTypes.COMMAND; }
 <YYINITIAL> "captive" { return SQFTypes.COMMAND; }
 <YYINITIAL> "captiveNum" { return SQFTypes.COMMAND; }
-<YYINITIAL> "case" { return SQFTypes.COMMAND; }
 <YYINITIAL> "catch" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cbChecked" { return SQFTypes.COMMAND; }
 <YYINITIAL> "cbSetChecked" { return SQFTypes.COMMAND; }
@@ -2004,7 +2003,6 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "%" { return SQFTypes.PERC; }
 <YYINITIAL> "+" { return SQFTypes.PLUS; }
 <YYINITIAL> "-" { return SQFTypes.MINUS; }
-//<YYINITIAL> "\\" { return SQFTypes.BSLASH; }
 <YYINITIAL> "/" { return SQFTypes.FSLASH; }
 <YYINITIAL> "^" { return SQFTypes.CARET; }
 
@@ -2012,8 +2010,6 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> ">" { return SQFTypes.GT; }
 
 <YYINITIAL> "!" { return SQFTypes.EXCL; }
-//<YYINITIAL> "&" { return SQFTypes.AMP; }
-//<YYINITIAL> "|" { return SQFTypes.BAR; }
 
 <YYINITIAL> "("   { return SQFTypes.LPAREN; }
 <YYINITIAL> ")"   { return SQFTypes.RPAREN; }
@@ -2027,4 +2023,4 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "?" { return SQFTypes.QUEST; }
 <YYINITIAL> ":" { return SQFTypes.COLON; }
 
-<YYINITIAL> . { return SQFTypes.BAD_CHARACTER; }
+<YYINITIAL> . { return TokenType.BAD_CHARACTER; }

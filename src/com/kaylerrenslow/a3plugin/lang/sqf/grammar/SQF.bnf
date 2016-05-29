@@ -24,43 +24,46 @@
 // @formatter:off
 sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
 
-file_scope ::= item_* return_statement? (comment | BAD_CHARACTER)* {extends("file_scope")=local_scope}
-local_scope ::= item_* return_statement? (comment | BAD_CHARACTER)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars getStatementsForScope checkIfSpawn]}
+file_scope ::= item_* return_statement? (comment )* {extends("file_scope")=local_scope}
+local_scope ::= item_* return_statement? (comment)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars getStatementsForScope checkIfSpawn]}
 
-private item_ ::= comment | statement | BAD_CHARACTER
+private item_ ::= comment | statement
 
 comment ::= INLINE_COMMENT | BLOCK_COMMENT | COMMENT_COMMAND
 variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope isAssigningVariable getMyAssignment getPrivatization varNameMatches]}
 
-statement ::= ( assignment | expression | quest_statement) SEMICOLON
+statement ::= ( assignment | expression | quest_statement | case_statement) SEMICOLON
 
 return_statement ::= expression SEMICOLON?
 quest_statement ::= QUEST expression COLON expression
+case_statement ::= CASE expression COLON code_block
 
 assignment ::= (COMMAND? variable) EQ (expression | code_block) {methods=[getAssigningVariable isDeclaredPrivate]}
 
 expression ::= conditional_group_
-            | comparison_group_
+            | add_group_
+            | comp_expression
             | mul_group_
             | unary_group_
             | exponent_expression
-            | add_group_
             | config_fetch_expression
             | command_expression
-            | primary_group_
+            | literal_expression
+            | paren_expression
 
 private add_group_ ::= add_expression | sub_expression
 private mul_group_ ::= mul_expression | div_expression | mod_expression
-private unary_group_ ::= unary_plus_expression | unary_min_expression
+private unary_group_ ::= unary_expression
 private conditional_group_::= bool_and_expression | bool_or_expression | bool_not_expression
-private comparison_group_ ::= comp_expression
 
-private primary_group_ ::= string
-                         | macro_call
-                         | variable
-                         | INTEGER_LITERAL
-                         | array_val
-                         | DEC_LITERAL
+unary_expression ::= (PLUS | MINUS) (literal_expression | paren_expression)
+
+literal_expression ::= string
+                    | macro_call
+                    | variable
+                    | INTEGER_LITERAL
+                    | array_val
+                    | DEC_LITERAL
 
 add_expression ::= expression PLUS expression
 sub_expression ::= expression MINUS expression
@@ -76,11 +79,9 @@ comp_expression ::= expression (EQEQ | NE | LT | LE | GT | GE) expression
 
 config_fetch_expression ::= expression (FSLASH | GTGT) expression
 
-unary_plus_expression ::= PLUS expression
-unary_min_expression ::= MINUS expression
 exponent_expression ::= expression (CARET expression)+
-command_expression ::= command_operand_ COMMAND command_operand_? | COMMAND command_operand_ | COMMAND
-    private command_operand_ ::= unary_group_| primary_group_ | paren_expression | code_block
+command_expression ::= (((PLUS | MINUS | EXCL | NOT)? (paren_expression | literal_expression)) | code_block)? COMMAND (code_block | expression)?
+
 paren_expression ::= LPAREN expression RPAREN
 
 
@@ -88,6 +89,7 @@ string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.
 
 macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 
-array_val ::= LBRACKET (expression | code_block (COMMA expression | code_block)*)? RBRACKET
+array_val ::= LBRACKET array_entry (COMMA array_entry)* RBRACKET
+private array_entry ::= expression | code_block
 
 code_block ::= LBRACE local_scope? RBRACE

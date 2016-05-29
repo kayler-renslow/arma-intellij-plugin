@@ -40,7 +40,7 @@ public class SQFPsiImplUtilForGrammar {
 	}
 
 	public static boolean isDeclaredPrivate(SQFAssignment assignment) {
-		return assignment.getNode().getFirstChildNode().getElementType() == SQFTypes.PRIVATE;
+		return assignment.getNode().getFirstChildNode().getElementType() == SQFTypes.COMMAND && assignment.getNode().getFirstChildNode().getText().equals("private");
 	}
 
 //	public static SQFScope getLoopScope(SQFForLoopBase loop) {

@@ -1,7 +1,6 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting;
 
 import com.intellij.openapi.editor.colors.TextAttributesKey;
-import com.intellij.openapi.editor.colors.impl.DefaultColorsScheme;
 import com.intellij.openapi.fileTypes.SyntaxHighlighter;
 import com.intellij.openapi.options.colors.AttributesDescriptor;
 import com.intellij.openapi.options.colors.ColorDescriptor;
@@ -32,7 +31,6 @@ public class SQFColorSettingsPage implements ColorSettingsPage{
 			new AttributesDescriptor("Magic Variable", SQFSyntaxHighlighter.MAGIC_VAR),
 			new AttributesDescriptor("Command", SQFSyntaxHighlighter.COMMAND),
 			new AttributesDescriptor("Comment", SQFSyntaxHighlighter.COMMENT),
-			new AttributesDescriptor("Constant", SQFSyntaxHighlighter.CONSTANT),
 			new AttributesDescriptor("Keyword", SQFSyntaxHighlighter.KEYWORD),
 			new AttributesDescriptor("String", SQFSyntaxHighlighter.STRING),
 			new AttributesDescriptor("Number", SQFSyntaxHighlighter.NUM),

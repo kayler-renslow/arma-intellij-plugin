@@ -25,7 +25,6 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey GLOBAL_VAR = createTextAttributesKey("A3_SQF_GLOBAL_VAR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
 	public static final TextAttributesKey LOCAL_VAR = createTextAttributesKey("A3_SQF_LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
 
-	public static final TextAttributesKey CONSTANT = createTextAttributesKey("A3_SQF_CONSTANT", DefaultLanguageHighlighterColors.CONSTANT);
 	public static final TextAttributesKey MAGIC_VAR = createTextAttributesKey("A3_SQF_MAGIC_VARIABLE");
 	public static final TextAttributesKey KEYWORD = createTextAttributesKey("A3_SQF_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
 	public static final TextAttributesKey COMMAND = createTextAttributesKey("A3_SQF_COMMAND", DefaultLanguageHighlighterColors.METADATA);
