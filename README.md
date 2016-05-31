@@ -12,6 +12,7 @@ This project is open source. Do what you want with the code. Sell it, modify it,
 
 ### Some Information on the Source Code
 *None* of the documentation files for SQF commands or BIS functions is inside the repo. This is intentional and keeps the repo size smaller. You may need to create a few directories to get the plugin started and possibly a few blank files with command names as the name (e.g. createVehicle command's doc file will be located in "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/commands-doc/createVehicle" and it has no file extension like .txt or .html).
+**Alternatively** you could extract the documentation files out of the Arma.Intellij.Plugin.jar and place them inside your project.
 
 Also, the Lexer and Parser is generated and is not committed either. You will need to find Header.bnf, Header.flex, SQF.bnf, and SQF.flex and run the generators. For generating .flex files, right click and click "Run JFlex generator". To generate .bnf files, right click and click "Generate Parser Code". 
 
