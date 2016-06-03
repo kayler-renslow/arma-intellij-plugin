@@ -16,9 +16,9 @@ Shared between languages
 
 SQF
 	ADDED:
-        finding usages of commands
+        implementation for annotator without it working
     CHANGED:
-        removed "keywords" from grammar and now uses purely commands
+        none
     FIXED:
         none
 

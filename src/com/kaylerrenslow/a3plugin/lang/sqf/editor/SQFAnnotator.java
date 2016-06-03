@@ -3,7 +3,7 @@ package com.kaylerrenslow.a3plugin.lang.sqf.editor;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.psi.PsiElement;
-import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.visitor.SQFVisitorAnnotator;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -13,11 +13,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SQFAnnotator implements Annotator{
 
-	private final SQFVisitorAnnotator visitorAnnotator = new SQFVisitorAnnotator();
-
 	@Override
 	public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
-		visitorAnnotator.setAnnotator(holder);
-		element.accept(visitorAnnotator);
+		element.accept(new SQFVisitorAnnotator(holder));
 	}
 }
