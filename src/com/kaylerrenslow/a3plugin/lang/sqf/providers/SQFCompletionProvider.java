@@ -61,7 +61,7 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		} else {
 			prevSibText = prevSiblingNotWhitespace.getText();
 		}
-		System.out.println("SQFCompletionProvider.addCompletions prevSibText=" + prevSibText);
+
 		boolean isFunctionCallExp = prevSibText.equals("call") || prevSibText.equals("spawn");
 
 		if (cursor.getText().contains("_fnc") || isFunctionCallExp) {

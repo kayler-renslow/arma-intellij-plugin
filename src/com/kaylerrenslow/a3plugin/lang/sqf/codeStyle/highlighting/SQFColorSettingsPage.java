@@ -31,7 +31,6 @@ public class SQFColorSettingsPage implements ColorSettingsPage{
 			new AttributesDescriptor("Magic Variable", SQFSyntaxHighlighter.MAGIC_VAR),
 			new AttributesDescriptor("Command", SQFSyntaxHighlighter.COMMAND),
 			new AttributesDescriptor("Comment", SQFSyntaxHighlighter.COMMENT),
-			new AttributesDescriptor("Keyword", SQFSyntaxHighlighter.KEYWORD),
 			new AttributesDescriptor("String", SQFSyntaxHighlighter.STRING),
 			new AttributesDescriptor("Number", SQFSyntaxHighlighter.NUM),
 			new AttributesDescriptor("Operator", SQFSyntaxHighlighter.OPERATOR),

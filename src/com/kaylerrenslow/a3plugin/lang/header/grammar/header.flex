@@ -23,7 +23,7 @@ IDENTIFIER = [:jletter:] [:jletterdigit:]*
 
 LINE_TERMINATOR = \r | \n | \r\n
 INPUT_CHARACTER = [^\r\n]
-MACRO_NEWLINE = (" \\\n" | " \\\r\n" | " \\\r") [ \t\f]*
+MACRO_NEWLINE = ("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*
 MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
 
 

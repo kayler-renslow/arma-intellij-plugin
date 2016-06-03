@@ -16,9 +16,9 @@ Shared between languages
 
 SQF
 	ADDED:
-        none
+        finding usages of commands
     CHANGED:
-        none
+        removed "keywords" from grammar and now uses purely commands
     FIXED:
         none
 

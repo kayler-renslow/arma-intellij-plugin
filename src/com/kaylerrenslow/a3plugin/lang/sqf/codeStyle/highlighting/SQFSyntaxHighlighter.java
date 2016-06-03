@@ -26,7 +26,6 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	public static final TextAttributesKey LOCAL_VAR = createTextAttributesKey("A3_SQF_LOCAL_VAR", DefaultLanguageHighlighterColors.LOCAL_VARIABLE);
 
 	public static final TextAttributesKey MAGIC_VAR = createTextAttributesKey("A3_SQF_MAGIC_VARIABLE");
-	public static final TextAttributesKey KEYWORD = createTextAttributesKey("A3_SQF_KEYWORD", DefaultLanguageHighlighterColors.KEYWORD);
 	public static final TextAttributesKey COMMAND = createTextAttributesKey("A3_SQF_COMMAND", DefaultLanguageHighlighterColors.METADATA);
 	public static final TextAttributesKey OPERATOR = createTextAttributesKey("A3_SQF_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
 
@@ -49,7 +48,6 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	private static final TextAttributesKey[] COMMAND_KEYS = new TextAttributesKey[]{COMMAND};
 	private static final TextAttributesKey[] GLOBAL_VAR_KEYS = new TextAttributesKey[]{GLOBAL_VAR};
 	private static final TextAttributesKey[] LOCAL_VAR_KEYS = new TextAttributesKey[]{LOCAL_VAR};
-	private static final TextAttributesKey[] KEYWORD_KEYS = new TextAttributesKey[]{KEYWORD};
 
 	private static final TextAttributesKey[] STRING_KEYS = new TextAttributesKey[]{STRING};
 	private static final TextAttributesKey[] NUM_KEYS = new TextAttributesKey[]{NUM};
@@ -101,15 +99,8 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(SQFTypes.LANG_VAR)){
 			return MAGIC_VAR_KEYS;
 		}
-		for(IElementType e: SQFStatic.COMMANDS){
-			if(tokenType.equals(e)){
-				return COMMAND_KEYS;
-			}
-		}
-		for(IElementType e: SQFStatic.KEYWORDS){
-			if(tokenType.equals(e)){
-				return KEYWORD_KEYS;
-			}
+		if(tokenType.equals(SQFTypes.COMMAND_TOKEN)){
+			return COMMAND_KEYS;
 		}
 		for(IElementType e: SQFStatic.OPERATORS){
 			if(tokenType.equals(e)){

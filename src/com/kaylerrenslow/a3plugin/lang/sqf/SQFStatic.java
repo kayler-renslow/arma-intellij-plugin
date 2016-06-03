@@ -36,12 +36,9 @@ public class SQFStatic {
 
 	private static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
 
-	public static final IElementType[] KEYWORDS = {SQFTypes.NOT, SQFTypes.AND, SQFTypes.OR, SQFTypes.MOD};
-
 	public static final IElementType[] OPERATORS = {SQFTypes.EQEQ, SQFTypes.EQ, SQFTypes.ASTERISK, SQFTypes.NE, SQFTypes.PERC, SQFTypes.PLUS, SQFTypes.MINUS, SQFTypes.FSLASH, SQFTypes.CARET, SQFTypes.GTGT, SQFTypes.GT, SQFTypes.GE,
 			SQFTypes.LT, SQFTypes.LE, SQFTypes.EXCL, SQFTypes.AMPAMP, SQFTypes.BARBAR, SQFTypes.QUEST, SQFTypes.COLON};
 
-	public static final IElementType[] COMMANDS = {SQFTypes.COMMAND, SQFTypes.CASE};
 
 	static {
 		Collections.sort(LIST_COMMANDS);
@@ -51,13 +48,8 @@ public class SQFStatic {
 	public static final String[] VALS = {"parsingNamespace", "currentNamespace", "missionNamespace", "profileNamespace", "saveProfileNamespace", "uiNamespace", "configFile", "campaignConfigFile", "missionConfigFile", "true", "false", "nil", "configNull", "controlNull", "displayNull", "grpNull", "objNull", "scriptNull", "locationNull", "netObjNull", "taskNull", "teamMemberNull"};
 
 	public static boolean hasDocumentation(IElementType type) {
-		if (type == SQFTypes.COMMAND) {
+		if (type == SQFTypes.COMMAND_TOKEN) {
 			return true;
-		}
-		for (IElementType keywordType : KEYWORDS) {
-			if (keywordType == type) {
-				return true;
-			}
 		}
 		return false;
 	}
