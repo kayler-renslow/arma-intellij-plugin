@@ -227,4 +227,19 @@ public class SQFPsiUtil {
 	public static SQFString createNewStringLiteral(Project project, String textWithoutQuotes) {
 		return (SQFString) createElement(project, "\"" + textWithoutQuotes + "\"", SQFTypes.STRING);
 	}
+
+	@SuppressWarnings("unchecked")
+	/** Get all array entries in the array where the expression type is of class type. Do not make this a utility method for the grammar because the generic type parameter won't work */
+	public static <T extends SQFExpression> List<T> getExpressionsOfType(SQFArrayVal array, Class<T> type) {
+		List<SQFArrayEntry> arrayEntryList = array.getArrayEntryList();
+		List<T> items = new ArrayList<>(arrayEntryList.size());
+		for (SQFArrayEntry arrayEntry : arrayEntryList) { //iterate over each string in params ["_var1","_var2"]
+			if (arrayEntry.getExpression() != null) {
+				if (type.isInstance(arrayEntry)) {
+					items.add((T) arrayEntry.getExpression());
+				}
+			}
+		}
+		return items;
+	}
 }

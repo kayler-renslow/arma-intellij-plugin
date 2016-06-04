@@ -8,10 +8,7 @@ import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighter;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFAssignment;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFCaseStatement;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVisitor;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -44,6 +41,33 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 			a.setTextAttributes(SQFSyntaxHighlighter.COMMENT_NOTE);
 
 		}
+	}
+
+	@Override
+	public void visitCommandExpression(@NotNull SQFCommandExpression o) {
+		PsiElement prefix = o.getPrefixArgument();
+		PsiElement postfix = o.getPostfixArgument();
+		String commandName = o.getCommand().getText();
+		if (commandName.equals("private")) {
+			boolean error = false;
+			if (postfix instanceof SQFLiteralExpression) {
+				SQFLiteralExpression literal = (SQFLiteralExpression) postfix;
+				if (literal.getArrayVal() == null && literal.getString() == null) {
+					error = true;
+				}
+			} else {
+				error = true;
+			}
+			if (error) {
+				if (prefix != null) {
+					createDeleteTokenAnotation(prefix);
+				}
+				expect("String or Array of Strings", postfix);
+			}
+		} else if (commandName.equals("params")) {
+
+		}
+		super.visitCommandExpression(o);
 	}
 
 	@Override

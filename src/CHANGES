@@ -16,9 +16,9 @@ Shared between languages
 
 SQF
 	ADDED:
-        implementation for annotator without it working
+        added in old method of variable privatizations and declarations. This is done with wrapper classes.
     CHANGED:
-        none
+        stopped the use of a visitor to check scope and private declarations and moved back to old method
     FIXED:
         none
 
