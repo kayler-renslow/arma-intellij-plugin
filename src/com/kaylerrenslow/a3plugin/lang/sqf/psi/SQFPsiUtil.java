@@ -16,6 +16,8 @@ import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFPrivateDecl;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFPrivateDeclVar;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,17 +27,17 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * @author Kayler
- *         Psi utilities for SQF
- *         Created on 03/20/2016.
- */
+ @author Kayler
+ Psi utilities for SQF
+ Created on 03/20/2016. */
 public class SQFPsiUtil {
 
 
 	/**
-	 * Check if the given element is inside a [] spawn {}. For spawn, all variables are created in a different environment
-	 * We must iterate over all upper code blocks and see if they are part of a spawn statement. Unlike scope.checkIfSpawn(), this will traverse the tree upwards to the file scope to make sure that the element isn't inside the spawn scope
-	 * @return the scope that starts the spawn scope ([] spawn {}), or null if not inside spawn
+	 Check if the given element is inside a [] spawn {}. For spawn, all variables are created in a different environment
+	 We must iterate over all upper code blocks and see if they are part of a spawn statement. Unlike scope.checkIfSpawn(), this will traverse the tree upwards to the file scope to make sure that the element isn't inside the spawn scope
+
+	 @return the scope that starts the spawn scope ([] spawn {}), or null if not inside spawn
 	 */
 	@Nullable
 	public static SQFScope checkIfInsideSpawn(@NotNull PsiElement element) {
@@ -58,10 +60,10 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 * Checks if the given PsiElement is a BIS function (is of type SQFTypes.VARIABLE or SQFTypes.GLOBAL_VAR and is defined in documentation, false otherwise).
-	 *
-	 * @param element element
-	 * @return true if the given PsiElement is a BIS function, false otherwise
+	 Checks if the given PsiElement is a BIS function (is of type SQFTypes.VARIABLE or SQFTypes.GLOBAL_VAR and is defined in documentation, false otherwise).
+
+	 @param element element
+	 @return true if the given PsiElement is a BIS function, false otherwise
 	 */
 	public static boolean isBisFunction(@NotNull PsiElement element) {
 		if (PsiUtil.isOfElementType(element, SQFTypes.VARIABLE)) {
@@ -81,10 +83,10 @@ public class SQFPsiUtil {
 
 
 	/**
-	 * Gets the containing scope of the psi element. Scope is determined by what code block element is in, or if not in a code block then the file's file scope is returned
-	 *
-	 * @param element element to get scope of
-	 * @return scope
+	 Gets the containing scope of the psi element. Scope is determined by what code block element is in, or if not in a code block then the file's file scope is returned
+
+	 @param element element to get scope of
+	 @return scope
 	 */
 	@NotNull
 	public static SQFScope getContainingScope(@NotNull PsiElement element) {
@@ -92,18 +94,18 @@ public class SQFPsiUtil {
 		while (parent != null && !(parent instanceof SQFScope)) {
 			parent = parent.getParent();
 		}
-		if(parent == null){
-			return getFileScope((SQFFile)element.getContainingFile());
+		if (parent == null) {
+			return getFileScope((SQFFile) element.getContainingFile());
 		}
 		return (SQFScope) parent;
 	}
 
 	/**
-	 * Adds all SQFVariables in the current module that is equal to findVar into a list and returns it
-	 *
-	 * @param project project
-	 * @param findVar global variable
-	 * @return list
+	 Adds all SQFVariables in the current module that is equal to findVar into a list and returns it
+
+	 @param project project
+	 @param findVar global variable
+	 @return list
 	 */
 	@NotNull
 	public static List<SQFVariable> findGlobalVariables(@NotNull Project project, @NotNull SQFVariable findVar) {
@@ -133,11 +135,11 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 * Adds all SQFVariables in the current module where the variable name is a config function and the function tag is equal to parameter tag
-	 *
-	 * @param module module
-	 * @param tag tag to search for
-	 * @return list
+	 Adds all SQFVariables in the current module where the variable name is a config function and the function tag is equal to parameter tag
+
+	 @param module module
+	 @param tag tag to search for
+	 @return list
 	 */
 	@NotNull
 	public static List<SQFVariable> findConfigFunctionVariablesWithTag(@NotNull Module module, @NotNull String tag) {
@@ -158,9 +160,9 @@ public class SQFPsiUtil {
 				if (type != SQFTypes.GLOBAL_VAR) {
 					continue;
 				}
-				if(SQFStatic.followsSQFFunctionNameRules(var.getVarName())){
+				if (SQFStatic.followsSQFFunctionNameRules(var.getVarName())) {
 					SQFStatic.SQFFunctionTagAndName tagAndName = SQFStatic.getFunctionTagAndName(var.getVarName());
-					if(tagAndName.tagName.equals(tag)){
+					if (tagAndName.tagName.equals(tag)) {
 						result.add(var);
 					}
 				}
@@ -169,32 +171,26 @@ public class SQFPsiUtil {
 		return result;
 	}
 
-//	/**
-//	 * Creates a new SQFPrivateDecl with new vars appended and returns it
-//	 *
-//	 * @param project  project
-//	 * @param decl     the private declaration to append to
-//	 * @param varNames the names of the new variables to put inside the declaration
-//	 * @return decl var
-//	 */
-//	@NotNull
-//	public static SQFPrivateDecl createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
-//		List<SQFPrivateDeclVar> declVars = decl.getPrivateDeclVars();
-//		String text = "private [";
-//		for (SQFPrivateDeclVar declVar : declVars) {
-//			text += "\"" + declVar.getVarName() + "\",";
-//		}
-//		for (int i = 0; i < varNames.length; i++) {
-//			text += "\"" + varNames[i] + (i != varNames.length - 1 ? "\"," : "\"];");
-//		}
-//		return (SQFPrivateDecl) createElement(project, text, SQFTypes.PRIVATE_DECL);
-//	}
-//
-//	@NotNull
-//	public static SQFPrivateDeclVar createPrivateDeclVarElement(@NotNull Project project, @NotNull String varName) {
-//		SQFFile file = createFile(project, "private \"" + varName + "\";");
-//		return (SQFPrivateDeclVar) PsiUtil.findDescendantElements(file, SQFTypes.PRIVATE_DECL_VAR, null).get(0).getPsi();
-//	}
+	/**
+	 Creates a new SQFCommandExpression that is a private[] syntax with new vars appended and returns it
+
+	 @param project project
+	 @param decl the private declaration to append to
+	 @param varNames the names of the new variables to put inside the declaration
+	 @return command expression that is the new private declaration
+	 */
+	@NotNull
+	public static SQFPrivateDecl createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
+		List<SQFPrivateDeclVar> declVars = decl.getPrivateDeclVars();
+		String text = "private [";
+		for (SQFPrivateDeclVar declVar : declVars) {
+			text += "\"" + declVar.getVarName() + "\",";
+		}
+		for (int i = 0; i < varNames.length; i++) {
+			text += "\"" + varNames[i] + (i != varNames.length - 1 ? "\"," : "\"];");
+		}
+		return (SQFPrivateDecl) createElement(project, text, SQFTypes.COMMAND_EXPRESSION);
+	}
 
 	@NotNull
 	public static SQFVariable createVariable(@NotNull Project project, @NotNull String text) {
@@ -235,7 +231,7 @@ public class SQFPsiUtil {
 		List<T> items = new ArrayList<>(arrayEntryList.size());
 		for (SQFArrayEntry arrayEntry : arrayEntryList) { //iterate over each string in params ["_var1","_var2"]
 			if (arrayEntry.getExpression() != null) {
-				if (type.isInstance(arrayEntry)) {
+				if (type.isInstance(arrayEntry.getExpression())) {
 					items.add((T) arrayEntry.getExpression());
 				}
 			}

@@ -46,6 +46,11 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 	}
 
 	@Override
+	public boolean isLangVar() {
+		return this.myVariableElementType == SQFTypes.LANG_VAR;
+	}
+
+	@Override
 	public ItemPresentation getPresentation() {
 		if(this.isGlobalVariable()){
 			if(SQFStatic.followsSQFFunctionNameRules(this.getVarName())){

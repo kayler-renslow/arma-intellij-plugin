@@ -4,6 +4,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -55,25 +56,24 @@ public class SQFVariableReference implements PsiReference {
 
 	@Override
 	public boolean isReferenceTo(PsiElement element) {
-//		if (!(element instanceof SQFVariable)) {
-//			return false;
-//		}
-//		PsiElement selfResolve = resolve();
-//		if(selfResolve == element || selfResolve == null){
-//			return false;
-//		}
-//		SQFVariable other = (SQFVariable) element;
-//
-//		boolean referenceTo = other.getVarName().equals(target.getVarName());
-//
-//		if (!var.isGlobalVariable()) {
-//			SQFScope myScope = ((SQFVariable) selfResolve).getDeclarationScope();
-//			SQFScope otherScope = ((SQFVariable) element).getDeclarationScope();
-//			referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == selfResolve.getContainingFile();
-//			return referenceTo;
-//		}
-//		return referenceTo;
-		return false;
+		if (!(element instanceof SQFVariable)) {
+			return false;
+		}
+		PsiElement selfResolve = resolve();
+		if(selfResolve == element || selfResolve == null){
+			return false;
+		}
+		SQFVariable other = (SQFVariable) element;
+
+		boolean referenceTo = other.getVarName().equals(target.getVarName());
+
+		if (!var.isGlobalVariable()) {
+			SQFScope myScope = ((SQFVariable) selfResolve).getDeclarationScope();
+			SQFScope otherScope = ((SQFVariable) element).getDeclarationScope();
+			referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == selfResolve.getContainingFile();
+			return referenceTo;
+		}
+		return referenceTo;
 	}
 
 	@NotNull

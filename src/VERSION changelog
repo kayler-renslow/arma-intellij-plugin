@@ -19,9 +19,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        none
+        unused check for global vars
+        finding usages of commands
     CHANGED:
-        none
+        removed "keywords" from parser. All prior keywords are now treated as commands.
+        grammar was mostly rewritten into a more concise and correct one
     FIXED:
         none
 

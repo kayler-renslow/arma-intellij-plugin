@@ -173,11 +173,11 @@ public class SQFPsiImplUtilForGrammar {
 		}
 
 
-			/*Find where the variable is declared private*/
+		/*Find where the variable is declared private*/
 
 		if (var.isAssigningVariable()) {
 			if (var.getMyAssignment().isDeclaredPrivate()) { //private var = 1;
-				return new SQFPrivatization.SQFVarInheritedPrivatization(var, containingScope);
+				return new SQFPrivatization.SQFPrivateAssignment(var, new SQFPrivateAssignmentPrivatizer(var.getMyAssignment()));
 			}
 		}
 
@@ -248,8 +248,6 @@ public class SQFPsiImplUtilForGrammar {
 				ret.add(new SQFPrivateDeclVar(assignment.getAssigningVariable(), new SQFPrivateAssignmentPrivatizer(assignment)));
 			}
 		}
-
-		PsiElement postfix;
 		String commandName;
 		SQFCommandExpression expression;
 

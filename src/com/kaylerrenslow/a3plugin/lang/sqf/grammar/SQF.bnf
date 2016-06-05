@@ -92,7 +92,7 @@ string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.
 
 macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 
-array_val ::= LBRACKET array_entry (COMMA array_entry)* RBRACKET {}
+array_val ::= (LBRACKET RBRACKET) | (LBRACKET array_entry (COMMA array_entry)* RBRACKET )
 array_entry ::= expression | code_block
 
 code_block ::= LBRACE local_scope? RBRACE

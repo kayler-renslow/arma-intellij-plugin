@@ -15,14 +15,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
- Created by Kayler on 06/03/2016.
- */
+ @author Kayler
+ SQF Command (e.g. createVehicle or params)
+ Createdon 06/03/2016. */
 public class SQFCommandElement extends ASTWrapperPsiElement implements PsiNamedElement {
 	public SQFCommandElement(@NotNull ASTNode node) {
 		super(node);
 	}
 
 	@Override
+	/**Get the name of the command (e.g. createVehicle or params or findDisplay)*/
 	public String getName() {
 		return getText();
 	}
