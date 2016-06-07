@@ -83,7 +83,7 @@ comp_expression ::= expression (EQEQ | NE | LT | LE | GT | GE) expression
 config_fetch_expression ::= expression (FSLASH | GTGT) expression
 
 exponent_expression ::= expression (CARET expression)+
-command_expression ::= (((PLUS | MINUS | EXCL | NOT)? (paren_expression | literal_expression)) | code_block)? command ((code_block expression?) | expression)? {methods=[getCommandName getPrefixArgument getPostfixArgument isControlStructure]}
+command_expression ::= (((PLUS | MINUS | EXCL | NOT)? (paren_expression | literal_expression)) | code_block)? command ((code_block expression?) | expression)? {methods=[getCommandName getPrefixArgument getPostfixArgument]}
 
 paren_expression ::= LPAREN expression RPAREN
 

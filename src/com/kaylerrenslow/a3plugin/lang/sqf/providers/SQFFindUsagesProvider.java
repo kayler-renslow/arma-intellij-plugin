@@ -40,7 +40,7 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 			}
 			return "Value read";
 		}
-		return getClass().getName() + " getHelpId";
+		return "SQF";
 	}
 
 	@NotNull
@@ -71,9 +71,6 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@NotNull
 	@Override
 	public String getNodeText(@NotNull PsiElement element, boolean useFullName) {
-		if(element instanceof SQFVariable){
-			return element.getText();
-		}
-		return getClass().getName() + " getNodeText";
+		return element.getText(); //text to display in find usages window beneath list
 	}
 }

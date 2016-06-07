@@ -72,6 +72,9 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 		if (privatizer instanceof SQFPrivateAssignmentPrivatizer) {
 			return new SQFPrivateAssignment(variable, (SQFPrivateAssignmentPrivatizer) privatizer);
 		}
+		if(privatizer instanceof SQFScope){
+			return new SQFVarInheritedPrivatization(variable, (SQFScope) privatizer);
+		}
 		throw new IllegalArgumentException("No known implementation class for privatizer element=" + privatizer);
 	}
 
@@ -86,15 +89,16 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 		 @param declarationScope the scope in which it is declared private in
 		 */
 		public SQFVarInheritedPrivatization(@NotNull SQFVariable privateElement, @NotNull SQFScope declarationScope) {
-			super(privateElement, null);
+			super(privateElement, declarationScope);
 			this.declarationScope = declarationScope;
 		}
 
-		@Nullable
+		@NotNull
 		@Override
-		public SQFScope getPrivatizer() {
+		public SQFScope getDeclarationScope() {
 			return this.declarationScope;
 		}
+
 	}
 
 	public static class SQFPrivateDeclClassic extends SQFPrivatization<SQFVariable, SQFPrivateDecl> {

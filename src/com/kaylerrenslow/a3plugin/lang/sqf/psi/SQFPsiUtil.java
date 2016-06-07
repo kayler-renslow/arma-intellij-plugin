@@ -238,4 +238,25 @@ public class SQFPsiUtil {
 		}
 		return items;
 	}
+
+	/**
+	 Get a postfix argument of class type. This method will traverse as far right until the end of the expression (for instance, searching expression 'vehicle player setPos' will search all the way to setPos)<br>
+	 Do not
+
+	 @param commandExpression command expression
+	 @return the first element of matched type, or null if none could be found.
+	 */
+	@Nullable
+	public static <T extends PsiElement> T getAPostfixArgument(SQFCommandExpression commandExpression, Class<T> tClass) {
+		PsiElement postfix = commandExpression.getPostfixArgument();
+		while (postfix != null) {
+			if (tClass.isInstance(postfix)) {
+				return (T) postfix;
+			}
+			if(postfix instanceof SQFCommandExpression){
+				postfix = ((SQFCommandExpression) postfix).getPostfixArgument();
+			}
+		}
+		return null;
+	}
 }

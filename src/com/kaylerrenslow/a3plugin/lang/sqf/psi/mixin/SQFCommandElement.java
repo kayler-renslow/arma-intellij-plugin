@@ -2,12 +2,15 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFCommand;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFCommandItemPresentation;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFCommandReference;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -18,7 +21,7 @@ import java.util.ArrayList;
  @author Kayler
  SQF Command (e.g. createVehicle or params)
  Createdon 06/03/2016. */
-public class SQFCommandElement extends ASTWrapperPsiElement implements PsiNamedElement {
+public abstract class SQFCommandElement extends ASTWrapperPsiElement implements PsiNamedElement, SQFCommand {
 	public SQFCommandElement(@NotNull ASTNode node) {
 		super(node);
 	}
@@ -27,6 +30,11 @@ public class SQFCommandElement extends ASTWrapperPsiElement implements PsiNamedE
 	/**Get the name of the command (e.g. createVehicle or params or findDisplay)*/
 	public String getName() {
 		return getText();
+	}
+
+	@Override
+	public ItemPresentation getPresentation() {
+		return new SQFCommandItemPresentation(this);
 	}
 
 	@NotNull

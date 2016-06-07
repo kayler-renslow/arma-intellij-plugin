@@ -70,7 +70,6 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 			references = var.getReferences();
 		}
 		int numAssignments = 0;
-		SQFScope containingScope;
 		boolean isUsedOverride = false;
 		boolean isDefinedByParams = false;
 		for (PsiReference reference : references) {
@@ -88,18 +87,6 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 						isUsedOverride = true;
 						numAssignments++;
 						break;
-					}
-				}
-			}
-			if (!isGlobalVar) {
-				containingScope = SQFPsiUtil.getContainingScope(resolve);
-				String[] iterVars = containingScope.getUserData(SQFScope.KEY_ITERATION_VARS);
-				if (iterVars != null) {
-					for (String iterVar : iterVars) {
-						if (iterVar.equals(resolve.getText())) {
-							numAssignments++;
-							isUsedOverride = true;
-						}
 					}
 				}
 			}
@@ -159,14 +146,11 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 				annotator.createAnnotation(HighlightSeverity.WARNING, rangeCurrentNode, Plugin.resources.getString("lang.sqf.annotator.variable_already_private"));
 				annotator.createAnnotation(HighlightSeverity.WARNING, rangeMatchedNode, Plugin.resources.getString("lang.sqf.annotator.variable_already_private"));
 			}
-			if (currentPrivateVar.getVarElement().getReferences().length == 0) {
-				TextRange range;
-				if (currentPrivateVar.getVarElement() instanceof SQFString) {
-					range = ((SQFString) currentPrivateVar.getVarElement()).getNonQuoteRangeRelativeToFile();
-				} else {
-					range = TextRange.from(currentPrivateVar.getVarElement().getTextOffset(), currentPrivateVar.getVarElement().getTextLength());
+			if (currentPrivateVar.getVarElement() instanceof SQFString) { //usage check already handled for variables, so only need to check for strings
+				if (currentPrivateVar.getVarElement().getReferences().length == 0) {
+					TextRange range = ((SQFString) currentPrivateVar.getVarElement()).getNonQuoteRangeRelativeToFile();
+					annotator.createWeakWarningAnnotation(range, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
 				}
-				annotator.createWeakWarningAnnotation(range, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
 			}
 			vars.add(currentPrivateVar.getVarName());
 		}

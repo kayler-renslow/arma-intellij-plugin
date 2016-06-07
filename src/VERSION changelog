@@ -25,7 +25,10 @@ SQF
         removed "keywords" from parser. All prior keywords are now treated as commands.
         grammar was mostly rewritten into a more concise and correct one
     FIXED:
-        none
+        Scope was wrong for this scenario:
+            _i = 100;
+            for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
+            hint str _i; // 100
 
 Header
     ADDED:

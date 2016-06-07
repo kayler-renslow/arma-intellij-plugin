@@ -20,13 +20,12 @@ SQF
     CHANGED:
         none
     FIXED:
-        unused variable check fixed for private vars in strings
-        already private between private _var and private["_var"]
-        Scope was wrong for this scenario:
-            _i = 100;
-            for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
-            hint str _i; // 100
-
+        string var in for loop not being referenced in code block
+        variables in for spec do loop not being linked to those in the first code block in the array array, except for when declared private
+            Example: this worked
+            for [{private _i=0;},{true},{}] do {_i = _i + 1;};
+            but not this (which is what was fixed)
+            for [{_i=0;},{true},{}] do {_i = _i + 1;};
 Header
     ADDED:
         none

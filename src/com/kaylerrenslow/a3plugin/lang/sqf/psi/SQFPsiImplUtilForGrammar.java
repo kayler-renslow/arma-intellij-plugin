@@ -199,9 +199,9 @@ public class SQFPsiImplUtilForGrammar {
 					array = (SQFArrayVal) cursor;
 				}
 			}
-			SQFStatement statement = (SQFStatement) cursor;
-			if (statement.getExpression() != null && statement.getExpression() instanceof SQFCommandExpression) {
-				SQFCommandExpression forCommandExp = (SQFCommandExpression) statement.getExpression();
+			SQFStatement cursorStatement = (SQFStatement) cursor;
+			if (cursorStatement.getExpression() != null && cursorStatement.getExpression() instanceof SQFCommandExpression) {
+				SQFCommandExpression forCommandExp = (SQFCommandExpression) cursorStatement.getExpression();
 				if (forCommandExp.getCommandName().equals("for")) {
 					if (array == null) { //the containing scope wasn't inside the array itself and may be inside the postfix expression of do (e.g. for[{],{},{}] do{})
 						if (forCommandExp.getPostfixArgument() instanceof SQFCommandExpression) {
@@ -216,10 +216,12 @@ public class SQFPsiImplUtilForGrammar {
 						SQFCodeBlock firstCodeBlock = array.getArrayEntryList().get(0).getCodeBlock();
 						if (firstCodeBlock != null) {
 							if (firstCodeBlock.getLocalScope() != null) { //may be formatted wrong since no type checking
-								List<SQFPrivateDeclVar> privateVars = firstCodeBlock.getLocalScope().getPrivateVars();
-								for (SQFPrivateDeclVar privateVar : privateVars) {
-									if (var.varNameMatches(privateVar.getVarName())) {
-										return SQFPrivatization.getPrivatization(var, privateVar.getPrivatizer());
+								List<SQFStatement> statementList = firstCodeBlock.getLocalScope().getStatementList();
+								for (SQFStatement statement : statementList) {
+									if (statement.getAssignment() != null) {
+										if (statement.getAssignment().getAssigningVariable().varNameMatches(var)) {
+											return SQFPrivatization.getPrivatization(var, firstCodeBlock.getLocalScope());
+										}
 									}
 								}
 							}
@@ -353,26 +355,6 @@ public class SQFPsiImplUtilForGrammar {
 
 	public static String getCommandName(SQFCommandExpression commandExpression) {
 		return commandExpression.getCommand().getText();
-	}
-
-	/**
-	 Check if the command expression is a "control structure". https://community.bistudio.com/wiki/Control_Structures
-
-	 @param commandExpression command expression
-	 @return true if the expression is a "control structure", false otherwise
-	 */
-	public static boolean isControlStructure(SQFCommandExpression commandExpression) {
-		switch (commandExpression.getCommandName()) {
-			case "if":
-				return true;
-			case "for":
-				return true;
-			case "switch":
-				return true;
-			case "while":
-				return true;
-		}
-		return false;
 	}
 
 }

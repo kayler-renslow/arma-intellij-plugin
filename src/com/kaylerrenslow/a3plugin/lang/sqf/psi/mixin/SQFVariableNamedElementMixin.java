@@ -63,23 +63,18 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 	@Override
 	public PsiReference[] getReferences() {
 		SQFVariable me = this;
-		SQFScope myVarScope = me.getDeclarationScope();
+		SQFScope myDeclarationScope = me.getDeclarationScope();
 
 		ArrayList<PsiReference> refs = new ArrayList<>();
-		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(myVarScope, SQFTypes.VARIABLE, null, me.getVarName());
+		//need to search entire file because of for spec case (for[{private _i = 0},{},{}] do{/*_i can be referenced here, but from here _i won't be seen*/})
+		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(this.getContainingFile(), SQFTypes.VARIABLE, null, me.getVarName());
 		SQFVariable other;
-		boolean foundMe = false;
 		for (int i = 0; i < nodes.size(); i++) {
 			other = ((SQFVariable) nodes.get(i).getPsi());
-			foundMe = foundMe || other == this;
-			if (myVarScope == other.getDeclarationScope()) {
+			if (myDeclarationScope == other.getDeclarationScope()) {
 				refs.add(new SQFVariableReference(me, other));
 			}
 		}
-		if (!foundMe) {
-			refs.add(new SQFVariableReference(me, me));
-		}
-
 		return refs.toArray(new PsiReference[refs.size()]);
 	}
 
