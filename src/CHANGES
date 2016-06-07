@@ -8,7 +8,10 @@ Plugin
 
 Shared between languages
 	ADDED:
-        none
+        documentation 'tags'.
+            Commands: @command command_name
+            BIS Functions: @bis function_name
+            Config function: @fnc function_name
     CHANGED:
         none
     FIXED:
@@ -20,12 +23,8 @@ SQF
     CHANGED:
         none
     FIXED:
-        string var in for loop not being referenced in code block
-        variables in for spec do loop not being linked to those in the first code block in the array array, except for when declared private
-            Example: this worked
-            for [{private _i=0;},{true},{}] do {_i = _i + 1;};
-            but not this (which is what was fixed)
-            for [{_i=0;},{true},{}] do {_i = _i + 1;};
+        none
+
 Header
     ADDED:
         none

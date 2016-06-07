@@ -45,8 +45,6 @@ public class SQFStatic {
 		Collections.sort(LIST_BIS_FUNCTIONS);
 	}
 
-	public static final String[] VALS = {"parsingNamespace", "currentNamespace", "missionNamespace", "profileNamespace", "saveProfileNamespace", "uiNamespace", "configFile", "campaignConfigFile", "missionConfigFile", "true", "false", "nil", "configNull", "controlNull", "displayNull", "grpNull", "objNull", "scriptNull", "locationNull", "netObjNull", "taskNull", "teamMemberNull"};
-
 	public static boolean hasDocumentation(IElementType type) {
 		if (type == SQFTypes.COMMAND_TOKEN) {
 			return true;
@@ -92,8 +90,13 @@ public class SQFStatic {
 
 	 @param fullFunctionName full function name
 	 @return SQFFunctionTagAndName instance
+	 @throws IllegalArgumentException when the function name doesn't follow the function naming requirements
 	 */
+	@NotNull
 	public static SQFFunctionTagAndName getFunctionTagAndName(String fullFunctionName) {
+		if (!SQFStatic.followsSQFFunctionNameRules(fullFunctionName)) {
+			throw new IllegalArgumentException("function '" + fullFunctionName + "' doesn't follow SQF function name rules.");
+		}
 		int _fnc_Index = fullFunctionName.indexOf("_fnc_");
 		String tagName = fullFunctionName.substring(0, _fnc_Index); //the function's prefix tag. exampleTag_fnc_functionClassName
 		String functionClassName = fullFunctionName.substring(_fnc_Index + 5); //function's class name.

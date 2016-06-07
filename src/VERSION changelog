@@ -11,7 +11,10 @@ Plugin
 
 Shared between languages
 	ADDED:
-        none
+        documentation 'tags'.
+            Commands: @command command_name
+            BIS Functions: @bis function_name
+            Config function: @fnc function_name
     CHANGED:
         none
     FIXED:

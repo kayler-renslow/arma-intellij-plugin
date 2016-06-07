@@ -2,9 +2,9 @@ features:
     check if function exists when doing call or spawn
     renaming files will rename them in includes and if a SQF function, will rename the class decl
 
-EXTENSIVELY test finding scope and privatization
 fix auto completion since the grammar was changed
 
+fix Config function: @fnc function_name. need a way to get module from a psi file
 
 for header preprocessors, you will have to implement the lexer both times. However, use the current SQF version for both. Then have a shared TokenType called preprocessor
     We would also have a shared annotator that would look for these tokens and provide proper coloring and error checking
