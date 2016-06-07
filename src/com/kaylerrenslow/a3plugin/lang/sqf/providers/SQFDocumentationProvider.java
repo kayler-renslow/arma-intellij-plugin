@@ -7,6 +7,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.psi.*;
 import com.intellij.psi.xml.XmlTag;
 import com.kaylerrenslow.a3plugin.Plugin;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassDeclaration;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.DocumentationUtil;
@@ -81,30 +82,8 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 			}
 			return null;
 		}
-		if (element instanceof SQFVariable) { //must come after check for psi file, or stack overflow
-			if (SQFStatic.followsSQFFunctionNameRules(element.getText())) {
-				try {
-					Module module = PluginUtil.getModuleForPsiFile(element.getContainingFile());
-					if (module == null) {
-						//TODO get the module some other way
-						return null;
-					}
-					module = PluginUtil.getModuleForPsiFile(originalElement.getContainingFile());
-					HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, element.getText());
-					System.out.println("SQFDocumentationProvider.generateDoc " + function);
-					if (function != null) {
-						if (!function.getFunctionFileExtension().equals(".sqf")) {
-							return function.getClassDeclaration().getText();
-						}
-						PsiFile functionPsiFile = function.getPsiFile();
-						if (functionPsiFile != null) {
-							return generateDoc(functionPsiFile, originalElement);
-						}
-					}
-				} catch (Exception e) {
-					e.printStackTrace(System.out);
-				}
-			}
+		if (element instanceof HeaderClassDeclaration) {
+			return element.getText().replaceAll("[\t]+", " ");
 		}
 		return null;
 	}
@@ -146,7 +125,22 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 			return SQFPsiUtil.createElement(context.getProject(), link.substring(DOC_LINK_PREFIX_BIS_FUNCTION.length()), SQFTypes.GLOBAL_VAR);
 		}
 		if (link.startsWith(DOC_LINK_PREFIX_USER_FUNCTION)) {
-			return SQFPsiUtil.createElement(context.getProject(), link.substring(DOC_LINK_PREFIX_USER_FUNCTION.length()), SQFTypes.VARIABLE);
+			try {
+				Module module = PluginUtil.getModuleForPsiFile(context.getContainingFile());
+				if (module == null) {
+					return null;
+				}
+				String functionName = link.substring(DOC_LINK_PREFIX_USER_FUNCTION.length());
+				HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, functionName);
+				if (function != null) {
+					if (!function.getFunctionFileExtension().equals(".sqf")) {
+						return function.getClassDeclaration();
+					}
+					return function.getPsiFile();
+				}
+			} catch (Exception e) {
+				e.printStackTrace(System.out);
+			}
 		}
 		return null;
 	}

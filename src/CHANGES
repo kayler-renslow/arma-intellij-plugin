@@ -8,10 +8,7 @@ Plugin
 
 Shared between languages
 	ADDED:
-        documentation 'tags'.
-            Commands: @command command_name
-            BIS Functions: @bis function_name
-            Config function: @fnc function_name
+        none
     CHANGED:
         none
     FIXED:
@@ -19,11 +16,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        none
+        syntax coloring of documentation tags
     CHANGED:
         none
     FIXED:
-        none
+        Config function: @fnc function_name. need a way to get module from a psi file
 
 Header
     ADDED:
