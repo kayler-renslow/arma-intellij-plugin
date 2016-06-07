@@ -3,12 +3,12 @@ package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 import com.intellij.lang.refactoring.RefactoringSupportProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
-import com.kaylerrenslow.a3plugin.dialog.SimpleMessageDialog;
 import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFCommandElement;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +22,9 @@ public class SQFRefactoringSupportProvider extends RefactoringSupportProvider{
 	@Override
 	public boolean isMemberInplaceRenameAvailable(@NotNull PsiElement element, @Nullable PsiElement context) {
 		if(!(element instanceof PsiNamedElement)){
+			return false;
+		}
+		if(element instanceof SQFCommandElement){
 			return false;
 		}
 		if(element instanceof SQFVariable){

@@ -1,10 +1,9 @@
-Version: 1.0.3
-Release date: May 22 2016
+Version: tbd
+Release date: tbd
 
 Plugin
 	ADDED:
-        automatic plugin update check
-        view version in about
+        none
     CHANGED:
         none
     FIXED:
@@ -12,7 +11,10 @@ Plugin
 
 Shared between languages
 	ADDED:
-        ability to disable the error notification at the top of files for SQF and Header (Go to main menu > Arma Plugin > Plugin Properties)
+        documentation 'tags'.
+            Commands: @command command_name
+            BIS Functions: @bis function_name
+            Config function: @fnc function_name
     CHANGED:
         none
     FIXED:
@@ -20,12 +22,16 @@ Shared between languages
 
 SQF
 	ADDED:
-        none
+        unused check for global vars
+        finding usages of commands
     CHANGED:
-        none
+        removed "keywords" from parser. All prior keywords are now treated as commands.
+        grammar was mostly rewritten into a more concise and correct one
     FIXED:
-        documentation not showing up for some commands
-        auto completion for config files and other things
+        Scope was wrong for this scenario:
+            _i = 100;
+            for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
+            hint str _i; // 100
 
 Header
     ADDED:

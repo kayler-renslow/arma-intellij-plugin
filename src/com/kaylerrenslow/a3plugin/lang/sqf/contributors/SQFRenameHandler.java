@@ -14,8 +14,8 @@ import com.intellij.refactoring.BaseRefactoringProcessor;
 import com.intellij.refactoring.rename.RenameHandler;
 import com.intellij.refactoring.rename.RenameProcessor;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.a3plugin.dialog.newGroup.SQFConfigFunctionInformationHolder;
 import com.kaylerrenslow.a3plugin.dialog.SimpleMessageDialog;
+import com.kaylerrenslow.a3plugin.dialog.newGroup.SQFConfigFunctionInformationHolder;
 import com.kaylerrenslow.a3plugin.dialog.newGroup.functionRename.FunctionRenameDialog;
 import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
 import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
@@ -25,6 +25,7 @@ import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFFile;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFCommandElement;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.FilePath;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
@@ -49,6 +50,9 @@ public class SQFRenameHandler implements RenameHandler {
 			return false;
 		}
 		PsiElement psiElement = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
+		if(psiElement instanceof SQFCommandElement){
+			return true;
+		}
 		if (psiElement instanceof SQFVariable) {
 			SQFVariable var = (SQFVariable) psiElement;
 			if (SQFStatic.followsSQFFunctionNameRules(var.getVarName())) {

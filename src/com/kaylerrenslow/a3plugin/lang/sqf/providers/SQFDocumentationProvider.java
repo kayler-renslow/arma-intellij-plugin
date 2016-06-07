@@ -7,16 +7,15 @@ import com.intellij.openapi.module.Module;
 import com.intellij.psi.*;
 import com.intellij.psi.xml.XmlTag;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassDeclaration;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.DocumentationUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableLookupElementDataObject;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
-import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
-import com.kaylerrenslow.a3plugin.util.FilePath;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,15 +24,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Kayler
- *         Provides documentation for SQF PsiElements
- *         Created on 01/03/2016.
- */
+ @author Kayler
+ Provides documentation for SQF PsiElements
+ Created on 01/03/2016. */
 public class SQFDocumentationProvider extends DocumentationProviderEx {
 	private static final String BIS_WIKI_URL_PREFIX = Plugin.resources.getString("plugin.doc.sqf.wiki_URL_prefix");
 	private static final String EXTERNAL_LINK_NOTIFICATION = Plugin.resources.getString("plugin.doc.sqf.wiki_doc_external_link_notification_string_format");
-	private static final String DOC_LINK_PREFIX_BIS_FUNCTION = "bis-function:";
-	private static final String DOC_LINK_PREFIX_COMMAND = "command:";
+	/** Used for BIS function documentation links. This comes after the psi element protocol in anchor tags. Example use case: &lt;a href='psi-element://bis-function:BIS_fnc_MP'&gt;BIS_fnc_MP&lt;/a&gt; */
+	public static final String DOC_LINK_PREFIX_BIS_FUNCTION = "bis-function:";
+	/** Used for command documentation links. This comes after the psi element protocol in anchor tags. Example use case: &lt;a href='psi-element://command:createVehicle'&gt;createVehicle&lt;/a&gt; */
+	public static final String DOC_LINK_PREFIX_COMMAND = "command:";
+	/** Used for CfgFunction documentation links. This comes after the psi element protocol in anchor tags. For functions defined in CfgFunctions. Example use case: &lt;a href='psi-element://function:f_fnc_test'&gt;f_fnc_test&lt;/a&gt; */
+	public static final String DOC_LINK_PREFIX_USER_FUNCTION = "function:";
 
 	@Nullable
 	@Override
@@ -80,6 +82,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 			}
 			return null;
 		}
+		if (element instanceof HeaderClassDeclaration) {
+			return element.getText().replaceAll("[\t]+", " ");
+		}
 		return null;
 	}
 
@@ -100,15 +105,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 			if (!function.getFunctionFileExtension().equals(".sqf")) {
 				return function.getClassDeclaration();
 			}
-			PsiDirectory rootMissionDirectory;
-			try {
-				Module module = PluginUtil.getModuleForPsiFile(function.getClassDeclaration().getContainingFile());
-				rootMissionDirectory = ArmaProjectDataManager.getInstance().getDataForModule(module).getRootMissionDirectory();
-			} catch (DescriptionExtNotDefinedException e) {
-				e.printStackTrace(System.out);
-				return null;
-			}
-			return PluginUtil.findFileByPath(FilePath.getFilePathFromString(function.getFullRelativePath(), '/'), rootMissionDirectory, element.getProject());
+			return function.getPsiFile();
 
 		}
 		return null;
@@ -121,11 +118,29 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 			if (link.startsWith(DOC_LINK_PREFIX_COMMAND)) {
 				return PsiUtil.getFirstDescendantNode(SQFPsiUtil.createFile(context.getProject(), link.substring(DOC_LINK_PREFIX_COMMAND.length()))).getPsi();
 			}
-		} catch (IndexOutOfBoundsException e) { //for when the commands are inside the documentation but not registered as a SQFTypes.COMMAND because lexer is not up to date
+		} catch (Exception e) { //for when the commands are inside the documentation but not registered as a SQFTypes.COMMAND because lexer is not up to date
 			e.printStackTrace(System.out);
 		}
 		if (link.startsWith(DOC_LINK_PREFIX_BIS_FUNCTION)) {
 			return SQFPsiUtil.createElement(context.getProject(), link.substring(DOC_LINK_PREFIX_BIS_FUNCTION.length()), SQFTypes.GLOBAL_VAR);
+		}
+		if (link.startsWith(DOC_LINK_PREFIX_USER_FUNCTION)) {
+			try {
+				Module module = PluginUtil.getModuleForPsiFile(context.getContainingFile());
+				if (module == null) {
+					return null;
+				}
+				String functionName = link.substring(DOC_LINK_PREFIX_USER_FUNCTION.length());
+				HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, functionName);
+				if (function != null) {
+					if (!function.getFunctionFileExtension().equals(".sqf")) {
+						return function.getClassDeclaration();
+					}
+					return function.getPsiFile();
+				}
+			} catch (Exception e) {
+				e.printStackTrace(System.out);
+			}
 		}
 		return null;
 	}
@@ -133,7 +148,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	@Override
 	@Nullable
 	public PsiElement getCustomDocumentationElement(@NotNull final Editor editor, @NotNull final PsiFile file, @Nullable PsiElement contextElement) {
-		if(contextElement == null){
+		if (contextElement == null) {
 			return null;
 		}
 		if (SQFStatic.hasDocumentation(contextElement.getNode().getElementType())) {

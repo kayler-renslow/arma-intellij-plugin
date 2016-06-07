@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * Example use case is where user types 'elif'. When user presses enter, handleInsert is invoked and the text 'elif' is replaced with replaceString (defined in the constructor's parameters)
  * Created on 03/28/2016.
  */
-public abstract class CompletionElementWithTextReplace implements CompletionElement{
+public class CompletionElementWithTextReplace implements CompletionElement{
 
 	protected String replaceStr, lookupStr, typeText;
 	protected int newCursorPos;

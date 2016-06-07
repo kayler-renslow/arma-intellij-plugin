@@ -11,14 +11,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.PluginIcons;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
-import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.*;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.SQFCompInsertHandlerHintfln;
+import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.SQFCompInsertHandlerHintfo;
+import com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements.SQFCompletionElementTextReplace.SQFCompInsertHandlerParams;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
@@ -28,10 +27,9 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
- * @author Kayler
- *         Does the backend work for SQF auto completion operations
- *         Created on 01/02/2016.
- */
+ @author Kayler
+ Does the backend work for SQF auto completion operations
+ Created on 01/02/2016. */
 public class SQFCompletionProvider extends CompletionProvider<CompletionParameters> {
 
 	@Override
@@ -46,10 +44,8 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		ASTNode prevSiblingNotWhitespace;
 
 		if (PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.LOCAL_VAR) || PsiUtil.isOfElementType(cursor.getNode(), SQFTypes.GLOBAL_VAR)) {
-//			System.out.println("SQFCompletionProvider.addCompletions originalPositionNull:" + originalPositionNull);
 			prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode().getTreeParent()); //get parent because local_var and global_var is inside SQFTypes.VARIABLE
 		} else {
-//			System.out.println("SQFCompletionProvider.addCompletions originalPositionNull:" + originalPositionNull);
 			prevSiblingNotWhitespace = PsiUtil.getPrevSiblingNotWhitespace(cursor.getNode());
 		}
 
@@ -64,7 +60,7 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 
 		if (cursor.getText().contains("_fnc") || isFunctionCallExp) {
 			if (!addBisFunctions(result, cursor)) {
-				completeFunctionCall(parameters, result);
+				CompletionAdders.addFunctions(parameters, result);
 				addVariablesAndCommands(parameters, result, cursor, false);
 			}
 		} else if (prevSibText.equals("localize")) {
@@ -77,6 +73,9 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 
 	private void completeLocalize(@NotNull CompletionResultSet result, @NotNull PsiElement cursor) {
 		Module module = PluginUtil.getModuleForPsiFile(cursor.getContainingFile());
+		if (module == null) {
+			return;
+		}
 		Stringtable table;
 		try {
 			table = ArmaProjectDataManager.getInstance().getDataForModule(module).getStringtable();
@@ -88,20 +87,6 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		for (StringtableKey key : keys) {
 			result.addElement(key.getLookupElement(false));
 		}
-	}
-
-	private void completeFunctionCall(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
-		try {
-			ArrayList<HeaderConfigFunction> configFunctions = HeaderPsiUtil.getAllConfigFunctionsFromDescriptionExt(parameters.getOriginalFile());
-			String tailTextFormat = " " + Plugin.resources.getString("lang.sqf.completion.tail_text.function");
-			for (HeaderConfigFunction configFunction : configFunctions) {
-				result.addElement(LookupElementBuilder.create(configFunction, configFunction.getCallableName()).withTailText(String.format(tailTextFormat, configFunction.getFullRelativePath()), true).withIcon
-						(HeaderConfigFunction.getIcon()));
-			}
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
-		}
-
 	}
 
 	private void completeCurrentWord(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result, PsiElement cursor) {
@@ -141,30 +126,14 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		}
 
 		if (!lookForLocalVars && allowCommands) { //add all commands
-			String name;
-			String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.command");
-			for (int i = 0; i < SQFStatic.LIST_COMMANDS.size(); i++) {
-				name = SQFStatic.LIST_COMMANDS.get(i);
-				result.addElement(LookupElementBuilder.createWithSmartPointer(name, SQFPsiUtil.createElement(project, name, SQFTypes.COMMAND)).withIcon(PluginIcons.ICON_SQF_COMMAND).appendTailText(" " + trailText, true));
-			}
-			PsiElement element;
-			for (int i = 0; i < SQFStatic.VALS.length; i++) {
-				name = SQFStatic.VALS[i];
-				element = PsiUtil.getFirstDescendantNode(SQFPsiUtil.createFile(project, name)).getPsi();
-				result.addElement(LookupElementBuilder.createWithSmartPointer(name, element).withIcon(PluginIcons.ICON_SQF_COMMAND).appendTailText(" " + trailText, true));
-			}
+			CompletionAdders.addCommands(project, result);
 		}
 	}
 
 	private boolean addBisFunctions(@NotNull CompletionResultSet result, PsiElement cursor) {
 		Project project = cursor.getProject();
 		if (SQFStatic.isMaybeBISFunction(cursor.getText())) { //add all bis functions
-			String functionName;
-			String tailText = Plugin.resources.getString("lang.sqf.completion.tail_text.bis_function");
-			for (int i = 0; i < SQFStatic.LIST_BIS_FUNCTIONS.size(); i++) {
-				functionName = SQFStatic.LIST_BIS_FUNCTIONS.get(i);
-				result.addElement(LookupElementBuilder.createWithSmartPointer(functionName, SQFPsiUtil.createElement(project, functionName, SQFTypes.GLOBAL_VAR)).withIcon(PluginIcons.ICON_SQF_FUNCTION).appendTailText(" " + tailText, true));
-			}
+			CompletionAdders.addBISFunctions(project, result);
 			return true;
 		}
 		return false;

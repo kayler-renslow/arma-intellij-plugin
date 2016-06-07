@@ -1,6 +1,13 @@
 package com.kaylerrenslow.a3plugin.lang.header.psi;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.psi.PsiDirectory;
+import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.a3plugin.PluginIcons;
+import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
+import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
+import com.kaylerrenslow.a3plugin.util.FilePath;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -122,5 +129,20 @@ public class HeaderConfigFunction {
 	@NotNull
 	public static Icon getIcon() {
 		return PluginIcons.ICON_SQF_FUNCTION;
+	}
+
+	/**Get the psi file associated with this function*/
+	@Nullable
+	public PsiFile getPsiFile(){
+		PsiDirectory rootMissionDirectory;
+		try {
+			Module module = PluginUtil.getModuleForPsiFile(getClassDeclaration().getContainingFile());
+			rootMissionDirectory = ArmaProjectDataManager.getInstance().getDataForModule(module).getRootMissionDirectory();
+		} catch (DescriptionExtNotDefinedException e) {
+			e.printStackTrace(System.out);
+			return null;
+		}
+		return PluginUtil.findFileByPath(FilePath.getFilePathFromString(getFullRelativePath(), '/'), rootMissionDirectory, this.classWithTag.getProject());
+
 	}
 }

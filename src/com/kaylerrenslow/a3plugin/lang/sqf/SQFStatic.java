@@ -36,53 +36,18 @@ public class SQFStatic {
 
 	private static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
 
-	public static final IElementType[] KEYWORDS = {SQFTypes.WITH, SQFTypes.TRUE, SQFTypes.FALSE, SQFTypes.NOT, SQFTypes.AND, SQFTypes.OR, SQFTypes.MOD, SQFTypes.NIL, SQFTypes.CONFIG_NULL,
-			SQFTypes.CONTROL_NULL,
-			SQFTypes.DISPLAY_NULL,
-			SQFTypes.GRP_NULL,
-			SQFTypes.OBJ_NULL,
-			SQFTypes.SCRIPT_NULL,
-			SQFTypes.LOCATION_NULL,
-			SQFTypes.NET_OBJ_NULL,
-			SQFTypes.TASK_NULL,
-			SQFTypes.TEAM_MEMBER_NULL, SQFTypes.PRIVATE, SQFTypes.SCOPE_NAME,
-			SQFTypes.BREAK, SQFTypes.BREAK_TO, SQFTypes.BREAK_OUT, SQFTypes.CONTINUE, SQFTypes.FOR, SQFTypes.TO, SQFTypes.STEP, SQFTypes.FOR_EACH, SQFTypes.FROM, SQFTypes.WHILE, SQFTypes.GOTO, SQFTypes.ASSERT, SQFTypes.IF,
-			SQFTypes.THEN, SQFTypes.ELSE, SQFTypes.SWITCH, SQFTypes.CASE, SQFTypes.DEFAULT, SQFTypes.DO, SQFTypes.WAIT_UNTIL, SQFTypes.EXIT_WITH, SQFTypes.PARAMS};
-
 	public static final IElementType[] OPERATORS = {SQFTypes.EQEQ, SQFTypes.EQ, SQFTypes.ASTERISK, SQFTypes.NE, SQFTypes.PERC, SQFTypes.PLUS, SQFTypes.MINUS, SQFTypes.FSLASH, SQFTypes.CARET, SQFTypes.GTGT, SQFTypes.GT, SQFTypes.GE,
 			SQFTypes.LT, SQFTypes.LE, SQFTypes.EXCL, SQFTypes.AMPAMP, SQFTypes.BARBAR, SQFTypes.QUEST, SQFTypes.COLON};
 
-	public static final IElementType[] NAMESPACES_AND_CONFIGS = {SQFTypes.PARSING_NAMESPACE,
-			SQFTypes.CURRENT_NAMESPACE,
-			SQFTypes.MISSION_NAMESPACE,
-			SQFTypes.PROFILE_NAMESPACE,
-			SQFTypes.SAVE_PROFILE_NAMESPACE,
-			SQFTypes.UI_NAMESPACE, SQFTypes.CONFIG_FILE,
-			SQFTypes.CAMPAIGN_CONFIG_FILE,
-			SQFTypes.MISSION_CONFIG_FILE,};
-
-	public static final IElementType[] COMMANDS = {SQFTypes.COMMAND};
 
 	static {
 		Collections.sort(LIST_COMMANDS);
 		Collections.sort(LIST_BIS_FUNCTIONS);
 	}
 
-	public static final String[] VALS = {"parsingNamespace", "currentNamespace", "missionNamespace", "profileNamespace", "saveProfileNamespace", "uiNamespace", "configFile", "campaignConfigFile", "missionConfigFile", "true", "false", "nil", "configNull", "controlNull", "displayNull", "grpNull", "objNull", "scriptNull", "locationNull", "netObjNull", "taskNull", "teamMemberNull"};
-
 	public static boolean hasDocumentation(IElementType type) {
-		if (type == SQFTypes.COMMAND) {
+		if (type == SQFTypes.COMMAND_TOKEN) {
 			return true;
-		}
-		for (IElementType keywordType : KEYWORDS) {
-			if (keywordType == type) {
-				return true;
-			}
-		}
-		for (IElementType constant : NAMESPACES_AND_CONFIGS) {
-			if (constant == type) {
-				return true;
-			}
 		}
 		return false;
 	}
@@ -125,8 +90,13 @@ public class SQFStatic {
 
 	 @param fullFunctionName full function name
 	 @return SQFFunctionTagAndName instance
+	 @throws IllegalArgumentException when the function name doesn't follow the function naming requirements
 	 */
+	@NotNull
 	public static SQFFunctionTagAndName getFunctionTagAndName(String fullFunctionName) {
+		if (!SQFStatic.followsSQFFunctionNameRules(fullFunctionName)) {
+			throw new IllegalArgumentException("function '" + fullFunctionName + "' doesn't follow SQF function name rules.");
+		}
 		int _fnc_Index = fullFunctionName.indexOf("_fnc_");
 		String tagName = fullFunctionName.substring(0, _fnc_Index); //the function's prefix tag. exampleTag_fnc_functionClassName
 		String functionClassName = fullFunctionName.substring(_fnc_Index + 5); //function's class name.

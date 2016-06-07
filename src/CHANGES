@@ -16,11 +16,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        none
+        syntax coloring of documentation tags
     CHANGED:
         none
     FIXED:
-        none
+        Config function: @fnc function_name. need a way to get module from a psi file
 
 Header
     ADDED:

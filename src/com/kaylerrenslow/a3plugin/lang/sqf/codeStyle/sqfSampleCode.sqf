@@ -8,7 +8,7 @@ disableSerialization; //disable the serialization
 {
     private["_arr", "_localVar"];
 
-    _localVariable = 'single quote string'
+    _localVariable = 'single quote string';
     meaningOfLife = 42;
 
     if (1==1 and 2==2 && 42==42) then {
