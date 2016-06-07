@@ -12,15 +12,15 @@ Shared between languages
     CHANGED:
         none
     FIXED:
-        none
+        usage type provider
 
 SQF
 	ADDED:
-        syntax coloring of documentation tags
+        none
     CHANGED:
         none
     FIXED:
-        Config function: @fnc function_name. need a way to get module from a psi file
+        none
 
 Header
     ADDED:

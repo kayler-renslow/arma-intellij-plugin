@@ -3,11 +3,13 @@ package com.kaylerrenslow.a3plugin.lang.header.editor;
 import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.openapi.util.TextRange;
+import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderSyntaxHighlighter;
 import com.kaylerrenslow.a3plugin.lang.header.psi.*;
+import com.kaylerrenslow.a3plugin.lang.shared.DocumentationTagUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.SharedSyntaxHighlighterColors;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +28,12 @@ public class HeaderAnnotatorVisitor extends HeaderVisitor {
 
 	public void setAnnotationHolder(AnnotationHolder holder) {
 		this.holder = holder;
+	}
+
+	@Override
+	public void visitComment(PsiComment comment) {
+		super.visitComment(comment);
+		DocumentationTagUtil.annotateDocumentation(holder, comment);
 	}
 
 	@Override

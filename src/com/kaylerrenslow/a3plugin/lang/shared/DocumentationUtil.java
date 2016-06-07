@@ -1,7 +1,10 @@
 package com.kaylerrenslow.a3plugin.lang.shared;
 
 import com.intellij.codeInsight.documentation.DocumentationManagerProtocol;
+import com.intellij.psi.PsiComment;
 import com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDocumentationProvider;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import org.jetbrains.annotations.NotNull;
 
 /**
  @author Kayler
@@ -35,5 +38,16 @@ public class DocumentationUtil {
 	private static String insertFunctionLinks(String docString) {
 		String commandRegex = "@fnc ([a-zA-Z_0-9]+)";
 		return docString.replaceAll(commandRegex, "<a href='" + DocumentationManagerProtocol.PSI_ELEMENT_PROTOCOL + SQFDocumentationProvider.DOC_LINK_PREFIX_USER_FUNCTION + "$1'>$1</a>");
+	}
+
+	@NotNull
+	public static String getCommentContent(@NotNull PsiComment comment) {
+		if (comment.getNode().getElementType() == SQFTypes.INLINE_COMMENT) {
+			if (comment.getText().length() <= 2) {
+				return "";
+			}
+			return comment.getText().substring(2);
+		}
+		return comment.getText().substring(2, comment.getTextLength() - 2).replaceAll("\t([^\r\n])", "$1"); //shift comments left 1 tab if tabbed
 	}
 }

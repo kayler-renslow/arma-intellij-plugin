@@ -68,7 +68,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		}
 		if (PsiUtil.isOfElementType(element, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(element, SQFTypes.BLOCK_COMMENT)) {
 			PsiComment comment = (PsiComment) element;
-			return DocumentationUtil.purtify(SQFPsiUtil.getCommentContent(comment));
+			return DocumentationUtil.purtify(DocumentationUtil.getCommentContent(comment));
 		}
 		if (element instanceof PsiFile) {
 			PsiElement[] children = element.getChildren();
@@ -77,7 +77,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 					break;
 				}
 				if (child instanceof PsiComment) {
-					return DocumentationUtil.purtify(SQFPsiUtil.getCommentContent((PsiComment) child));
+					return DocumentationUtil.purtify(DocumentationUtil.getCommentContent((PsiComment) child));
 				}
 			}
 			return null;
