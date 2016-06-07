@@ -55,7 +55,7 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 	@Override
 	public void visitVariable(@NotNull SQFVariable var) {
 		super.visitVariable(var);
-		if(var.isLangVar()){
+		if (var.isLangVar()) {
 			return;
 		}
 		if (var.getParent() instanceof SQFMacroCall) {
@@ -73,7 +73,6 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 		SQFScope containingScope;
 		boolean isUsedOverride = false;
 		boolean isDefinedByParams = false;
-
 		for (PsiReference reference : references) {
 			PsiElement resolve = reference.resolve();
 			if (resolve == null) {
@@ -84,8 +83,8 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 				if (resolveVar.isAssigningVariable()) {
 					numAssignments++;
 				}
-				if(isGlobalVar){
-					if(SQFStatic.followsSQFFunctionNameRules(resolveVar.getVarName())){
+				if (isGlobalVar) {
+					if (SQFStatic.followsSQFFunctionNameRules(resolveVar.getVarName())) {
 						isUsedOverride = true;
 						numAssignments++;
 						break;
@@ -110,7 +109,7 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 		if (!isGlobalVar) {
 			privatization = var.getPrivatization();
 			if (privatization instanceof SQFPrivatization.SQFPrivateDeclParams) {
-				SQFParamsStatement paramsStatement = ((SQFPrivatization.SQFPrivateDeclParams) privatization).getDeclarationElement();
+				SQFParamsStatement paramsStatement = ((SQFPrivatization.SQFPrivateDeclParams) privatization).getPrivatizer();
 				if (paramsStatement != null && paramsStatement.varIsDefined(var.getVarName())) {
 					isDefinedByParams = true;
 				}
@@ -134,28 +133,42 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 	@Override
 	public void visitScope(@NotNull SQFScope scope) {
 		super.visitScope(scope);
-		List<SQFPrivateDeclVar> declVars = scope.getPrivateDeclaredVars();
-		Iterator<SQFPrivateDeclVar> iter = declVars.iterator();
+		List<SQFPrivateDeclVar> privateVars = scope.getPrivateVars();
+		Iterator<SQFPrivateDeclVar> iter = privateVars.iterator();
 		ArrayList<String> vars = new ArrayList<>();
 		int matchedIndex;
-		ASTNode n1, n2;
-		int rangeStartOffset, rangeLengthOffset;
+		ASTNode currentPrivateVarNode, matchedNode;
+		TextRange rangeCurrentNode, rangeMatchedNode;
+		SQFPrivateDeclVar currentPrivateVar;
 		while (iter.hasNext()) {
-			n1 = iter.next().getVarElement().getNode();
-			matchedIndex = vars.indexOf(n1.getText());
+			currentPrivateVar = iter.next();
+			currentPrivateVarNode = currentPrivateVar.getVarElement().getNode();
+			matchedIndex = vars.indexOf(currentPrivateVar.getVarName());
 			if (matchedIndex >= 0) {
-				n2 = declVars.get(matchedIndex).getVarElement().getNode();
-				if(declVars.get(matchedIndex).getVarElement() instanceof SQFString){
-					rangeStartOffset = 1;
-					rangeLengthOffset = -2;
-				}else{
-					rangeStartOffset = 0;
-					rangeLengthOffset = 0;
+				matchedNode = privateVars.get(matchedIndex).getVarElement().getNode();
+				if (currentPrivateVarNode.getPsi() instanceof SQFString) {
+					rangeCurrentNode = ((SQFString) (currentPrivateVarNode.getPsi())).getNonQuoteRangeRelativeToFile();
+				} else {
+					rangeCurrentNode = TextRange.from(currentPrivateVarNode.getStartOffset(), currentPrivateVarNode.getTextLength());
 				}
-				annotator.createAnnotation(HighlightSeverity.WARNING, TextRange.from(n1.getStartOffset() + rangeStartOffset, n1.getTextLength() + rangeLengthOffset), Plugin.resources.getString("lang.sqf.annotator.variable_already_private"));
-				annotator.createAnnotation(HighlightSeverity.WARNING, TextRange.from(n2.getStartOffset() + rangeStartOffset, n2.getTextLength() + rangeLengthOffset), Plugin.resources.getString("lang.sqf.annotator.variable_already_private"));
+				if (matchedNode.getPsi() instanceof SQFString) {
+					rangeMatchedNode = ((SQFString) (matchedNode.getPsi())).getNonQuoteRangeRelativeToFile();
+				} else {
+					rangeMatchedNode = TextRange.from(matchedNode.getStartOffset(), matchedNode.getTextLength());
+				}
+				annotator.createAnnotation(HighlightSeverity.WARNING, rangeCurrentNode, Plugin.resources.getString("lang.sqf.annotator.variable_already_private"));
+				annotator.createAnnotation(HighlightSeverity.WARNING, rangeMatchedNode, Plugin.resources.getString("lang.sqf.annotator.variable_already_private"));
 			}
-			vars.add(n1.getText());
+			if (currentPrivateVar.getVarElement().getReferences().length == 0) {
+				TextRange range;
+				if (currentPrivateVar.getVarElement() instanceof SQFString) {
+					range = ((SQFString) currentPrivateVar.getVarElement()).getNonQuoteRangeRelativeToFile();
+				} else {
+					range = TextRange.from(currentPrivateVar.getVarElement().getTextOffset(), currentPrivateVar.getVarElement().getTextLength());
+				}
+				annotator.createWeakWarningAnnotation(range, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
+			}
+			vars.add(currentPrivateVar.getVarName());
 		}
 	}
 
@@ -187,10 +200,10 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 				public void run() {
 					SQFScope varScope = varScopePointer.getElement();
 					SQFVariable fixVar = fixVarPointer.getElement();
-					ASTNode[] statements = varScope.getNode().getChildren(TokenSet.create(SQFTypes.COMMAND_EXPRESSION));
+					ASTNode[] commandExpressionNodes = varScope.getNode().getChildren(TokenSet.create(SQFTypes.COMMAND_EXPRESSION));
 					SQFCommandExpression commandExpression;
 					SQFPrivateDecl decl;
-					for (ASTNode nodeExpr : statements) {
+					for (ASTNode nodeExpr : commandExpressionNodes) {
 						commandExpression = (SQFCommandExpression) nodeExpr.getPsi();
 						decl = SQFPrivateDecl.parse(commandExpression);
 						if (decl != null) {

@@ -25,7 +25,7 @@
 sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
 
 file_scope ::= item_* return_statement? (comment )* {extends("file_scope")=local_scope}
-local_scope ::= item_* return_statement? (comment)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateDeclaredVars getStatementsForScope checkIfSpawn getPrivatizerElement]}
+local_scope ::= item_* return_statement? (comment)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateVars getStatementsForScope checkIfSpawn getPrivatizerElement getCodeBlock]}
 
 private item_ ::= comment | statement
 
@@ -83,12 +83,12 @@ comp_expression ::= expression (EQEQ | NE | LT | LE | GT | GE) expression
 config_fetch_expression ::= expression (FSLASH | GTGT) expression
 
 exponent_expression ::= expression (CARET expression)+
-command_expression ::= (((PLUS | MINUS | EXCL | NOT)? (paren_expression | literal_expression)) | code_block)? command ((code_block expression?) | expression)? {methods=[getPrefixArgument getPostfixArgument]}
+command_expression ::= (((PLUS | MINUS | EXCL | NOT)? (paren_expression | literal_expression)) | code_block)? command ((code_block expression?) | expression)? {methods=[getCommandName getPrefixArgument getPostfixArgument isControlStructure]}
 
 paren_expression ::= LPAREN expression RPAREN
 
 
-string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFStringMixin" methods=[getNonQuoteText]}
+string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFStringMixin" methods=[getNonQuoteText getNonQuoteRangeRelativeToFile getNonQuoteRangeRelativeToElement]}
 
 macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 

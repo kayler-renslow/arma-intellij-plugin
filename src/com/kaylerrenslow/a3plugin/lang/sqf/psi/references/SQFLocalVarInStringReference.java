@@ -1,17 +1,15 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.references;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFString;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
 
 /**
  * @author Kayler
@@ -20,11 +18,13 @@ import java.util.ArrayList;
  */
 public class SQFLocalVarInStringReference implements PsiReference {
 	private final SQFVariable targetVar;
-	private final PsiElement string;
+	private final SQFString string;
+	private final SQFScope targetVarScope;
 
-	public SQFLocalVarInStringReference(SQFVariable targetVar, PsiElement string) {
+	public SQFLocalVarInStringReference(SQFVariable targetVar, SQFScope targetVarScope, SQFString string) {
 		this.targetVar = targetVar;
 		this.string = string;
+		this.targetVarScope = targetVarScope;
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class SQFLocalVarInStringReference implements PsiReference {
 
 	@Override
 	public TextRange getRangeInElement() {
-		return TextRange.from(1, string.getNode().getTextLength() - 2);
+		return string.getNonQuoteRangeRelativeToElement();
 	}
 
 	@Nullable
@@ -63,14 +63,13 @@ public class SQFLocalVarInStringReference implements PsiReference {
 
 	@Override
 	public boolean isReferenceTo(PsiElement element) {
-		if (!(element instanceof SQFVariableNamedElement)) {
+		if (!(element instanceof SQFVariable)) {
 			return false;
 		}
-		SQFVariable other = (SQFVariable) element;
-		SQFScope myScope = SQFPsiUtil.getContainingScope(this.string);
-		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(myScope, SQFTypes.VARIABLE, null, getCanonicalText());
-		for(ASTNode node : nodes){
-			if(node == other.getNode()){
+		SQFVariable paramVar = (SQFVariable) element;
+		PsiReference[] references = paramVar.getReferences();
+		for(PsiReference reference : references){
+			if(reference.resolve() == paramVar && paramVar.getDeclarationScope() == targetVarScope){
 				return true;
 			}
 		}

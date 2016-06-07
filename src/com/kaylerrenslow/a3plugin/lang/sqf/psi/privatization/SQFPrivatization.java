@@ -15,21 +15,23 @@ import org.jetbrains.annotations.Nullable;
  */
 public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivatizer> {
 	private final E privateElement;
-	private final T declarationElement;
+	private final T privatizer;
+	private final SQFScope declarationScope;
 
 	/**
 	 A private declaration is something that can be declared private inside a given scope. Example is a variable
 
 	 @param privateElement the element that is being declared private
-	 @param declarationElement the element that actually specifies the privatization (for instance private ["_hi"];) (can be null)
+	 @param privatizer the privatizer linked to this privatization
 	 */
-	private SQFPrivatization(@NotNull E privateElement, @Nullable T declarationElement) {
+	private SQFPrivatization(@NotNull E privateElement, @Nullable T privatizer) {
 		this.privateElement = privateElement;
-		this.declarationElement = declarationElement;
+		this.privatizer = privatizer;
+		declarationScope = privatizer == null ? SQFPsiUtil.getContainingScope(this.privateElement) : SQFPsiUtil.getContainingScope(privatizer.getPrivatizerElement());
 	}
 
 	/**
-	 Get the element that is being declared private
+	 Get the element that is being declared private (usually SQFVariable)
 	 */
 	@NotNull
 	public E getPrivateElement() {
@@ -40,8 +42,8 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	 Get the element that is actually declaring the privatization. Can be null if the privatization is some how inherited
 	 */
 	@Nullable
-	public T getDeclarationElement() {
-		return declarationElement;
+	public T getPrivatizer() {
+		return privatizer;
 	}
 
 	/**
@@ -49,10 +51,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	 */
 	@NotNull
 	public SQFScope getDeclarationScope() {
-		if (declarationElement == null) {
-			return SQFPsiUtil.getContainingScope(this.privateElement);
-		}
-		return SQFPsiUtil.getContainingScope(declarationElement.getPrivatizerElement());
+		return declarationScope;
 	}
 
 	/**
@@ -93,7 +92,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 
 		@Nullable
 		@Override
-		public SQFScope getDeclarationElement() {
+		public SQFScope getPrivatizer() {
 			return this.declarationScope;
 		}
 	}

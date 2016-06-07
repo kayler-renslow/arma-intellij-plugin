@@ -42,7 +42,8 @@ public class SQFPrivateDecl implements SQFPrivatizer {
 	/**
 	 Get all variables that are declared private
 	 */
-	public List<SQFPrivateDeclVar> getPrivateDeclVars() {
+	@Override
+	public List<SQFPrivateDeclVar> getPrivateVars() {
 		return privateDeclVars;
 	}
 
@@ -50,7 +51,7 @@ public class SQFPrivateDecl implements SQFPrivatizer {
 	@Nullable
 	public static SQFPrivateDecl parse(SQFCommandExpression expression) {
 		PsiElement postfix = expression.getPostfixArgument();
-		String commandName = expression.getCommand().getText();
+		String commandName = expression.getCommandName();
 		SQFPrivateDecl privateDecl = null;
 		if (commandName.equals("private")) { //is private []; or private ""
 			if (postfix instanceof SQFLiteralExpression) {

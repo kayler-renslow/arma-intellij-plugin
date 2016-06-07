@@ -47,7 +47,7 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 	public void visitCommandExpression(@NotNull SQFCommandExpression o) {
 		PsiElement prefix = o.getPrefixArgument();
 		PsiElement postfix = o.getPostfixArgument();
-		String commandName = o.getCommand().getText();
+		String commandName = o.getCommandName();
 		if (commandName.equals("private")) {
 			boolean error = false;
 			if (postfix instanceof SQFLiteralExpression) {

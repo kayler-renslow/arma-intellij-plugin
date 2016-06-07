@@ -23,10 +23,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- * @author Kayler
- *         PsiElement mixin for SQF grammar file. This mixin is meant for SQFVariables
- *         Created on 03/19/2016.
- */
+ @author Kayler
+ PsiElement mixin for SQF grammar file. This mixin is meant for SQFVariables
+ Created on 03/19/2016. */
 public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implements SQFVariableNamedElement, SQFVariable {
 	private final IElementType myVariableElementType;
 
@@ -41,7 +40,7 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 	}
 
 	@Override
-	public boolean isGlobalVariable(){
+	public boolean isGlobalVariable() {
 		return this.myVariableElementType == SQFTypes.GLOBAL_VAR;
 	}
 
@@ -52,8 +51,8 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 
 	@Override
 	public ItemPresentation getPresentation() {
-		if(this.isGlobalVariable()){
-			if(SQFStatic.followsSQFFunctionNameRules(this.getVarName())){
+		if (this.isGlobalVariable()) {
+			if (SQFStatic.followsSQFFunctionNameRules(this.getVarName())) {
 				return new SQFFunctionItemPresentation(this.getVarName(), this.getContainingFile());
 			}
 		}
@@ -69,11 +68,16 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 		ArrayList<PsiReference> refs = new ArrayList<>();
 		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(myVarScope, SQFTypes.VARIABLE, null, me.getVarName());
 		SQFVariable other;
+		boolean foundMe = false;
 		for (int i = 0; i < nodes.size(); i++) {
 			other = ((SQFVariable) nodes.get(i).getPsi());
+			foundMe = foundMe || other == this;
 			if (myVarScope == other.getDeclarationScope()) {
 				refs.add(new SQFVariableReference(me, other));
 			}
+		}
+		if (!foundMe) {
+			refs.add(new SQFVariableReference(me, me));
 		}
 
 		return refs.toArray(new PsiReference[refs.size()]);

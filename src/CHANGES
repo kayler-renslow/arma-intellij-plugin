@@ -16,12 +16,16 @@ Shared between languages
 
 SQF
 	ADDED:
-        unused check for global vars
+        none
     CHANGED:
         none
     FIXED:
-        couldn't have empty arrays
-        variable references
+        unused variable check fixed for private vars in strings
+        already private between private _var and private["_var"]
+        Scope was wrong for this scenario:
+            _i = 100;
+            for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
+            hint str _i; // 100
 
 Header
     ADDED:

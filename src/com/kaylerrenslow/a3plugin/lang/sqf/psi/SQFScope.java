@@ -3,7 +3,6 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiElement;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.privatization.SQFPrivatizer;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFPrivateDeclVar;
 
 import java.util.List;
 
@@ -14,7 +13,7 @@ import java.util.List;
  */
 public interface SQFScope extends PsiElement, SQFPrivatizer{
 	List<SQFStatement> getStatementsForScope();
-	List<SQFPrivateDeclVar> getPrivateDeclaredVars();
 	boolean checkIfSpawn();
+	SQFCodeBlock getCodeBlock();
 	Key<String[]> KEY_ITERATION_VARS = new Key<>("KEY_ITERATION_VARS");
 }

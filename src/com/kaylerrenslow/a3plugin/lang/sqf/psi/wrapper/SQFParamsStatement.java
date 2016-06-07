@@ -38,7 +38,8 @@ public class SQFParamsStatement implements SQFPrivatizer {
 	/**
 	 Get a list of all private vars
 	 */
-	public List<SQFPrivateDeclVar> getPrivateDeclVars() {
+	@Override
+	public List<SQFPrivateDeclVar> getPrivateVars() {
 		return privateDeclVars;
 	}
 
@@ -59,7 +60,7 @@ public class SQFParamsStatement implements SQFPrivatizer {
 	public static SQFParamsStatement parse(SQFCommandExpression expression) {
 		PsiElement postfix = expression.getPostfixArgument();
 		PsiElement prefix = expression.getPrefixArgument();
-		String commandName = expression.getCommand().getText();
+		String commandName = expression.getCommandName();
 
 		SQFParamsStatement paramsStatement = null;
 

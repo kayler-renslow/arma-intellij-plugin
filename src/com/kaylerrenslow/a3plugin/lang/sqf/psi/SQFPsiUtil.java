@@ -181,7 +181,7 @@ public class SQFPsiUtil {
 	 */
 	@NotNull
 	public static SQFPrivateDecl createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
-		List<SQFPrivateDeclVar> declVars = decl.getPrivateDeclVars();
+		List<SQFPrivateDeclVar> declVars = decl.getPrivateVars();
 		String text = "private [";
 		for (SQFPrivateDeclVar declVar : declVars) {
 			text += "\"" + declVar.getVarName() + "\",";

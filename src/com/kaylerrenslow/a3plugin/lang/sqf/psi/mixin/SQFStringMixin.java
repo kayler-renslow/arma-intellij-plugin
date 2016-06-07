@@ -4,10 +4,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiReference;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFLocalVarInStringReference;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,7 +15,7 @@ import java.util.ArrayList;
  *         PsiElement mixin for SQF grammar file. This mixin is meant for PrivateDeclVar PsiElements. (variables in strings next to private keyword)
  *         Created on 03/23/2016.
  */
-public class SQFStringMixin extends ASTWrapperPsiElement {
+public abstract class SQFStringMixin extends ASTWrapperPsiElement implements SQFString{
 
 	public SQFStringMixin(@NotNull ASTNode node) {
 		super(node);
@@ -46,8 +43,8 @@ public class SQFStringMixin extends ASTWrapperPsiElement {
 		for (ASTNode node : nodes) {
 			var = (SQFVariable) node.getPsi();
 
-			if (var.getVarName().equals(myVarName)) {
-				references.add(new SQFLocalVarInStringReference(var, this));
+			if (var.getVarName().equals(myVarName) && var.getDeclarationScope() == myContainingScope) {
+				references.add(new SQFLocalVarInStringReference(var, myContainingScope, this));
 			}
 		}
 		return references.toArray(new PsiReference[references.size()]);
