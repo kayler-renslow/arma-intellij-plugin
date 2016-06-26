@@ -1,15 +1,11 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.references;
 
-import com.intellij.ide.highlighter.XmlFileType;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderFile;
-import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.shared.XmlPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,19 +52,9 @@ public class SQFStringtableKeyReference implements PsiReference {
 
 	@Override
 	public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-		XmlAttributeValue value = createXmlElement(this.keyAttributeValue.getProject(), newElementName, XmlAttributeValue.class);
+		XmlAttributeValue value = XmlPsiUtil.createXmlElement(this.keyAttributeValue.getProject(), newElementName, XmlAttributeValue.class);
 		this.keyAttributeValue.getParent().getNode().replaceChild(keyAttributeValue.getNode(), value.getNode());
 		return value;
-	}
-
-	private static <T extends PsiElement> T createXmlElement(@NotNull Project project, @NotNull String text, @NotNull Class<T> tClass) {
-		HeaderFile file = createFile(project, text);
-		return PsiUtil.findFirstDescendantElement(file, tClass);
-	}
-
-	private static HeaderFile createFile(@NotNull Project project, @NotNull String text) {
-		String fileName = "fake_xml_file.xml";
-		return (HeaderFile) PsiFileFactory.getInstance(project).createFileFromText(fileName, XmlFileType.INSTANCE, text);
 	}
 
 	@Override

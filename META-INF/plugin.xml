@@ -46,6 +46,7 @@
 		<lang.foldingBuilder language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderFoldingBuilder" />
 		<annotator language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderAnnotator"/>
 		<lang.documentationProvider language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderDocumentationProvider"/>
+		<lang.findUsagesProvider language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderFindUsagesProvider"/>
 
 		<!-- Shared for Languages -->
 		<usageTypeProvider implementation="com.kaylerrenslow.a3plugin.lang.shared.ArmaUsageTypeProvider"/>

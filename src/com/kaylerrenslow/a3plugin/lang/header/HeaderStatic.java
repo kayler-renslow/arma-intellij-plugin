@@ -1,6 +1,8 @@
 package com.kaylerrenslow.a3plugin.lang.header;
 
+import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.Plugin;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import com.kaylerrenslow.a3plugin.util.FileReader;
 
 /**
@@ -15,4 +17,7 @@ public class HeaderStatic{
 	public static final String FILE_EXTENSION_DEFAULT = Plugin.resources.getString("lang.header.file_extension_default");
 	public static final String HEADER_SAMPLE_CODE_TEXT = FileReader.getText("/com/kaylerrenslow/a3plugin/lang/header/codeStyle/headerSampleCode.h");
 
+	public static final TokenSet IDENTIFERS = TokenSet.create(HeaderTypes.IDENTIFIER);
+	public static final TokenSet COMMENTS = TokenSet.create(HeaderTypes.BLOCK_COMMENT, HeaderTypes.INLINE_COMMENT);
+	public static final TokenSet LITERALS = TokenSet.create(HeaderTypes.HEX_LITERAL, HeaderTypes.NUMBER_LITERAL);
 }

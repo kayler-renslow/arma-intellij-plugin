@@ -1,4 +1,4 @@
-package com.kaylerrenslow.a3plugin.lang.shared.stringtable.psi;
+package com.kaylerrenslow.a3plugin.lang.header.psi.references;
 
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  @author Kayler
- Creates a reference that points from stringtable key attribute in stringtable.xml to Header StringtableKey
+ Creates a reference that points from Header StringtableKey to stringtable key attribute in stringtable.xml
  Created on 06/25/2016. */
 public class HeaderStringtableKeyReference implements PsiReference {
 	private final HeaderStringtableKey key;
@@ -50,7 +50,7 @@ public class HeaderStringtableKeyReference implements PsiReference {
 
 	@Override
 	public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-		return this.key.setName(newElementName.substring(newElementName.indexOf("_") + 1));
+		return key.setName(newElementName);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ import com.intellij.psi.xml.XmlAttributeValue;
 import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderStringtableKey;
+import com.kaylerrenslow.a3plugin.lang.header.psi.references.HeaderStringtableKeyReference;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFString;
@@ -46,13 +47,12 @@ public class StringtableReferenceContributor extends PsiReferenceContributor {
 				if (!element.getContainingFile().getVirtualFile().equals(stringtable.getVirtualFile())) {
 					return PsiReference.EMPTY_ARRAY;
 				}
-				String idString = attributeValue.getText();
 				ArrayList<PsiReference> referenceList = new ArrayList<>();
-				List<SQFString> stringList = SQFPsiUtil.findAllStrings(element.getProject(), m, idString);
+				List<SQFString> stringList = SQFPsiUtil.findAllStrings(element.getProject(), m, attributeValue.getText());
 				for(SQFString sqfString : stringList){
 					referenceList.add(new StringtableSQFStringReference(sqfString, attributeValue));
 				}
-				List<HeaderStringtableKey> headerStringKeyList = HeaderPsiUtil.findAllStringtableKeys(element.getProject(), m, idString);
+				List<HeaderStringtableKey> headerStringKeyList = HeaderPsiUtil.findAllStringtableKeys(element.getProject(), m, attributeValue.getValue());
 				for(HeaderStringtableKey key : headerStringKeyList){
 					referenceList.add(new HeaderStringtableKeyReference(key, attributeValue));
 				}

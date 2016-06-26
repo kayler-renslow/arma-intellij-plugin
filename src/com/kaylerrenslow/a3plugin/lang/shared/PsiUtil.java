@@ -205,9 +205,9 @@ public class PsiUtil {
 			if (type.isInstance(child)) {
 				return (T) child;
 			}
-			PsiElement e = findFirstDescendantElement(child, type);
+			T e = findFirstDescendantElement(child, type);
 			if (e != null) {
-				return (T) e;
+				return e;
 			}
 			child = child.getNextSibling();
 		}

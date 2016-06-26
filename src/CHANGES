@@ -8,9 +8,9 @@ Plugin
 
 Shared between languages
 	ADDED:
-        support to find usages of stringtable entries
+        none
     CHANGED:
-        converted sqf variable reference and var in string reference to polyvariant
+        none
     FIXED:
         none
 
@@ -28,4 +28,4 @@ Header
     CHANGED:
         none
     FIXED:
-        none
+        stringtable key references
