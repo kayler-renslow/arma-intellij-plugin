@@ -16,7 +16,7 @@ Shared between languages
 
 SQF
 	ADDED:
-        none
+        attempt for creating references in format strings
     CHANGED:
         none
     FIXED:
@@ -28,4 +28,4 @@ Header
     CHANGED:
         none
     FIXED:
-        stringtable key references
+        none

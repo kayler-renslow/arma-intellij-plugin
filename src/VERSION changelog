@@ -15,7 +15,7 @@ Shared between languages
             Commands: @command command_name
             BIS Functions: @bis function_name
             Config function: @fnc function_name
-        support to find usages of stringtable entries
+        support to find usages of stringtable entries, as well as refactor-renaming them
     CHANGED:
         none
     FIXED:

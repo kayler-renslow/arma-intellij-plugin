@@ -4,7 +4,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
@@ -14,6 +14,7 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFCommandItemPresen
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFCommandReference;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 
@@ -21,7 +22,7 @@ import java.util.ArrayList;
  @author Kayler
  SQF Command (e.g. createVehicle or params)
  Createdon 06/03/2016. */
-public abstract class SQFCommandElement extends ASTWrapperPsiElement implements PsiNamedElement, SQFCommand {
+public abstract class SQFCommandElement extends ASTWrapperPsiElement implements PsiNameIdentifierOwner, SQFCommand {
 	public SQFCommandElement(@NotNull ASTNode node) {
 		super(node);
 	}
@@ -49,6 +50,12 @@ public abstract class SQFCommandElement extends ASTWrapperPsiElement implements 
 		}
 
 		return refs.toArray(new PsiReference[refs.size()]);
+	}
+
+	@Nullable
+	@Override
+	public PsiElement getNameIdentifier() {
+		return this;
 	}
 
 	@Override

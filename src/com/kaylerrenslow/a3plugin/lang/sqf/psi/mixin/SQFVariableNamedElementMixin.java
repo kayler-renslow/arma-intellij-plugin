@@ -75,12 +75,19 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 				refVars.add(other);
 			}
 		}
-		return new PsiReference[]{new SQFVariableReference(me, refVars)};
+		if (refVars.size() > 0) {
+			return new PsiReference[]{new SQFVariableReference(me, refVars)};
+		}
+		return PsiReference.EMPTY_ARRAY;
 	}
 
 	@Override
 	public PsiReference getReference() {
-		return getReferences()[0];
+		PsiReference[] references = getReferences();
+		if (references == PsiReference.EMPTY_ARRAY) {
+			return null;
+		}
+		return references[0];
 	}
 
 	@Override

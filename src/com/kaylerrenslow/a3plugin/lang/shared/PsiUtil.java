@@ -127,7 +127,7 @@ public class PsiUtil {
 	 @return true if node has ancestor of IElementType type and ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
 	 */
 	public static boolean isDescendantOf(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String textContent) {
-		return getAncestorWithType(node, type, textContent) != null;
+		return getFirstAncestorOfType(node, type, textContent) != null;
 	}
 
 	/**
@@ -140,7 +140,7 @@ public class PsiUtil {
 	 @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
 	 */
 	@Nullable
-	public static ASTNode getAncestorWithType(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String textContent) {
+	public static ASTNode getFirstAncestorOfType(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String textContent) {
 		ASTNode parent = node.getTreeParent();
 		boolean isChild = false;
 		while (parent != null && !isChild) {
@@ -151,6 +151,32 @@ public class PsiUtil {
 			isChild = parent.getElementType() == type && (textContent == null || parent.getText().equals(textContent));
 		}
 		return parent;
+	}
+
+	/**
+	 Checks if the given node has an ancestor that inherits from the given class. If there is one, this method will return that ancestor. Otherwise, it will return null.<br>
+	 If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
+
+	 @param start where to start traversing upwards
+	 @param clazz type to check
+	 @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
+	 @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
+	 */
+	@Nullable
+	public static <T extends PsiElement> T getFirstAncestorOfType(@NotNull PsiElement start, @NotNull Class<T> clazz, @Nullable String textContent) {
+		PsiElement parent = start.getParent();
+		boolean isChild = false;
+		while (parent != null && !isChild) {
+			parent = parent.getParent();
+			if (parent == null) {
+				break;
+			}
+			isChild = clazz.isInstance(parent) && (textContent == null || parent.getText().equals(textContent));
+		}
+		if (isChild) {
+			return (T) parent;
+		}
+		return null;
 	}
 
 	/**
@@ -199,7 +225,7 @@ public class PsiUtil {
 
 
 	@Nullable
-	public static<T extends PsiElement> T findFirstDescendantElement(@NotNull PsiElement element, @NotNull Class<T> type) {
+	public static <T extends PsiElement> T findFirstDescendantElement(@NotNull PsiElement element, @NotNull Class<T> type) {
 		PsiElement child = element.getFirstChild();
 		while (child != null) {
 			if (type.isInstance(child)) {

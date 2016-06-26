@@ -65,7 +65,7 @@ literal_expression ::= string
                     | array_val
                     | DEC_LITERAL
 
-command ::= COMMAND_TOKEN {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFCommandElement" methods=[]}
+command ::= COMMAND_TOKEN {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFCommandElement" implements="com.intellij.psi.PsiNameIdentifierOwner" methods=[]}
 
 
 add_expression ::= expression PLUS expression

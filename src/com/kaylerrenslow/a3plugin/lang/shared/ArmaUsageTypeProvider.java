@@ -52,7 +52,7 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider {
 
 	@Nullable
 	private UsageType getUsageTypeForVariable(SQFVariable variable) {
-		ASTNode statementNode = PsiUtil.getAncestorWithType(variable.getNode(), SQFTypes.STATEMENT, null);
+		ASTNode statementNode = PsiUtil.getFirstAncestorOfType(variable.getNode(), SQFTypes.STATEMENT, null);
 		if (statementNode != null) {
 			SQFStatement statement = (SQFStatement) statementNode.getPsi();
 			if (statement.getAssignment() != null) {
