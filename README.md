@@ -5,7 +5,7 @@ Arma games are created by [Bohemia Interactive](https://www.bistudio.com/) and I
 This project is open source. Do what you want with the code. Sell it, modify it, claim you made it, or anything else - I don't care. Just make sure you are respecting the rights of Jetbrains and Bohemia Interactive.
 
 ### How to Clone and Edit Source for Arma Intellij Plugin
-1. How to write Java and experience with Intellij (so you should have [Intellij](https://www.jetbrains.com/idea/) by now.)
+1. You should know how to write Java and experience with Intellij (so you should have [Intellij](https://www.jetbrains.com/idea/) by now.)
 2. Read the official documentation for Plugin development with Intellij. This will tell you how to prepare for a new Plugin project. Visit the docs [here](http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/prerequisites.html).
 3. By now you should have Intellij set up and a new project. Now go to the Main Menu Bar, then "VCS", then "Checkout", then "Github". Clone the Arma Intellij Plugin source. Now you will want to link that source code to the plugin project you created.
 4. Done
