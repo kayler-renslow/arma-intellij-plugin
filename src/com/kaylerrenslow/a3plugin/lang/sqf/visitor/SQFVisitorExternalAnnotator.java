@@ -69,27 +69,46 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 		} else {
 			references = var.getReferences();
 		}
+
+		int numUsages = 0;
+
 		int numAssignments = 0;
 		boolean isUsedOverride = false;
 		boolean isDefinedByParams = false;
 		for (PsiReference reference : references) {
-			PsiElement resolve = reference.resolve();
-			if (resolve == null) {
-				continue;
+			PsiPolyVariantReference polyRef = null;
+			ResolveResult[] polyResults = null;
+			int polyRefInd = 0;
+			if (reference instanceof PsiPolyVariantReference) {
+				polyRef = (PsiPolyVariantReference) reference;
+				polyResults = polyRef.multiResolve(true);
 			}
-			if (resolve instanceof SQFVariable) {
-				SQFVariable resolveVar = (SQFVariable) resolve;
-				if (resolveVar.isAssigningVariable()) {
-					numAssignments++;
+			PsiElement resolve;
+			do {
+				if (polyRef != null) {
+					resolve = polyResults[polyRefInd++].getElement();
+				} else {
+					resolve = reference.resolve();
 				}
-				if (isGlobalVar) {
-					if (SQFStatic.followsSQFFunctionNameRules(resolveVar.getVarName())) {
-						isUsedOverride = true;
+				if (resolve == null) {
+					continue;
+				}
+				numUsages++;
+				if (resolve instanceof SQFVariable) {
+					SQFVariable resolveVar = (SQFVariable) resolve;
+					if (resolveVar.isAssigningVariable()) {
 						numAssignments++;
-						break;
+					}
+					if (isGlobalVar) {
+						if (SQFStatic.followsSQFFunctionNameRules(resolveVar.getVarName())) {
+							isUsedOverride = true;
+							numAssignments++;
+							break;
+						}
 					}
 				}
-			}
+			} while (polyRef != null && polyRefInd < polyResults.length);
+
 		}
 
 		SQFPrivatization privatization = null;
@@ -102,7 +121,7 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 				}
 			}
 		}
-		if (numAssignments == references.length && !isUsedOverride) {
+		if (numAssignments == numUsages && !isUsedOverride) {
 			annotator.createWeakWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
 		}
 		if (numAssignments == 0 && !isDefinedByParams) {

@@ -2,16 +2,13 @@ package com.kaylerrenslow.a3plugin.lang.header.psi;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiManager;
 import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.util.Attribute;
 import com.kaylerrenslow.a3plugin.util.FilePath;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import com.kaylerrenslow.a3plugin.util.TraversalObjectFinder;
-import org.apache.xmlbeans.impl.piccolo.io.FileFormatException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,6 +20,10 @@ import java.util.List;
  *         Created on 01/01/2016.
  */
 public class HeaderPsiUtilForGrammar {
+
+	public static String getKey(HeaderStringtableKey key){
+		return key.getText().substring(1).replaceFirst("[sS][tT][rR]_", "str_");
+	}
 
 	public static boolean bracesAreEmpty(HeaderClassDeclaration classDeclaration) {
 		if (classDeclaration.getClassContent() == null) {

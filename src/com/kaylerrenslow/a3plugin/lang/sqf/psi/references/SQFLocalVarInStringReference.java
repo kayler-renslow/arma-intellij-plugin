@@ -1,8 +1,7 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.references;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
@@ -11,20 +10,26 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * @author Kayler
  * A reference between a local variable and a String that contains the variable
  * Created on 04/12/2016.
  */
-public class SQFLocalVarInStringReference implements PsiReference {
-	private final SQFVariable targetVar;
+public class SQFLocalVarInStringReference implements PsiPolyVariantReference {
+	private final SQFVariable[] targetVars;
 	private final SQFString string;
 	private final SQFScope targetVarScope;
+	private ResolveResult[] resolveResult;
 
-	public SQFLocalVarInStringReference(SQFVariable targetVar, SQFScope targetVarScope, SQFString string) {
-		this.targetVar = targetVar;
+	public SQFLocalVarInStringReference(List<SQFVariable> targetVars, SQFScope targetVarScope, SQFString string) {
+		this.targetVars = targetVars.toArray(new SQFVariable[targetVars.size()]);
 		this.string = string;
 		this.targetVarScope = targetVarScope;
+
+		resolveResult = PsiElementResolveResult.createResults(targetVars);
 	}
 
 	@Override
@@ -40,13 +45,13 @@ public class SQFLocalVarInStringReference implements PsiReference {
 	@Nullable
 	@Override
 	public PsiElement resolve() {
-		return targetVar;
+		return targetVars[0];
 	}
 
 	@NotNull
 	@Override
 	public String getCanonicalText() {
-		return targetVar.getVarName();
+		return targetVars[0].getVarName();
 	}
 
 	@Override
@@ -85,7 +90,7 @@ public class SQFLocalVarInStringReference implements PsiReference {
 	@Override
 	public String toString() {
 		return "SQFLocalVarInStringReference{" +
-				"targetVar=" + targetVar +
+				"targetVar=" + Arrays.toString(targetVars) +
 				", string=" + string +
 				'}';
 	}
@@ -93,5 +98,11 @@ public class SQFLocalVarInStringReference implements PsiReference {
 	@Override
 	public boolean isSoft() {
 		return false;
+	}
+
+	@NotNull
+	@Override
+	public ResolveResult[] multiResolve(boolean incompleteCode) {
+		return resolveResult;
 	}
 }

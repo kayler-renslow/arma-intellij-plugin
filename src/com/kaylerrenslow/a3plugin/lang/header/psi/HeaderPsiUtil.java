@@ -2,10 +2,14 @@ package com.kaylerrenslow.a3plugin.lang.header.psi;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.search.FileTypeIndex;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.dialog.newGroup.SQFConfigFunctionInformationHolder;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
 import com.kaylerrenslow.a3plugin.lang.header.exception.*;
@@ -18,12 +22,44 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Kayler
  *         Created on 03/30/2016.
  */
 public class HeaderPsiUtil {
+
+	/**
+	 Finds all stringtable keys in the module in all header files with the key's text equal to keyText (doesn't include '$')
+
+	 @param project project
+	 @param module current module
+	 @param keyText stringtable key (excluding '$')
+	 @return list all keys
+	 */
+	@NotNull
+	public static List<HeaderStringtableKey> findAllStringtableKeys(@NotNull Project project, @NotNull Module module, @NotNull String keyText) {
+		List<HeaderStringtableKey> result = new ArrayList<>();
+		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, HeaderFileType.INSTANCE, module.getModuleContentScope());
+		for (VirtualFile virtualFile : files) {
+			HeaderFile headerFile = (HeaderFile) PsiManager.getInstance(project).findFile(virtualFile);
+			if (headerFile == null) {
+				continue;
+			}
+			ArrayList<HeaderStringtableKey> strings = PsiUtil.findDescendantElementsOfInstance(headerFile, HeaderStringtableKey.class, null);
+			if (strings == null) {
+				continue;
+			}
+			for (HeaderStringtableKey string : strings) {
+				if (string.getKey().equals(keyText)) {
+					result.add(string);
+				}
+			}
+		}
+		return result;
+	}
 
 	/**
 	 * Creates a new config function and inserts it into CfgFunctions. The CfgFunctions is determined by the module inside newFunction.module

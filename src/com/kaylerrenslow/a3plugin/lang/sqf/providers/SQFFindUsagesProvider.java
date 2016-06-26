@@ -5,10 +5,10 @@ import com.intellij.lang.cacheBuilder.WordsScanner;
 import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
-import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFLexerAdapter;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFCommand;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFString;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -22,12 +22,12 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@Nullable
 	@Override
 	public WordsScanner getWordsScanner() {
-		return new DefaultWordsScanner(new SQFLexerAdapter(), TokenSet.create(SQFTypes.GLOBAL_VAR, SQFTypes.LOCAL_VAR, SQFTypes.VARIABLE), TokenSet.create(SQFTypes.INLINE_COMMENT), TokenSet.create(SQFTypes.DEC_LITERAL, SQFTypes.INTEGER_LITERAL));
+		return new DefaultWordsScanner(new SQFLexerAdapter(), SQFStatic.IDENTIFIERS, SQFStatic.COMMENTS, SQFStatic.NUMBER_LITERALS);
 	}
 
 	@Override
 	public boolean canFindUsagesFor(@NotNull PsiElement psiElement) {
-		return psiElement instanceof PsiNamedElement;
+		return psiElement instanceof PsiNamedElement || psiElement instanceof SQFString;
 	}
 
 	@Nullable
@@ -39,6 +39,9 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 				return "Function";
 			}
 			return "Value read";
+		}
+		if(psiElement instanceof SQFString){
+			return "SQF String";
 		}
 		return "SQF";
 	}
@@ -55,6 +58,9 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 		}
 		if(element instanceof SQFCommand){
 			return "Command";
+		}
+		if(element instanceof SQFString){
+			return "String";
 		}
 		return "unknown type";
 	}

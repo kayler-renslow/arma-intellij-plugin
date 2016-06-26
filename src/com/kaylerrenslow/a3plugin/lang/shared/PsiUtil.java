@@ -199,15 +199,15 @@ public class PsiUtil {
 
 
 	@Nullable
-	public static PsiElement findFirstDescendantElement(@NotNull PsiElement element, @NotNull Class<?> type) {
+	public static<T extends PsiElement> T findFirstDescendantElement(@NotNull PsiElement element, @NotNull Class<T> type) {
 		PsiElement child = element.getFirstChild();
 		while (child != null) {
 			if (type.isInstance(child)) {
-				return child;
+				return (T) child;
 			}
 			PsiElement e = findFirstDescendantElement(child, type);
 			if (e != null) {
-				return e;
+				return (T) e;
 			}
 			child = child.getNextSibling();
 		}
@@ -244,7 +244,7 @@ public class PsiUtil {
 	}
 
 
-	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor) {
+	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(PsiElement rootElement, Class<E> type, PsiElement cursor) {
 		ArrayList<E> list = new ArrayList<>();
 		findDescdantElementsOfInstance(rootElement, type, cursor, list);
 		return list;

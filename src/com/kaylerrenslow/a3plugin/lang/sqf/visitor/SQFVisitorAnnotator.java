@@ -65,7 +65,9 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 				if (prefix != null) {
 					createDeleteTokenAnotation(prefix);
 				}
-				expect("String or Array of Strings", postfix);
+				if (postfix != null) {
+					expect("String or Array of Strings", postfix);
+				}
 			}
 		} else if (commandName.equals("params")) {
 

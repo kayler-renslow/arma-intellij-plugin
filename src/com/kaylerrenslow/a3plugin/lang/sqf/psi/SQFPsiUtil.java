@@ -110,6 +110,9 @@ public class SQFPsiUtil {
 	public static List<SQFVariable> findGlobalVariables(@NotNull Project project, @NotNull SQFVariable findVar) {
 		List<SQFVariable> result = new ArrayList<>();
 		Module m = PluginUtil.getModuleForPsiFile(findVar.getContainingFile());
+		if(m == null){
+			return result;
+		}
 		GlobalSearchScope searchScope = m.getModuleContentScope();
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, searchScope);
 		for (VirtualFile virtualFile : files) {
@@ -117,7 +120,7 @@ public class SQFPsiUtil {
 			if (sqfFile == null) {
 				continue;
 			}
-			ArrayList<SQFVariable> vars = PsiUtil.<SQFVariable>findDescendantElementsOfInstance(sqfFile, SQFVariable.class, null);
+			ArrayList<SQFVariable> vars = PsiUtil.findDescendantElementsOfInstance(sqfFile, SQFVariable.class, null);
 			if (vars == null) {
 				continue;
 			}
@@ -127,6 +130,36 @@ public class SQFPsiUtil {
 				}
 				if (findVar.getVarName().equals(var.getVarName())) {
 					result.add(var);
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 Finds all SQFStrings in the module in all SQF files with text equal to quoteText
+
+	 @param project project
+	 @param module current module
+	 @param quoteText text to search for (including quotes)
+	 @return list all strings
+	 */
+	@NotNull
+	public static List<SQFString> findAllStrings(@NotNull Project project, @NotNull Module module, @NotNull String quoteText) {
+		List<SQFString> result = new ArrayList<>();
+		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, module.getModuleContentScope());
+		for (VirtualFile virtualFile : files) {
+			SQFFile sqfFile = (SQFFile) PsiManager.getInstance(project).findFile(virtualFile);
+			if (sqfFile == null) {
+				continue;
+			}
+			ArrayList<SQFString> strings = PsiUtil.findDescendantElementsOfInstance(sqfFile, SQFString.class, null);
+			if (strings == null) {
+				continue;
+			}
+			for (SQFString string : strings) {
+				if (string.getText().equals(quoteText)) {
+					result.add(string);
 				}
 			}
 		}
@@ -241,7 +274,7 @@ public class SQFPsiUtil {
 			if (tClass.isInstance(postfix)) {
 				return (T) postfix;
 			}
-			if(postfix instanceof SQFCommandExpression){
+			if (postfix instanceof SQFCommandExpression) {
 				postfix = ((SQFCommandExpression) postfix).getPostfixArgument();
 			}
 		}

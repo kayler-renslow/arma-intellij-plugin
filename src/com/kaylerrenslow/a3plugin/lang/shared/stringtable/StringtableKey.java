@@ -5,7 +5,7 @@ import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.command.WriteCommandAction;
-import com.intellij.psi.xml.XmlTag;
+import com.intellij.psi.xml.XmlAttributeValue;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.Container;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.Key;
 import org.jetbrains.annotations.NotNull;
@@ -25,6 +25,9 @@ public class StringtableKey {
 		this.container = container;
 	}
 
+	public XmlAttributeValue getKeyXmlValue(){
+		return key.getID().getXmlAttributeValue();
+	}
 
 	public String getKeyName() {
 		return key.getID().getXmlAttribute().getValue();

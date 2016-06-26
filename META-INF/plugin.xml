@@ -16,7 +16,7 @@
 		<!-- SQF Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.sqf.SQFFileTypeFactory"/>
 		<lang.parserDefinition language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition"/>
-		<lang.syntaxHighlighterFactory key="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighterFactory"/>
+		<lang.syntaxHighlighterFactory language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighterFactory"/>
 		<colorSettingsPage implementation="com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFColorSettingsPage"/>
 		<completion.contributor language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.contributors.SQFCompletionContributor"/>
 		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDocumentationProvider"/>
@@ -35,7 +35,7 @@
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>
 		<lang.parserDefinition language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition"/>
-		<lang.syntaxHighlighterFactory key="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderSyntaxHighlighterFactory"/>
+		<lang.syntaxHighlighterFactory language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderSyntaxHighlighterFactory"/>
 		<colorSettingsPage implementation="com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderColorSettingsPage"/>
 		<completion.contributor language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.contributors.HeaderCompletionContributor"/>
 		<lang.commenter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderCommenter"/>
@@ -65,6 +65,7 @@
 
 		<!-- Stringtable-->
 		<dom.fileDescription implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.StringtableDomFileDescription" />
+		<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.psi.StringtableReferenceContributor"/>
 
 		<!-- Other things-->
 		<moduleBuilder builderClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleBuilder" />

@@ -8,11 +8,11 @@ Plugin
 
 Shared between languages
 	ADDED:
-        none
+        support to find usages of stringtable entries
     CHANGED:
-        none
+        converted sqf variable reference and var in string reference to polyvariant
     FIXED:
-        usage type provider
+        none
 
 SQF
 	ADDED:

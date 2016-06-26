@@ -2,12 +2,19 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.module.Module;
 import com.intellij.psi.PsiReference;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFLocalVarInStringReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFStringtableKeyReference;
+import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
+import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
@@ -22,17 +29,36 @@ public abstract class SQFStringMixin extends ASTWrapperPsiElement implements SQF
 
 	@Override
 	public PsiReference getReference() {
-		if (!stringContainsLocalVar()) {
+		PsiReference[] references = getReferences();
+		if (references == PsiReference.EMPTY_ARRAY) {
 			return null;
 		}
-		return getReferences()[0];
+		return references[0];
 	}
 
 	@NotNull
 	@Override
 	public PsiReference[] getReferences() {
 		if (!stringContainsLocalVar()) {
-			return new PsiReference[0];
+			Module m = PluginUtil.getModuleForPsiFile(getContainingFile());
+			if (m == null) {
+				return PsiReference.EMPTY_ARRAY;
+			}
+			Stringtable stringtable;
+			try {
+				stringtable = ArmaProjectDataManager.getInstance().getDataForModule(m).getStringtable();
+			} catch (FileNotFoundException e) {
+				return PsiReference.EMPTY_ARRAY;
+			}
+			String nonquote = getNonQuoteText();
+			StringtableKey[] keysValues = stringtable.getAllKeysValues();
+			for(StringtableKey key : keysValues){
+				if(key.getKeyName().equals(nonquote)){
+					return new PsiReference[]{new SQFStringtableKeyReference(this, key.getKeyXmlValue())};
+				}
+			}
+
+			return PsiReference.EMPTY_ARRAY;
 		}
 		SQFScope searchScope = SQFPsiUtil.getContainingScope(this);
 		SQFStatement myStatement = (SQFStatement) PsiUtil.getAncestorWithType(this.getNode(), SQFTypes.STATEMENT, null).getPsi();
@@ -55,17 +81,17 @@ public abstract class SQFStringMixin extends ASTWrapperPsiElement implements SQF
 			}
 		}
 		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(searchScope, SQFTypes.VARIABLE, null, this.getNonQuoteText());
-		ArrayList<PsiReference> references = new ArrayList<>();
 		SQFVariable var;
 		String myVarName = this.getNonQuoteText();
+		ArrayList<SQFVariable> refVars = new ArrayList<>(nodes.size());
 		for (ASTNode node : nodes) {
 			var = (SQFVariable) node.getPsi();
 
 			if (var.getVarName().equals(myVarName) && var.getDeclarationScope() == searchScope) {
-				references.add(new SQFLocalVarInStringReference(var, searchScope, this));
+				refVars.add(var);
 			}
 		}
-		return references.toArray(new PsiReference[references.size()]);
+		return new PsiReference[]{new SQFLocalVarInStringReference(refVars, searchScope, this)};
 	}
 
 	private boolean stringContainsLocalVar() {

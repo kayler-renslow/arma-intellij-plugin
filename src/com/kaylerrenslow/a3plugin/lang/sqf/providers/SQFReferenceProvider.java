@@ -28,11 +28,7 @@ public class SQFReferenceProvider extends PsiReferenceProvider{
 
 		if(var.isGlobalVariable()){
 			List<SQFVariable> vars = SQFPsiUtil.findGlobalVariables(element.getProject(), var);
-			PsiReference[] references = new PsiReference[vars.size()];
-			for (int i = 0; i < vars.size(); i++){
-				references[i] = new SQFVariableReference(var, vars.get(i));
-			}
-			return references;
+			return new PsiReference[]{new SQFVariableReference(var, vars)};
 		}
 		return new PsiReference[0];
 	}
