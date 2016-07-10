@@ -86,4 +86,9 @@ public abstract class SQFStringMixin extends ASTWrapperPsiElement implements SQF
 	public String getNonQuoteText() {
 		return getText().substring(1, getTextLength() - 1);
 	}
+
+	@Override
+	public String toString() {
+		return "SQFStringMixin{" + getText() + "}";
+	}
 }

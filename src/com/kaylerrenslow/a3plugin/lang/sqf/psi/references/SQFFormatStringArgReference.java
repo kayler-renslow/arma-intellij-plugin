@@ -44,7 +44,7 @@ public class SQFFormatStringArgReference implements PsiReference{
 	@NotNull
 	@Override
 	public String getCanonicalText() {
-		return targetArgument.getText();
+		return rangeInString.substring(formatString.getText());
 	}
 
 	@Override
@@ -59,7 +59,6 @@ public class SQFFormatStringArgReference implements PsiReference{
 
 	@Override
 	public boolean isReferenceTo(PsiElement element) {
-		System.out.println("SQFFormatStringArgReference.isReferenceTo element = " + element.getText());
 		return element == resolve();
 	}
 

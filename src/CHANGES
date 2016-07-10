@@ -16,11 +16,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        attempt for creating references in format strings
+        none
     CHANGED:
         none
     FIXED:
-        none
+        pattern for finding format string arguments (%1, %%1, %%%10, etc)
 
 Header
     ADDED:

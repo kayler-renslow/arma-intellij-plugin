@@ -31,29 +31,32 @@ public class StringtableReferenceContributor extends PsiReferenceContributor {
 			@Override
 			public PsiReference[] getReferencesByElement(@NotNull PsiElement element, @NotNull ProcessingContext context) {
 				XmlAttributeValue attributeValue = (XmlAttributeValue) element;
-				if(!(attributeValue.getParent() instanceof XmlAttribute && ((XmlAttribute) attributeValue.getParent()).getName().equals("ID"))){
+				if (!(attributeValue.getParent() instanceof XmlAttribute && ((XmlAttribute) attributeValue.getParent()).getName().equals("ID"))) {
 					return PsiReference.EMPTY_ARRAY;
 				}
 				Module m = PluginUtil.getModuleForPsiFile(element.getContainingFile());
 				if (m == null) {
 					return PsiReference.EMPTY_ARRAY;
 				}
-				Stringtable stringtable;
 				try {
-					stringtable = ArmaProjectDataManager.getInstance().getDataForModule(m).getStringtable();
+					Stringtable stringtable = ArmaProjectDataManager.getInstance().getDataForModule(m).getStringtable();
+					if(element.getContainingFile() == null){
+						return PsiReference.EMPTY_ARRAY;
+					}
+					if (!element.getContainingFile().getVirtualFile().equals(stringtable.getVirtualFile())) {
+						return PsiReference.EMPTY_ARRAY;
+					}
 				} catch (FileNotFoundException e) {
 					return PsiReference.EMPTY_ARRAY;
 				}
-				if (!element.getContainingFile().getVirtualFile().equals(stringtable.getVirtualFile())) {
-					return PsiReference.EMPTY_ARRAY;
-				}
+
 				ArrayList<PsiReference> referenceList = new ArrayList<>();
 				List<SQFString> stringList = SQFPsiUtil.findAllStrings(element.getProject(), m, attributeValue.getText());
-				for(SQFString sqfString : stringList){
+				for (SQFString sqfString : stringList) {
 					referenceList.add(new StringtableSQFStringReference(sqfString, attributeValue));
 				}
 				List<HeaderStringtableKey> headerStringKeyList = HeaderPsiUtil.findAllStringtableKeys(element.getProject(), m, attributeValue.getValue());
-				for(HeaderStringtableKey key : headerStringKeyList){
+				for (HeaderStringtableKey key : headerStringKeyList) {
 					referenceList.add(new HeaderStringtableKeyReference(key, attributeValue));
 				}
 

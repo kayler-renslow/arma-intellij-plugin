@@ -18,7 +18,7 @@ import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,6 +46,7 @@ public class SQFReferenceContributor extends PsiReferenceContributor {
 	}
 
 	private static class FormatStringPsiReferenceProvider extends PsiReferenceProvider {
+		private static final Pattern pattern = Pattern.compile("[%]{0}(%[0-9]+)|[%]{2}(%[0-9]+)"); //don't match %%1 because percent is cancelled, but you can match %%%1 or %1
 
 		@NotNull
 		@Override
@@ -58,21 +59,25 @@ public class SQFReferenceContributor extends PsiReferenceContributor {
 			if (!formatString.getText().contains("%")) {
 				return PsiReference.EMPTY_ARRAY;
 			}
-			Pattern pattern = Pattern.compile("(%[0-9]+)");
 			Matcher matcher = pattern.matcher(formatString.getText());
-			ArrayList<PsiReference> references = new ArrayList<>();
+			LinkedList<PsiReference> references = new LinkedList<>();
 			int argNum; //argument number in format string (e.g. 1 from '%1' or 20 from '%20')
 			int start; //start text range in format string for the argument number
 			int end; //end text range in format string for the argument number
+			int groupNum; //matched group
 			while (matcher.find()) {
-				argNum = Integer.parseInt(matcher.group(1).substring(1));
-				start = matcher.start(1);
-				end = matcher.end(1);
+				if (matcher.group(1) == null) {
+					groupNum = 2;
+				} else {
+					groupNum = 1;
+				}
+				argNum = Integer.parseInt(matcher.group(groupNum).substring(1));
+				start = matcher.start(groupNum);
+				end = matcher.end(groupNum);
 				if (argNum >= arrayVal.getArrayEntryList().size()) {
 					continue;
 				}
 				references.add(new SQFFormatStringArgReference(formatString, TextRange.create(start, end), arrayVal.getArrayEntryList().get(argNum)));
-
 			}
 			return references.toArray(new PsiReference[references.size()]);
 		}
