@@ -1,5 +1,5 @@
-Version: 1.0.4 (Splendid Update)
-Release date: July 10, 2016
+Version: 1.0.4_1 (Splendid Update)
+Release date: July 11, 2016
 
 Plugin
 	ADDED:
@@ -33,6 +33,7 @@ SQF
             _i = 100;
             for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
             hint str _i; // 100
+        **terrible performance for sqf files
 
 Header
     ADDED:

@@ -20,7 +20,7 @@ SQF
     CHANGED:
         none
     FIXED:
-        pattern for finding format string arguments (%1, %%1, %%%10, etc)
+        terrible performance while editing SQF
 
 Header
     ADDED:

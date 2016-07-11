@@ -174,6 +174,7 @@ public class SQFStatic {
 		return FileReader.getText(BIS_FUNCTIONS_DOC_FILE_DIR + bisFunction);
 	}
 
+
 	public static class SQFFunctionTagAndName {
 		public final String tagName;
 		public final String functionClassName;

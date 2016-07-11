@@ -21,12 +21,20 @@ public class SQFVisitorAnnotator extends SQFVisitor {
 
 	private AnnotationHolder annotator;
 
-	private Annotation expect(String expected, PsiElement got) {
+	public static Annotation expect(AnnotationHolder annotator, String expected, PsiElement got) {
 		return annotator.createErrorAnnotation(got, String.format(Plugin.resources.getString("lang.sqf.annotator.error.expected_f"), expected, got.getText()));
 	}
 
-	private Annotation createDeleteTokenAnotation(PsiElement element) {
+	public static Annotation createDeleteTokenAnotation(AnnotationHolder annotator, PsiElement element) {
 		return annotator.createErrorAnnotation(element, String.format(Plugin.resources.getString("lang.sqf.annotator.error.unexpected_f"), element.getText()));
+	}
+
+	private Annotation expect(String expected, PsiElement got) {
+		return expect(annotator, expected, got);
+	}
+
+	private Annotation createDeleteTokenAnotation(PsiElement element) {
+		return createDeleteTokenAnotation(annotator, element);
 	}
 
 

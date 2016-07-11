@@ -4,6 +4,8 @@ import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.ui.JBColor;
 
 import javax.swing.*;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 
 /**
  * @author Kayler
@@ -43,5 +45,12 @@ public class SimpleMessageDialog {
 		DialogBuilder db = newDialog(title, message);
 		db.show();
 		return db;
+	}
+
+	public static String getExceptionString(Throwable t) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		t.printStackTrace(pw);
+		return "An error occurred. Please report this message to the developer(s).\n" + sw.toString();
 	}
 }

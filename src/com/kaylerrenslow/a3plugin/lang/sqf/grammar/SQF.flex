@@ -65,13 +65,10 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "this" { return SQFTypes.LANG_VAR; }
 <YYINITIAL> "_this" { return SQFTypes.LANG_VAR; }
 <YYINITIAL> "_x" { return SQFTypes.LANG_VAR; }
+<YYINITIAL> "_forEachIndex" { return SQFTypes.LANG_VAR; }
 <YYINITIAL> "_exception" { return SQFTypes.LANG_VAR; }
 
 
-<YYINITIAL> "mod" { return SQFTypes.COMMAND_TOKEN; }
-<YYINITIAL> "not" { return SQFTypes.COMMAND_TOKEN; }
-<YYINITIAL> "and" { return SQFTypes.COMMAND_TOKEN; }
-<YYINITIAL> "or" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "abs" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "accTime" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "acos" { return SQFTypes.COMMAND_TOKEN; }
@@ -126,6 +123,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "addMPEventHandler" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "addMusicEventHandler" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "addOwnedMine" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "addPlayerScores" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "addPrimaryWeaponItem" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "addPublicVariableEventHandler" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "addRating" { return SQFTypes.COMMAND_TOKEN; }
@@ -183,6 +181,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "allUnitsUAV" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "allVariables" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ammo" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "and" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "animate" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "animateDoor" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "animateSource" { return SQFTypes.COMMAND_TOKEN; }
@@ -296,6 +295,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "canStand" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "canSuspend" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "canUnloadInCombat" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "canVehicleCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "captive" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "captiveNum" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "case" { return SQFTypes.COMMAND_TOKEN; }
@@ -357,6 +357,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "configName" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "configNull" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "configProperties" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "configSourceAddonList" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "configSourceMod" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "configSourceModList" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "connectTerminalToUAV" { return SQFTypes.COMMAND_TOKEN; }
@@ -390,6 +391,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "createMenu" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "createMine" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "createMissionDisplay" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "createMPMissionsDisplay" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "createSimpleObject" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "createSimpleTask" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "createSite" { return SQFTypes.COMMAND_TOKEN; }
@@ -439,6 +441,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "ctrlRemoveEventHandler" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlScale" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetActiveColor" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "ctrlSetAngle" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetAutoScrollDelay" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetAutoScrollRewind" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetAutoScrollSpeed" { return SQFTypes.COMMAND_TOKEN; }
@@ -467,8 +470,10 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "ctrlSetFontHeightH4" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetFontHeightH5" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetFontHeightH6" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "ctrlSetFontHeightSecondary" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetFontP" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetFontPB" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "ctrlSetFontSecondary" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetForegroundColor" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetModel" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "ctrlSetModelDirAndUp" { return SQFTypes.COMMAND_TOKEN; }
@@ -636,7 +641,9 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "emptyPositions" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "enableAI" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "enableAIFeature" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "enableAimPrecision" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "enableAttack" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "enableAudioFeature" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "enableCamShake" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "enableCaustics" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "enableChannel" { return SQFTypes.COMMAND_TOKEN; }
@@ -664,6 +671,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "enableTeamSwitch" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "enableUAVConnectability" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "enableUAVWaypoints" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "enableVehicleCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "endLoadingScreen" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "endMission" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "engineOn" { return SQFTypes.COMMAND_TOKEN; }
@@ -715,11 +723,13 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "fleeing" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "floor" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "flyInHeight" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "flyInHeightASL" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "fog" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "fogForecast" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "fogParams" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "for" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "forceAddUniform" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "forcedMap" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "forceEnd" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "forceMap" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "forceRespawn" { return SQFTypes.COMMAND_TOKEN; }
@@ -760,6 +770,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "get3DENMissionAttribute" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "get3DENMouseOver" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "get3DENSelected" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "getAimingCoef" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getAllHitPointsDamage" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getAllOwnedMines" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getAmmoCargo" { return SQFTypes.COMMAND_TOKEN; }
@@ -780,6 +791,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "getClientState" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getClientStateNumber" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getConnectedUAV" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "getCustomAimingCoef" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getDammage" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getDescription" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getDir" { return SQFTypes.COMMAND_TOKEN; }
@@ -809,6 +821,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "getMass" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getMissionConfig" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getMissionConfigValue" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "getMissionDLCs" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getModelInfo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getMousePosition" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getNumber" { return SQFTypes.COMMAND_TOKEN; }
@@ -839,6 +852,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "getRepairCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getResolution" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getShadowDistance" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "getShotParents" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getSlingLoad" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getSpeed" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getStamina" { return SQFTypes.COMMAND_TOKEN; }
@@ -848,7 +862,9 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "getUnitLoadout" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getUnitTrait" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getVariable" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "getVehicleCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getWeaponCargo" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "getWeaponSway" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getWPPos" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "glanceAt" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "globalChat" { return SQFTypes.COMMAND_TOKEN; }
@@ -977,6 +993,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "isUAVConnectable" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isUAVConnected" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isUniformAllowed" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "isVehicleCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isWalking" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isWeaponDeployed" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isWeaponRested" { return SQFTypes.COMMAND_TOKEN; }
@@ -1140,12 +1157,15 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "mineActive" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "mineDetectedBy" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "missionConfigFile" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "missionDifficulty" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "missionName" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "missionNamespace" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "missionStart" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "missionVersion" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "mod" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "modelToWorld" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "modelToWorldVisual" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "modParams" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "moonIntensity" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "moonPhase" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "morale" { return SQFTypes.COMMAND_TOKEN; }
@@ -1187,6 +1207,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "nextWeatherChange" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "nil" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "nMenuItems" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "not" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "numberToDate" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "objectCurators" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "objectFromNetId" { return SQFTypes.COMMAND_TOKEN; }
@@ -1212,9 +1233,11 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "onShowNewObject" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "onTeamSwitch" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "openCuratorInterface" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "openDLCPage" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "openMap" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "openYoutubeVideo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "opfor" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "or" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "orderGetIn" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "overcast" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "overcastForecast" { return SQFTypes.COMMAND_TOKEN; }
@@ -1229,6 +1252,8 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "pickWeaponPool" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "pitch" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "pixelGrid" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "pixelGridBase" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "pixelGridNoUIScale" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "pixelH" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "pixelW" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "playableSlotsNumber" { return SQFTypes.COMMAND_TOKEN; }
@@ -1304,6 +1329,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "rating" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "rectangular" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "registeredTasks" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "registerRemoteExecFunc" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "registerTask" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "reload" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "reloadEnabled" { return SQFTypes.COMMAND_TOKEN; }
@@ -1408,6 +1434,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "safeZoneX" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "safeZoneXAbs" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "safeZoneY" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "save3DENInventory" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "saveGame" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "saveIdentity" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "saveJoysticks" { return SQFTypes.COMMAND_TOKEN; }
@@ -1462,7 +1489,9 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "set3DENLayer" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "set3DENLinesVisible" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "set3DENMissionAttributes" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "set3DENModelsVisible" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "set3DENObjectType" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "set3DENSelected" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setAccTime" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setAirportSide" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setAmmo" { return SQFTypes.COMMAND_TOKEN; }
@@ -1611,6 +1640,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "setRepairCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setShadowDistance" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setSide" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "setSimpleTaskAlwaysVisible" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setSimpleTaskCustomData" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setSimpleTaskDescription" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setSimpleTaskDestination" { return SQFTypes.COMMAND_TOKEN; }
@@ -1660,6 +1690,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "setVehicleAmmo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setVehicleAmmoDef" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setVehicleArmor" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "setVehicleCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setVehicleId" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setVehicleLock" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setVehiclePosition" { return SQFTypes.COMMAND_TOKEN; }
@@ -1674,6 +1705,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "setWaypointCombatMode" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setWaypointCompletionRadius" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setWaypointDescription" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "setWaypointForceBehaviour" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setWaypointFormation" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setWaypointHousePosition" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "setWaypointLoiterRadius" { return SQFTypes.COMMAND_TOKEN; }
@@ -1712,16 +1744,19 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "shownMap" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "shownPad" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "shownRadio" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "shownScoretable" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "shownUAVFeed" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "shownWarrant" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "shownWatch" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "showPad" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "showRadio" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "showScoretable" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "showSubtitles" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "showUAVFeed" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "showWarrant" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "showWatch" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "showWaypoint" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "showWaypoints" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "side" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "sideAmbientLife" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "sideChat" { return SQFTypes.COMMAND_TOKEN; }
@@ -1766,6 +1801,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "startLoadingScreen" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "step" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "stop" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "stopEngineRTD" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "stopped" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "str" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "sunOrMoon" { return SQFTypes.COMMAND_TOKEN; }
@@ -1802,6 +1838,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "taskDescription" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "taskDestination" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "taskHint" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "taskMarkerOffset" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "taskNull" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "taskParent" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "taskResult" { return SQFTypes.COMMAND_TOKEN; }
@@ -1876,6 +1913,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "tvSort" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "tvSortByValue" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "tvText" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "tvTooltip" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "tvValue" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "type" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "typeName" { return SQFTypes.COMMAND_TOKEN; }
@@ -1893,7 +1931,10 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "uniformItems" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "uniformMagazines" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "unitAddons" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "unitAimPosition" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "unitAimPositionVisual" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "unitBackpack" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "unitIsUAV" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "unitPos" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "unitReady" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "unitRecoilCoefficient" { return SQFTypes.COMMAND_TOKEN; }
@@ -1905,6 +1946,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "updateDrawIcon" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "updateMenuItem" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "updateObjectTree" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "useAISteeringComponent" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "useAudioTimeForMoves" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "vectorAdd" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "vectorCos" { return SQFTypes.COMMAND_TOKEN; }
@@ -1923,6 +1965,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "vectorUp" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "vectorUpVisual" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "vehicle" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "vehicleCargoEnabled" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "vehicleChat" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "vehicleRadio" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "vehicles" { return SQFTypes.COMMAND_TOKEN; }
@@ -1951,6 +1994,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "waypointCombatMode" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "waypointCompletionRadius" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "waypointDescription" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "waypointForceBehaviour" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "waypointFormation" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "waypointHousePosition" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "waypointLoiterRadius" { return SQFTypes.COMMAND_TOKEN; }
@@ -1970,6 +2014,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "weaponAccessories" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "weaponCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "weaponDirection" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "weaponInertia" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "weaponLowered" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "weapons" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "weaponsItems" { return SQFTypes.COMMAND_TOKEN; }
@@ -1990,6 +2035,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "worldToModel" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "worldToModelVisual" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "worldToScreen" { return SQFTypes.COMMAND_TOKEN; }
+
 
 
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }

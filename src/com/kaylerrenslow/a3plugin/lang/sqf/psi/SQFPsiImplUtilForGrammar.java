@@ -29,6 +29,10 @@ public class SQFPsiImplUtilForGrammar {
 	public static PsiElement getPrefixArgument(SQFCommandExpression commandExpression) {
 		ASTNode cur = commandExpression.getNode().getFirstChildNode();
 		while (cur.getElementType() != SQFTypes.COMMAND) {
+			if (cur.getElementType() == SQFTypes.UNARY_EXPRESSION) {
+				SQFUnaryExpression unaryExpression = (SQFUnaryExpression) cur.getPsi();
+				cur = unaryExpression.getExpression().getNode(); //no need to jump outside after next if statement since this is technically the prefix command
+			}
 			if (cur.getElementType() == SQFTypes.PAREN_EXPRESSION || cur.getElementType() == SQFTypes.LITERAL_EXPRESSION || cur.getElementType() == SQFTypes.CODE_BLOCK) {
 				return cur.getPsi();
 			}
@@ -44,6 +48,9 @@ public class SQFPsiImplUtilForGrammar {
 		ASTNode next = PsiUtil.getNextSiblingNotWhitespace(command);
 		if (next == null) {
 			return null;
+		}
+		if (next.getPsi() instanceof SQFUnaryExpression) {
+			return ((SQFUnaryExpression) next.getPsi()).getExpression();
 		}
 		return next.getPsi();
 	}
