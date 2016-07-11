@@ -33,6 +33,7 @@ SQF
             _i = 100;
             for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
             hint str _i; // 100
+        making variable private fix didn't append to existing private decl
         **terrible performance for sqf files
 
 Header

@@ -20,7 +20,7 @@ SQF
     CHANGED:
         none
     FIXED:
-        terrible performance while editing SQF
+        making variable private fix didn't append to existing private decl
 
 Header
     ADDED:

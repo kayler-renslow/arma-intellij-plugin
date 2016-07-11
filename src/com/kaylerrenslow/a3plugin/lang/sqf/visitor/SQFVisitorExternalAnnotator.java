@@ -9,8 +9,8 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.*;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
-import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.Plugin;
+import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.privatization.SQFPrivatization;
@@ -308,14 +308,12 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 				public void run() {
 					SQFScope varScope = varScopePointer.getElement();
 					SQFVariable fixVar = fixVarPointer.getElement();
-					ASTNode[] commandExpressionNodes = varScope.getNode().getChildren(TokenSet.create(SQFTypes.COMMAND_EXPRESSION));
-					SQFCommandExpression commandExpression;
+					ArrayList<SQFCommandExpression> commandExpressions = PsiUtil.findDescendantElementsOfInstance(file, SQFCommandExpression.class, null);
 					SQFPrivateDecl decl;
-					for (ASTNode nodeExpr : commandExpressionNodes) {
-						commandExpression = (SQFCommandExpression) nodeExpr.getPsi();
+					for (SQFCommandExpression commandExpression : commandExpressions) {
 						decl = SQFPrivateDecl.parse(commandExpression);
 						if (decl != null) {
-							SQFCommandExpression newDecl = (SQFCommandExpression) SQFPsiUtil.createPrivateDeclFromExisting(project, decl, fixVar.getVarName());
+							SQFCommandExpression newDecl = SQFPsiUtil.createPrivateDeclFromExisting(project, decl, fixVar.getVarName());
 							decl.getPrivateDeclExpression().replace(newDecl);
 							return;
 						}

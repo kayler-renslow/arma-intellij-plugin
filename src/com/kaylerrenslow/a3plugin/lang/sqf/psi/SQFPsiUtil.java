@@ -212,7 +212,7 @@ public class SQFPsiUtil {
 	 @return command expression that is the new private declaration
 	 */
 	@NotNull
-	public static SQFPrivateDecl createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
+	public static SQFCommandExpression createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
 		List<SQFPrivateDeclVar> declVars = decl.getPrivateVars();
 		String text = "private [";
 		for (SQFPrivateDeclVar declVar : declVars) {
@@ -221,7 +221,7 @@ public class SQFPsiUtil {
 		for (int i = 0; i < varNames.length; i++) {
 			text += "\"" + varNames[i] + (i != varNames.length - 1 ? "\"," : "\"];");
 		}
-		return (SQFPrivateDecl) createElement(project, text, SQFTypes.COMMAND_EXPRESSION);
+		return (SQFCommandExpression) createElement(project, text, SQFTypes.COMMAND_EXPRESSION);
 	}
 
 	@NotNull
