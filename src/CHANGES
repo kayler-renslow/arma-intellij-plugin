@@ -20,7 +20,7 @@ SQF
     CHANGED:
         none
     FIXED:
-        making variable private fix didn't append to existing private decl
+        none
 
 Header
     ADDED:
