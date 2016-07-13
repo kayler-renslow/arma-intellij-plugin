@@ -1,5 +1,5 @@
-Version: 1.0.4_1 (Splendid Update)
-Release date: July 11, 2016
+Version: tbd
+Release date: tbd
 
 Plugin
 	ADDED:
@@ -11,11 +11,7 @@ Plugin
 
 Shared between languages
 	ADDED:
-        documentation 'tags'.
-            Commands: @command command_name
-            BIS Functions: @bis function_name
-            Config function: @fnc function_name
-        support to find usages of stringtable entries, as well as refactor-renaming them
+        none
     CHANGED:
         none
     FIXED:
@@ -23,18 +19,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        unused check for global vars
-        finding usages of commands
+        support for hex numbers
     CHANGED:
-        removed "keywords" from parser. All prior keywords are now treated as commands.
-        grammar was mostly rewritten into a more concise and correct one
+        did some optimizations to finding variable scope
     FIXED:
-        Scope was wrong for this scenario:
-            _i = 100;
-            for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
-            hint str _i; // 100
-        making variable private fix didn't append to existing private decl
-        **terrible performance for sqf files
+        none
 
 Header
     ADDED:

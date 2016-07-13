@@ -43,7 +43,7 @@ DEC_LITERAL = ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 
 NUMBER_LITERAL = {INTEGER_LITERAL} | {DEC_LITERAL}
 
-HEX_LITERAL = 0 [xX] 0* {HEX_DIGIT} {1,8}
+HEX_LITERAL = [0] [xX] [0]* {HEX_DIGIT} {1,8}
 HEX_DIGIT   = [0-9a-fA-F]
 
 ESCAPE_SEQUENCE = \\[^\r\n]
@@ -113,4 +113,4 @@ END_IF   = "#endif"
 <YYINITIAL> ":"   { return HeaderTypes.COLON; }
 <YYINITIAL> ";"   { return HeaderTypes.SEMICOLON; }
 
-<YYINITIAL> . { return HeaderTypes.BAD_CHARACTER; }
+<YYINITIAL> . { return TokenType.BAD_CHARACTER; }

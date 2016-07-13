@@ -19,7 +19,7 @@ headerFile ::= file_entry*
 
 file_entries ::= file_entry*
 
-file_entry ::= INLINE_COMMENT | BLOCK_COMMENT | preprocessor_group | statement_ | BAD_CHARACTER
+file_entry ::= INLINE_COMMENT | BLOCK_COMMENT | preprocessor_group | statement_
 
 private statement_ ::= (assignment | class_declaration) SEMICOLON | macro_function SEMICOLON? | defined_text SEMICOLON?
 

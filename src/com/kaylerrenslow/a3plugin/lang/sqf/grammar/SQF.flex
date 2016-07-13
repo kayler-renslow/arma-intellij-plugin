@@ -34,6 +34,10 @@ DEC_SIGNIFICAND = "." {DIGITS} | {DIGITS} "." {DIGIT}+
 DEC_EXPONENT = ({DEC_SIGNIFICAND} | {INTEGER_LITERAL}) [Ee] [+-]? {DIGIT}*
 DEC_LITERAL = ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 
+HEX_LITERAL = [0] [xX] [0]* {HEX_DIGIT} {1,8}
+HEX_DIGIT   = [0-9a-fA-F]
+
+
 ESCAPE_SEQUENCE = \\[^\r\n]
 
 STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
@@ -45,7 +49,7 @@ BLOCK_COMMENT = "/*" [^*] ~"*/" | "/*" "*"+ "/" | "/*" {COMMENT_CONTENT} "*"+ "/
 
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 
-MACRO_NEWLINE = (" \\\n" | " \\\r\n" | " \\\r") [ \t\f]*
+MACRO_NEWLINE = ("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*
 MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
 MACRO_TEXT = {MACRO_CHARACTER}+
 MACRO = "#" {MACRO_TEXT}
@@ -57,6 +61,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> {BLOCK_COMMENT} { return SQFTypes.BLOCK_COMMENT; }
 <YYINITIAL> {INLINE_COMMENT} { return SQFTypes.INLINE_COMMENT; }
 
+<YYINITIAL> {HEX_LITERAL} { return SQFTypes.HEX_LITERAL; }
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; }

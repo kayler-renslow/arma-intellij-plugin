@@ -117,7 +117,7 @@ public class SQFRenameHandler implements RenameHandler {
 					if (renameRootTag) {
 						function.getClassWithTag().setAttribute("tag", "\"" + neww.functionTagName + "\"");
 						java.util.List<SQFVariable> vars = SQFPsiUtil.findConfigFunctionVariablesWithTag(module, old.getTagName());
-						//we don't need to updateToNewResolution the references for each of the variables because ALL cases where the tag matches is returned
+						//we don't need to update the references for each of the variables because ALL cases where the tag matches is returned
 
 						SQFStatic.SQFFunctionTagAndName tagAndName;
 						for (SQFVariable v : vars) {

@@ -18,7 +18,7 @@
   name("macro_call")="Macro Call"
   name("assignment")="Assignment"
   name("expression")="Expression"
-  extends(".*expression")=expression
+  extends(".*expression|code_block")=expression
   consumeTokenMethod(".*expression|expression")="consumeTokenFast" //https://github.com/JetBrains/Grammar-Kit/blob/master/HOWTO.md#24-compact-expression-parsing-with-priorities
   extends(".*_statement")=statement
 }
@@ -39,7 +39,7 @@ return_statement ::= expression SEMICOLON?
 quest_statement ::= QUEST expression COLON expression
 case_statement ::= command expression COLON code_block
 
-assignment ::= (command? variable) EQ (expression | code_block) {methods=[getAssigningVariable isDeclaredPrivate]}
+assignment ::= (command? variable) EQ expression {methods=[getAssigningVariable isDeclaredPrivate]}
 
 expression ::= conditional_group_
             | add_group_
@@ -50,6 +50,7 @@ expression ::= conditional_group_
             | config_fetch_expression
             | command_expression
             | literal_expression
+            | code_block
             | paren_expression
 
 
@@ -66,6 +67,7 @@ literal_expression ::= string
                     | INTEGER_LITERAL
                     | array_val
                     | DEC_LITERAL
+                    | HEX_LITERAL
 
 add_expression ::= expression PLUS expression
 sub_expression ::= expression MINUS expression
@@ -95,6 +97,6 @@ string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.
 macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 
 array_val ::= (LBRACKET RBRACKET) | (LBRACKET array_entry (COMMA array_entry)* RBRACKET )
-array_entry ::= expression | code_block
+array_entry ::= expression {methods=[getCodeBlock]}
 
 code_block ::= (LBRACE RBRACE)| (LBRACE local_scope RBRACE)

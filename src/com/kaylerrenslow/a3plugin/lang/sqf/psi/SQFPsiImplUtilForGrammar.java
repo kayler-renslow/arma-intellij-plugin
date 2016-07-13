@@ -5,6 +5,7 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.dataKeys.SQFDataKeys;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableBase;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.privatization.SQFPrivatization;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFParamsStatement;
@@ -24,6 +25,14 @@ import java.util.List;
  Created on 03/19/2016. */
 public class SQFPsiImplUtilForGrammar {
 
+	@Nullable
+	public static SQFCodeBlock getCodeBlock(SQFArrayEntry arrayEntry) {
+		if (arrayEntry.getExpression() instanceof SQFCodeBlock) {
+			return (SQFCodeBlock) arrayEntry.getExpression();
+		}
+		return null;
+	}
+
 	/** Get the argument preceding the command */
 	@Nullable
 	public static PsiElement getPrefixArgument(SQFCommandExpression commandExpression) {
@@ -33,7 +42,7 @@ public class SQFPsiImplUtilForGrammar {
 				SQFUnaryExpression unaryExpression = (SQFUnaryExpression) cur.getPsi();
 				cur = unaryExpression.getExpression().getNode(); //no need to jump outside after next if statement since this is technically the prefix command
 			}
-			if (cur.getElementType() == SQFTypes.PAREN_EXPRESSION || cur.getElementType() == SQFTypes.LITERAL_EXPRESSION || cur.getElementType() == SQFTypes.CODE_BLOCK) {
+			if (cur.getElementType() == SQFTypes.LITERAL_EXPRESSION || cur.getElementType() == SQFTypes.CODE_BLOCK) {
 				return cur.getPsi();
 			}
 			cur = cur.getTreeNext();
@@ -103,6 +112,16 @@ public class SQFPsiImplUtilForGrammar {
 	 */
 	@NotNull
 	public static SQFScope getDeclarationScope(SQFVariable var) {
+		SQFScope userDataScope = var.getUserData(SQFDataKeys.DECLARATION_SCOPE);
+		if (userDataScope == null) {
+			userDataScope = getActualDeclarationScope(var);
+			var.putUserData(SQFDataKeys.DECLARATION_SCOPE, userDataScope); //cache it to minimize computation
+		}
+		return userDataScope;
+	}
+
+	@NotNull
+	private static SQFScope getActualDeclarationScope(SQFVariable var) {
 		if (var.isGlobalVariable()) {
 			return SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile());
 		}
@@ -114,7 +133,7 @@ public class SQFPsiImplUtilForGrammar {
 		//That leaves it to where it was first declared. We must be careful and check that the first use isn't inside a spawn and that the scope is no lower than the method parameter var's scope
 
 		/*
-		[] spawn { _var = 69; }; //spawn has its own environment
+		[] spawn { _var = 69; }; //spawn has its own environment (this scenario should be caught from getPrivatization())
 
 		_var = 0; //first declaration of parameter var
 		if(true) then{
@@ -125,6 +144,7 @@ public class SQFPsiImplUtilForGrammar {
 		};
 		*/
 		SQFScope containingScope = SQFPsiUtil.getContainingScope(var);
+		SQFScope returnScope = null;
 		do {
 			List<SQFStatement> statements = containingScope.getStatementsForScope();
 			SQFAssignment assignment;
@@ -134,18 +154,20 @@ public class SQFPsiImplUtilForGrammar {
 					continue;
 				}
 				if (assignment.getAssigningVariable() == var) {
-					return containingScope;
+					returnScope = containingScope;
 				}
 				if (assignment.getAssigningVariable().varNameMatches(var)) {
 					//name matches. check to make sure the assignment comes before where var is
 					if (assignment.getNode().getStartOffset() < var.getNode().getStartOffset()) {
-						return containingScope;
+						returnScope = containingScope; //do not return yet. We need to go up as high as possible
 					}
 				}
 			}
 			containingScope = SQFPsiUtil.getContainingScope(containingScope);
 		} while (!(containingScope instanceof SQFFileScope));
-
+		if (returnScope != null) {
+			return returnScope;
+		}
 		return SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile());
 	}
 
@@ -157,11 +179,20 @@ public class SQFPsiImplUtilForGrammar {
 	 */
 	@Nullable
 	public static SQFPrivatization getPrivatization(SQFVariable var) {
+		SQFPrivatization userDataPrivatization = var.getUserData(SQFDataKeys.PRIVATIZATION);
+		if (userDataPrivatization == null) {
+			userDataPrivatization = getActualPrivatization(var);
+			var.putUserData(SQFDataKeys.PRIVATIZATION, userDataPrivatization); //cache it to minimize computation
+		}
+		return userDataPrivatization;
+	}
+
+	@Nullable
+	private static SQFPrivatization getActualPrivatization(SQFVariable var) {
 		if (var.isGlobalVariable()) {
 			return null;
 		}
 		SQFScope containingScope = SQFPsiUtil.getContainingScope(var);
-
 
 		boolean _this = false; //true if var's name = _this
 		if (var.getVariableType() == SQFTypes.LANG_VAR) {
@@ -293,6 +324,15 @@ public class SQFPsiImplUtilForGrammar {
 	 @return list of all private variables for the given scope
 	 */
 	public static List<SQFPrivateDeclVar> getPrivateVars(SQFScope scope) {
+		List<SQFPrivateDeclVar> privateVars = scope.getUserData(SQFDataKeys.PRIVATE_DECL_VARS);
+		if (privateVars == null) {
+			privateVars = getActualPrivateDeclVars(scope);
+		}
+		return privateVars;
+	}
+
+	@NotNull
+	private static List<SQFPrivateDeclVar> getActualPrivateDeclVars(SQFScope scope) {
 		List<SQFStatement> statements = PsiUtil.findChildrenOfType(scope, SQFStatement.class);
 		Iterator<SQFStatement> statementIterator = statements.iterator();
 		SQFStatement currentStatement;

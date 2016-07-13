@@ -50,7 +50,7 @@ public abstract class SQFStringMixin extends ASTWrapperPsiElement implements SQF
 						if (possibleStringLiteral != null && possibleStringLiteral.getString() == this) { //is a for loop variable
 							//now set the search scope to the code block next to 'do'
 							SQFCodeBlock doCodeBlock = SQFPsiUtil.getAPostfixArgument(forPostfixExp, SQFCodeBlock.class);
-							if (doCodeBlock != null) {
+							if (doCodeBlock != null && doCodeBlock.getLocalScope() != null) {
 								searchScope = doCodeBlock.getLocalScope();
 							}
 						}

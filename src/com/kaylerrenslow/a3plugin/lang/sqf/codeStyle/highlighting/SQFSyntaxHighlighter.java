@@ -87,7 +87,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(SQFTypes.STRING_LITERAL)){
 			return STRING_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.INTEGER_LITERAL) || tokenType.equals(SQFTypes.DEC_LITERAL)){
+		if(tokenType.equals(SQFTypes.INTEGER_LITERAL) || tokenType.equals(SQFTypes.DEC_LITERAL) || tokenType.equals(SQFTypes.HEX_LITERAL)){
 			return NUM_KEYS;
 		}
 		if(tokenType.equals(SQFTypes.LOCAL_VAR)){

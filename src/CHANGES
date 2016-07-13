@@ -16,9 +16,9 @@ Shared between languages
 
 SQF
 	ADDED:
-        none
+        support for hex numbers
     CHANGED:
-        none
+        did some optimizations to finding variable scope (cached declaration scope and privatization)
     FIXED:
         none
 

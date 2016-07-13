@@ -73,7 +73,7 @@ public class SQFVariableReference implements PsiPolyVariantReference {
 
 		if (!var.isGlobalVariable()) {
 			SQFScope myScope = var.getDeclarationScope();
-			SQFScope otherScope = ((SQFVariable) element).getDeclarationScope();
+			SQFScope otherScope = other.getDeclarationScope();
 			referenceTo = referenceTo && myScope == otherScope && other.getContainingFile() == var.getContainingFile();
 			return referenceTo;
 		}
