@@ -5,7 +5,7 @@ Arma games are created by [Bohemia Interactive](https://www.bistudio.com/) and I
 
 ### Key Features
 * Syntax checking for Header files (*.h, *.hh, *.sqm, *.ext, *.hpp) and SQF files
-* Description.ext Function lookup (See feature Spotlight a.)
+* Description.ext function lookup
 * Documentation 'tags' which can link to command wiki documentation without opening the browser.
 * Automatic plugin update checking (as of 1.0.3)
 * Finding usages of variables
