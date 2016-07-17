@@ -1,8 +1,20 @@
 # Arma Intellij Plugin
-Arma games are created by [Bohemia Interactive](https://www.bistudio.com/) and Intellij is created by [Jetbrains](https://www.jetbrains.com/). Arma Intellij Plugin was created by Kayler Renslow. The plugin and it's creator aren't affiliated with Jetbrains or Bohemia Interactive.
 
 ### License
-This project is open source. Do what you want with the code. Sell it, modify it, claim you made it, or anything else - I don't care. Just make sure you are respecting the rights of Jetbrains and Bohemia Interactive.
+Arma games are created by [Bohemia Interactive](https://www.bistudio.com/) and Intellij is created by [Jetbrains](https://www.jetbrains.com/). Arma Intellij Plugin was created by Kayler Renslow. The plugin and it's creator aren't affiliated with Jetbrains or Bohemia Interactive. This project is open source. Do what you want with the code. Sell it, modify it, claim you made it, or anything else - I don't care. Just make sure you are respecting the rights of Jetbrains and Bohemia Interactive.
+
+### Key Features
+* Syntax checking for Header files (*.h, *.hh, *.sqm, *.ext, *.hpp) and SQF files
+* Description.ext function lookup
+* Documentation 'tags' which can link to command wiki documentation without opening the browser.
+* Automatic plugin update checking (as of 1.0.3)
+* Finding usages of variables
+* Syntax highlighting
+* Rename refactoring for functions and variables
+* Seamless config function creation (alt + insert)
+* Auto-completion (ctrl + space)
+* An "Arma Color" picker dialog which allows to convert HEX or RGB to Arma's color format (black -> [0,0,0,1])
+* Wiki documentation on all commands and BIS functions via ctrl+Q
 
 ### How to Clone and Edit Source for Arma Intellij Plugin
 1. You should know how to write Java and you should have experience using [Intellij](https://www.jetbrains.com/idea/).
