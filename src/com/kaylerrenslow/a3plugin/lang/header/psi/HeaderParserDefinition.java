@@ -23,16 +23,17 @@ import org.jetbrains.annotations.NotNull;
  * Created on 10/31/2015.
  */
 public class HeaderParserDefinition implements ParserDefinition{
-	public static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-	public static final TokenSet COMMENTS = TokenSet.create(HeaderTypes.INLINE_COMMENT, HeaderTypes.BLOCK_COMMENT);
-	public static final IFileElementType FILE = new IFileElementType(Language.<HeaderLanguage>findInstance(HeaderLanguage.class));
+	private static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
+	private static final TokenSet COMMENTS = TokenSet.create(HeaderTypes.INLINE_COMMENT, HeaderTypes.BLOCK_COMMENT);
+	private static final TokenSet STRINGS = TokenSet.create(HeaderTypes.STRING_LITERAL);
+	private static final IFileElementType FILE = new IFileElementType(Language.<HeaderLanguage>findInstance(HeaderLanguage.class));
 
 	@NotNull
 	@Override
 	public Lexer createLexer(Project project) {
 		return new HeaderLexerAdapter();
 	}
-
+	
 	@Override
 	public PsiParser createParser(Project project) {
 		return new HeaderParser();
@@ -58,7 +59,7 @@ public class HeaderParserDefinition implements ParserDefinition{
 	@NotNull
 	@Override
 	public TokenSet getStringLiteralElements() {
-		return TokenSet.EMPTY;
+		return STRINGS;
 	}
 
 	@NotNull

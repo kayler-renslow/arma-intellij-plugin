@@ -4,7 +4,6 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
-import com.intellij.psi.impl.source.tree.JavaDocElementType;
 
 %%
 
@@ -19,7 +18,6 @@ import com.intellij.psi.impl.source.tree.JavaDocElementType;
 
 STRINGTABLE_ENTRY = "$STR_" [:jletter:] [:jletterdigit:]*
 IDENTIFIER = [:jletter:] [:jletterdigit:]*
-//NUM_IDENTIFIER = [:jletterdigit:]+
 
 LINE_TERMINATOR = \r | \n | \r\n
 INPUT_CHARACTER = [^\r\n]
@@ -31,7 +29,6 @@ WHITE_SPACE = ([ \t\f] | {LINE_TERMINATOR})+
 
 BLOCK_COMMENT = "/*" ~"*/"
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
-
 
 DIGIT = [0-9]
 DIGITS = {DIGIT}+
@@ -91,8 +88,6 @@ END_IF   = "#endif"
 <YYINITIAL> {EVAL} { return HeaderTypes.PREPROCESS_EVAL; }
 
 <YYINITIAL> {IDENTIFIER} { return HeaderTypes.IDENTIFIER; }
-
-//<YYINITIAL> "\\" { return HeaderTypes.BSLASH; }
 
 <YYINITIAL> "="   { return HeaderTypes.EQ; }
 

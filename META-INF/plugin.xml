@@ -1,14 +1,14 @@
 <idea-plugin version="2">
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
-	<version>1.0.4_1</version>
+	<version>1.0.5</version>
 	<!--<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>-->
 	<description>
 		Plugin that offers syntax checking of SQF files, syntax highlighting, find usages, refactor renaming, and more various features.
 	</description>
 
 	<change-notes>
-		Changelog is available at the github page: https://github.com/kayler-renslow/arma-intellij-plugin/releases
+		Changelog is available at the GitHub page: https://github.com/kayler-renslow/arma-intellij-plugin/releases
 	</change-notes>
 
 	<idea-version since-build="131"/>

@@ -4,7 +4,6 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
-import com.intellij.psi.impl.source.tree.JavaDocElementType;
 
 %%
 
@@ -37,7 +36,6 @@ DEC_LITERAL = ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 HEX_LITERAL = [0] [xX] [0]* {HEX_DIGIT} {1,8}
 HEX_DIGIT   = [0-9a-fA-F]
 
-
 ESCAPE_SEQUENCE = \\[^\r\n]
 
 STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
@@ -56,7 +54,7 @@ MACRO = "#" {MACRO_TEXT}
 %%
 
 <YYINITIAL> {WHITE_SPACE} { return TokenType.WHITE_SPACE; }
-<YYINITIAL> {MACRO} {return TokenType.WHITE_SPACE;}
+<YYINITIAL> {MACRO} { return TokenType.WHITE_SPACE; }
 
 <YYINITIAL> {BLOCK_COMMENT} { return SQFTypes.BLOCK_COMMENT; }
 <YYINITIAL> {INLINE_COMMENT} { return SQFTypes.INLINE_COMMENT; }
