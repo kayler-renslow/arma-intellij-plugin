@@ -3,9 +3,9 @@ package com.kaylerrenslow.a3plugin.lang.sqf.psi;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
-import com.kaylerrenslow.a3plugin.lang.sqf.dataKeys.SQFDataKeys;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableBase;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.privatization.SQFPrivatization;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFParamsStatement;
@@ -42,7 +42,7 @@ public class SQFPsiImplUtilForGrammar {
 				SQFUnaryExpression unaryExpression = (SQFUnaryExpression) cur.getPsi();
 				cur = unaryExpression.getExpression().getNode(); //no need to jump outside after next if statement since this is technically the prefix command
 			}
-			if (cur.getElementType() == SQFTypes.LITERAL_EXPRESSION || cur.getElementType() == SQFTypes.CODE_BLOCK) {
+			if (cur.getElementType() != TokenType.WHITE_SPACE) {
 				return cur.getPsi();
 			}
 			cur = cur.getTreeNext();
@@ -112,16 +112,6 @@ public class SQFPsiImplUtilForGrammar {
 	 */
 	@NotNull
 	public static SQFScope getDeclarationScope(SQFVariable var) {
-		SQFScope userDataScope = var.getUserData(SQFDataKeys.DECLARATION_SCOPE);
-		if (userDataScope == null) {
-			userDataScope = getActualDeclarationScope(var);
-			var.putUserData(SQFDataKeys.DECLARATION_SCOPE, userDataScope); //cache it to minimize computation
-		}
-		return userDataScope;
-	}
-
-	@NotNull
-	private static SQFScope getActualDeclarationScope(SQFVariable var) {
 		if (var.isGlobalVariable()) {
 			return SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile());
 		}
@@ -171,6 +161,7 @@ public class SQFPsiImplUtilForGrammar {
 		return SQFPsiUtil.getFileScope((SQFFile) var.getContainingFile());
 	}
 
+
 	/**
 	 Gets privatization instance for the given variable. Essentially, this is getting where and how the variable is declared private.
 
@@ -179,21 +170,11 @@ public class SQFPsiImplUtilForGrammar {
 	 */
 	@Nullable
 	public static SQFPrivatization getPrivatization(SQFVariable var) {
-		SQFPrivatization userDataPrivatization = var.getUserData(SQFDataKeys.PRIVATIZATION);
-		if (userDataPrivatization == null) {
-			userDataPrivatization = getActualPrivatization(var);
-			var.putUserData(SQFDataKeys.PRIVATIZATION, userDataPrivatization); //cache it to minimize computation
-		}
-		return userDataPrivatization;
-	}
-
-	@Nullable
-	private static SQFPrivatization getActualPrivatization(SQFVariable var) {
 		if (var.isGlobalVariable()) {
 			return null;
 		}
 		SQFScope containingScope = SQFPsiUtil.getContainingScope(var);
-
+		
 		boolean _this = false; //true if var's name = _this
 		if (var.getVariableType() == SQFTypes.LANG_VAR) {
 			if (var.getVarName().equals("_this")) { //_this is either file scope or spawn's statement scope
@@ -202,10 +183,10 @@ public class SQFPsiImplUtilForGrammar {
 				return new SQFPrivatization.SQFVarInheritedPrivatization(var, containingScope);
 			}
 		}
-
+		
 		SQFScope spawnScope = SQFPsiUtil.checkIfInsideSpawn(var);
 		boolean insideSpawn = spawnScope != null;
-
+		
 		if (_this) {
 			if (insideSpawn) {
 				return new SQFPrivatization.SQFVarInheritedPrivatization(var, spawnScope);
@@ -215,7 +196,7 @@ public class SQFPsiImplUtilForGrammar {
 
 
 		/*Find where the variable is declared private*/
-
+		
 		SQFAssignment varAssignment = var.getMyAssignment();
 		if (varAssignment != null) {
 			if (varAssignment.isDeclaredPrivate()) { //private var = 1;
@@ -241,7 +222,7 @@ public class SQFPsiImplUtilForGrammar {
 			if (cursorStatement.getExpression() != null && cursorStatement.getExpression() instanceof SQFCommandExpression) {
 				SQFCommandExpression forCommandExp = (SQFCommandExpression) cursorStatement.getExpression();
 				if (forCommandExp.getCommandName().equals("for")) {
-					if (array == null) { //the containing scope wasn't inside the array itself and may be inside the postfix expression of do (e.g. for[{],{},{}] do{})
+					if (array == null) { //the containing scope wasn't inside the array itself and may be inside the postfix expression of do (e.g. for[{},{},{}] do{})
 						if (forCommandExp.getPostfixArgument() instanceof SQFCommandExpression) {
 							SQFCommandExpression postfixArgumentCommand = (SQFCommandExpression) forCommandExp.getPostfixArgument();
 							if (postfixArgumentCommand.getPrefixArgument() instanceof SQFLiteralExpression) {
@@ -268,10 +249,10 @@ public class SQFPsiImplUtilForGrammar {
 				}
 			}
 		}
-
+		
 		List<SQFPrivateDeclVar> privateDeclaredVarsForScope = containingScope.getPrivateVars();
 		SQFScope privatizedScope = containingScope;
-
+		
 		while (privatizedScope != null) {
 			if (insideSpawn && privatizedScope == spawnScope) { //inside spawn and not declared private elsewhere
 				return new SQFPrivatization.SQFVarInheritedPrivatization(var, spawnScope); //can't escape the spawn's environment
@@ -292,9 +273,10 @@ public class SQFPsiImplUtilForGrammar {
 			privatizedScope = SQFPsiUtil.getContainingScope(privatizedScope.getParent());
 			privateDeclaredVarsForScope = privatizedScope.getPrivateVars();
 		}
-
+		
 		return null;
 	}
+
 
 	public static ArrayList<SQFStatement> getStatementsForScope(SQFScope scope) {
 		ArrayList<SQFStatement> statements = new ArrayList<>();
@@ -324,25 +306,16 @@ public class SQFPsiImplUtilForGrammar {
 	 @return list of all private variables for the given scope
 	 */
 	public static List<SQFPrivateDeclVar> getPrivateVars(SQFScope scope) {
-		List<SQFPrivateDeclVar> privateVars = scope.getUserData(SQFDataKeys.PRIVATE_DECL_VARS);
-		if (privateVars == null) {
-			privateVars = getActualPrivateDeclVars(scope);
-		}
-		return privateVars;
-	}
-
-	@NotNull
-	private static List<SQFPrivateDeclVar> getActualPrivateDeclVars(SQFScope scope) {
 		List<SQFStatement> statements = PsiUtil.findChildrenOfType(scope, SQFStatement.class);
 		Iterator<SQFStatement> statementIterator = statements.iterator();
 		SQFStatement currentStatement;
-
+		
 		List<SQFPrivateDeclVar> ret = new ArrayList<>();
-
+		
 		SQFAssignment assignment;
 		String commandName;
 		SQFCommandExpression expression;
-
+		
 		while (statementIterator.hasNext()) {
 			currentStatement = statementIterator.next();
 			if (currentStatement.getAssignment() != null) {
@@ -368,6 +341,7 @@ public class SQFPsiImplUtilForGrammar {
 		}
 		return ret;
 	}
+
 
 	public static PsiElement getPrivatizerElement(SQFScope scope) {
 		return scope;

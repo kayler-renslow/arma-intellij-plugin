@@ -29,132 +29,133 @@ import java.util.List;
  Annotator used for costly annotating
  Created on 06/03/2016. */
 public class SQFVisitorExternalAnnotator extends SQFVisitor {
-
+	
 	public final List<ToMarkAnnotation> toMarkAnnotations = new ArrayList<>();
-
-	public static class ToRegisterFix{
+	
+	public static class ToRegisterFix {
 		private final IntentionAndQuickFixAction quickFixAction;
-
+		
 		public ToRegisterFix(IntentionAndQuickFixAction quickFixAction) {
 			this.quickFixAction = quickFixAction;
 		}
-
+		
 		public IntentionAndQuickFixAction getQuickFixAction() {
 			return quickFixAction;
 		}
 	}
-
+	
 	public static class ToMarkAnnotation {
-
+		
 		public ToRegisterFix myFix;
-
+		
 		public void setMyFix(ToRegisterFix myFix) {
 			this.myFix = myFix;
 		}
-
+		
 		public static class Annotation extends ToMarkAnnotation {
-
+			
 			private final HighlightSeverity warning;
 			private final TextRange rangeCurrentNode;
 			private final String string;
+			
 			public Annotation(HighlightSeverity warning, TextRange rangeCurrentNode, String string) {
 				this.warning = warning;
 				this.rangeCurrentNode = rangeCurrentNode;
 				this.string = string;
 			}
-
+			
 			public HighlightSeverity getWarning() {
 				return warning;
 			}
-
+			
 			public TextRange getRangeCurrentNode() {
 				return rangeCurrentNode;
 			}
-
+			
 			public String getString() {
 				return string;
 			}
-
+			
 		}
-
+		
 		public static class WarningAnnotation extends ToMarkAnnotation {
 			private final SQFVariable var;
 			private final String string;
-
+			
 			public WarningAnnotation(SQFVariable var, String string) {
 				this.var = var;
 				this.string = string;
 			}
-
+			
 			public SQFVariable getVar() {
 				return var;
 			}
-
+			
 			public String getString() {
 				return string;
 			}
 		}
-
+		
 		public static class WeakWarningAnnotation extends ToMarkAnnotation {
-
+			
 			private final SQFVariable var;
 			private final String string;
-
+			
 			public WeakWarningAnnotation(SQFVariable var, String string) {
 				this.var = var;
 				this.string = string;
 			}
-
+			
 			public SQFVariable getVar() {
 				return var;
 			}
-
+			
 			public String getString() {
 				return string;
 			}
 		}
-
+		
 		public static class WeakWarningAnnotation2 extends ToMarkAnnotation {
 			private final TextRange range;
 			private final String string;
-
+			
 			public WeakWarningAnnotation2(TextRange range, String string) {
 				this.range = range;
 				this.string = string;
 			}
-
+			
 			public TextRange getRange() {
 				return range;
 			}
-
+			
 			public String getString() {
 				return string;
 			}
 		}
 	}
-
+	
 	@Override
 	public void visitPsiElement(@NotNull PsiElement o) {
 		PsiElement[] children = o.getChildren();
 		for (PsiElement child : children) {
-			try{
+			try {
 				child.accept(this);
-			}catch (Error e){
+			} catch (Error e) {
 				e.printStackTrace();
 			}
 		}
-		try{
+		try {
 			super.visitPsiElement(o);
-		}catch (Error e){
+		} catch (Error e) {
 			e.printStackTrace();
 		}
 	}
-
+	
 	@Override
 	public void visitFileScope(@NotNull SQFFileScope o) {
 		super.visitFileScope(o);
 	}
-
+	
 	@Override
 	public void visitVariable(@NotNull SQFVariable var) {
 		super.visitVariable(var);
@@ -165,16 +166,16 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 			return;
 		}
 		boolean isGlobalVar = var.isGlobalVariable();
-
+		
 		PsiReference[] references;
 		if (isGlobalVar) {
 			references = ReferenceProvidersRegistry.getReferencesFromProviders(var);
 		} else {
 			references = var.getReferences();
 		}
-
+		
 		int numUsages = 0;
-
+		
 		int numAssignments = 0;
 		boolean isUsedOverride = false;
 		boolean isDefinedByParams = false;
@@ -199,7 +200,7 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 				numUsages++;
 				if (resolve instanceof SQFVariable) {
 					SQFVariable resolveVar = (SQFVariable) resolve;
-					if (resolveVar.isAssigningVariable()) {
+					if (resolveVar.isAssigningVariable() && !resolveVar.getMyAssignment().getExpression().getText().equals("nil")) {
 						numAssignments++;
 					}
 					if (isGlobalVar) {
@@ -211,9 +212,9 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 					}
 				}
 			} while (polyRef != null && polyRefInd < polyResults.length);
-
+			
 		}
-
+		
 		SQFPrivatization privatization = null;
 		if (!isGlobalVar) {
 			privatization = var.getPrivatization();
@@ -228,19 +229,23 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 			toMarkAnnotations.add(new ToMarkAnnotation.WeakWarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_unused")));
 		}
 		if (numAssignments == 0 && !isDefinedByParams) {
-			toMarkAnnotations.add(new ToMarkAnnotation.WarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_uninitialized")));
+			if (privatization instanceof SQFPrivatization.SQFPrivateDeclParams) {
+				toMarkAnnotations.add(new ToMarkAnnotation.WarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_may_be_uninitialized")));
+			} else {
+				toMarkAnnotations.add(new ToMarkAnnotation.WarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_uninitialized")));
+			}
 		}
-
+		
 		SQFScope declScope = var.getDeclarationScope();
 		if (privatization != null || isGlobalVar) {
 			return;
 		}
-
+		
 		ToMarkAnnotation.WarningAnnotation toMark = new ToMarkAnnotation.WarningAnnotation(var, Plugin.resources.getString("lang.sqf.annotator.variable_not_private"));
 		toMarkAnnotations.add(toMark);
 		toMark.setMyFix(new ToRegisterFix(new SQFAnnotatorFixNotPrivate(var, declScope)));
 	}
-
+	
 	@Override
 	public void visitScope(@NotNull SQFScope scope) {
 		super.visitScope(scope);
@@ -279,28 +284,28 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 			vars.add(currentPrivateVar.getVarName());
 		}
 	}
-
+	
 	private class SQFAnnotatorFixNotPrivate extends IntentionAndQuickFixAction {
 		private final SmartPsiElementPointer<SQFScope> varScopePointer;
 		private final SmartPsiElementPointer<SQFVariable> fixVarPointer;
-
+		
 		public SQFAnnotatorFixNotPrivate(SQFVariable var, SQFScope declScope) {
 			this.fixVarPointer = SmartPointerManager.getInstance(var.getProject()).createSmartPsiElementPointer(var, var.getContainingFile());
 			this.varScopePointer = SmartPointerManager.getInstance(var.getProject()).createSmartPsiElementPointer(declScope, declScope.getContainingFile());
 		}
-
+		
 		@NotNull
 		@Override
 		public String getName() {
 			return Plugin.resources.getString("lang.sqf.annotator.variable_not_private.quick_fix");
 		}
-
+		
 		@NotNull
 		@Override
 		public String getFamilyName() {
 			return "";
 		}
-
+		
 		@Override
 		public void applyFix(@NotNull Project project, PsiFile file, @Nullable Editor editor) {
 			Runnable runnable = new Runnable() {
@@ -318,7 +323,7 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 							return;
 						}
 					}
-
+					
 					PsiElement declStatement = SQFPsiUtil.createElement(project, String.format("private[\"%s\"];", fixVar.getVarName()), SQFTypes.STATEMENT);
 					if (varScope.getFirstChild() != null) {
 						varScope.addBefore(declStatement, varScope.getFirstChild());
@@ -328,9 +333,9 @@ public class SQFVisitorExternalAnnotator extends SQFVisitor {
 				}
 			};
 			WriteCommandAction.runWriteCommandAction(project, runnable);
-
+			
 		}
 	}
-
-
+	
+	
 }

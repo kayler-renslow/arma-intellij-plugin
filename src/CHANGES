@@ -16,11 +16,13 @@ Shared between languages
 
 SQF
 	ADDED:
-        support for hex numbers
-    CHANGED:
-        did some optimizations to finding variable scope (cached declaration scope and privatization)
-    FIXED:
         none
+    CHANGED:
+        removed optimizations to finding variable scope (cached declaration scope and privatization) because they resulted in wrong values
+        variables set to nil will now be marked as uninitialized
+        variables declared in params command that have no default value will be marked as "may be uninitialized" instead of more definitive "not initialized"
+    FIXED:
+        params [["_var", nil]];//was saying _var was defined when it shouldn't be
 
 Header
     ADDED:

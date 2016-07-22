@@ -1,7 +1,4 @@
 FIX FINDING SCOPE FOR SQF VARIABLES, ESPECIALLY WITH LOOPS
-CHECK IF THE OPTIMIZATIONS WORK FOR WHEN A NEW VARIABLE IS CREATED. MAKE SURE THAT FOR BOTH THE OLD VARIABLE AND NEW VARIABLE, THE REFERENCES ARE CORRECT
-    from changes: "did some optimizations to finding variable scope (cached declaration scope and privatization)"
-
 
 features:
     check if function exists when doing call or spawn
