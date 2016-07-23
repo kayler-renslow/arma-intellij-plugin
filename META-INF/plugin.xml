@@ -40,7 +40,7 @@
 		<completion.contributor language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.contributors.HeaderCompletionContributor"/>
 		<lang.commenter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderCommenter"/>
 		<!--<lang.formatter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.codeStyle.formatting.HeaderFormattingBuilder"/>-->
-		<codeStyleSettingsProvider  implementation="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderCodeStyleSettingsProvider"/>
+		<!--<codeStyleSettingsProvider  implementation="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderCodeStyleSettingsProvider"/>-->
 		<langCodeStyleSettingsProvider implementation="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderLanguageCodeStyleSettingsProvider"/>
 		<lang.braceMatcher language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderBraceMatcher" />
 		<lang.foldingBuilder language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderFoldingBuilder" />

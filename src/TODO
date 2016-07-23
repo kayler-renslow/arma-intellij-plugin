@@ -4,7 +4,7 @@ features:
     check if function exists when doing call or spawn
     renaming files will rename them in includes and if a SQF function, will rename the class decl
 
-THIS IS BROKEN AGAIN
+THIS IS BROKEN AGAIN (scope)
  _i = 100;
 for [{private _i = 0}, {_i < 5}, {_i = _i + 1}] do {};
 hint str _i; // 100

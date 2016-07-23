@@ -231,6 +231,7 @@ public class SQFPsiImplUtilForGrammar {
 							}
 						}
 					}
+					
 					if (array != null) { //definitely not the for spec loop if null
 						SQFCodeBlock firstCodeBlock = array.getArrayEntryList().get(0).getCodeBlock();
 						if (firstCodeBlock != null) {

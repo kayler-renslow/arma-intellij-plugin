@@ -12,7 +12,7 @@ class TestClass {
 		/*Another block comment*/
 		array[] = {var, 1, 1e1, "", 42, 43};
 		math = 1 + 69 * 1;
-		stringtable_value = $str_myTag_Yes;
+		stringtable_value = <stringtableValue>$str_myTag_Yes</stringtableValue>;
 	};
 
 	thingy = 0; /*hi*/

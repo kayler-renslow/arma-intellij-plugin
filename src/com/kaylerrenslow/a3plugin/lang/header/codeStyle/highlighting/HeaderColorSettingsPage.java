@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -33,7 +34,12 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 			new AttributesDescriptor("Comma", HeaderSyntaxHighlighter.COMMA),
 			new AttributesDescriptor("Stringtable Value", HeaderSyntaxHighlighter.STRINGTABLE_VALUE)
 	};
-
+	
+	private static final Map<String, TextAttributesKey> map = new HashMap<>();
+	static {
+		map.put("stringtableValue", HeaderSyntaxHighlighter.STRINGTABLE_VALUE);
+	}
+	
 	@Nullable
 	@Override
 	public Icon getIcon() {
@@ -55,7 +61,7 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 	@Nullable
 	@Override
 	public Map<String, TextAttributesKey> getAdditionalHighlightingTagToDescriptorMap() {
-		return null;
+		return map;
 	}
 
 	@NotNull

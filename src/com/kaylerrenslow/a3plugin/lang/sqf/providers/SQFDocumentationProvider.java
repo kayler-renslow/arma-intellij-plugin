@@ -36,31 +36,31 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	public static final String DOC_LINK_PREFIX_COMMAND = "command:";
 	/** Used for CfgFunction documentation links. This comes after the psi element protocol in anchor tags. For functions defined in CfgFunctions. Example use case: &lt;a href='psi-element://function:f_fnc_test'&gt;f_fnc_test&lt;/a&gt; */
 	public static final String DOC_LINK_PREFIX_USER_FUNCTION = "function:";
-
+	
 	@Nullable
 	@Override
 	public String getQuickNavigateInfo(PsiElement element, PsiElement originalElement) {
 		return generateDoc(element, originalElement);
 	}
-
+	
 	@Nullable
 	@Override
 	public List<String> getUrlFor(PsiElement element, PsiElement originalElement) {
 		List<String> lst = new ArrayList<>();
-		if (SQFStatic.hasDocumentation(element.getNode().getElementType()) || SQFStatic.isBisFunction(element.getText())) {
+		if (SQFStatic.isCommand(element.getNode().getElementType()) || SQFStatic.isBisFunction(element.getText())) {
 			lst.add(getWikiUrl(element.getText()));
 			return lst;
 		}
 		return null;
 	}
-
+	
 	@Nullable
 	@Override
 	public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
 		if (element instanceof XmlTag) {
 			return Stringtable.getKeyDoc((XmlTag) element);
 		}
-		if (SQFStatic.hasDocumentation(element.getNode().getElementType())) {
+		if (SQFStatic.isCommand(element.getNode().getElementType())) {
 			return generateCommandDoc(element.getText());
 		}
 		if (SQFStatic.isBisFunction(element.getText())) {
@@ -87,14 +87,14 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		}
 		return null;
 	}
-
+	
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLookupItem(PsiManager psiManager, Object object, PsiElement element) {
 		if (object instanceof StringtableLookupElementDataObject) {
 			return ((StringtableLookupElementDataObject) object).getTargetTag();
 		}
-		if (SQFStatic.hasDocumentation(element.getNode().getElementType())) {
+		if (SQFStatic.isCommand(element.getNode().getElementType())) {
 			return element;
 		}
 		if (element instanceof PsiFile) {
@@ -106,11 +106,11 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 				return function.getClassDeclaration();
 			}
 			return function.getPsiFile();
-
+			
 		}
 		return null;
 	}
-
+	
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLink(PsiManager psiManager, String link, PsiElement context) {
@@ -144,17 +144,17 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		}
 		return null;
 	}
-
+	
 	@Override
 	@Nullable
 	public PsiElement getCustomDocumentationElement(@NotNull final Editor editor, @NotNull final PsiFile file, @Nullable PsiElement contextElement) {
 		if (contextElement == null) {
 			return null;
 		}
-		if (SQFStatic.hasDocumentation(contextElement.getNode().getElementType())) {
+		if (SQFStatic.isCommand(contextElement.getNode().getElementType())) {
 			return contextElement;
 		}
-
+		
 		if (PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)) { //this code works, but only when the selected statement has the comment
 			SQFVariable var = (SQFVariable) (contextElement.getParent());
 			PsiReference[] references = var.getReferences();
@@ -168,10 +168,10 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 				}
 			}
 		}
-
+		
 		return null;
 	}
-
+	
 	@Nullable
 	private PsiElement getInlineComment(@NotNull Editor editor, ASTNode statementNode) {
 		ASTNode commentNode = PsiUtil.getNextSiblingNotWhitespace(statementNode);
@@ -183,7 +183,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		}
 		return null;
 	}
-
+	
 	private static String generateCommandDoc(String commandName) {
 		String doc = String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(commandName));
 		try {
@@ -193,7 +193,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		}
 		return doc;
 	}
-
+	
 	private static String generateFunctionDoc(String functionName) {
 		String doc = String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(functionName));
 		try {
@@ -203,9 +203,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		}
 		return doc;
 	}
-
+	
 	private static String getWikiUrl(String wikiLinkName) {
 		return BIS_WIKI_URL_PREFIX + wikiLinkName;
 	}
-
+	
 }

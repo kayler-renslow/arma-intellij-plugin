@@ -20,10 +20,9 @@ public class SQFDocTagsCompletionProvider extends CompletionProvider<CompletionP
 		if (cursor == null) {
 			return;
 		}
-		int caretPos = parameters.getEditor().getCaretModel().getPrimaryCaret().getOffset();
-		String docText = parameters.getEditor().getDocument().getText();
-		String subText = docText.substring(caretPos - 1, cursor.getTextLength());
-		if (subText.startsWith("@")) {
+		String commentText = cursor.getText();
+		int caretPos = parameters.getEditor().getCaretModel().getPrimaryCaret().getOffset() - cursor.getTextOffset();
+		if (commentText.charAt(caretPos - 1) == '@') {
 			result.addElement(new CompletionElementWithTextReplace("@command", "command", 7, Plugin.resources.getString("lang.shared.auto_completion.tags.trail_text.command")).getLookupElement(parameters, context, result));
 			result.addElement(new CompletionElementWithTextReplace("@bis", "bis", 3, Plugin.resources.getString("lang.shared.auto_completion.tags.trail_text.bis")).getLookupElement(parameters, context, result));
 			result.addElement(new CompletionElementWithTextReplace("@fnc", "fnc", 3, Plugin.resources.getString("lang.shared.auto_completion.tags.trail_text.fnc")).getLookupElement(parameters, context, result));

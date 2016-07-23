@@ -12,17 +12,16 @@ Shared between languages
     CHANGED:
         none
     FIXED:
-        none
+        Stringtable Value color not properly being displayed in color settings page
 
 SQF
 	ADDED:
         none
     CHANGED:
-        removed optimizations to finding variable scope (cached declaration scope and privatization) because they resulted in wrong values
-        variables set to nil will now be marked as uninitialized
-        variables declared in params command that have no default value will be marked as "may be uninitialized" instead of more definitive "not initialized"
+        none
     FIXED:
-        params [["_var", nil]];//was saying _var was defined when it shouldn't be
+        https://github.com/kayler-renslow/arma-intellij-plugin/issues/17
+        quick documentation lookup not working for commands while still typing the command
 
 Header
     ADDED:
