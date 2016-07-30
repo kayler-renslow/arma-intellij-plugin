@@ -1,7 +1,7 @@
 # Arma Intellij Plugin
 
 ### License
-Arma games are created by [Bohemia Interactive](https://www.bistudio.com/) and Intellij is created by [Jetbrains](https://www.jetbrains.com/). Arma Intellij Plugin was created by Kayler Renslow. The plugin and it's creator aren't affiliated with Jetbrains or Bohemia Interactive. This project is open source. Do what you want with the code. Sell it, modify it, claim you made it, or anything else - I don't care (I still reserve my rights to the source code). Just make sure you are respecting the rights of Jetbrains and Bohemia Interactive.
+Arma games are created and owned by [Bohemia Interactive](https://www.bistudio.com/) and Intellij is created and owned by [Jetbrains](https://www.jetbrains.com/). Arma Intellij Plugin was created by Kayler Renslow. The plugin and it's creator aren't affiliated with Jetbrains or Bohemia Interactive. This project is licensed under the [MIT License](https://en.wikipedia.org/wiki/MIT_License). You don't need to contact me if you want to create derivatives or publish the project elsewhere.
 
 ### Key Features
 * Syntax checking for Header files (*.h, *.hh, *.sqm, *.ext, *.hpp) and SQF files
