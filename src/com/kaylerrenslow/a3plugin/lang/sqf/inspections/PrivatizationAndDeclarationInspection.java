@@ -1,7 +1,10 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.inspections;
 
 import com.intellij.codeHighlighting.HighlightDisplayLevel;
-import com.intellij.codeInspection.*;
+import com.intellij.codeInspection.IntentionAndQuickFixAction;
+import com.intellij.codeInspection.LocalInspectionTool;
+import com.intellij.codeInspection.ProblemHighlightType;
+import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.command.WriteCommandAction;
 import com.intellij.openapi.editor.Editor;
@@ -37,22 +40,10 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 		return HighlightDisplayLevel.WARNING;
 	}
 	
-	@Nullable
-	@Override
-	public ProblemDescriptor[] checkFile(@NotNull PsiFile file, @NotNull InspectionManager manager, boolean isOnTheFly) {
-		return super.checkFile(file, manager, isOnTheFly);
-	}
-	
-	@NotNull
-	@Override
-	public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly, @NotNull LocalInspectionToolSession session) {
-		return new InspectionVisitor(holder);
-	}
-	
 	@NotNull
 	@Override
 	public PsiElementVisitor buildVisitor(@NotNull ProblemsHolder holder, boolean isOnTheFly) {
-		return super.buildVisitor(holder, isOnTheFly);
+		return new InspectionVisitor(holder);
 	}
 	
 	@Nls

@@ -16,12 +16,11 @@ Shared between languages
 
 SQF
 	ADDED:
-        Inspection that you can turn on/off for: checks to see if variables are defined, being used, and private
+        none
     CHANGED:
         none
     FIXED:
-        bad performance for case statements (https://github.com/kayler-renslow/arma-intellij-plugin/issues/22)
-        external annotator being very slow
+        none
 
 Header
     ADDED:
