@@ -1,4 +1,5 @@
 FIX FINDING SCOPE FOR SQF VARIABLES, ESPECIALLY WITH LOOPS
+//http://pasting.io/#dardo/477
 
 features:
     check if function exists when doing call or spawn

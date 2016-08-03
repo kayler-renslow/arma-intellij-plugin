@@ -12,16 +12,16 @@ Shared between languages
     CHANGED:
         none
     FIXED:
-        Stringtable Value color not properly being displayed in color settings page
+        none
 
 SQF
 	ADDED:
-        none
+        Inspection that you can turn on/off for: checks to see if variables are defined, being used, and private
     CHANGED:
         none
     FIXED:
-        https://github.com/kayler-renslow/arma-intellij-plugin/issues/17
-        quick documentation lookup not working for commands while still typing the command
+        bad performance for case statements (https://github.com/kayler-renslow/arma-intellij-plugin/issues/22)
+        external annotator being very slow
 
 Header
     ADDED:

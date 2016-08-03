@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
-	<version>1.0.5</version>
+	<version>1.0.5_1</version>
 	<!--<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>-->
 	<description>
 		Plugin that offers syntax checking of SQF files, syntax highlighting, find usages, refactor renaming, and more various features.
@@ -22,7 +22,7 @@
 		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDocumentationProvider"/>
 		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFCommenter"/>
 		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFAnnotator"/>
-		<externalAnnotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFExternalAnnotator"/>
+		<localInspection language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.inspections.PrivatizationAndDeclarationInspection" enabledByDefault="true" groupName="Arma SQF"/>
 		<lang.findUsagesProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFFindUsagesProvider"/>
 		<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.sqf.contributors.SQFReferenceContributor"/>
 		<lang.refactoringSupport language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFRefactoringSupportProvider"/>

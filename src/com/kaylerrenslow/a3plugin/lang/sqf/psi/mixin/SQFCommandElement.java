@@ -9,7 +9,6 @@ import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFCommand;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFCommandItemPresentation;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFCommandReference;
 import org.jetbrains.annotations.NonNls;
@@ -41,7 +40,7 @@ public abstract class SQFCommandElement extends ASTWrapperPsiElement implements 
 	@NotNull
 	@Override
 	public PsiReference[] getReferences() {
-		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(getContainingFile(), SQFTypes.COMMAND, null, getName());
+		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(getContainingFile(), this.getNode().getElementType(), null, getName());
 		SQFCommandElement other;
 		ArrayList<SQFCommandReference> refs = new ArrayList<>();
 		for (int i = 0; i < nodes.size(); i++) {

@@ -52,7 +52,7 @@ public class SQFStatic {
 	
 	/** Return true if the given type refers to a command, false otherwise */
 	public static boolean isCommand(IElementType type) {
-		return type == SQFTypes.COMMAND_TOKEN || type == SQFTypes.COMMAND;
+		return type == SQFTypes.COMMAND_TOKEN || type == SQFTypes.COMMAND || type == SQFTypes.CASE || type == SQFTypes.CASE_COMMAND;
 	}
 	
 	/**

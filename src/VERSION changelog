@@ -1,5 +1,5 @@
-Version: 1.0.5
-Release date: July 22 2016
+Version: 1.0.5_1
+Release date: August 3 2016
 
 Plugin
 	ADDED:
@@ -19,14 +19,12 @@ Shared between languages
 
 SQF
 	ADDED:
-        support for hex numbers
+        Inspection that you can turn on/off for: checks to see if variables are defined, being used, and private (this functionality has been in place for a while, but now it can be turned off if you like)
     CHANGED:
-        variables set to nil will now be marked as uninitialized
-        variables declared in params command that have no default value will be marked as "may be uninitialized" instead of more definitive "not initialized"
+        none
     FIXED:
-        params [["_var", nil]];//was saying _var was defined when it shouldn't be
-        https://github.com/kayler-renslow/arma-intellij-plugin/issues/17
-        quick documentation lookup not working for commands while still typing the command
+        bad performance for case statements (https://github.com/kayler-renslow/arma-intellij-plugin/issues/22)
+        external annotator being very slow
 
 Header
     ADDED:

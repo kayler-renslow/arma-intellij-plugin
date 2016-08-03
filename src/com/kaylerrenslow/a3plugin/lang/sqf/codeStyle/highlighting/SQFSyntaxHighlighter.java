@@ -99,7 +99,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 		if(tokenType.equals(SQFTypes.LANG_VAR)){
 			return MAGIC_VAR_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.COMMAND_TOKEN)){
+		if(SQFStatic.isCommand(tokenType)){
 			return COMMAND_KEYS;
 		}
 		for(IElementType e: SQFStatic.OPERATORS){

@@ -71,7 +71,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "_forEachIndex" { return SQFTypes.LANG_VAR; }
 <YYINITIAL> "_exception" { return SQFTypes.LANG_VAR; }
 
-
+<YYINITIAL> "case" { return SQFTypes.CASE; }
 <YYINITIAL> "abs" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "accTime" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "acos" { return SQFTypes.COMMAND_TOKEN; }
@@ -301,7 +301,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "canVehicleCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "captive" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "captiveNum" { return SQFTypes.COMMAND_TOKEN; }
-<YYINITIAL> "case" { return SQFTypes.COMMAND_TOKEN; }
+
 <YYINITIAL> "catch" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "cbChecked" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "cbSetChecked" { return SQFTypes.COMMAND_TOKEN; }

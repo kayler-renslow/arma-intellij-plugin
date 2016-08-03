@@ -37,7 +37,7 @@ statement ::= ( assignment | case_statement | expression | quest_statement ) SEM
 
 return_statement ::= expression SEMICOLON?
 quest_statement ::= QUEST expression COLON expression
-case_statement ::= command expression COLON code_block
+case_statement ::= case_command expression COLON code_block
 
 assignment ::= (command? variable) EQ expression {methods=[getAssigningVariable isDeclaredPrivate]}
 
@@ -90,7 +90,7 @@ private command_postfix_arg_ ::= (code_block expression?) | expression
 
 paren_expression ::= LPAREN expression RPAREN
 
-
+case_command ::= CASE {extends("case_command")=command}
 command ::= COMMAND_TOKEN {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFCommandElement" implements="com.intellij.psi.PsiNameIdentifierOwner" methods=[]}
 string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFStringMixin" methods=[getNonQuoteText getNonQuoteRangeRelativeToFile getNonQuoteRangeRelativeToElement]}
 
