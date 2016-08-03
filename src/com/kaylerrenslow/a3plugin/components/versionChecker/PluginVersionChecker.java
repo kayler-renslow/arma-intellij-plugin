@@ -72,7 +72,7 @@ public class PluginVersionChecker implements ProjectComponent {
 		try {
 			newPluginVersion = newPluginVersion(project);
 		} catch (Exception e) {
-			PluginVersionNotification.showNewNotification("Arma Intellij Plugin Error", e.getMessage(), NotificationType.ERROR, null);
+			PluginVersionNotification.showNewNotification("Arma Intellij Plugin Error", e.getMessage(), NotificationType.ERROR, null, project);
 			return;
 		}
 		if (newPluginVersion == null) {
@@ -84,7 +84,7 @@ public class PluginVersionChecker implements ProjectComponent {
 			public void hyperlinkUpdate(@NotNull Notification notification, @NotNull HyperlinkEvent event) {
 				BrowserUtil.browse(event.getURL());
 			}
-		});
+		}, project);
 	}
 
 	private static String newPluginVersion(@NotNull Project project) throws Exception {
@@ -125,7 +125,7 @@ public class PluginVersionChecker implements ProjectComponent {
 
 	private static String newVersionAvailable(@NotNull JsonFile latestVersionJson) throws Exception {
 		JsonObject object;
-		String apiChange = "Apparently Github changed their API";
+		String apiChange = "Apparently GitHub changed their API";
 		try {
 			object = (JsonObject) latestVersionJson.getFirstChild();
 		} catch (Exception e) {

@@ -22,7 +22,7 @@
 		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDocumentationProvider"/>
 		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFCommenter"/>
 		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFAnnotator"/>
-		<localInspection language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.inspections.PrivatizationAndDeclarationInspection" enabledByDefault="true" groupName="Arma SQF"/>
+		<localInspection language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.inspections.PrivatizationAndDeclarationInspection" enabledByDefault="true" groupName="Arma SQF" displayName=""/>
 		<lang.findUsagesProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFFindUsagesProvider"/>
 		<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.sqf.contributors.SQFReferenceContributor"/>
 		<lang.refactoringSupport language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFRefactoringSupportProvider"/>
