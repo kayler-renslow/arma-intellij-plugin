@@ -1,5 +1,4 @@
 FIX FINDING SCOPE FOR SQF VARIABLES, ESPECIALLY WITH LOOPS
-//http://pasting.io/#dardo/477
 
 features:
     check if function exists when doing call or spawn
@@ -15,3 +14,5 @@ for header preprocessors, you will have to implement the lexer both times. Howev
     We need to figure out how to provide references for them though
 
 parse through mission.sqm for function calls and such to see if variables are defined outside SQF (useful for unused inspection)
+
+header lexer could not match input when doing analyze->inspect code

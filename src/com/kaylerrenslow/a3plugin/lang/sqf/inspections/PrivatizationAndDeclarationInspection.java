@@ -176,12 +176,12 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 				if (matchedIndex >= 0) {
 					matchedNode = privateVars.get(matchedIndex).getVarElement().getNode();
 					if (currentPrivateVarNode.getPsi() instanceof SQFString) {
-						rangeCurrentNode = ((SQFString) (currentPrivateVarNode.getPsi())).getNonQuoteRangeRelativeToFile();
+						rangeCurrentNode = ((SQFString) (currentPrivateVarNode.getPsi())).getNonQuoteRangeRelativeToElement();
 					} else {
 						rangeCurrentNode = TextRange.from(currentPrivateVarNode.getStartOffset(), currentPrivateVarNode.getTextLength());
 					}
 					if (matchedNode.getPsi() instanceof SQFString) {
-						rangeMatchedNode = ((SQFString) (matchedNode.getPsi())).getNonQuoteRangeRelativeToFile();
+						rangeMatchedNode = ((SQFString) (matchedNode.getPsi())).getNonQuoteRangeRelativeToElement();
 					} else {
 						rangeMatchedNode = TextRange.from(matchedNode.getStartOffset(), matchedNode.getTextLength());
 					}
@@ -190,7 +190,7 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 				}
 				if (currentPrivateVar.getVarElement() instanceof SQFString) { //usage check already handled for variables, so only need to check for strings
 					if (currentPrivateVar.getVarElement().getReferences().length == 0) {
-						TextRange range = ((SQFString) currentPrivateVar.getVarElement()).getNonQuoteRangeRelativeToFile();
+						TextRange range = ((SQFString) currentPrivateVar.getVarElement()).getNonQuoteRangeRelativeToElement();
 						holder.registerProblem(currentPrivateVar.getVarElement(), range, Plugin.resources.getString("lang.sqf.annotator.variable_unused"));
 					}
 				}

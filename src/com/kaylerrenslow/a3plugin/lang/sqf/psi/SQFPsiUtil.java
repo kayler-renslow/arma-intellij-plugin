@@ -5,6 +5,7 @@ import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.search.FileTypeIndex;
@@ -30,18 +31,18 @@ import java.util.List;
  Psi utilities for SQF
  Created on 03/20/2016. */
 public class SQFPsiUtil {
-
-
+	
+	
 	/**
 	 Check if the given element is inside a [] spawn {}. For spawn, all variables are created in a different environment
 	 We must iterate over all upper code blocks and see if they are part of a spawn statement. Unlike scope.checkIfSpawn(), this will traverse the tree upwards to the file scope to make sure that the element isn't inside the spawn scope
-
+	 
 	 @return the scope that starts the spawn scope ([] spawn {}), or null if not inside spawn
 	 */
 	@Nullable
 	public static SQFScope checkIfInsideSpawn(@NotNull PsiElement element) {
 		SQFScope containingScope = SQFPsiUtil.getContainingScope(element);
-
+		
 		PsiElement codeBlock = containingScope.getParent();
 		SQFScope spawnScope = containingScope;
 		ASTNode previous;
@@ -57,10 +58,10 @@ public class SQFPsiUtil {
 		}
 		return null;
 	}
-
+	
 	/**
 	 Checks if the given PsiElement is a BIS function (is of type SQFTypes.VARIABLE or SQFTypes.GLOBAL_VAR and is defined in documentation, false otherwise).
-
+	 
 	 @param element element
 	 @return true if the given PsiElement is a BIS function, false otherwise
 	 */
@@ -73,17 +74,17 @@ public class SQFPsiUtil {
 		}
 		return false;
 	}
-
-
+	
+	
 	@NotNull
 	public static SQFFileScope getFileScope(@NotNull SQFFile containingFile) {
 		return (SQFFileScope) containingFile.getNode().getChildren(TokenSet.create(SQFTypes.FILE_SCOPE))[0].getPsi();
 	}
-
-
+	
+	
 	/**
 	 Gets the containing scope of the psi element. Scope is determined by what code block element is in, or if not in a code block then the file's file scope is returned
-
+	 
 	 @param element element to get scope of
 	 @return scope
 	 */
@@ -98,10 +99,10 @@ public class SQFPsiUtil {
 		}
 		return (SQFScope) parent;
 	}
-
+	
 	/**
 	 Adds all SQFVariables in the current module that is equal to findVar into a list and returns it
-
+	 
 	 @param project project
 	 @param findVar global variable
 	 @return list
@@ -110,16 +111,17 @@ public class SQFPsiUtil {
 	public static List<SQFVariable> findGlobalVariables(@NotNull Project project, @NotNull SQFVariable findVar) {
 		List<SQFVariable> result = new ArrayList<>();
 		Module m = PluginUtil.getModuleForPsiFile(findVar.getContainingFile());
-		if(m == null){
+		if (m == null) {
 			return result;
 		}
 		GlobalSearchScope searchScope = m.getModuleContentScope();
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, searchScope);
 		for (VirtualFile virtualFile : files) {
-			SQFFile sqfFile = (SQFFile) PsiManager.getInstance(project).findFile(virtualFile);
-			if (sqfFile == null) {
+			PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
+			if(!(file instanceof SQFFile)){
 				continue;
 			}
+			SQFFile sqfFile = (SQFFile) file;
 			ArrayList<SQFVariable> vars = PsiUtil.findDescendantElementsOfInstance(sqfFile, SQFVariable.class, null);
 			if (vars == null) {
 				continue;
@@ -135,10 +137,10 @@ public class SQFPsiUtil {
 		}
 		return result;
 	}
-
+	
 	/**
 	 Finds all SQFStrings in the module in all SQF files with text equal to quoteText
-
+	 
 	 @param project project
 	 @param module current module
 	 @param quoteText text to search for (including quotes)
@@ -149,10 +151,11 @@ public class SQFPsiUtil {
 		List<SQFString> result = new ArrayList<>();
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, module.getModuleContentScope());
 		for (VirtualFile virtualFile : files) {
-			SQFFile sqfFile = (SQFFile) PsiManager.getInstance(project).findFile(virtualFile);
-			if (sqfFile == null) {
+			PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
+			if (!(file instanceof SQFFile)) {
 				continue;
 			}
+			SQFFile sqfFile = (SQFFile) file;
 			ArrayList<SQFString> strings = PsiUtil.findDescendantElementsOfInstance(sqfFile, SQFString.class, null);
 			if (strings == null) {
 				continue;
@@ -165,10 +168,10 @@ public class SQFPsiUtil {
 		}
 		return result;
 	}
-
+	
 	/**
 	 Adds all SQFVariables in the current module where the variable name is a config function and the function tag is equal to parameter tag
-
+	 
 	 @param module module
 	 @param tag tag to search for
 	 @return list
@@ -179,10 +182,11 @@ public class SQFPsiUtil {
 		GlobalSearchScope searchScope = module.getModuleContentScope();
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, SQFFileType.INSTANCE, searchScope);
 		for (VirtualFile virtualFile : files) {
-			SQFFile sqfFile = (SQFFile) PsiManager.getInstance(module.getProject()).findFile(virtualFile);
-			if (sqfFile == null) {
+			PsiFile file = PsiManager.getInstance(module.getProject()).findFile(virtualFile);
+			if (!(file instanceof SQFFile)) {
 				continue;
 			}
+			SQFFile sqfFile = (SQFFile) file;
 			ArrayList<SQFVariable> vars = PsiUtil.<SQFVariable>findDescendantElementsOfInstance(sqfFile, SQFVariable.class, null);
 			if (vars == null) {
 				continue;
@@ -202,10 +206,10 @@ public class SQFPsiUtil {
 		}
 		return result;
 	}
-
+	
 	/**
 	 Creates a new SQFCommandExpression that is a private[] syntax with new vars appended and returns it
-
+	 
 	 @param project project
 	 @param decl the private declaration to append to
 	 @param varNames the names of the new variables to put inside the declaration
@@ -223,28 +227,28 @@ public class SQFPsiUtil {
 		}
 		return (SQFCommandExpression) createElement(project, text, SQFTypes.COMMAND_EXPRESSION);
 	}
-
+	
 	@NotNull
 	public static SQFVariable createVariable(@NotNull Project project, @NotNull String text) {
 		return (SQFVariable) createElement(project, text, SQFTypes.VARIABLE);
 	}
-
+	
 	@NotNull
 	public static SQFFile createFile(@NotNull Project project, @NotNull String text) {
 		String fileName = "fake_sqf_file.sqf";
 		return (SQFFile) PsiFileFactory.getInstance(project).createFileFromText(fileName, SQFFileType.INSTANCE, text);
 	}
-
+	
 	@NotNull
 	public static PsiElement createElement(@NotNull Project project, @NotNull String text, @NotNull IElementType type) {
 		SQFFile file = createFile(project, text);
 		return PsiUtil.findDescendantElements(file, type, null).get(0).getPsi();
 	}
-
+	
 	public static SQFString createNewStringLiteral(Project project, String textWithoutQuotes) {
 		return (SQFString) createElement(project, "\"" + textWithoutQuotes + "\"", SQFTypes.STRING);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	/** Get all array entries in the array where the expression type is of class type. Do not make this a utility method for the grammar because the generic type parameter won't work */
 	public static <T extends SQFExpression> List<T> getExpressionsOfType(SQFArrayVal array, Class<T> type) {
@@ -259,11 +263,11 @@ public class SQFPsiUtil {
 		}
 		return items;
 	}
-
+	
 	/**
 	 Get a postfix argument of class type. This method will traverse as far right until the end of the expression (for instance, searching expression 'vehicle player setPos' will search all the way to setPos)<br>
 	 Do not
-
+	 
 	 @param commandExpression command expression
 	 @return the first element of matched type, or null if none could be found.
 	 */

@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
-	<version>1.0.5_1</version>
+	<version>1.0.5_2</version>
 	<!--<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>-->
 	<description>
 		Plugin that offers syntax checking of SQF files, syntax highlighting, find usages, refactor renaming, and more various features.

@@ -1,5 +1,5 @@
-Version: 1.0.5_1
-Release date: August 3 2016
+Version: 1.0.5_2
+Release date: August 12, 2016
 
 Plugin
 	ADDED:
@@ -19,17 +19,17 @@ Shared between languages
 
 SQF
 	ADDED:
-        Inspection that you can turn on/off for: checks to see if variables are defined, being used, and private (this functionality has been in place for a while, but now it can be turned off if you like)
+        none
     CHANGED:
         none
     FIXED:
-        bad performance for case statements (https://github.com/kayler-renslow/arma-intellij-plugin/issues/22)
-        external annotator being very slow
+        none
 
 Header
     ADDED:
         none
     CHANGED:
-        none
+        sqm files are no longer parsed by the Header parser
     FIXED:
-        none
+        https://github.com/kayler-renslow/arma-intellij-plugin/issues/25
+        https://github.com/kayler-renslow/arma-intellij-plugin/issues/23

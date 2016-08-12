@@ -26,6 +26,7 @@ Header
     ADDED:
         none
     CHANGED:
-        none
+        sqm files are no longer parsed by the Header parser
     FIXED:
-        none
+        https://github.com/kayler-renslow/arma-intellij-plugin/issues/25
+        https://github.com/kayler-renslow/arma-intellij-plugin/issues/23

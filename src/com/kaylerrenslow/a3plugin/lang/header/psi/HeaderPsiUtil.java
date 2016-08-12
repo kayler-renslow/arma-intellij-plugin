@@ -44,10 +44,11 @@ public class HeaderPsiUtil {
 		List<HeaderStringtableKey> result = new ArrayList<>();
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, HeaderFileType.INSTANCE, module.getModuleContentScope());
 		for (VirtualFile virtualFile : files) {
-			HeaderFile headerFile = (HeaderFile) PsiManager.getInstance(project).findFile(virtualFile);
-			if (headerFile == null) {
+			PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
+			if(!(file instanceof HeaderFile)){
 				continue;
 			}
+			HeaderFile headerFile = (HeaderFile) file;
 			ArrayList<HeaderStringtableKey> strings = PsiUtil.findDescendantElementsOfInstance(headerFile, HeaderStringtableKey.class, null);
 			if (strings == null) {
 				continue;
