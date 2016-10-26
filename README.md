@@ -16,6 +16,9 @@ Arma games are created and owned by [Bohemia Interactive](https://www.bistudio.c
 * An "Arma Color" picker dialog which allows to convert HEX or RGB to Arma's color format (black -> [0,0,0,1])
 * Wiki documentation on all commands and BIS functions via ctrl+Q
 
+### Video Walkthrough
+https://www.youtube.com/watch?v=BOkfMCutb7U
+
 ### How to Clone and Edit Source for Arma Intellij Plugin
 1. You should know how to write Java and you should have experience using [Intellij](https://www.jetbrains.com/idea/).
 2. Read the official documentation for Plugin development with Intellij. This will tell you how to prepare for a new Plugin project. Visit the docs [here](http://www.jetbrains.org/intellij/sdk/docs/tutorials/custom_language_support/prerequisites.html).
