@@ -12,7 +12,7 @@
 **Changed**<br>
 * 
 **Fixed**<br>
-* https://github.com/kayler-renslow/arma-intellij-plugin/issues/30
+*
 
 ## SQF
 **Added**<br>
@@ -20,7 +20,7 @@
 **Changed**<br>
 * 
 **Fixed**<br>
-* https://github.com/kayler-renslow/arma-intellij-plugin/issues/27
+* https://github.com/kayler-renslow/arma-intellij-plugin/issues/24
 
 ## Header
 **Added**<br>

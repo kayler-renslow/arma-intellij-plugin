@@ -178,12 +178,12 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 					if (currentPrivateVarNode.getPsi() instanceof SQFString) {
 						rangeCurrentNode = ((SQFString) (currentPrivateVarNode.getPsi())).getNonQuoteRangeRelativeToElement();
 					} else {
-						rangeCurrentNode = TextRange.from(currentPrivateVarNode.getStartOffset(), currentPrivateVarNode.getTextLength());
+						rangeCurrentNode = TextRange.from(0, currentPrivateVarNode.getTextLength());
 					}
 					if (matchedNode.getPsi() instanceof SQFString) {
 						rangeMatchedNode = ((SQFString) (matchedNode.getPsi())).getNonQuoteRangeRelativeToElement();
 					} else {
-						rangeMatchedNode = TextRange.from(matchedNode.getStartOffset(), matchedNode.getTextLength());
+						rangeMatchedNode = TextRange.from(0, matchedNode.getTextLength());
 					}
 					holder.registerProblem(matchedNode.getPsi(), rangeMatchedNode, Plugin.resources.getString("lang.sqf.annotator.variable_already_private"));
 					holder.registerProblem(matchedNode.getPsi(), rangeCurrentNode, Plugin.resources.getString("lang.sqf.annotator.variable_already_private"));
