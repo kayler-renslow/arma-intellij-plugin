@@ -3,7 +3,7 @@
 * 
 
 **Changed**<br>
-* moved grammars to better location
+*
 
 **Fixed**<br>
 * 
@@ -26,7 +26,7 @@
 * 
 
 **Fixed**<br>
-* https://github.com/kayler-renslow/arma-intellij-plugin/issues/28
+*
 
 ## Header
 **Added**<br>
