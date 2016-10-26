@@ -1,16 +1,16 @@
-Version: 1.0.5_2
-Release date: August 12, 2016
+Version: tbd
+Release date: tbd
 
 Plugin
-	ADDED:
+	Added:
         none
-    CHANGED:
+    Changed:
         none
-    FIXED:
+    Fixed:
         none
 
 Shared between languages
-	ADDED:
+	Added:
         none
     CHANGED:
         none
@@ -18,18 +18,17 @@ Shared between languages
         none
 
 SQF
-	ADDED:
+	Added:
         none
-    CHANGED:
+    Changed:
         none
-    FIXED:
+    Fixed:
         none
 
 Header
-    ADDED:
+    Added:
         none
-    CHANGED:
-        sqm files are no longer parsed by the Header parser
-    FIXED:
-        https://github.com/kayler-renslow/arma-intellij-plugin/issues/25
-        https://github.com/kayler-renslow/arma-intellij-plugin/issues/23
+    Changed:
+        none
+    Fixed:
+        none

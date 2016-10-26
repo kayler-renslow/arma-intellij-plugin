@@ -1,20 +1,10 @@
 package com.kaylerrenslow.a3plugin.project;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.module.ModuleUtilCore;
-import com.intellij.openapi.project.ProjectManager;
-import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.openapi.vfs.VirtualFileSystem;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiManager;
-import com.intellij.psi.search.FileTypeIndex;
-import com.intellij.psi.search.GlobalSearchScope;
-import com.intellij.util.indexing.FileBasedIndex;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
-import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
 import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderFile;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
@@ -22,7 +12,6 @@ import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
-import java.util.Collection;
 
 /**
  * @author Kayler
@@ -84,6 +73,9 @@ public class ArmaModuleData{
 			return this.stringtable;
 		}
 		this.stringtable = Stringtable.load(this.module);
+		if (!stringtable.getVirtualFile().exists()) {
+			throw new FileNotFoundException("stringtable.xml doesn't exist");
+		}
 		return this.stringtable;
 	}
 }

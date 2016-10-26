@@ -16,3 +16,6 @@ for header preprocessors, you will have to implement the lexer both times. Howev
 parse through mission.sqm for function calls and such to see if variables are defined outside SQF (useful for unused inspection)
 
 header lexer could not match input when doing analyze->inspect code
+
+
+bis documentation tags are brokeded
