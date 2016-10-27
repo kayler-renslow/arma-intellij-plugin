@@ -10,22 +10,21 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author Kayler
- * A reference between a local variable and a String that contains the variable
- * Created on 04/12/2016.
- */
-public class SQFLocalVarInStringReference implements PsiPolyVariantReference {
-	private final SQFVariable[] targetVars;
+ @author Kayler
+ A reference between at least one local variable and a String that contains the variable (differs from {@link SQFLocalVarInStringsReference} such that this resolves to a {@link SQFVariable} where
+ the other resovles to a {@link SQFString})
+ Created on 04/12/2016. */
+public class SQFLocalVarsInStringReference implements PsiPolyVariantReference {
+	private final List<SQFVariable> targetVars;
 	private final SQFString string;
 	private final SQFScope targetVarScope;
 	private ResolveResult[] resolveResult;
 
-	public SQFLocalVarInStringReference(List<SQFVariable> targetVars, SQFScope targetVarScope, SQFString string) {
-		this.targetVars = targetVars.toArray(new SQFVariable[targetVars.size()]);
+	public SQFLocalVarsInStringReference(List<SQFVariable> targetVars, SQFScope targetVarScope, SQFString string) {
+		this.targetVars = targetVars;
 		this.string = string;
 		this.targetVarScope = targetVarScope;
 
@@ -45,13 +44,13 @@ public class SQFLocalVarInStringReference implements PsiPolyVariantReference {
 	@Nullable
 	@Override
 	public PsiElement resolve() {
-		return targetVars[0];
+		return targetVars.get(0);
 	}
 
 	@NotNull
 	@Override
 	public String getCanonicalText() {
-		return targetVars[0].getVarName();
+		return targetVars.get(0).getVarName();
 	}
 
 	@Override
@@ -68,13 +67,16 @@ public class SQFLocalVarInStringReference implements PsiPolyVariantReference {
 
 	@Override
 	public boolean isReferenceTo(PsiElement element) {
+		if (element instanceof SQFString) {
+			return element.getText().equals(this.string.getText());
+		}
 		if (!(element instanceof SQFVariable)) {
 			return false;
 		}
 		SQFVariable paramVar = (SQFVariable) element;
 		PsiReference[] references = paramVar.getReferences();
-		for(PsiReference reference : references){
-			if(reference.resolve() == paramVar && paramVar.getDeclarationScope() == targetVarScope){
+		for (PsiReference reference : references) {
+			if (reference.resolve() == paramVar && paramVar.getDeclarationScope() == targetVarScope) {
 				return true;
 			}
 		}
@@ -90,7 +92,7 @@ public class SQFLocalVarInStringReference implements PsiPolyVariantReference {
 	@Override
 	public String toString() {
 		return "SQFLocalVarInStringReference{" +
-				"targetVar=" + Arrays.toString(targetVars) +
+				"targetVars=" + targetVars +
 				", string=" + string +
 				'}';
 	}

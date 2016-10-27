@@ -9,12 +9,10 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFFunctionItemPresentation;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFVariableItemPresentation;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFLocalVarInStringsReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
@@ -66,19 +64,52 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 		SQFScope myDeclarationScope = me.getDeclarationScope();
 
 		//need to search entire file because of for spec case (for[{private _i = 0},{},{}] do{/*_i can be referenced here, but from here _i won't be seen*/})
-		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(this.getContainingFile(), SQFTypes.VARIABLE, null, me.getVarName());
-		SQFVariable other;
+		ArrayList<SQFVariable> variables = PsiUtil.findDescendantElementsOfInstance(this.getContainingFile(), SQFVariable.class, null, me.getVarName());
 		ArrayList<SQFVariable> refVars = new ArrayList<>();
-		for (int i = 0; i < nodes.size(); i++) {
-			other = ((SQFVariable) nodes.get(i).getPsi());
-			if (myDeclarationScope == other.getDeclarationScope()) {
-				refVars.add(other);
+		for (SQFVariable variable : variables) {
+			if (myDeclarationScope == variable.getDeclarationScope()) {
+				refVars.add(variable);
 			}
 		}
-		if (refVars.size() > 0) {
-			return new PsiReference[]{new SQFVariableReference(me, refVars)};
+		final String varNameAsQuote = "\"" + me.getVarName() + "\"";
+
+		//get all for loop strings
+		ArrayList<SQFString> stringMatches = PsiUtil.findDescendantElementsOfInstance(getContainingFile(), SQFString.class, null, varNameAsQuote);
+		ArrayList<SQFString> strings = new ArrayList<>();
+		for (SQFString string : stringMatches) {
+			if (SQFPsiUtil.getForVarScope(string) == myDeclarationScope) { //compare for-loop scope to declaration scope
+				strings.add(string);
+			}
 		}
-		return PsiReference.EMPTY_ARRAY;
+		//get all strings inside declaration scope (can differ from for-loop scope)
+		stringMatches = PsiUtil.findDescendantElementsOfInstance(myDeclarationScope, SQFString.class, null, varNameAsQuote);
+		for (SQFString string : stringMatches) {
+			if (!strings.contains(string)) {
+				strings.add(string);
+			}
+		}
+
+
+		if (refVars.size() <= 0 && strings.size() <= 0) {
+			return PsiReference.EMPTY_ARRAY;
+		}
+		PsiReference varReference = null;
+		PsiReference stringReference = null;
+		if (refVars.size() > 0) {
+			varReference = new SQFVariableReference(me, refVars);
+		}
+		if (strings.size() > 0) {
+			stringReference = new SQFLocalVarInStringsReference(this, strings);
+		}
+
+		if (varReference != null && stringReference != null) {
+			return new PsiReference[]{varReference, stringReference};
+		}
+		if (varReference != null) {
+			return new PsiReference[]{varReference};
+		}
+
+		return new PsiReference[]{stringReference};
 	}
 
 	@Override

@@ -286,4 +286,42 @@ public class SQFPsiUtil {
 		}
 		return null;
 	}
+
+	/**
+	 Get the for-loop {@link SQFScope} instance for the given {@link SQFString}. Example cases for getting for-loop scope:<br>
+	 <ul>
+	 <li>for "_i" from 0 to 2 do { }; //"_i" is {@link SQFString} and the scope will be the one inside the {}</li>
+	 <li>for [{_i=0;},{true},{_i = _i+1}] do { }; //not the kind of for-loop meant for this method
+	 </ul>
+
+	 @param str str to get scope of
+	 @return the scope for the {@link SQFString}, or null if not a part of a valid for-loop
+	 */
+	@Nullable
+	public static SQFScope getForVarScope(@NotNull SQFString str) {
+		ASTNode statementNode = PsiUtil.getFirstAncestorOfType(str.getNode(), SQFTypes.STATEMENT, null);
+		if (statementNode != null) {
+			SQFStatement myStatement = (SQFStatement) statementNode.getPsi();
+			if (myStatement.getExpression() instanceof SQFCommandExpression) { //check if String is a for loop variable (for "_var" from 0 to 10 do{})
+				SQFCommandExpression commandExpression = (SQFCommandExpression) myStatement.getExpression();
+				if (commandExpression.getCommandName().equals("for")) {
+					if (commandExpression.getPostfixArgument() instanceof SQFCommandExpression) {
+						SQFCommandExpression forPostfixExp = (SQFCommandExpression) commandExpression.getPostfixArgument();
+						if (forPostfixExp.getPrefixArgument() instanceof SQFLiteralExpression) {
+							SQFLiteralExpression possibleStringLiteral = (SQFLiteralExpression) forPostfixExp.getPrefixArgument();
+							if (possibleStringLiteral != null && possibleStringLiteral.getString() == str) { //is a for loop variable
+								//now set the search scope to the code block next to 'do'
+								SQFCodeBlock doCodeBlock = SQFPsiUtil.getAPostfixArgument(forPostfixExp, SQFCodeBlock.class);
+								if (doCodeBlock != null && doCodeBlock.getLocalScope() != null) {
+									return doCodeBlock.getLocalScope();
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		return null;
+	}
+
 }

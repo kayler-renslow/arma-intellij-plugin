@@ -269,23 +269,26 @@ public class PsiUtil {
 		return null;
 	}
 
-
-	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(PsiElement rootElement, Class<E> type, PsiElement cursor) {
+	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(@NotNull PsiElement rootElement, @NotNull Class<E> type, @Nullable PsiElement cursor, @Nullable String textContent) {
 		ArrayList<E> list = new ArrayList<>();
-		findDescdantElementsOfInstance(rootElement, type, cursor, list);
+		findDescdantElementsOfInstance(rootElement, type, cursor, textContent, list);
 		return list;
 	}
 
-	private static <E extends PsiElement> void findDescdantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor, ArrayList<E> list) {
+	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(@NotNull PsiElement rootElement, @NotNull Class<E> type, @Nullable PsiElement cursor) {
+		return findDescendantElementsOfInstance(rootElement, type, cursor, null);
+	}
+
+	private static <E extends PsiElement> void findDescdantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor, String textContent, ArrayList<E> list) {
 		PsiElement child = rootElement.getFirstChild();
 		while (child != null) {
 			if (cursor != null && child == cursor) {
 				continue;
 			}
-			if (type.isAssignableFrom(child.getClass())) {
+			if (type.isAssignableFrom(child.getClass()) && (textContent == null || child.getText().equals(textContent))) {
 				list.add((E) child);
 			}
-			findDescdantElementsOfInstance(child, type, cursor, list);
+			findDescdantElementsOfInstance(child, type, cursor, textContent, list);
 			child = child.getNextSibling();
 		}
 	}

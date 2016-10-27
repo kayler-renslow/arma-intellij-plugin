@@ -7,6 +7,7 @@ import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFString;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -15,10 +16,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author Kayler
- * This type of reference is used between two variables. Both variables must have the same element type.
- * Created on 04/08/2016.
- */
+ @author Kayler
+ This type of reference is used between two variables. Both variables must have the same element type.
+ Created on 04/08/2016. */
 public class SQFVariableReference implements PsiPolyVariantReference {
 	private final SQFVariable var;
 	private final SQFVariable[] targets;
@@ -64,6 +64,10 @@ public class SQFVariableReference implements PsiPolyVariantReference {
 
 	@Override
 	public boolean isReferenceTo(PsiElement element) {
+		if (element instanceof SQFString) {
+			SQFString sqfString = (SQFString) element;
+			return sqfString.getNonQuoteText().equals(var.getVarName());
+		}
 		if (!(element instanceof SQFVariable)) {
 			return false;
 		}
