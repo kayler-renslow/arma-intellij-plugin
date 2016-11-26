@@ -26,7 +26,7 @@
 * 
 
 **Fixed**<br>
-* https://github.com/kayler-renslow/arma-intellij-plugin/issues/26
+* 
 
 ## Header
 **Added**<br>

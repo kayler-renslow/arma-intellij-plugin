@@ -16,12 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * @author Kayler
- *         Created on 01/01/2016.
- */
+ @author Kayler
+ Created on 01/01/2016. */
 public class HeaderPsiUtilForGrammar {
 
-	public static String getKey(HeaderStringtableKey key){
+	public static String getKey(HeaderStringtableKey key) {
 		return key.getText().substring(1).replaceFirst("[sS][tT][rR]_", "str_");
 	}
 
@@ -117,7 +116,7 @@ public class HeaderPsiUtilForGrammar {
 
 	public static HeaderFileEntry addFileEntry(HeaderClassDeclaration decl, String textWithoutSemicolon) {
 		decl.createClassContent();
-		HeaderFileEntry fileEntry = (HeaderFileEntry)HeaderPsiUtil.createElement(decl.getProject(), textWithoutSemicolon + ";", HeaderTypes.FILE_ENTRY);
+		HeaderFileEntry fileEntry = (HeaderFileEntry) HeaderPsiUtil.createElement(decl.getProject(), textWithoutSemicolon + ";", HeaderTypes.FILE_ENTRY);
 		decl.getClassContent().getFileEntries().getNode().addChild(fileEntry.getNode());
 		return fileEntry;
 	}
@@ -134,10 +133,10 @@ public class HeaderPsiUtilForGrammar {
 	}
 
 	/**
-	 * Get all attributes inside the class declaration. Attributes are any assignment inside the class. If traverseIncludes is true, it will traverse include statements
-	 *
-	 * @param traverseIncludes true if to traverse includes while getting attributes, false if to skip over them
-	 * @return array of attributes (assignment expressions)
+	 Get all attributes inside the class declaration. Attributes are any assignment inside the class. If traverseIncludes is true, it will traverse include statements
+
+	 @param traverseIncludes true if to traverse includes while getting attributes, false if to skip over them
+	 @return array of attributes (assignment expressions)
 	 */
 	public static Attribute[] getAttributes(HeaderClassDeclaration decl, boolean traverseIncludes) {
 		ArrayList<Attribute> attributesList = new ArrayList<>();
@@ -202,7 +201,10 @@ public class HeaderPsiUtilForGrammar {
 					if (preprocessor instanceof HeaderPreInclude) {
 						PsiFile includedFile = ((HeaderPreInclude) preprocessor).getHeaderFileFromInclude();
 						if (includedFile instanceof HeaderFile) {
-							HeaderClassDeclaration firstClass = (HeaderClassDeclaration) PsiUtil.findFirstDescendantElement(includedFile, HeaderClassDeclaration.class);
+							HeaderClassDeclaration firstClass = PsiUtil.findFirstDescendantElement(includedFile, HeaderClassDeclaration.class);
+							if (firstClass == null) {
+								return;
+							}
 							if (firstClass.getClassContent() != null) {
 								if (entryFinder.stopped()) {
 									return;
@@ -223,13 +225,14 @@ public class HeaderPsiUtilForGrammar {
 	}
 
 	/**
-	 * Fetches the PsiFile inside the include.
-	 *
-	 * @param include HeaderPreInclude instance
-	 * @return PsiFile that points to the file included, or null if the include's file path doesn't point to an existing file
+	 Fetches the PsiFile inside the include.
+
+	 @param include HeaderPreInclude instance
+	 @return PsiFile that points to the file included, or null if the include's file path doesn't point to an existing file
 	 */
 	@Nullable
 	public static PsiFile getHeaderFileFromInclude(HeaderPreInclude include) {
-		return PluginUtil.findFileByPath(FilePath.getFilePathFromString(include.getPathString(), '\\'), include.getContainingFile().getContainingDirectory(), include.getProject());
+		FilePath path = FilePath.getFilePathFromString(include.getPathString(), FilePath.DEFAULT_DELIMETER);
+		return PluginUtil.findFileByPath(path, include.getContainingFile().getContainingDirectory());
 	}
 }

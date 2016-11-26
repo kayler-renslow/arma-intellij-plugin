@@ -11,8 +11,6 @@ import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
-
 /**
  * @author Kayler
  *         This class is a wrapper class for a function that was defined inside the missionConfigFile (description.ext >> CfgFunctions)
@@ -142,7 +140,7 @@ public class HeaderConfigFunction {
 			e.printStackTrace(System.out);
 			return null;
 		}
-		return PluginUtil.findFileByPath(FilePath.getFilePathFromString(getFullRelativePath(), '/'), rootMissionDirectory, this.classWithTag.getProject());
+        return PluginUtil.findFileByPath(FilePath.getFilePathFromString(getFullRelativePath(), FilePath.DEFAULT_DELIMETER), rootMissionDirectory);
 
 	}
 }

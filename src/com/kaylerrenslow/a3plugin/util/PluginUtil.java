@@ -3,7 +3,6 @@ package com.kaylerrenslow.a3plugin.util;
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -39,15 +38,16 @@ public class PluginUtil {
 	/**
 	 Finds the file (specified by filePath) inside the given root directory. The search does not include the root directory itself. For instance, filePath could be equal to root directory ("exampleRootName" and return null)
 
-	 @param filePath FilePath object
-	 @param rootDirectory the root directory to beging the search
 	 @return the VirtualFile that was found, or null if the given file path points to nothing at the given root directory
+	 @param filePath FilePath object
+	 @param rootDirectory the root directory to begin the search
 	 */
 	@Nullable
-	public static PsiFile findFileByPath(@NotNull FilePath filePath, @NotNull PsiDirectory rootDirectory, @NotNull Project project) {
+	public static PsiFile findFileByPath(@NotNull FilePath filePath, @NotNull PsiDirectory rootDirectory) {
+		PsiDirectory currentRootDirectory = rootDirectory;
 		if (filePath.getFileName().matches("[a-zA-Z]+:")) { //starts with drive. example  d:/file/file2.txt
-			while (rootDirectory.getParent() != null) {
-				rootDirectory = rootDirectory.getParent();
+			while (currentRootDirectory.getParent() != null) {
+				currentRootDirectory = currentRootDirectory.getParent();
 			}
 			filePath = filePath.getChild();
 			if (filePath == null) {
@@ -55,31 +55,35 @@ public class PluginUtil {
 			}
 		} else {
 			while (filePath.fileNameIsDotDot()) {
-				if (rootDirectory.getParent() == null) {
+				if (currentRootDirectory.getParent() == null) {
 					return null;
 				}
-				rootDirectory = rootDirectory.getParent();
+				currentRootDirectory = currentRootDirectory.getParent();
 				filePath = filePath.getChild();
 				if (filePath == null) { //just simply a ../
 					return null;
 				}
 			}
 		}
-		PsiDirectory matched = rootDirectory.findSubdirectory(filePath.getFileName());
-
+		PsiDirectory matched = currentRootDirectory.findSubdirectory(filePath.getFileName());
 		if (matched != null) {
+			//current is a directory
 			if (filePath.getChild() == null) {
-				return rootDirectory.findFile(filePath.getFileName());
+				//no children left to traverse
+				return null;
 			} else {
-				return findFileByPath(filePath.getChild(), matched, project);
+				//children to traverse
+				return findFileByPath(filePath.getChild(), matched);
 			}
 		} else {
+			//current is not a directory
 			if (filePath.getChild() == null) {
-				return rootDirectory.findFile(filePath.getFileName());
+				//is the end path
+				return currentRootDirectory.findFile(filePath.getFileName());
 			}
 		}
-
 		return null;
+
 	}
 
 

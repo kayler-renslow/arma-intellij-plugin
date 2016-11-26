@@ -4,7 +4,6 @@ import com.intellij.lang.annotation.Annotation;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.ExternalAnnotator;
 import com.intellij.openapi.editor.Editor;
-import com.intellij.openapi.util.Key;
 import com.intellij.psi.PsiErrorElement;
 import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.a3plugin.Plugin;
@@ -32,8 +31,8 @@ public class SharedExternalAnnotator extends ExternalAnnotator {
 	public Object collectInformation(@NotNull PsiFile file, @NotNull Editor editor, boolean hasErrors) {
 		if(hasErrors){
 			if(Plugin.pluginProps.propertyIsTrue(Plugin.UserPropertiesKey.SHOW_SCRIPT_ERRORS)){
-				return new AnnotationInformation(Information.FILE_ERROR, "There is a syntax error.");
-			}
+                return new AnnotationInformation(Information.FILE_ERROR, "There is an error.");
+            }
 		}
 		return null;
 	}
@@ -55,8 +54,8 @@ public class SharedExternalAnnotator extends ExternalAnnotator {
 		if(annotationResult instanceof AnnotationInformation){
 			AnnotationInformation information = (AnnotationInformation)annotationResult;
 			if(information.type == Information.FILE_ERROR){
-				PsiErrorElement errorElement = (PsiErrorElement) PsiUtil.findFirstDescendantElement(file, PsiErrorElement.class);
-				if(errorElement == null){
+                PsiErrorElement errorElement = PsiUtil.findFirstDescendantElement(file, PsiErrorElement.class);
+                if(errorElement == null){
 					Annotation a = holder.createErrorAnnotation(file, information.message);
 					a.setFileLevelAnnotation(true);
 					return;

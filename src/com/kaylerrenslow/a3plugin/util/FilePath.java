@@ -1,5 +1,6 @@
 package com.kaylerrenslow.a3plugin.util;
 
+import org.intellij.lang.annotations.RegExp;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -11,6 +12,10 @@ import org.jetbrains.annotations.Nullable;
 public class FilePath {
 	private final String fileName;
 	private FilePath child;
+
+	public static final
+	@RegExp
+	String DEFAULT_DELIMETER = "[\\\\|/]";
 
 	/** Create a new file path
 	 * @param fileName root file name
@@ -40,15 +45,11 @@ public class FilePath {
 
 	/** Create a file path from an existing string.
 	 * @param path the file path (e.g. "hello\text.txt")
-	 * @param directoryDelimiter delimiter to specify where file name ends. Can be '/' or '\' or anything else
+	 * @param directoryDelimitersRegex delimiter to specify where file name ends. Can be '/' or '\' or anything else
 	 * @return a new FilePath instance
 	 */
-	public static FilePath getFilePathFromString(@NotNull String path, char directoryDelimiter){
-		String delimeter = directoryDelimiter + "";
-		if(directoryDelimiter == '\\'){
-			delimeter = "\\\\";
-		}
-		String[] tokens = path.split("[" + delimeter + "]");
+	public static FilePath getFilePathFromString(@NotNull String path, @RegExp String directoryDelimitersRegex) {
+		String[] tokens = path.split(directoryDelimitersRegex);
 
 		String[] children = null;
 		if(tokens.length > 1){
@@ -81,5 +82,10 @@ public class FilePath {
 	@Nullable
 	public FilePath getChild() {
 		return child;
+	}
+
+	@Override
+	public String toString() {
+		return "FilePath{" + getFullPath('/') + "}";
 	}
 }

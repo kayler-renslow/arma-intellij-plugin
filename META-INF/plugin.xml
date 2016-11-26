@@ -2,9 +2,12 @@
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
 	<version>1.0.6</version>
-	<!--<vendor email="support@yourcompany.com" url="http://www.yourcompany.com">YourCompany</vendor>-->
+	<vendor email="armaintellijplugin@kaylerrenslow.com" url="https://github.com/kayler-renslow/arma-intellij-plugin">
+		Kayler Renslow
+	</vendor>
 	<description>
-		Plugin that offers syntax checking of SQF files, syntax highlighting, find usages, refactor renaming, and more various features.
+		Plugin that offers syntax checking of SQF files, syntax highlighting, find usages, refactor renaming, and more
+		various features for Arma 3.
 	</description>
 
 	<change-notes>
