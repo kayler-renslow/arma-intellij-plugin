@@ -34,161 +34,162 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 
 /**
+ * Provides custom renaming for SQF config functions.
+ *
  * @author Kayler
- *         Provides custom renaming for SQF config functions.
- *         Created on 04/27/2016.
+ * @since 04/27/2016.
  */
 public class SQFRenameHandler implements RenameHandler {
 
-	@Override
-	public boolean isAvailableOnDataContext(DataContext dataContext) {
-		if (!(dataContext.getData(CommonDataKeys.PSI_FILE.getName()) instanceof SQFFile)) {
-			return false;
-		}
-		Module module = DataKeys.MODULE.getData(dataContext);
-		if (module == null) {
-			return false;
-		}
-		PsiElement psiElement = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-		if(psiElement instanceof SQFCommandElement){
-			return true;
-		}
-		if (psiElement instanceof SQFVariable) {
-			SQFVariable var = (SQFVariable) psiElement;
-			if (SQFStatic.followsSQFFunctionNameRules(var.getVarName())) {
-				try {
-					HeaderPsiUtil.getFunctionFromCfgFunctions(module, var.getVarName());
-				} catch (GenericConfigException e) {
-					return false;
-				}
-				return true;
-			}
-		}
-		return false; //use default rename method
-	}
+    @Override
+    public boolean isAvailableOnDataContext(DataContext dataContext) {
+        if (!(dataContext.getData(CommonDataKeys.PSI_FILE.getName()) instanceof SQFFile)) {
+            return false;
+        }
+        Module module = DataKeys.MODULE.getData(dataContext);
+        if (module == null) {
+            return false;
+        }
+        PsiElement psiElement = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
+        if (psiElement instanceof SQFCommandElement) {
+            return true;
+        }
+        if (psiElement instanceof SQFVariable) {
+            SQFVariable var = (SQFVariable) psiElement;
+            if (SQFStatic.followsSQFFunctionNameRules(var.getVarName())) {
+                try {
+                    HeaderPsiUtil.getFunctionFromCfgFunctions(module, var.getVarName());
+                } catch (GenericConfigException e) {
+                    return false;
+                }
+                return true;
+            }
+        }
+        return false; //use default rename method
+    }
 
-	@Override
-	public boolean isRenaming(DataContext dataContext) {
-		return isAvailableOnDataContext(dataContext);
-	}
+    @Override
+    public boolean isRenaming(DataContext dataContext) {
+        return isAvailableOnDataContext(dataContext);
+    }
 
-	@Override
-	public void invoke(@NotNull Project project, Editor editor, PsiFile file, DataContext dataContext) {
-		PsiElement psiElement = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
-		if (!(psiElement instanceof SQFVariable)) {
-			return;
-		}
-		Module module = DataKeys.MODULE.getData(dataContext);
-		if (module == null) {
-			return;
-		}
+    @Override
+    public void invoke(@NotNull Project project, Editor editor, PsiFile file, DataContext dataContext) {
+        PsiElement psiElement = CommonDataKeys.PSI_ELEMENT.getData(dataContext);
+        if (!(psiElement instanceof SQFVariable)) {
+            return;
+        }
+        Module module = DataKeys.MODULE.getData(dataContext);
+        if (module == null) {
+            return;
+        }
 
-		SQFVariable variable = (SQFVariable) psiElement;
-		Component contextComponent = DataKeys.CONTEXT_COMPONENT.getData(dataContext);
-		HeaderConfigFunction function;
-		try {
-			function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, variable.getVarName());
-		} catch (GenericConfigException e) {
-			SimpleMessageDialog.showNewDialog("Error", e.getMessage());
-			return;
-		}
+        SQFVariable variable = (SQFVariable) psiElement;
+        Component contextComponent = DataKeys.CONTEXT_COMPONENT.getData(dataContext);
+        HeaderConfigFunction function;
+        try {
+            function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, variable.getVarName());
+        } catch (GenericConfigException e) {
+            SimpleMessageDialog.showNewDialog("Error", e.getMessage());
+            return;
+        }
 
-		FunctionRenameDialog renameDialog = FunctionRenameDialog.showNewInstance(contextComponent, module, function);
-		if(renameDialog.dialogFinished()){
-			rename(renameDialog.getNewFunctionDefinition(), renameDialog.getRenameRootTagValue(), variable, function, module);
-		}
-	}
+        FunctionRenameDialog renameDialog = FunctionRenameDialog.showNewInstance(contextComponent, module, function);
+        if (renameDialog.dialogFinished()) {
+            rename(renameDialog.getNewFunctionDefinition(), renameDialog.getRenameRootTagValue(), variable, function, module);
+        }
+    }
 
-	private void rename(SQFConfigFunctionInformationHolder neww, boolean renameRootTag, SQFVariable variable, HeaderConfigFunction old, Module module) {
-		WriteCommandAction.runWriteCommandAction(module.getProject(), new Runnable() {
-			@Override
-			public void run() {
-				boolean renameFunction = false;
-				String newFunctionName = SQFStatic.getFullFunctionName(neww.functionTagName, neww.functionClassName);
-				HeaderConfigFunction function;
-				try {
-					function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, old.getCallableName());
-				} catch (GenericConfigException e) {
-					SimpleMessageDialog.showNewDialog("Error", e.getMessage());
-					return;
-				}
+    private void rename(SQFConfigFunctionInformationHolder neww, boolean renameRootTag, SQFVariable variable, HeaderConfigFunction old, Module module) {
+        WriteCommandAction.runWriteCommandAction(module.getProject(), new Runnable() {
+            @Override
+            public void run() {
+                boolean renameFunction = false;
+                String newFunctionName = SQFStatic.getFullFunctionName(neww.functionTagName, neww.functionClassName);
+                HeaderConfigFunction function;
+                try {
+                    function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, old.getCallableName());
+                } catch (GenericConfigException e) {
+                    SimpleMessageDialog.showNewDialog("Error", e.getMessage());
+                    return;
+                }
 
-				if (!old.getTagName().equals(neww.functionTagName)) {
-					if (renameRootTag) {
-						function.getClassWithTag().setAttribute("tag", "\"" + neww.functionTagName + "\"");
-						java.util.List<SQFVariable> vars = SQFPsiUtil.findConfigFunctionVariablesWithTag(module, old.getTagName());
-						//we don't need to update the references for each of the variables because ALL cases where the tag matches is returned
+                if (!old.getTagName().equals(neww.functionTagName)) {
+                    if (renameRootTag) {
+                        function.getClassWithTag().setAttribute("tag", "\"" + neww.functionTagName + "\"");
+                        java.util.List<SQFVariable> vars = SQFPsiUtil.findConfigFunctionVariablesWithTag(module, old.getTagName());
+                        //we don't need to update the references for each of the variables because ALL cases where the tag matches is returned
 
-						SQFStatic.SQFFunctionTagAndName tagAndName;
-						for (SQFVariable v : vars) {
-							tagAndName = SQFStatic.getFunctionTagAndName(v.getVarName());
-							v.setName(SQFStatic.getFullFunctionName(neww.functionTagName, tagAndName.functionClassName));
-						}
+                        SQFStatic.SQFFunctionTagAndName tagAndName;
+                        for (SQFVariable v : vars) {
+                            tagAndName = SQFStatic.getFunctionTagAndName(v.getVarName());
+                            v.setName(SQFStatic.getFullFunctionName(neww.functionTagName, tagAndName.functionClassName));
+                        }
 
-					} else {
-						try {
-							HeaderPsiUtil.insertNewFunctionIntoCfgFunctions(neww); //guaranteed not to exist because this check was done inside the dialog
-						} catch (GenericConfigException e) {
-							SimpleMessageDialog.showNewDialog("Error", e.getMessage());
-						}
-						function.getClassDeclaration().removeFromTree();
-						renameFunction = true;
-					}
-				}
-				if (!old.getFunctionFileName().equals(neww.functionFileName)) {
-					PsiDirectory rootMissionDirectory;
-					PsiFile sqfFile = null;
-					try {
-						rootMissionDirectory = ArmaProjectDataManager.getInstance().getDataForModule(module).getRootMissionDirectory();
-						sqfFile = PluginUtil.findFileByPath(FilePath.getFilePathFromString(function.getFullRelativePath(), '/'), rootMissionDirectory, module.getProject());
-					} catch (DescriptionExtNotDefinedException e) {
-						SimpleMessageDialog.showNewDialog("Error", e.getMessage());
-					}
-					if (sqfFile == null) {
-						SimpleMessageDialog.showNewDialog("Error", "The SQF file doesn't exist for function: " + function.getCallableName());
-					} else {
-						try {
-							sqfFile.setName(neww.functionFileName);
-						} catch (IncorrectOperationException e) {
-							SimpleMessageDialog.showNewDialog("Error", e.getMessage());
-						}
-					}
-					function.getClassDeclaration().setAttribute("file", "\""+neww.functionFileName+"\"");
+                    } else {
+                        try {
+                            HeaderPsiUtil.insertNewFunctionIntoCfgFunctions(neww); //guaranteed not to exist because this check was done inside the dialog
+                        } catch (GenericConfigException e) {
+                            SimpleMessageDialog.showNewDialog("Error", e.getMessage());
+                        }
+                        function.getClassDeclaration().removeFromTree();
+                        renameFunction = true;
+                    }
+                }
+                if (!old.getFunctionFileName().equals(neww.functionFileName)) {
+                    PsiDirectory rootMissionDirectory;
+                    PsiFile sqfFile = null;
+                    try {
+                        rootMissionDirectory = ArmaProjectDataManager.getInstance().getDataForModule(module).getRootMissionDirectory();
+                        sqfFile = PluginUtil.findFileByPath(FilePath.getFilePathFromString(function.getFullRelativePath(), FilePath.DEFAULT_DELIMETER), rootMissionDirectory);
+                    } catch (DescriptionExtNotDefinedException e) {
+                        SimpleMessageDialog.showNewDialog("Error", e.getMessage());
+                    }
+                    if (sqfFile == null) {
+                        SimpleMessageDialog.showNewDialog("Error", "The SQF file doesn't exist for function: " + function.getCallableName());
+                    } else {
+                        try {
+                            sqfFile.setName(neww.functionFileName);
+                        } catch (IncorrectOperationException e) {
+                            SimpleMessageDialog.showNewDialog("Error", e.getMessage());
+                        }
+                    }
+                    function.getClassDeclaration().setAttribute("file", "\"" + neww.functionFileName + "\"");
 
-				}
-				if (!old.getFunctionClassName().equals(neww.functionClassName)) {
-					function.getClassDeclaration().getClassStub().setName(neww.functionClassName);
-					renameFunction = true;
-				}
+                }
+                if (!old.getFunctionClassName().equals(neww.functionClassName)) {
+                    function.getClassDeclaration().getClassStub().setName(neww.functionClassName);
+                    renameFunction = true;
+                }
 
-				if (renameFunction) {
-					invokeRefactoring(createRenameProcessor(variable.getProject(), variable, newFunctionName));
-				}
+                if (renameFunction) {
+                    invokeRefactoring(createRenameProcessor(variable.getProject(), variable, newFunctionName));
+                }
 
-				//				CreateTemplateInPackageaction
-				//				FileTemplateUtil
-			}
-		});
+                //				CreateTemplateInPackageaction
+                //				FileTemplateUtil
+            }
+        });
 
-	}
+    }
 
-	private RenameProcessor createRenameProcessor(Project project, PsiElement myPsiElement, String newName) {
-		return new RenameProcessor(project, myPsiElement, newName, false, false);
-	}
+    private RenameProcessor createRenameProcessor(Project project, PsiElement myPsiElement, String newName) {
+        return new RenameProcessor(project, myPsiElement, newName, false, false);
+    }
 
-	private void invokeRefactoring(BaseRefactoringProcessor processor) {
-		processor.setPrepareSuccessfulSwingThreadCallback(new Runnable() {
-			@Override
-			public void run() {
-				//						System.out.println("SQFRenameHandler.run");
-			}
-		});
-		processor.setPreviewUsages(false);
-		processor.run();
-	}
+    private void invokeRefactoring(BaseRefactoringProcessor processor) {
+        processor.setPrepareSuccessfulSwingThreadCallback(new Runnable() {
+            @Override
+            public void run() {
+                //						System.out.println("SQFRenameHandler.run");
+            }
+        });
+        processor.setPreviewUsages(false);
+        processor.run();
+    }
 
-	@Override
-	public void invoke(@NotNull Project project, @NotNull PsiElement[] elements, DataContext dataContext) {
-		System.out.println("SQFRenameHandler.invoke");
-	}
+    @Override
+    public void invoke(@NotNull Project project, @NotNull PsiElement[] elements, DataContext dataContext) {
+        System.out.println("SQFRenameHandler.invoke");
+    }
 }

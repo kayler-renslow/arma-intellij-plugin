@@ -17,7 +17,7 @@ import java.util.List;
 
 /**
  @author Kayler
- Created on 01/01/2016. */
+ @since 01/01/2016 */
 public class HeaderPsiUtilForGrammar {
 
 	public static String getKey(HeaderStringtableKey key) {

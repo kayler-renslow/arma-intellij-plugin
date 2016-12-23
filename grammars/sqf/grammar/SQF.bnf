@@ -45,10 +45,10 @@ expression ::= conditional_group_
             | add_group_
             | comp_expression
             | mul_group_
-            | unary_expression
             | exponent_expression
             | config_fetch_expression
             | command_expression
+            | unary_expression //keep below command expression
             | literal_expression
             | code_block
             | paren_expression

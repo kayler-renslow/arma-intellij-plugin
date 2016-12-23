@@ -1,16 +1,13 @@
-package com.kaylerrenslow.a3plugin.lang.sqf.providers.completionElements;
+package com.kaylerrenslow.a3plugin.lang.sqf.providers;
 
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.InsertionContext;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
-import com.intellij.codeInsight.lookup.LookupElementPresentation;
 import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.lang.shared.completion.CompletionElementWithTextReplace;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * @author Kayler

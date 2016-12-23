@@ -1,7 +1,11 @@
 package com.kaylerrenslow.a3plugin.dialog.actions.newGroup;
 
-import com.intellij.openapi.actionSystem.*;
+import com.intellij.openapi.actionSystem.AnAction;
+import com.intellij.openapi.actionSystem.AnActionEvent;
+import com.intellij.openapi.actionSystem.CommonDataKeys;
+import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.command.WriteCommandAction;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -9,8 +13,8 @@ import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.dialog.newGroup.SQFConfigFunctionInformationHolder;
 import com.kaylerrenslow.a3plugin.dialog.SimpleMessageDialog;
+import com.kaylerrenslow.a3plugin.dialog.newGroup.SQFConfigFunctionInformationHolder;
 import com.kaylerrenslow.a3plugin.dialog.newGroup.functionCreation.FunctionCreationDialog;
 import com.kaylerrenslow.a3plugin.lang.header.exception.DescriptionExtNotDefinedException;
 import com.kaylerrenslow.a3plugin.lang.header.exception.GenericConfigException;
@@ -74,6 +78,7 @@ public class Action_NewSQFFunction extends AnAction {
 
 				try {
 					created = directoryFile.createChildData(null, fileName);
+					FileEditorManager.getInstance(project).openFile(created, true);
 				} catch (IOException e) {
 					e.printStackTrace(System.out);
 					String title = Plugin.resources.getString("plugin.message.file_creation_error.title");

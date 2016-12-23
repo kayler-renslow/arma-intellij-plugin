@@ -11,15 +11,19 @@ import javax.swing.*;
  */
 public class PluginIcons{
 
-	public static final Icon ICON_ARMA3_FILE = IconLoader.getIcon("/com/kaylerrenslow/a3plugin/icons/plugin.png");
+    public static final Icon ICON_ARMA3_FILE = IconLoader.getIcon("icons/plugin.png");
 
-	public static final Icon ICON_SQF = IconLoader.getIcon("/com/kaylerrenslow/a3plugin/icons/sqf.png");
-	public static final Icon ICON_SQF_COMMAND = IconLoader.getIcon("/com/kaylerrenslow/a3plugin/icons/command.png");
-	public static final Icon ICON_SQF_VARIABLE = IconLoader.getIcon("/com/kaylerrenslow/a3plugin/icons/variable.png");
-	public static final Icon ICON_SQF_MAGIC_VARIABLE = IconLoader.getIcon("/com/kaylerrenslow/a3plugin/icons/magic_variable.png");
-	public static final Icon ICON_SQF_FUNCTION = IconLoader.getIcon("/com/kaylerrenslow/a3plugin/icons/function.png");
+    public static final Icon ICON_SQF = IconLoader.getIcon(path("icons/sqf.png"));
+    public static final Icon ICON_SQF_COMMAND = IconLoader.getIcon(path("icons/command.png"));
+    public static final Icon ICON_SQF_VARIABLE = IconLoader.getIcon(path("icons/variable.png"));
+    public static final Icon ICON_SQF_MAGIC_VARIABLE = IconLoader.getIcon(path("icons/magic_variable.png"));
+    public static final Icon ICON_SQF_FUNCTION = IconLoader.getIcon(path("icons/function.png"));
 
-	public static final Icon ICON_HEADER = IconLoader.getIcon("/com/kaylerrenslow/a3plugin/icons/header.png");
+    public static final Icon ICON_HEADER = IconLoader.getIcon(path("icons/header.png"));
 
-	public static final ImageIcon ARMA_LOGO = new ImageIcon(ResourceGetter.getResourceAsURL("/com/kaylerrenslow/a3plugin/img/arma-logo.png"));
+    public static final ImageIcon ARMA_LOGO = new ImageIcon(ResourceGetter.getResourceAsURL(path("img/arma-logo.png")));
+
+    private static String path(String p) {
+        return "/com/kaylerrenslow/a3plugin/" + p;
+    }
 }

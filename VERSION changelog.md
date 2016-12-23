@@ -1,44 +1,54 @@
-**Version:** tbd<br>
-**Release Date:** tbd
+**Version:** 1.0.7  
+**Release Date:** December 25, 2016
 
 ## Plugin
-**Added**<br>
+**Added**  
 * 
 
-**Changed**<br>
-*
 
-**Fixed**<br>
+**Changed**  
+* 
+
+
+**Fixed**  
 * 
 
 
 ## Shared between languages
-**Added**<br>
+**Added**  
 * 
 
-**Changed**<br>
+
+**Changed**  
 * 
 
-**Fixed**<br>
+
+**Fixed**  
 * 
+
 
 ## SQF
-**Added**<br>
-* 
+**Added**  
+* SQF file template
 
-**Changed**<br>
-* 
 
-**Fixed**<br>
-* 
+**Changed**  
+* removed SQF function creation from alt+insert menu (will come back when properly implemented) 
+
+
+**Fixed**  
+* https://github.com/kayler-renslow/arma-intellij-plugin/issues/31
+* https://github.com/kayler-renslow/arma-intellij-plugin/issues/35
 
 
 ## Header
-**Added**<br>
+**Added**  
 * 
 
-**Changed**<br>
+
+**Changed**  
 * 
 
-**Fixed**<br>
+
+**Fixed**  
 * 

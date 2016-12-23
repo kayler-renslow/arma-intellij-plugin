@@ -11,6 +11,8 @@ import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.*;
+
 /**
  * @author Kayler
  *         This class is a wrapper class for a function that was defined inside the missionConfigFile (description.ext >> CfgFunctions)

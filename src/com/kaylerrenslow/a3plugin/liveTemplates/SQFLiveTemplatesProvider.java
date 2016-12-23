@@ -9,7 +9,7 @@ import org.jetbrains.annotations.Nullable;
 public class SQFLiveTemplatesProvider implements DefaultLiveTemplatesProvider {
 	@Override
 	public String[] getDefaultLiveTemplateFiles() {
-		final String path = "liveTemplates/sqf/";
+		final String path = "com/kaylerrenslow/a3plugin/liveTemplates/sqf/";
 		return new String[]{path + "SQFParamsD", path + "SQFCall", path + "SQFForSpec", path + "SQFForVar", path + "SQFIfThen", path + "SQFIfExit", path + "SQFHintArg", path + "SQFHintValue"};
 	}
 

@@ -16,98 +16,99 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
+ * Annotator for Header language
+ *
  * @author Kayler
- *         Annotator for Header language
- *         Created on 04/08/2016.
+ * @since 04/08/2016
  */
 public class HeaderAnnotatorVisitor extends HeaderVisitor {
 
-	private AnnotationHolder holder;
+    private AnnotationHolder holder;
 
-	private String[] preprocessors = {"#define", "#undef", "#ifdef", "#ifndef", "#else", "#endif"};
+    private String[] preprocessors = {"#define", "#undef", "#ifdef", "#ifndef", "#else", "#endif"};
 
-	public void setAnnotationHolder(AnnotationHolder holder) {
-		this.holder = holder;
-	}
+    public void setAnnotationHolder(AnnotationHolder holder) {
+        this.holder = holder;
+    }
 
-	@Override
-	public void visitComment(PsiComment comment) {
-		super.visitComment(comment);
-		DocumentationTagUtil.annotateDocumentation(holder, comment);
-	}
+    @Override
+    public void visitComment(PsiComment comment) {
+        super.visitComment(comment);
+        DocumentationTagUtil.annotateDocumentation(holder, comment);
+    }
 
-	@Override
-	public void visitPreDefine(@NotNull HeaderPreDefine define) {
-		super.visitPreDefine(define);
-		annotatePreprocessorText(define);
-	}
+    @Override
+    public void visitPreDefine(@NotNull HeaderPreDefine define) {
+        super.visitPreDefine(define);
+        annotatePreprocessorText(define);
+    }
 
-	@Override
-	public void visitPreIfdef(@NotNull HeaderPreIfdef ifdef) {
-		super.visitPreIfdef(ifdef);
-		annotatePreprocessorText(ifdef);
-	}
+    @Override
+    public void visitPreIfdef(@NotNull HeaderPreIfdef ifdef) {
+        super.visitPreIfdef(ifdef);
+        annotatePreprocessorText(ifdef);
+    }
 
-	@Override
-	public void visitPreIfndef(@NotNull HeaderPreIfndef ifndef) {
-		super.visitPreIfndef(ifndef);
-		annotatePreprocessorText(ifndef);
-	}
+    @Override
+    public void visitPreIfndef(@NotNull HeaderPreIfndef ifndef) {
+        super.visitPreIfndef(ifndef);
+        annotatePreprocessorText(ifndef);
+    }
 
 
-	@Override
-	public void visitPreUndef(@NotNull HeaderPreUndef undef) {
-		super.visitPreUndef(undef);
-		annotatePreprocessorText(undef);
-	}
+    @Override
+    public void visitPreUndef(@NotNull HeaderPreUndef undef) {
+        super.visitPreUndef(undef);
+        annotatePreprocessorText(undef);
+    }
 
-	private void annotatePreprocessorText(PsiElement preprocessorElement) {
-		String text = preprocessorElement.getText();
-		String[] tokens = text.split("\\s");
-		int offset = preprocessorElement.getTextOffset();
-		for (String s : tokens) {
-			for (String preprocessor : preprocessors) {
-				if (s.equals(preprocessor)) {
-					Annotation a = holder.createInfoAnnotation(TextRange.from(offset + text.indexOf(s), s.length()), null);
-					a.setTextAttributes(HeaderSyntaxHighlighter.PREPROCESSOR);
-				}
-			}
-		}
-	}
+    private void annotatePreprocessorText(PsiElement preprocessorElement) {
+        String text = preprocessorElement.getText();
+        String[] tokens = text.split("\\s");
+        int offset = preprocessorElement.getTextOffset();
+        for (String s : tokens) {
+            for (String preprocessor : preprocessors) {
+                if (s.equals(preprocessor)) {
+                    Annotation a = holder.createInfoAnnotation(TextRange.from(offset + text.indexOf(s), s.length()), null);
+                    a.setTextAttributes(HeaderSyntaxHighlighter.PREPROCESSOR);
+                }
+            }
+        }
+    }
 
-	@Override
-	public void visitPreInclude(@NotNull HeaderPreInclude include) {
-		super.visitPreInclude(include);
-		if(!include.getPathString().startsWith("\\")){ //make sure it isn't \something\somethingElse
-			PsiFile includedFile = include.getHeaderFileFromInclude();
-			if(includedFile == null){
-				holder.createErrorAnnotation(include.getTextRange(), Plugin.resources.getString("lang.header.annotator.include_file_dne"));
-			}else if(!(includedFile instanceof HeaderFile)){
-				holder.createWeakWarningAnnotation(include.getTextRange(), Plugin.resources.getString("lang.header.annotator.include_file_not_header"));
-			}
+    @Override
+    public void visitPreInclude(@NotNull HeaderPreInclude include) {
+        super.visitPreInclude(include);
+        if (!include.getPathString().startsWith("\\")) { //make sure it isn't \something\somethingElse
+            PsiFile includedFile = include.getHeaderFileFromInclude();
+            if (includedFile == null) {
+                holder.createErrorAnnotation(include.getTextRange(), Plugin.resources.getString("lang.header.annotator.include_file_dne"));
+            } else if (!(includedFile instanceof HeaderFile)) {
+                holder.createWeakWarningAnnotation(include.getTextRange(), Plugin.resources.getString("lang.header.annotator.include_file_not_header"));
+            }
 
-		}
-	}
+        }
+    }
 
-	@Override
-	public void visitFileEntries(@NotNull HeaderFileEntries entries) {
-		super.visitFileEntries(entries);
-		ArrayList<HeaderClassDeclaration> declarations = HeaderPsiUtil.getClassDeclarationsWithEntriesEqual(entries, null, null, false, 1, 1);
+    @Override
+    public void visitFileEntries(@NotNull HeaderFileEntries entries) {
+        super.visitFileEntries(entries);
+        ArrayList<HeaderClassDeclaration> declarations = HeaderPsiUtil.getClassDeclarationsWithEntriesEqual(entries, null, null, false, 1, 1);
 
-		//check for duplicate class declarations
-		HeaderClassDeclaration classDeclarationMatch;
-		ArrayList<String> classDeclarationNames = new ArrayList<>();
-		for (HeaderClassDeclaration classDeclaration : declarations) {
-			int index = classDeclarationNames.indexOf(classDeclaration.getClassName());
-			if (index >= 0) {
-				classDeclarationMatch = declarations.get(index);
-				Annotation a = holder.createErrorAnnotation(classDeclarationMatch.getClassNameNode(), Plugin.resources.getString("lang.header.annotator.class_already_defined"));
-				a.setTextAttributes(SharedSyntaxHighlighterColors.RED_WORD);
-				a = holder.createErrorAnnotation(classDeclaration.getClassNameNode(), Plugin.resources.getString("lang.header.annotator.class_already_defined"));
-				a.setTextAttributes(SharedSyntaxHighlighterColors.RED_WORD);
-			} else {
-				classDeclarationNames.add(classDeclaration.getClassName());
-			}
-		}
-	}
+        //check for duplicate class declarations
+        HeaderClassDeclaration classDeclarationMatch;
+        ArrayList<String> classDeclarationNames = new ArrayList<>();
+        for (HeaderClassDeclaration classDeclaration : declarations) {
+            int index = classDeclarationNames.indexOf(classDeclaration.getClassName());
+            if (index >= 0) {
+                classDeclarationMatch = declarations.get(index);
+                Annotation a = holder.createErrorAnnotation(classDeclarationMatch.getClassNameNode(), Plugin.resources.getString("lang.header.annotator.class_already_defined"));
+                a.setTextAttributes(SharedSyntaxHighlighterColors.RED_WORD);
+                a = holder.createErrorAnnotation(classDeclaration.getClassNameNode(), Plugin.resources.getString("lang.header.annotator.class_already_defined"));
+                a.setTextAttributes(SharedSyntaxHighlighterColors.RED_WORD);
+            } else {
+                classDeclarationNames.add(classDeclaration.getClassName());
+            }
+        }
+    }
 }

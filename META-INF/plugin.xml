@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
-	<version>1.0.6</version>
+	<version>1.0.7</version>
 	<vendor email="armaintellijplugin@kaylerrenslow.com" url="https://github.com/kayler-renslow/arma-intellij-plugin">
 		Kayler Renslow
 	</vendor>
@@ -61,7 +61,7 @@
 		<!--<languageInjector implementation="com.kaylerrenslow.a3plugin.lang.shared.HeaderInSQFInjector" />-->
 
 		<!-- File Templates-->
-		<!--<internalFileTemplate name="sqfFileTemplate" />-->
+		<internalFileTemplate name="SQF File"/>
 
 		<!-- Live Templates-->
 		<liveTemplateContext implementation="com.kaylerrenslow.a3plugin.liveTemplates.SQFLiveTemplateContext" />
@@ -80,6 +80,10 @@
 		<component>
 			<implementation-class>com.kaylerrenslow.a3plugin.components.versionChecker.PluginVersionChecker</implementation-class>
 		</component>
+		<component>
+			<implementation-class>com.kaylerrenslow.a3plugin.components.FileTemplateProjectComponent
+			</implementation-class>
+		</component>
 	</project-components>
 
 	<actions>
@@ -91,12 +95,9 @@
 			<action id="a3plugin.action.mm.color_picker" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowArmaColorPicker" text="Arma Color Picker" description="Arma Color Picker" />
 			<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_About" text="About" description="About" />
 		</group>
-		<action id="a3plugin.action.newGroup.new_SQF_file" class="com.kaylerrenslow.a3plugin.dialog.actions.newGroup.Action_NewSQFFile" text="New SQF File"	description="Create a new SQF File" icon="/com/kaylerrenslow/a3plugin/icons/sqf.png">
-			<add-to-group group-id="NewGroup1" anchor="first"/>
-		</action>
-		<action id="a3plugin.action.newGroup.new_SQF_function" class="com.kaylerrenslow.a3plugin.dialog.actions.newGroup.Action_NewSQFFunction" text="New SQF Function"	description="Create a new SQF Function" icon="/com/kaylerrenslow/a3plugin/icons/function.png">
-			<add-to-group group-id="NewGroup1" anchor="first"/>
-		</action>
+		<!--<action id="a3plugin.action.newGroup.new_SQF_function" class="com.kaylerrenslow.a3plugin.dialog.actions.newGroup.Action_NewSQFFunction" text="New SQF Function"	description="Create a new SQF Function" icon="/com/kaylerrenslow/a3plugin/icons/function.png">-->
+		<!--<add-to-group group-id="NewGroup1" anchor="first"/>-->
+		<!--</action>-->
 	</actions>
 
 
