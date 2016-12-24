@@ -10,9 +10,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- @author Kayler
- Creates a reference that points from Header StringtableKey to stringtable key attribute in stringtable.xml
- Created on 06/25/2016. */
+ * Creates a reference that points from Header StringtableKey to stringtable key attribute in stringtable.xml
+ *
+ * @author Kayler
+ * @since 06/25/2016
+ */
 public class HeaderStringtableKeyReference implements PsiReference {
 	private final HeaderStringtableKey key;
 	private final XmlAttributeValue keyAttributeValue;

@@ -12,7 +12,7 @@ import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
-import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringTable;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFCompletionElementTextReplace.SQFCompInsertHandlerHintfln;
@@ -27,9 +27,11 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
 /**
- @author Kayler
- Does the backend work for SQF auto completion operations
- Created on 01/02/2016. */
+ * Does the backend work for SQF auto completion operations
+ *
+ * @author Kayler
+ * @since 01/02/2016
+ */
 public class SQFCompletionProvider extends CompletionProvider<CompletionParameters> {
 
 	@Override
@@ -76,7 +78,7 @@ public class SQFCompletionProvider extends CompletionProvider<CompletionParamete
 		if (module == null) {
 			return;
 		}
-		Stringtable table;
+		StringTable table;
 		try {
 			table = ArmaProjectDataManager.getInstance().getDataForModule(module).getStringtable();
 		} catch (FileNotFoundException e) {

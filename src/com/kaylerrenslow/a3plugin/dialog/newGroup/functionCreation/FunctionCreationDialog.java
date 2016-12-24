@@ -8,9 +8,10 @@ import com.kaylerrenslow.a3plugin.dialog.util.DialogUtil;
 import java.awt.*;
 
 /**
+ * Creates a synchronous dialog for creating a new SQF config function
+ *
  * @author Kayler
- *         Creates a synchronous dialog for creating a new SQF config function
- *         Created on 05/08/2016.
+ * @since 05/08/2016
  */
 public class FunctionCreationDialog {
 
@@ -35,12 +36,12 @@ public class FunctionCreationDialog {
 	/**
 	 * Returns true if the dialog was properly closed, false otherwise
 	 */
-	public boolean dialogFinished(){
+	public boolean dialogFinished() {
 		return !this.dialog.cancelled();
 	}
 
 	public SQFConfigFunctionInformationHolder getNewFunctionDefinition() {
-		if(!dialogFinished()){
+		if (!dialogFinished()) {
 			throw new IllegalStateException("Shouldn't access this when the dialog improperly closed");
 		}
 		return new SQFConfigFunctionInformationHolder(dialog.getTagName(), dialog.getFunctionName(), dialog.getFunctionLocation(), "", this.dialog.module, null);

@@ -11,7 +11,8 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collections;
 
 /**
- * Created by Kayler on 04/15/2016.
+ * @author Kayler
+ * @since 04/15/2016
  */
 public class SQFParameterInfo implements ParameterInfoHandler {
 	@Override
@@ -47,7 +48,7 @@ public class SQFParameterInfo implements ParameterInfoHandler {
 		System.out.println("SQFParameterInfo.showParameterInfo");
 		context.setItemsToShow(new Object[]{element});
 
-		context.showHint((PsiElement)element, ((PsiElement) element).getTextOffset(), this);
+		context.showHint((PsiElement) element, ((PsiElement) element).getTextOffset(), this);
 	}
 
 	@Nullable
@@ -79,13 +80,13 @@ public class SQFParameterInfo implements ParameterInfoHandler {
 	@Override
 	public void updateUI(Object p, @NotNull ParameterInfoUIContext context) {
 		System.out.println("SQFParameterInfo.updateUI");
-		PsiElement element = (PsiElement)p;
+		PsiElement element = (PsiElement) p;
 		int index = Collections.binarySearch(SQFStatic.LIST_COMMANDS, element.getText());
-		if(index < 0){
+		if (index < 0) {
 			return;
 		}
 		String commandParams = SQFStatic.getCommandDocSyntax(SQFStatic.LIST_COMMANDS.get(index));
-		if(commandParams == null){
+		if (commandParams == null) {
 			return;
 		}
 		context.setupUIComponentPresentation(commandParams, 0, 0, false, false, false, JBColor.background());

@@ -8,18 +8,18 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import com.intellij.psi.tree.TokenSet;
-import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @author Kayler
  * FormattingModelBuilder implementation for Header language
- * Created on 03/18/2016.
+ *
+ * @author Kayler
+ * @since 03/18/2016
  */
-public class HeaderFormattingBuilder implements FormattingModelBuilder{
+public class HeaderFormattingBuilder implements FormattingModelBuilder {
 	@NotNull
 	@Override
 	public FormattingModel createModel(PsiElement element, CodeStyleSettings settings) {

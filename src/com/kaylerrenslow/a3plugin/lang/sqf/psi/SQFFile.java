@@ -10,18 +10,19 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 /**
- * @author Kayler
  * PsiFile for SQF language
- * Created on 10/31/2015.
+ *
+ * @author Kayler
+ * @since 10/31/2015
  */
-public class SQFFile extends PsiFileBase{
+public class SQFFile extends PsiFileBase {
 	public SQFFile(FileViewProvider viewProvider) {
 		super(viewProvider, SQFLanguage.INSTANCE);
 	}
 
 	@NotNull
 	@Override
-	public FileType getFileType(){
+	public FileType getFileType() {
 		return SQFFileType.INSTANCE;
 	}
 

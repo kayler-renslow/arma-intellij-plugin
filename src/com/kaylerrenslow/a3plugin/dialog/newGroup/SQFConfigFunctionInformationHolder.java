@@ -6,9 +6,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Class that holds information for a config function (function defined inside description.ext/CfgFunctions
+ *
  * @author Kayler
- *         Class that holds information for a config function (function defined inside description.ext/CfgFunctions
- *         Created on 04/25/2016.
+ * @since 04/25/2016
  */
 public class SQFConfigFunctionInformationHolder {
 	/**

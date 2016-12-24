@@ -9,8 +9,8 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Kayler
- * Created on 03/28/2016.
+ * @since 03/28/2016
  */
-public interface CompletionElement extends InsertHandler<LookupElement>{
+public interface CompletionElement extends InsertHandler<LookupElement> {
 	LookupElement getLookupElement(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result);
 }

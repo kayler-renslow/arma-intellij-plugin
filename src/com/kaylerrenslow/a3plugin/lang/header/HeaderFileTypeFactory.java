@@ -5,9 +5,10 @@ import com.intellij.openapi.fileTypes.FileTypeFactory;
 import org.jetbrains.annotations.NotNull;
 
 /**
+ * FileTypeFactory extension point for Header language
+ *
  * @author Kayler
- * FileTypeFactory extension point for Header langauge
- *         Created on 10/31/2015.
+ * @since 10/31/2015
  */
 public class HeaderFileTypeFactory extends FileTypeFactory {
 

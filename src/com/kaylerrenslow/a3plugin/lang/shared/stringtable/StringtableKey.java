@@ -12,11 +12,13 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Wrapper class for Key xml elements inside stringtable.xml
+ *
  * @author Kayler
- *         Wrapper class for Key xml elements inside stringtable.xml
- *         Created on 04/09/2016.
+ * @since 04/09/2016
  */
 public class StringtableKey {
+	public static final StringtableKey[] EMPTY = new StringtableKey[0];
 	private final Key key;
 	private Container container;
 
@@ -25,7 +27,7 @@ public class StringtableKey {
 		this.container = container;
 	}
 
-	public XmlAttributeValue getKeyXmlValue(){
+	public XmlAttributeValue getKeyXmlValue() {
 		return key.getID().getXmlAttributeValue();
 	}
 
@@ -37,7 +39,7 @@ public class StringtableKey {
 		if (this.container == null) {
 			return this.key.getXmlElement().getContainingFile().getName();
 		}
-		return this.key.getXmlElement().getContainingFile().getName() + " - "+container.getName().getXmlAttribute().getValue();
+		return this.key.getXmlElement().getContainingFile().getName() + " - " + container.getName().getXmlAttribute().getValue();
 	}
 
 	/**
@@ -58,7 +60,7 @@ public class StringtableKey {
 	 * @return new lookup element
 	 */
 	public LookupElement getLookupElement(boolean isDollar) {
-		LookupElementBuilder element = LookupElementBuilder.create(new StringtableLookupElementDataObject(key.getXmlTag()), isDollar ? getDollarKeyName() : getKeyName()).withTailText(" (" + getTailText() + ")", true).withCaseSensitivity(false);
+		LookupElementBuilder element = LookupElementBuilder.create(new StringTableLookupElementDataObject(key.getXmlTag()), isDollar ? getDollarKeyName() : getKeyName()).withTailText(" (" + getTailText() + ")", true).withCaseSensitivity(false);
 		if (!isDollar) {
 			element = element.withInsertHandler(new TextReplace());
 		}

@@ -6,7 +6,8 @@ import com.intellij.psi.PsiLanguageInjectionHost;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 05/06/2016.
+ * @author Kayler
+ * @since 05/06/2016
  */
 public class HeaderInSQFInjector implements LanguageInjector {
 	@Override

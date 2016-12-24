@@ -12,7 +12,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- Created by Kayler on 06/25/2016.
+ * @author Kayler
+ * @since 06/25/2016
  */
 public class HeaderFindUsagesProvider implements FindUsagesProvider {
 	@Nullable
@@ -35,13 +36,13 @@ public class HeaderFindUsagesProvider implements FindUsagesProvider {
 	@NotNull
 	@Override
 	public String getType(@NotNull PsiElement element) {
-		return element instanceof HeaderStringtableKey ? "Stringtable Key" : "";
+		return element instanceof HeaderStringtableKey ? "StringTable Key" : "";
 	}
 
 	@NotNull
 	@Override
 	public String getDescriptiveName(@NotNull PsiElement element) {
-		return element instanceof HeaderStringtableKey ? "Stringtable Key" : "";
+		return element instanceof HeaderStringtableKey ? "StringTable Key" : "";
 	}
 
 	@NotNull

@@ -4,10 +4,10 @@ import com.intellij.codeInsight.editorActions.QuoteHandler;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.editor.highlighter.HighlighterIterator;
 import com.intellij.openapi.util.TextRange;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 
 /**
- * Created by Kayler on 04/30/2016.
+ * @author Kayler
+ * @since 04/30/2016
  */
 public class SQFQuoteHandler implements QuoteHandler {
 	@Override

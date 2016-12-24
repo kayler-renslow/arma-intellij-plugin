@@ -15,11 +15,12 @@ import org.jetbrains.annotations.NotNull;
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 
 /**
- * @author Kayler
  * SyntaxHighlighter extension point for SQF language
- * Created on 11/01/2015.
+ *
+ * @author Kayler
+ * @since 11/01/2015
  */
-public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
+public class SQFSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey COMMENT = createTextAttributesKey("A3_SQF_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
 	public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("A3_SQF_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
 	public static final TextAttributesKey GLOBAL_VAR = createTextAttributesKey("A3_SQF_GLOBAL_VAR", DefaultLanguageHighlighterColors.INSTANCE_FIELD);
@@ -69,45 +70,45 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase{
 	@NotNull
 	@Override
 	public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-		if (tokenType.equals(SQFTypes.LBRACE) || tokenType.equals(SQFTypes.RBRACE)){
+		if (tokenType.equals(SQFTypes.LBRACE) || tokenType.equals(SQFTypes.RBRACE)) {
 			return BRACE_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.LBRACKET) || tokenType.equals(SQFTypes.RBRACKET)){
+		if (tokenType.equals(SQFTypes.LBRACKET) || tokenType.equals(SQFTypes.RBRACKET)) {
 			return BRACKET_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.LPAREN) || tokenType.equals(SQFTypes.RPAREN)){
+		if (tokenType.equals(SQFTypes.LPAREN) || tokenType.equals(SQFTypes.RPAREN)) {
 			return PAREN_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.COMMA)){
+		if (tokenType.equals(SQFTypes.COMMA)) {
 			return COMMA_KEYS;
 		}
-		if (tokenType.equals(SQFTypes.INLINE_COMMENT) || tokenType.equals(SQFTypes.BLOCK_COMMENT)){
+		if (tokenType.equals(SQFTypes.INLINE_COMMENT) || tokenType.equals(SQFTypes.BLOCK_COMMENT)) {
 			return COMMENT_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.STRING_LITERAL)){
+		if (tokenType.equals(SQFTypes.STRING_LITERAL)) {
 			return STRING_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.INTEGER_LITERAL) || tokenType.equals(SQFTypes.DEC_LITERAL) || tokenType.equals(SQFTypes.HEX_LITERAL)){
+		if (tokenType.equals(SQFTypes.INTEGER_LITERAL) || tokenType.equals(SQFTypes.DEC_LITERAL) || tokenType.equals(SQFTypes.HEX_LITERAL)) {
 			return NUM_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.LOCAL_VAR)){
+		if (tokenType.equals(SQFTypes.LOCAL_VAR)) {
 			return LOCAL_VAR_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.GLOBAL_VAR)){
+		if (tokenType.equals(SQFTypes.GLOBAL_VAR)) {
 			return GLOBAL_VAR_KEYS;
 		}
-		if(tokenType.equals(SQFTypes.LANG_VAR)){
+		if (tokenType.equals(SQFTypes.LANG_VAR)) {
 			return MAGIC_VAR_KEYS;
 		}
-		if(SQFStatic.isCommand(tokenType)){
+		if (SQFStatic.isCommand(tokenType)) {
 			return COMMAND_KEYS;
 		}
-		for(IElementType e: SQFStatic.OPERATORS){
-			if(tokenType.equals(e)){
+		for (IElementType e : SQFStatic.OPERATORS) {
+			if (tokenType.equals(e)) {
 				return OPERATOR_KEYS;
 			}
 		}
-		if (tokenType.equals(TokenType.BAD_CHARACTER)){
+		if (tokenType.equals(TokenType.BAD_CHARACTER)) {
 			return BAD_CHAR_KEYS;
 		}
 		return EMPTY_KEYS;

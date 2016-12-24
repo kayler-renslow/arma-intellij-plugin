@@ -7,11 +7,12 @@ import com.kaylerrenslow.a3plugin.wizards.steps.ArmaModuleWizardStep;
 import javax.swing.*;
 
 /**
- * @author Kayler
  * Wizard step that is the first one seen when clicking the Arma mission module in the new module picker
- * Created on 03/27/2016.
+ *
+ * @author Kayler
+ * @since 03/27/2016
  */
-public class ArmaModuleWizardStepMainComponent extends ArmaWizardStepComponent{
+public class ArmaModuleWizardStepMainComponent extends ArmaWizardStepComponent {
 
 	public ArmaModuleWizardStepMainComponent(ArmaModuleWizardStep wizardStep) {
 		super(wizardStep);

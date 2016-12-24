@@ -5,9 +5,10 @@ import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.Disposable;
 
 /**
- * Created by Kayler on 03/27/2016.
+ * @author Kayler
+ * @since 03/27/2016
  */
-public abstract class ArmaModuleWizardStep extends ModuleWizardStep{
+public abstract class ArmaModuleWizardStep extends ModuleWizardStep {
 	protected WizardContext context;
 	protected Disposable parentDisposable;
 

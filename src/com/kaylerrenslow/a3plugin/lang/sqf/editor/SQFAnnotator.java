@@ -18,46 +18,49 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVisitor;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author Kayler
  * Annotator implementation for SQF language
- * Created on 03/15/2016.
+ *
+ * @author Kayler
+ * @since 03/15/2016
  */
-public class SQFAnnotator implements Annotator{
+public class SQFAnnotator implements Annotator {
 
 	@Override
 	public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
 		element.accept(new SQFVisitorAnnotator(holder));
 	}
-	
+
 	/**
-	 @author Kayler
-	 AST visistor implementation for annotating with SQFAnnotator
-	 Created on 03/16/2016. */
+	 * AST visitor implementation for annotating with SQFAnnotator
+	 *
+	 * @author Kayler
+	 * @since 03/16/2016
+	 */
 	private static class SQFVisitorAnnotator extends SQFVisitor {
-		
+
 		private AnnotationHolder annotator;
-		
+
 		static Annotation expect(AnnotationHolder annotator, String expected, PsiElement got) {
 			return annotator.createErrorAnnotation(got, String.format(Plugin.resources.getString("lang.sqf.annotator.error.expected_f"), expected, got.getText()));
 		}
-		
+
 		static Annotation createDeleteTokenAnotation(AnnotationHolder annotator, PsiElement element) {
 			return annotator.createErrorAnnotation(element, String.format(Plugin.resources.getString("lang.sqf.annotator.error.unexpected_f"), element.getText()));
 		}
-		
+
 		private Annotation expect(String expected, PsiElement got) {
 			return expect(annotator, expected, got);
 		}
-		
+
 		private Annotation createDeleteTokenAnotation(PsiElement element) {
 			return createDeleteTokenAnotation(annotator, element);
 		}
-		
-		
+
+
 		SQFVisitorAnnotator(AnnotationHolder annotator) {
 			this.annotator = annotator;
 		}
-		
+
 		@Override
 		public void visitComment(PsiComment comment) {
 			String commentContent = DocumentationUtil.getCommentContent(comment);
@@ -68,7 +71,7 @@ public class SQFAnnotator implements Annotator{
 			//annotate tags
 			DocumentationTagUtil.annotateDocumentation(annotator, comment);
 		}
-		
+
 		@Override
 		public void visitCommandExpression(@NotNull SQFCommandExpression o) {
 			PsiElement prefix = o.getPrefixArgument();
@@ -93,10 +96,10 @@ public class SQFAnnotator implements Annotator{
 					}
 				}
 			} else if (commandName.equals("params")) {
-				
+
 			}
 		}
-		
+
 		@Override
 		public void visitAssignment(@NotNull SQFAssignment o) {
 			if (o.getCommand() != null) {
@@ -105,9 +108,9 @@ public class SQFAnnotator implements Annotator{
 				}
 			}
 		}
-		
-		
+
+
 	}
-	
-	
+
+
 }

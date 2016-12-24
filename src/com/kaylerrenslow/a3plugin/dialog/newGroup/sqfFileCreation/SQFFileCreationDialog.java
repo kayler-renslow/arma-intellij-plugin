@@ -7,9 +7,10 @@ import com.kaylerrenslow.a3plugin.dialog.util.DialogUtil;
 import java.awt.*;
 
 /**
+ * Creates a synchronous dialog for making new sqf files
+ *
  * @author Kayler
- *         Creates a synchronous dialog for making new sqf files
- *         Created on 05/08/2016.
+ * @since 05/08/2016
  */
 public class SQFFileCreationDialog {
 	private final Dialog_NewSQFFile dialog;
@@ -33,12 +34,12 @@ public class SQFFileCreationDialog {
 	/**
 	 * Returns true if the dialog was properly closed, false otherwise
 	 */
-	public boolean dialogFinished(){
+	public boolean dialogFinished() {
 		return !this.dialog.cancelled();
 	}
 
 	public String getFileName() {
-		if(!dialogFinished()){
+		if (!dialogFinished()) {
 			throw new IllegalStateException("Shouldn't access this when the dialog improperly closed");
 		}
 		return this.dialog.getFileName();

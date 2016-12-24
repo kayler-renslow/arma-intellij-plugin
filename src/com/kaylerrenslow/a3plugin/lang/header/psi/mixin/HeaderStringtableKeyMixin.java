@@ -11,7 +11,7 @@ import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderStringtableKey;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import com.kaylerrenslow.a3plugin.lang.header.psi.references.HeaderStringtableKeyReference;
-import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringTable;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
@@ -21,9 +21,10 @@ import org.jetbrains.annotations.NotNull;
 import java.io.FileNotFoundException;
 
 /**
- @author Kayler
- Mixin class for Header stringtable key entry ($STR_something_in_str_table)
- Created on 06/25/2016.
+ * Mixin class for Header stringtable key entry ($STR_something_in_str_table)
+ *
+ * @author Kayler
+ * @since 06/25/2016
  */
 public abstract class HeaderStringtableKeyMixin extends ASTWrapperPsiElement implements PsiNamedElement, HeaderStringtableKey {
 	public HeaderStringtableKeyMixin(@NotNull ASTNode node) {
@@ -42,7 +43,7 @@ public abstract class HeaderStringtableKeyMixin extends ASTWrapperPsiElement imp
 		if (m == null) {
 			return PsiReference.EMPTY_ARRAY;
 		}
-		Stringtable stringtable;
+		StringTable stringtable;
 		try {
 			stringtable = ArmaProjectDataManager.getInstance().getDataForModule(m).getStringtable();
 		} catch (FileNotFoundException e) {
@@ -50,8 +51,8 @@ public abstract class HeaderStringtableKeyMixin extends ASTWrapperPsiElement imp
 		}
 		String nonquote = getKey();
 		StringtableKey[] keysValues = stringtable.getAllKeysValues();
-		for(StringtableKey key : keysValues){
-			if(key.getKeyName().equals(nonquote)){
+		for (StringtableKey key : keysValues) {
+			if (key.getKeyName().equals(nonquote)) {
 				return new PsiReference[]{new HeaderStringtableKeyReference(this, key.getKeyXmlValue())};
 			}
 		}
@@ -60,7 +61,7 @@ public abstract class HeaderStringtableKeyMixin extends ASTWrapperPsiElement imp
 
 	@Override
 	public PsiElement setName(@NonNls @NotNull String name) throws IncorrectOperationException {
-		HeaderStringtableKey key = (HeaderStringtableKey) HeaderPsiUtil.createElement(getProject(), "dummy="+name.replaceFirst("[sS][tT][rR]_", "\\$STR_")+";", HeaderTypes.STRINGTABLE_KEY);
+		HeaderStringtableKey key = (HeaderStringtableKey) HeaderPsiUtil.createElement(getProject(), "dummy=" + name.replaceFirst("[sS][tT][rR]_", "\\$STR_") + ";", HeaderTypes.STRINGTABLE_KEY);
 		getParent().getNode().replaceChild(this.getNode(), key.getNode());
 		return key;
 	}

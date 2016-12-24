@@ -10,11 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- @author Kayler
- Creates a reference between a format String argument and the array entry (e.g. format["%1", (1+2)] will create a reference between '%1' and '(1+2)')
- Created on 06/26/2016.
+ * Creates a reference between a format String argument and the array entry (e.g. format["%1", (1+2)] will create a reference between '%1' and '(1+2)')
+ *
+ * @author Kayler
+ * @since 06/26/2016
  */
-public class SQFFormatStringArgReference implements PsiReference{
+public class SQFFormatStringArgReference implements PsiReference {
 	private final SQFString formatString;
 	private final TextRange rangeInString;
 	private final SQFArrayEntry targetArgument;

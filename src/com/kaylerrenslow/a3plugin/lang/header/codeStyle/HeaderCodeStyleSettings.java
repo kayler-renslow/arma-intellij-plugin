@@ -5,11 +5,12 @@ import com.intellij.psi.codeStyle.CustomCodeStyleSettings;
 import com.kaylerrenslow.a3plugin.lang.shared.formatting.CodeStyleUtil;
 
 /**
- * @author Kayler
  * CustomCodeStyleSettings implementation for Header language
- * Created on 03/18/2016.
+ *
+ * @author Kayler
+ * @since 03/18/2016
  */
-public class HeaderCodeStyleSettings extends CustomCodeStyleSettings{
+public class HeaderCodeStyleSettings extends CustomCodeStyleSettings {
 	public HeaderCodeStyleSettings(CodeStyleSettings settings) {
 		super("HeaderCodeStyleSettings", settings);
 		setDefaults(settings);

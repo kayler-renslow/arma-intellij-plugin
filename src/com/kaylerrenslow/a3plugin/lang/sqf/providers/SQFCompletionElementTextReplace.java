@@ -10,16 +10,17 @@ import com.kaylerrenslow.a3plugin.lang.shared.completion.CompletionElementWithTe
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author Kayler
  * CompletionElementWithTextReplace extension points for SQF language.
- * Created on 03/28/2016.
+ *
+ * @author Kayler
+ * @since 03/28/2016
  */
-public class SQFCompletionElementTextReplace{
+public class SQFCompletionElementTextReplace {
 	/**
 	 * Auto completion for hintfo.
 	 * Created on 03/28/2016.
 	 */
-	public static class SQFCompInsertHandlerHintfo extends CompletionElementWithTextReplace{
+	public static class SQFCompInsertHandlerHintfo extends CompletionElementWithTextReplace {
 		public SQFCompInsertHandlerHintfo() {
 			super("hintfo", "hint format[\"\"];", 13, " hint format[]");
 		}
@@ -30,7 +31,7 @@ public class SQFCompletionElementTextReplace{
 	 * Auto completion for hintarg.
 	 * Created on 03/31/2016.
 	 */
-	public static class SQFCompInsertHandlerHintfln extends CompletionElementWithTextReplace{
+	public static class SQFCompInsertHandlerHintfln extends CompletionElementWithTextReplace {
 
 		@Override
 		public void handleInsert(InsertionContext context, LookupElement item) {
@@ -48,7 +49,7 @@ public class SQFCompletionElementTextReplace{
 	}
 
 
-	public static class SQFCompInsertHandlerParams extends CompletionElementWithTextReplace{
+	public static class SQFCompInsertHandlerParams extends CompletionElementWithTextReplace {
 		public SQFCompInsertHandlerParams() {
 			super("params", "params[\"\"];", 8, "set up a params[] statement");
 		}

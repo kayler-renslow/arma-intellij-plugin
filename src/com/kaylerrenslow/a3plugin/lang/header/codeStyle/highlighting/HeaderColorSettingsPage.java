@@ -15,11 +15,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Kayler
  * ColorSettingsPage implementation for Header language
- * Created on 11/01/2015.
+ *
+ * @author Kayler
+ * @since 11/01/2015
  */
-public class HeaderColorSettingsPage implements ColorSettingsPage{
+public class HeaderColorSettingsPage implements ColorSettingsPage {
 	private static final AttributesDescriptor[] DESCRIPTORS = new AttributesDescriptor[]{
 			new AttributesDescriptor("Identifier", HeaderSyntaxHighlighter.IDENTIFIER),
 			new AttributesDescriptor("Keyword", HeaderSyntaxHighlighter.KEYWORD),
@@ -32,14 +33,15 @@ public class HeaderColorSettingsPage implements ColorSettingsPage{
 			new AttributesDescriptor("Bracket", HeaderSyntaxHighlighter.BRACKET),
 			new AttributesDescriptor("Parenthesis", HeaderSyntaxHighlighter.PAREN),
 			new AttributesDescriptor("Comma", HeaderSyntaxHighlighter.COMMA),
-			new AttributesDescriptor("Stringtable Value", HeaderSyntaxHighlighter.STRINGTABLE_VALUE)
+			new AttributesDescriptor("StringTable Value", HeaderSyntaxHighlighter.STRINGTABLE_VALUE)
 	};
-	
+
 	private static final Map<String, TextAttributesKey> map = new HashMap<>();
+
 	static {
 		map.put("stringtableValue", HeaderSyntaxHighlighter.STRINGTABLE_VALUE);
 	}
-	
+
 	@Nullable
 	@Override
 	public Icon getIcon() {

@@ -3,7 +3,8 @@ package com.kaylerrenslow.a3plugin.util;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 03/30/2016.
+ * @author Kayler
+ * @since 03/30/2016
  */
 public class Attribute {
 	public final String name;
@@ -21,9 +22,9 @@ public class Attribute {
 
 
 	@Override
-	public boolean equals(Object o){
-		if(o instanceof Attribute){
-			Attribute a = (Attribute)o;
+	public boolean equals(Object o) {
+		if (o instanceof Attribute) {
+			Attribute a = (Attribute) o;
 			return a.value.equals(this.value) && a.name.equals(this.name);
 		}
 		return false;

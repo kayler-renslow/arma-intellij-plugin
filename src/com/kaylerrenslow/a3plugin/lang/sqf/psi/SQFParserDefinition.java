@@ -18,11 +18,12 @@ import com.kaylerrenslow.a3plugin.lang.sqf.parser.SQFParser;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author Kayler
  * Creates JFlex lexer and Psi parser for SQF language
- * Created on 10/31/2015.
+ *
+ * @author Kayler
+ * @since 10/31/2015
  */
-public class SQFParserDefinition implements ParserDefinition{
+public class SQFParserDefinition implements ParserDefinition {
 	private static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
 	private static final TokenSet COMMENTS = TokenSet.create(SQFTypes.INLINE_COMMENT, SQFTypes.BLOCK_COMMENT);
 	private static final TokenSet STRING_LITERALS = TokenSet.create(SQFTypes.STRING_LITERAL);

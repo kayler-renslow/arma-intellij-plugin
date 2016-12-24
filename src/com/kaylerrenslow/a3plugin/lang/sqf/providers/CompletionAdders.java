@@ -16,10 +16,13 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
- Created by Kayler on 06/07/2016.
+ * @author Kayler
+ * @since 06/07/2016
  */
 public interface CompletionAdders {
-	/** Adds all Description.ext functions to the completion result */
+	/**
+	 * Adds all Description.ext functions to the completion result
+	 */
 	static void addFunctions(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result) {
 		try {
 			ArrayList<HeaderConfigFunction> configFunctions = HeaderPsiUtil.getAllConfigFunctionsFromDescriptionExt(parameters.getOriginalFile());
@@ -33,7 +36,9 @@ public interface CompletionAdders {
 		}
 	}
 
-	/** Adds all SQF commands to the completion result */
+	/**
+	 * Adds all SQF commands to the completion result
+	 */
 	static void addCommands(@NotNull Project project, @NotNull CompletionResultSet result) {
 		String name;
 		String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.command");
@@ -43,7 +48,9 @@ public interface CompletionAdders {
 		}
 	}
 
-	/** Adds all SQF BIS functions to the result*/
+	/**
+	 * Adds all SQF BIS functions to the result
+	 */
 	static void addBISFunctions(@NotNull Project project, @NotNull CompletionResultSet result) {
 		String functionName;
 		String tailText = Plugin.resources.getString("lang.sqf.completion.tail_text.bis_function");

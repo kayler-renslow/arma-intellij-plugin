@@ -13,10 +13,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 /**
- @author Kayler
- A reference between at least one local variable and a String that contains the variable (differs from {@link SQFLocalVarInStringsReference} such that this resolves to a {@link SQFVariable} where
- the other resovles to a {@link SQFString})
- Created on 04/12/2016. */
+ * A reference between at least one local variable and a String that contains the variable (differs from {@link SQFLocalVarInStringsReference} such that this resolves to a {@link SQFVariable} where
+ * the other resolves to a {@link SQFString})
+ *
+ * @author Kayler
+ * @since 04/12/2016
+ */
 public class SQFLocalVarsInStringReference implements PsiPolyVariantReference {
 	private final List<SQFVariable> targetVars;
 	private final SQFString string;

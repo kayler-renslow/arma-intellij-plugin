@@ -5,12 +5,13 @@ import com.kaylerrenslow.a3plugin.wizards.steps.ArmaModuleWizardStep;
 import javax.swing.*;
 
 /**
- * Created by Kayler on 03/27/2016.
+ * @author Kayler
+ * @since 03/27/2016
  */
-public abstract class ArmaWizardStepComponent extends JPanel{
+public abstract class ArmaWizardStepComponent extends JPanel {
 	protected final ArmaModuleWizardStep wizardStep;
 
-	public ArmaWizardStepComponent(ArmaModuleWizardStep wizardStep){
+	public ArmaWizardStepComponent(ArmaModuleWizardStep wizardStep) {
 		this.wizardStep = wizardStep;
 		initialize();
 	}

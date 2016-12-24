@@ -13,22 +13,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- @author Kayler
- Wrapper class that stores a command expression that is either private["_var"] or private "_var". The private expression makes variables private.
- Created on 06/04/2016. */
+ * Wrapper class that stores a command expression that is either private["_var"] or private "_var". The private expression makes variables private.
+ *
+ * @author Kayler
+ * @since 06/04/2016
+ */
 public class SQFPrivateDecl implements SQFPrivatizer {
 	private final SQFCommandExpression privateDeclExpression;
 	private final List<SQFPrivateDeclVar> privateDeclVars = new ArrayList<>();
 
 	/**
-	 @param privateDeclExpression the expression
+	 * @param privateDeclExpression the expression
 	 */
 	private SQFPrivateDecl(@NotNull SQFCommandExpression privateDeclExpression) {
 		this.privateDeclExpression = privateDeclExpression;
 	}
 
 	/**
-	 Get the command expression for this private declaration (usually private[] or params[]).
+	 * Get the command expression for this private declaration (usually private[] or params[]).
 	 */
 	public SQFCommandExpression getPrivateDeclExpression() {
 		return privateDeclExpression;
@@ -40,14 +42,16 @@ public class SQFPrivateDecl implements SQFPrivatizer {
 	}
 
 	/**
-	 Get all variables that are declared private
+	 * Get all variables that are declared private
 	 */
 	@Override
 	public List<SQFPrivateDeclVar> getPrivateVars() {
 		return privateDeclVars;
 	}
 
-	/** Get the a private declaration instance from the given command expression. Will return null if the expression couldn't be turned into a private decl */
+	/**
+	 * Get the a private declaration instance from the given command expression. Will return null if the expression couldn't be turned into a private decl
+	 */
 	@Nullable
 	public static SQFPrivateDecl parse(SQFCommandExpression expression) {
 		PsiElement postfix = expression.getPostfixArgument();

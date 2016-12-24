@@ -7,9 +7,10 @@ import com.kaylerrenslow.a3plugin.wizards.steps.swing.ArmaModuleWizardStepMainCo
 import javax.swing.*;
 
 /**
- * Created by Kayler on 03/27/2016.
+ * @author Kayler
+ * @since 03/27/2016
  */
-public class ArmaWizardStepMain extends ArmaModuleWizardStep{
+public class ArmaWizardStepMain extends ArmaModuleWizardStep {
 
 	public ArmaWizardStepMain(WizardContext context, Disposable parentDisposable) {
 		super(context, parentDisposable);

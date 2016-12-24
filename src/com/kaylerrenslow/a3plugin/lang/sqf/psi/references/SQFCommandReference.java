@@ -9,9 +9,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @author Kayler
  * This type of reference is used between two commands.
- * Created on 06/03/2016.
+ *
+ * @author Kayler
+ * @since 06/03/2016
  */
 public class SQFCommandReference implements PsiReference {
 	private final SQFCommandElement target, command;

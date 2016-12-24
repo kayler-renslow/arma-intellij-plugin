@@ -5,11 +5,12 @@ import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
 
 /**
- * @author Kayler
  * Code style UI panel for Header langauge. This ui is for configuring formatting options.
- * Created on 03/18/2016.
+ *
+ * @author Kayler
+ * @since 03/18/2016
  */
-public class HeaderCodeStyleMainPanel extends TabbedLanguageCodeStylePanel{
+public class HeaderCodeStyleMainPanel extends TabbedLanguageCodeStylePanel {
 	public HeaderCodeStyleMainPanel(CodeStyleSettings currentSettings, CodeStyleSettings settings) {
 		super(HeaderLanguage.INSTANCE, currentSettings, settings);
 	}

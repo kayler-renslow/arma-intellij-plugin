@@ -7,9 +7,9 @@ import com.kaylerrenslow.a3plugin.util.FileReader;
 
 /**
  * @author Kayler
- * Created on 12/28/2015.
+ * @since 12/28/2015
  */
-public class HeaderStatic{
+public class HeaderStatic {
 	public static final String NAME = "Arma.Header";
 	public static final String NAME_FOR_DISPLAY = Plugin.resources.getString("lang.header.name_for_display");
 	public static final String DESCRIPTION = Plugin.resources.getString("lang.header.description");

@@ -4,9 +4,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * @author Kayler
  * This classed is a wrapper class for ActionListener implementations.
- * Created on 12/30/2015.
+ * @author Kayler
+ * @since 12/30/2015
  */
 public class ActionListenerWrapper<E, T> implements ActionListener{
 	private E obj;

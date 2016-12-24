@@ -8,9 +8,10 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 /**
- * @author Kayler
  * ItemPresentation for any command.
- * Created on 06/06/2016.
+ *
+ * @author Kayler
+ * @since 06/06/2016
  */
 public class SQFCommandItemPresentation implements ItemPresentation {
 	private final SQFCommand command;

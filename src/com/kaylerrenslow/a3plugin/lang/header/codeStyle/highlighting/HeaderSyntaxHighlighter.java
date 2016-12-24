@@ -8,18 +8,18 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLexerAdapter;
-
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;
 
 /**
- * @author Kayler
  * SyntaxHighlighter for Header language
- * Created on 11/01/2015.
+ *
+ * @author Kayler
+ * @since 11/01/2015
  */
-public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
+public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey COMMENT = createTextAttributesKey("A3_HEADER_COMMENT", DefaultLanguageHighlighterColors.LINE_COMMENT);
 	public static final TextAttributesKey BAD_CHARACTER = createTextAttributesKey("A3_HEADER_BAD_CHARACTER", HighlighterColors.BAD_CHARACTER);
 
@@ -75,49 +75,49 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase{
 	@NotNull
 	@Override
 	public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-		if (tokenType.equals(HeaderTypes.LBRACE) || tokenType.equals(HeaderTypes.RBRACE)){
+		if (tokenType.equals(HeaderTypes.LBRACE) || tokenType.equals(HeaderTypes.RBRACE)) {
 			return BRACE_KEYS;
 		}
-		if(tokenType.equals(HeaderTypes.BRACKET_PAIR)){
+		if (tokenType.equals(HeaderTypes.BRACKET_PAIR)) {
 			return BRACKET_KEYS;
 		}
-		if(tokenType.equals(HeaderTypes.LPAREN) || tokenType.equals(HeaderTypes.RPAREN)){
+		if (tokenType.equals(HeaderTypes.LPAREN) || tokenType.equals(HeaderTypes.RPAREN)) {
 			return PAREN_KEYS;
 		}
-		if(tokenType.equals(HeaderTypes.COMMA)){
+		if (tokenType.equals(HeaderTypes.COMMA)) {
 			return COMMA_KEYS;
 		}
-		if (tokenType.equals(HeaderTypes.INLINE_COMMENT) || tokenType.equals(HeaderTypes.BLOCK_COMMENT) ){
+		if (tokenType.equals(HeaderTypes.INLINE_COMMENT) || tokenType.equals(HeaderTypes.BLOCK_COMMENT)) {
 			return COMMENT_KEYS;
 		}
-		if(tokenType.equals(HeaderTypes.STRING_LITERAL)){
+		if (tokenType.equals(HeaderTypes.STRING_LITERAL)) {
 			return STRING_KEYS;
 		}
-		if(tokenType.equals(HeaderTypes.NUMBER_LITERAL)){
+		if (tokenType.equals(HeaderTypes.NUMBER_LITERAL)) {
 			return NUM_KEYS;
 		}
-		if(tokenType.equals(HeaderTypes.IDENTIFIER)){
+		if (tokenType.equals(HeaderTypes.IDENTIFIER)) {
 			return IDENTIFIER_KEYS;
 		}
-		for(IElementType e: KEYWORDS){
-			if(tokenType.equals(e)){
+		for (IElementType e : KEYWORDS) {
+			if (tokenType.equals(e)) {
 				return KEYWORD_KEYS;
 			}
 		}
-		for(IElementType e: OPERATORS){
-			if(tokenType.equals(e)){
+		for (IElementType e : OPERATORS) {
+			if (tokenType.equals(e)) {
 				return OPERATOR_KEYS;
 			}
 		}
-		for(IElementType e: PREPROCESSORS){
-			if(tokenType.equals(e)){
+		for (IElementType e : PREPROCESSORS) {
+			if (tokenType.equals(e)) {
 				return PREPROCESSOR_KEYS;
 			}
 		}
-		if(tokenType == HeaderTypes.STRINGTABLE_ENTRY){
+		if (tokenType == HeaderTypes.STRINGTABLE_ENTRY) {
 			return STRINGTABLE_VALUE_KEYS;
 		}
-		if (tokenType.equals(TokenType.BAD_CHARACTER)){
+		if (tokenType.equals(TokenType.BAD_CHARACTER)) {
 			return BAD_CHAR_KEYS;
 		}
 		return EMPTY_KEYS;

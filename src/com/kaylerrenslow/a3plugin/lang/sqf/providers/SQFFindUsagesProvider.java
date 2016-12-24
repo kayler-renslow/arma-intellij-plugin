@@ -14,11 +14,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @author Kayler
  * Finds usages provider implementation for SQF language
- * Created on 03/19/2016.
+ *
+ * @author Kayler
+ * @since 03/19/2016
  */
-public class SQFFindUsagesProvider implements FindUsagesProvider{
+public class SQFFindUsagesProvider implements FindUsagesProvider {
 	@Nullable
 	@Override
 	public WordsScanner getWordsScanner() {
@@ -33,14 +34,14 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@Nullable
 	@Override
 	public String getHelpId(@NotNull PsiElement psiElement) {
-		if(psiElement instanceof SQFVariable){
-			SQFVariable var = (SQFVariable)psiElement;
-			if(var.followsSQFFunctionNameRules()){
+		if (psiElement instanceof SQFVariable) {
+			SQFVariable var = (SQFVariable) psiElement;
+			if (var.followsSQFFunctionNameRules()) {
 				return "Function";
 			}
 			return "Value read";
 		}
-		if(psiElement instanceof SQFString){
+		if (psiElement instanceof SQFString) {
 			return "SQF String";
 		}
 		return "SQF";
@@ -49,17 +50,17 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@NotNull
 	@Override
 	public String getType(@NotNull PsiElement element) {
-		if(element instanceof SQFVariable){
-			SQFVariable var = (SQFVariable)element;
-			if(var.followsSQFFunctionNameRules()){
+		if (element instanceof SQFVariable) {
+			SQFVariable var = (SQFVariable) element;
+			if (var.followsSQFFunctionNameRules()) {
 				return "Function";
 			}
 			return "Variable";
 		}
-		if(element instanceof SQFCommand){
+		if (element instanceof SQFCommand) {
 			return "Command";
 		}
-		if(element instanceof SQFString){
+		if (element instanceof SQFString) {
 			return "String";
 		}
 		return "unknown type";
@@ -68,7 +69,7 @@ public class SQFFindUsagesProvider implements FindUsagesProvider{
 	@NotNull
 	@Override
 	public String getDescriptiveName(@NotNull PsiElement element) {
-		if(element instanceof SQFVariable){
+		if (element instanceof SQFVariable) {
 			return element.getNode().getText();
 		}
 		return getClass().getName() + " getDescriptiveName";

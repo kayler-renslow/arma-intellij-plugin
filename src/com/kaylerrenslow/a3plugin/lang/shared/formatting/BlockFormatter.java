@@ -8,15 +8,15 @@ import com.intellij.psi.PsiElement;
 
 /**
  * @author Kayler
- * Created on 03/27/2016.
+ * @since 03/27/2016
  */
-public abstract class BlockFormatter{
+public abstract class BlockFormatter {
 	public Wrap childWrap;
 	public Indent childIndent;
 	public Alignment childAlignment;
 	public boolean allowGrandChildrenToIndent;
 
-	public void format(PsiElement currentElement, ASTNode childNode, int childNum, boolean allowGrandChildrenToIndent){
+	public void format(PsiElement currentElement, ASTNode childNode, int childNum, boolean allowGrandChildrenToIndent) {
 		childIndent = null;
 		childAlignment = null;
 		childWrap = null;

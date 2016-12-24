@@ -101,8 +101,9 @@
 		<liveTemplateContext implementation="com.kaylerrenslow.a3plugin.liveTemplates.SQFLiveTemplateContext" />
 		<defaultLiveTemplatesProvider implementation="com.kaylerrenslow.a3plugin.liveTemplates.SQFLiveTemplatesProvider" />
 
-		<!-- Stringtable-->
-		<dom.fileDescription implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.StringtableDomFileDescription" />
+		<!-- StringTable-->
+		<dom.fileDescription
+				implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.StringTableDomFileDescription"/>
 		<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.psi.StringtableReferenceContributor"/>
 
 		<!-- Other things-->

@@ -7,11 +7,11 @@ import com.intellij.patterns.PlatformPatterns;
 import com.intellij.psi.*;
 import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
-import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringTable;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableKey;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFFormatStringArgReference;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFStringtableKeyReference;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFStringTableKeyReference;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.references.SQFVariableReference;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
@@ -24,9 +24,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ * Registers to Intellij which references provider implementations are for SQF language
+ *
  * @author Kayler
- *         Registers to Intellij which references provider implementations are for SQF language
- *         Created on 03/20/2016.
+ * @since 03/20/2016
  */
 public class SQFReferenceContributor extends PsiReferenceContributor {
 	@Override
@@ -93,7 +94,7 @@ public class SQFReferenceContributor extends PsiReferenceContributor {
 			if (m == null) {
 				return PsiReference.EMPTY_ARRAY;
 			}
-			Stringtable stringtable;
+			StringTable stringtable;
 			try {
 				stringtable = ArmaProjectDataManager.getInstance().getDataForModule(m).getStringtable();
 			} catch (FileNotFoundException e) {
@@ -103,7 +104,7 @@ public class SQFReferenceContributor extends PsiReferenceContributor {
 			StringtableKey[] keysValues = stringtable.getAllKeysValues();
 			for (StringtableKey key : keysValues) {
 				if (key.getKeyName().equals(nonquote)) {
-					return new PsiReference[]{new SQFStringtableKeyReference(string, key.getKeyXmlValue())};
+					return new PsiReference[]{new SQFStringTableKeyReference(string, key.getKeyXmlValue())};
 				}
 			}
 			return PsiReference.EMPTY_ARRAY;

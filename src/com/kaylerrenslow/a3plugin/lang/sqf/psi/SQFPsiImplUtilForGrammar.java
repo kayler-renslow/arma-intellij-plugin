@@ -20,9 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- @author Kayler
- SQF grammar util class.
- Created on 03/19/2016. */
+ * SQF grammar util class.
+ *
+ * @author Kayler
+ * @since 03/19/2016
+ */
 public class SQFPsiImplUtilForGrammar {
 
 	@Nullable
@@ -33,7 +35,9 @@ public class SQFPsiImplUtilForGrammar {
 		return null;
 	}
 
-	/** Get the argument preceding the command */
+	/**
+	 * Get the argument preceding the command
+	 */
 	@Nullable
 	public static PsiElement getPrefixArgument(SQFCommandExpression commandExpression) {
 		ASTNode cur = commandExpression.getNode().getFirstChildNode();
@@ -50,7 +54,9 @@ public class SQFPsiImplUtilForGrammar {
 		return null;
 	}
 
-	/** Get the argument after the command. */
+	/**
+	 * Get the argument after the command.
+	 */
 	@Nullable
 	public static PsiElement getPostfixArgument(SQFCommandExpression commandExpression) {
 		ASTNode command = commandExpression.getCommand().getNode();
@@ -82,22 +88,22 @@ public class SQFPsiImplUtilForGrammar {
 
 
 	/**
-	 Checks if the given variable name follows the general rules of function naming (requires tag, _fnc_ and then an identifier).
-	 <p>Examples: tag_fnc_function, sj_fnc_function2</p>
-	 <p>Counter Examples: tag_fn_c_function, sj_nc_function2, potatoes, _fnc_function</p>
-
-	 @param variable Variable to test
-	 @return true if matches, false if it doesn't
+	 * Checks if the given variable name follows the general rules of function naming (requires tag, _fnc_ and then an identifier).
+	 * <p>Examples: tag_fnc_function, sj_fnc_function2</p>
+	 * <p>Counter Examples: tag_fn_c_function, sj_nc_function2, potatoes, _fnc_function</p>
+	 *
+	 * @param variable Variable to test
+	 * @return true if matches, false if it doesn't
 	 */
 	public static boolean followsSQFFunctionNameRules(SQFVariable variable) {
 		return SQFStatic.followsSQFFunctionNameRules(variable.getVarName());
 	}
 
 	/**
-	 Get's the assigning variable for the given SQFAssignment. Example:<br>
-	 <p>
-	 variable = 1+1; //variable is assigning variable
-	 </p>
+	 * Get's the assigning variable for the given SQFAssignment. Example:<br>
+	 * <p>
+	 * variable = 1+1; //variable is assigning variable
+	 * </p>
 	 */
 	@NotNull
 	public static SQFVariable getAssigningVariable(SQFAssignment assignment) {
@@ -105,10 +111,10 @@ public class SQFPsiImplUtilForGrammar {
 	}
 
 	/**
-	 Gets the current scope of the variable's declaration (for global variables and _this, it will be file scope). If the variable was never explicitly declared private or assigned a value, the scope will be file scope
-
-	 @param var element to get scope of
-	 @return scope
+	 * Gets the current scope of the variable's declaration (for global variables and _this, it will be file scope). If the variable was never explicitly declared private or assigned a value, the scope will be file scope
+	 *
+	 * @param var element to get scope of
+	 * @return scope
 	 */
 	@NotNull
 	public static SQFScope getDeclarationScope(SQFVariable var) {
@@ -163,10 +169,10 @@ public class SQFPsiImplUtilForGrammar {
 
 
 	/**
-	 Gets privatization instance for the given variable. Essentially, this is getting where and how the variable is declared private.
-
-	 @param var the variable
-	 @return new instance, or returns <b>null</b> if on of the following is met: <ul><li>not declared private</li><li>global variable</li></ul>
+	 * Gets privatization instance for the given variable. Essentially, this is getting where and how the variable is declared private.
+	 *
+	 * @param var the variable
+	 * @return new instance, or returns <b>null</b> if on of the following is met: <ul><li>not declared private</li><li>global variable</li></ul>
 	 */
 	@Nullable
 	public static SQFPrivatization getPrivatization(SQFVariable var) {
@@ -174,7 +180,7 @@ public class SQFPsiImplUtilForGrammar {
 			return null;
 		}
 		SQFScope containingScope = SQFPsiUtil.getContainingScope(var);
-		
+
 		boolean _this = false; //true if var's name = _this
 		if (var.getVariableType() == SQFTypes.LANG_VAR) {
 			if (var.getVarName().equals("_this")) { //_this is either file scope or spawn's statement scope
@@ -183,10 +189,10 @@ public class SQFPsiImplUtilForGrammar {
 				return new SQFPrivatization.SQFVarInheritedPrivatization(var, containingScope);
 			}
 		}
-		
+
 		SQFScope spawnScope = SQFPsiUtil.checkIfInsideSpawn(var);
 		boolean insideSpawn = spawnScope != null;
-		
+
 		if (_this) {
 			if (insideSpawn) {
 				return new SQFPrivatization.SQFVarInheritedPrivatization(var, spawnScope);
@@ -196,7 +202,7 @@ public class SQFPsiImplUtilForGrammar {
 
 
 		/*Find where the variable is declared private*/
-		
+
 		SQFAssignment varAssignment = var.getMyAssignment();
 		if (varAssignment != null) {
 			if (varAssignment.isDeclaredPrivate()) { //private var = 1;
@@ -231,7 +237,7 @@ public class SQFPsiImplUtilForGrammar {
 							}
 						}
 					}
-					
+
 					if (array != null) { //definitely not the for spec loop if null
 						SQFCodeBlock firstCodeBlock = array.getArrayEntryList().get(0).getCodeBlock();
 						if (firstCodeBlock != null) {
@@ -250,10 +256,10 @@ public class SQFPsiImplUtilForGrammar {
 				}
 			}
 		}
-		
+
 		List<SQFPrivateDeclVar> privateDeclaredVarsForScope = containingScope.getPrivateVars();
 		SQFScope privatizedScope = containingScope;
-		
+
 		while (privatizedScope != null) {
 			if (insideSpawn && privatizedScope == spawnScope) { //inside spawn and not declared private elsewhere
 				return new SQFPrivatization.SQFVarInheritedPrivatization(var, spawnScope); //can't escape the spawn's environment
@@ -274,7 +280,7 @@ public class SQFPsiImplUtilForGrammar {
 			privatizedScope = SQFPsiUtil.getContainingScope(privatizedScope.getParent());
 			privateDeclaredVarsForScope = privatizedScope.getPrivateVars();
 		}
-		
+
 		return null;
 	}
 
@@ -301,22 +307,22 @@ public class SQFPsiImplUtilForGrammar {
 
 
 	/**
-	 Get all the declared private variables for the given scope. This will not go deeper than the current scope.
-
-	 @param scope SQFScope
-	 @return list of all private variables for the given scope
+	 * Get all the declared private variables for the given scope. This will not go deeper than the current scope.
+	 *
+	 * @param scope SQFScope
+	 * @return list of all private variables for the given scope
 	 */
 	public static List<SQFPrivateDeclVar> getPrivateVars(SQFScope scope) {
 		List<SQFStatement> statements = PsiUtil.findChildrenOfType(scope, SQFStatement.class);
 		Iterator<SQFStatement> statementIterator = statements.iterator();
 		SQFStatement currentStatement;
-		
+
 		List<SQFPrivateDeclVar> ret = new ArrayList<>();
-		
+
 		SQFAssignment assignment;
 		String commandName;
 		SQFCommandExpression expression;
-		
+
 		while (statementIterator.hasNext()) {
 			currentStatement = statementIterator.next();
 			if (currentStatement.getAssignment() != null) {

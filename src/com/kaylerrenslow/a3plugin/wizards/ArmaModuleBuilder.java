@@ -7,7 +7,6 @@ import com.intellij.ide.util.projectWizard.WizardContext;
 import com.intellij.openapi.Disposable;
 import com.intellij.openapi.module.ModuleType;
 import com.intellij.openapi.options.ConfigurationException;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentEntry;
 import com.intellij.openapi.roots.ModifiableRootModel;
 import com.intellij.openapi.util.Pair;
@@ -22,16 +21,17 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Kayler on 01/01/2016.
+ * @author Kayler
+ * @since 01/01/2016
  */
-public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuilder{
+public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuilder {
 
 	private List<Pair<String, String>> sourcePaths;
 
 	@Override
 	public void setupRootModel(ModifiableRootModel rootModel) throws ConfigurationException {
 		ContentEntry contentEntry = doAddContentEntry(rootModel);
-		if(contentEntry != null){
+		if (contentEntry != null) {
 			final List<Pair<String, String>> sourcePaths = getSourcePaths();
 
 			if (sourcePaths != null) {
@@ -66,7 +66,7 @@ public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 
 	@Override
 	public void setSourcePaths(List<Pair<String, String>> sourcePaths) {
-		if(sourcePaths != null){
+		if (sourcePaths != null) {
 			this.sourcePaths = new ArrayList<>(sourcePaths);
 		}
 
@@ -74,7 +74,7 @@ public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 
 	@Override
 	public void addSourcePath(Pair<String, String> sourcePathInfo) {
-		if(this.sourcePaths == null){
+		if (this.sourcePaths == null) {
 			this.sourcePaths = new ArrayList<>();
 		}
 		this.sourcePaths.add(sourcePathInfo);

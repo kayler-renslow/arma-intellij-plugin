@@ -13,8 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- @author Kayler
- Created on 01/02/2016. */
+ * @author Kayler
+ * @since 01/02/2016
+ */
 public class PsiUtil {
 
 	public static ASTNode getFirstDescendantNode(PsiElement element) {
@@ -26,10 +27,10 @@ public class PsiUtil {
 	}
 
 	/**
-	 Traverses the entire ast tree with BFS, starting from start. Each node that is found will be sent to finder. It is also possible to stop the traversal at any time with finder
-
-	 @param start starting ASTNode
-	 @param finder TraversalObjectFinder
+	 * Traverses the entire ast tree with BFS, starting from start. Each node that is found will be sent to finder. It is also possible to stop the traversal at any time with finder
+	 *
+	 * @param start  starting ASTNode
+	 * @param finder TraversalObjectFinder
 	 */
 	public static void traverseBreadthFirstSearch(@NotNull ASTNode start, @NotNull TraversalObjectFinder<ASTNode> finder) {
 		finder.found(start);
@@ -56,10 +57,10 @@ public class PsiUtil {
 	}
 
 	/**
-	 Gets the closest next sibling, that is non-whitespace, relative to node
-
-	 @param node node to find sibling of
-	 @return non-whitespace sibling, or null if none was found
+	 * Gets the closest next sibling, that is non-whitespace, relative to node
+	 *
+	 * @param node node to find sibling of
+	 * @return non-whitespace sibling, or null if none was found
 	 */
 	@Nullable
 	public static ASTNode getNextSiblingNotWhitespace(@NotNull ASTNode node) {
@@ -67,11 +68,11 @@ public class PsiUtil {
 	}
 
 	/**
-	 Gets the closest next sibling, where the type is not skip, relative to node
-
-	 @param node node to find sibling of
-	 @param skip the token to skip
-	 @return non-skip sibling, or null if none was found
+	 * Gets the closest next sibling, where the type is not skip, relative to node
+	 *
+	 * @param node node to find sibling of
+	 * @param skip the token to skip
+	 * @return non-skip sibling, or null if none was found
 	 */
 	@Nullable
 	public static ASTNode getNextSiblingNotType(@NotNull ASTNode node, @NotNull IElementType skip) {
@@ -87,10 +88,10 @@ public class PsiUtil {
 	}
 
 	/**
-	 Gets the closest previous sibling, that is non-whitespace, relative to node
-
-	 @param node node to find sibling of
-	 @return non-whitespace sibling, or null if none was found
+	 * Gets the closest previous sibling, that is non-whitespace, relative to node
+	 *
+	 * @param node node to find sibling of
+	 * @return non-whitespace sibling, or null if none was found
 	 */
 	@Nullable
 	public static ASTNode getPrevSiblingNotWhitespace(@NotNull ASTNode node) {
@@ -98,11 +99,11 @@ public class PsiUtil {
 	}
 
 	/**
-	 Gets the closest previous sibling, that is not skip, relative to node
-
-	 @param node node to find sibling of
-	 @param skip what element type to skip
-	 @return non-whitespace sibling, or null if none was found
+	 * Gets the closest previous sibling, that is not skip, relative to node
+	 *
+	 * @param node node to find sibling of
+	 * @param skip what element type to skip
+	 * @return non-whitespace sibling, or null if none was found
 	 */
 	@Nullable
 	public static ASTNode getPrevSiblingNotType(@NotNull ASTNode node, @NotNull IElementType skip) {
@@ -118,26 +119,26 @@ public class PsiUtil {
 	}
 
 	/**
-	 Checks if the given node is a descendant of the given IElementType.<br>
-	 If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
-
-	 @param node node to check if has a ancestor of IElementType type
-	 @param type IElementType to check
-	 @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
-	 @return true if node has ancestor of IElementType type and ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
+	 * Checks if the given node is a descendant of the given IElementType.<br>
+	 * If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
+	 *
+	 * @param node        node to check if has a ancestor of IElementType type
+	 * @param type        IElementType to check
+	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
+	 * @return true if node has ancestor of IElementType type and ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
 	 */
 	public static boolean isDescendantOf(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String textContent) {
 		return getFirstAncestorOfType(node, type, textContent) != null;
 	}
 
 	/**
-	 Checks if the given node has an ancestor of the given IElementType. If there is one, this method will return that ancestor. Otherwise, it will return null.<br>
-	 If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
-
-	 @param node node to check if has a parent of IElementType type
-	 @param type IElementType to check
-	 @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
-	 @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
+	 * Checks if the given node has an ancestor of the given IElementType. If there is one, this method will return that ancestor. Otherwise, it will return null.<br>
+	 * If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
+	 *
+	 * @param node        node to check if has a parent of IElementType type
+	 * @param type        IElementType to check
+	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
+	 * @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
 	 */
 	@Nullable
 	public static ASTNode getFirstAncestorOfType(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String textContent) {
@@ -154,13 +155,13 @@ public class PsiUtil {
 	}
 
 	/**
-	 Checks if the given node has an ancestor that inherits from the given class. If there is one, this method will return that ancestor. Otherwise, it will return null.<br>
-	 If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
-
-	 @param start where to start traversing upwards
-	 @param clazz type to check
-	 @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
-	 @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
+	 * Checks if the given node has an ancestor that inherits from the given class. If there is one, this method will return that ancestor. Otherwise, it will return null.<br>
+	 * If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
+	 *
+	 * @param start       where to start traversing upwards
+	 * @param clazz       type to check
+	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
+	 * @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
 	 */
 	@Nullable
 	public static <T extends PsiElement> T getFirstAncestorOfType(@NotNull PsiElement start, @NotNull Class<T> clazz, @Nullable String textContent) {
@@ -180,44 +181,44 @@ public class PsiUtil {
 	}
 
 	/**
-	 Checks if IElementType of both nodes are the same. Returns false if either are null.
-
-	 @param node1 ASTNode
-	 @param node2 ASTNode
-	 @return true if node1's element type is node2's element type, false otherwise
+	 * Checks if IElementType of both nodes are the same. Returns false if either are null.
+	 *
+	 * @param node1 ASTNode
+	 * @param node2 ASTNode
+	 * @return true if node1's element type is node2's element type, false otherwise
 	 */
 	public static boolean isSameElementType(ASTNode node1, ASTNode node2) {
 		return node1 != null && node2 != null && node1.getElementType() == node1.getElementType();
 	}
 
 	/**
-	 Checks if IElementType of both elements are the same. Returns false if either are null.
-
-	 @param psiElement1 PsiElement
-	 @param psiElement2 PsiElement
-	 @return true if psiElement's element type is node2's element type, false otherwise
+	 * Checks if IElementType of both elements are the same. Returns false if either are null.
+	 *
+	 * @param psiElement1 PsiElement
+	 * @param psiElement2 PsiElement
+	 * @return true if psiElement's element type is node2's element type, false otherwise
 	 */
 	public static boolean isSameElementType(PsiElement psiElement1, PsiElement psiElement2) {
 		return isSameElementType(psiElement1.getNode(), psiElement2.getNode());
 	}
 
 	/**
-	 Checks if the given ASTNode is of IElementType et
-
-	 @param node ASTNode (if null, returns false)
-	 @param et IElement type
-	 @return true if node is of type et, false otherwise
+	 * Checks if the given ASTNode is of IElementType et
+	 *
+	 * @param node ASTNode (if null, returns false)
+	 * @param et   IElement type
+	 * @return true if node is of type et, false otherwise
 	 */
 	public static boolean isOfElementType(@Nullable ASTNode node, @NotNull IElementType et) {
 		return node != null && node.getElementType() == et;
 	}
 
 	/**
-	 Checks if the given PsiElement is of IElementType et
-
-	 @param pe PsiElement (if null, returns false)
-	 @param et IElement type
-	 @return true if pe is of type et, false otherwise
+	 * Checks if the given PsiElement is of IElementType et
+	 *
+	 * @param pe PsiElement (if null, returns false)
+	 * @param et IElement type
+	 * @return true if pe is of type et, false otherwise
 	 */
 	public static boolean isOfElementType(@Nullable PsiElement pe, @NotNull IElementType et) {
 		return pe != null && isOfElementType(pe.getNode(), et);
@@ -241,12 +242,12 @@ public class PsiUtil {
 	}
 
 	/**
-	 Traverses the entire AST tree of the given ASTNode and returns the first ASTNode that matches IElementType type
-
-	 @param node ASTNode to traverse
-	 @param type IElement the type to find in the AST tree
-	 @param content text to match inside the node, or null if doesn't matter
-	 @return ASTNode that is the first of type, or null if none was found
+	 * Traverses the entire AST tree of the given ASTNode and returns the first ASTNode that matches IElementType type
+	 *
+	 * @param node    ASTNode to traverse
+	 * @param type    IElement the type to find in the AST tree
+	 * @param content text to match inside the node, or null if doesn't matter
+	 * @return ASTNode that is the first of type, or null if none was found
 	 */
 	@Nullable
 	public static ASTNode findFirstDescendantElement(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String content) {
@@ -294,25 +295,25 @@ public class PsiUtil {
 	}
 
 	/**
-	 Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
-
-	 @param element PsiElement to traverse
-	 @param toFind IElement the type to find in the AST tree
-	 @param cursor the node that is already discovered since the user's mouse is over it (can be null)
-	 @return ArrayList containing all ASTNodes that mach the IElementType toFind
+	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
+	 *
+	 * @param element PsiElement to traverse
+	 * @param toFind  IElement the type to find in the AST tree
+	 * @param cursor  the node that is already discovered since the user's mouse is over it (can be null)
+	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
 	 */
 	public static ArrayList<ASTNode> findDescendantElements(PsiElement element, IElementType toFind, ASTNode cursor) {
 		return findDescendantElements(element, toFind, cursor, null);
 	}
 
 	/**
-	 Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list and the ASTNode's text equals textContent
-
-	 @param element PsiElement to traverse
-	 @param toFind IElement the type to find in the AST tree
-	 @param cursor the node that is already discovered since the user's mouse is over it (can be null)
-	 @param textContent text to look for in ASTNode (null if doesn't matter)
-	 @return ArrayList containing all ASTNodes that mach the IElementType toFind
+	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list and the ASTNode's text equals textContent
+	 *
+	 * @param element     PsiElement to traverse
+	 * @param toFind      IElement the type to find in the AST tree
+	 * @param cursor      the node that is already discovered since the user's mouse is over it (can be null)
+	 * @param textContent text to look for in ASTNode (null if doesn't matter)
+	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
 	 */
 	public static ArrayList<ASTNode> findDescendantElements(PsiElement element, IElementType toFind, ASTNode cursor, @Nullable String textContent) {
 		ArrayList<ASTNode> list = new ArrayList<>();
@@ -321,13 +322,13 @@ public class PsiUtil {
 	}
 
 	/**
-	 Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
-
-	 @param list list to add each ASTNode to that matches toFind's type
-	 @param element PsiElement to traverse
-	 @param toFind IElement the type to find in the AST tree
-	 @param cursor the node that is already discovered since the user's mouse is over it (can be null)
-	 @param textContent text to look for in ASTNode (null if doesn't matter)
+	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
+	 *
+	 * @param list        list to add each ASTNode to that matches toFind's type
+	 * @param element     PsiElement to traverse
+	 * @param toFind      IElement the type to find in the AST tree
+	 * @param cursor      the node that is already discovered since the user's mouse is over it (can be null)
+	 * @param textContent text to look for in ASTNode (null if doesn't matter)
 	 */
 	private static void traverseElement(ArrayList<ASTNode> list, PsiElement element, IElementType toFind, ASTNode cursor, String textContent) {
 		ASTNode[] children = element.getNode().getChildren(null);
@@ -337,13 +338,13 @@ public class PsiUtil {
 	}
 
 	/**
-	 Traverses all children of discoveredElement and adds ASTNode's that mach type of toFind to list
-
-	 @param list list of all elements of type toFind
-	 @param toFind element type to find
-	 @param cursor the ASTNode that has the mouse over it (can be null)
-	 @param discoveredElement previously discovered ASTNode
-	 @param textContent text to look for in ASTNode (null if doesn't matter)
+	 * Traverses all children of discoveredElement and adds ASTNode's that mach type of toFind to list
+	 *
+	 * @param list              list of all elements of type toFind
+	 * @param toFind            element type to find
+	 * @param cursor            the ASTNode that has the mouse over it (can be null)
+	 * @param discoveredElement previously discovered ASTNode
+	 * @param textContent       text to look for in ASTNode (null if doesn't matter)
 	 */
 	private static void traverseASTNode(ArrayList<ASTNode> list, IElementType toFind, ASTNode cursor, ASTNode discoveredElement, String textContent) {
 		if (textContent == null) {
@@ -375,11 +376,11 @@ public class PsiUtil {
 
 
 	/**
-	 Get children of the given PsiElement that extend/are type of the given class
-
-	 @param element element to get children of
-	 @param psiClass class
-	 @return list of all children
+	 * Get children of the given PsiElement that extend/are type of the given class
+	 *
+	 * @param element  element to get children of
+	 * @param psiClass class
+	 * @return list of all children
 	 */
 	@NotNull
 	public static <T extends PsiElement> List<T> findChildrenOfType(PsiElement element, Class<T> psiClass) {

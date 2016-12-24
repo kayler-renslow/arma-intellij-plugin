@@ -5,9 +5,10 @@ import com.kaylerrenslow.a3plugin.util.Attribute;
 import java.util.Arrays;
 
 /**
- * @author Kayler
  * This exception is created when trying to find a class inside a header config file and it doesn't exist
- * Created on 03/30/2016.
+ *
+ * @author Kayler
+ * @since 03/30/2016
  */
 public class ConfigClassNotDefinedException extends GenericConfigException {
 	private static final String classNotDefinedStringF = "Config class '%s' doesn't exist";

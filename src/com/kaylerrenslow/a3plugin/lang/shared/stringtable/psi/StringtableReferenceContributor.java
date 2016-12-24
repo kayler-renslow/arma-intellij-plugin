@@ -9,7 +9,7 @@ import com.intellij.util.ProcessingContext;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderStringtableKey;
 import com.kaylerrenslow.a3plugin.lang.header.psi.references.HeaderStringtableKeyReference;
-import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringTable;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFString;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- Created by Kayler on 06/25/2016.
+ * @author Kayler
+ * @since 06/25/2016
  */
 public class StringtableReferenceContributor extends PsiReferenceContributor {
 	@Override
@@ -39,8 +40,8 @@ public class StringtableReferenceContributor extends PsiReferenceContributor {
 					return PsiReference.EMPTY_ARRAY;
 				}
 				try {
-					Stringtable stringtable = ArmaProjectDataManager.getInstance().getDataForModule(m).getStringtable();
-					if(element.getContainingFile() == null){
+					StringTable stringtable = ArmaProjectDataManager.getInstance().getDataForModule(m).getStringtable();
+					if (element.getContainingFile() == null) {
 						return PsiReference.EMPTY_ARRAY;
 					}
 					if (!element.getContainingFile().getVirtualFile().equals(stringtable.getVirtualFile())) {

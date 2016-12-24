@@ -10,12 +10,13 @@ import com.intellij.util.ProcessingContext;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * @author Kayler
  * This class is responsible for creating Auto completion lookup elements while providing a base implementation for text replacing once the lookup element is selected.
  * Example use case is where user types 'elif'. When user presses enter, handleInsert is invoked and the text 'elif' is replaced with replaceString (defined in the constructor's parameters)
- * Created on 03/28/2016.
+ *
+ * @author Kayler
+ * @since 03/28/2016
  */
-public class CompletionElementWithTextReplace implements CompletionElement{
+public class CompletionElementWithTextReplace implements CompletionElement {
 
 	protected String replaceStr, lookupStr, typeText;
 	protected int newCursorPos;
@@ -27,7 +28,8 @@ public class CompletionElementWithTextReplace implements CompletionElement{
 		this.newCursorPos = newCursorPos;
 	}
 
-	public CompletionElementWithTextReplace(){}
+	public CompletionElementWithTextReplace() {
+	}
 
 	@Override
 	public LookupElement getLookupElement(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
@@ -36,7 +38,7 @@ public class CompletionElementWithTextReplace implements CompletionElement{
 
 	@Override
 	public void handleInsert(InsertionContext context, LookupElement item) {
-		Runnable runnable = new Runnable(){
+		Runnable runnable = new Runnable() {
 			@Override
 			public void run() {
 				context.getDocument().replaceString(context.getStartOffset(), context.getTailOffset(), replaceStr);

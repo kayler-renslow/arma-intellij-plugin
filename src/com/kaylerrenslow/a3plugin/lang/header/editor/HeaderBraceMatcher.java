@@ -2,18 +2,17 @@ package com.kaylerrenslow.a3plugin.lang.header.editor;
 
 import com.intellij.lang.BracePair;
 import com.intellij.lang.PairedBraceMatcher;
-import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
-import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * PairedBraceMatcher implementation for Header language. This class takes care of figuring out what tokens to automatically close when typing. For example, if { is pressed, } will be inserted automatically
+ *
  * @author Kayler
- *         PairedBraceMatcher implementation for Header language. This class takes care of figuring out what tokens to automatically close when typing. For example, if { is pressed, } will be inserted automatically
- *         Created on 03/20/2016.
+ * @since 03/20/2016
  */
 public class HeaderBraceMatcher implements PairedBraceMatcher {
 	private final BracePair[] pairs = new BracePair[]{new BracePair(HeaderTypes.LPAREN, HeaderTypes.RPAREN, false), new BracePair(HeaderTypes.LBRACE, HeaderTypes.RBRACE, true)};

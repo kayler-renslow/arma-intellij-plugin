@@ -12,14 +12,16 @@ import org.jetbrains.annotations.Nullable;
 
 
 /**
- @author Kayler
- Creates a reference that points from SQF string to stringtable key attribute
- Created on 06/25/2016. */
-public class SQFStringtableKeyReference implements PsiReference {
+ * Creates a reference that points from SQF string to stringtable key attribute
+ *
+ * @author Kayler
+ * @since 06/25/2016
+ */
+public class SQFStringTableKeyReference implements PsiReference {
 	private final SQFString string;
 	private final XmlAttributeValue keyAttributeValue;
 
-	public SQFStringtableKeyReference(SQFString string, XmlAttributeValue keyAttributeValue) {
+	public SQFStringTableKeyReference(SQFString string, XmlAttributeValue keyAttributeValue) {
 		this.string = string;
 		this.keyAttributeValue = keyAttributeValue;
 	}

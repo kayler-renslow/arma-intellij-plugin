@@ -13,27 +13,28 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @author Kayler
  * RefactoringSupportProvider extension point for SQF language. This decides what can be refactored *IN-LINE* and what can't
- * Created on 03/20/2016.
+ *
+ * @author Kayler
+ * @since 03/20/2016
  */
-public class SQFRefactoringSupportProvider extends RefactoringSupportProvider{
+public class SQFRefactoringSupportProvider extends RefactoringSupportProvider {
 
 	@Override
 	public boolean isMemberInplaceRenameAvailable(@NotNull PsiElement element, @Nullable PsiElement context) {
-		if(!(element instanceof PsiNamedElement)){
+		if (!(element instanceof PsiNamedElement)) {
 			return false;
 		}
-		if(element instanceof SQFCommandElement){
+		if (element instanceof SQFCommandElement) {
 			return false;
 		}
-		if(element instanceof SQFVariable){
-			SQFVariable variable = (SQFVariable)element;
-			if(SQFStatic.followsSQFFunctionNameRules(variable.getVarName())){
-				try{
-					HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(element.getContainingFile(),variable.getVarName());
+		if (element instanceof SQFVariable) {
+			SQFVariable variable = (SQFVariable) element;
+			if (SQFStatic.followsSQFFunctionNameRules(variable.getVarName())) {
+				try {
+					HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(element.getContainingFile(), variable.getVarName());
 					return function != null;
-				}catch (GenericConfigException e){
+				} catch (GenericConfigException e) {
 					return false;
 				}
 			}

@@ -27,9 +27,9 @@ import java.awt.*;
 import java.io.IOException;
 
 /**
- * @author Kayler
  * Action invoked when New->New SQF Function is called from main menu
- * Created on 04/05/2016.
+ * @author Kayler
+ * @since 04/05/2016
  */
 public class Action_NewSQFFunction extends AnAction {
 	@Override

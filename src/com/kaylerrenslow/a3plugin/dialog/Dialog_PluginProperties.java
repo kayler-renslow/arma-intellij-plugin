@@ -6,9 +6,9 @@ import com.intellij.openapi.ui.DialogBuilder;
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.ui.JBColor;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.util.KVPair;
 import com.kaylerrenslow.a3plugin.dialog.util.ActionListenerWrapper;
 import com.kaylerrenslow.a3plugin.dialog.util.DialogActionResponder;
+import com.kaylerrenslow.a3plugin.util.KVPair;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
@@ -17,9 +17,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 
 /**
- * @author Kayler
  * Dialog for Plugin Properties
- * Created on 12/30/2015.
+ * @author Kayler
+ * @since 12/30/2015
  */
 public class Dialog_PluginProperties extends DialogWrapper implements DialogActionResponder<ComboBox, Plugin.UserPropertiesKey>{
 	private static final String TITLE = "Configure Arma 3 Plugin Properties";

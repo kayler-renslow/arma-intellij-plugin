@@ -3,9 +3,10 @@ package com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom;
 import com.intellij.util.xml.DomNameStrategy;
 
 /**
- * Created by Kayler on 04/09/2016.
+ * @author Kayler
+ * @since 04/09/2016
  */
-public class StringtableXmlNameStrategy extends DomNameStrategy{
+public class StringtableXmlNameStrategy extends DomNameStrategy {
 
 
 	@Override
@@ -22,7 +23,7 @@ public class StringtableXmlNameStrategy extends DomNameStrategy{
 		if (name == null || name.length() == 0) {
 			return name;
 		}
-		if (name.length() > 1 && Character.isUpperCase(name.charAt(0))){
+		if (name.length() > 1 && Character.isUpperCase(name.charAt(0))) {
 			return name;
 		}
 		char chars[] = name.toCharArray();

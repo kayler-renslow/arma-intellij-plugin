@@ -16,9 +16,11 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- @author Kayler
- This type of reference is used between two variables. Both variables must have the same element type.
- Created on 04/08/2016. */
+ * This type of reference is used between two variables. Both variables must have the same element type.
+ *
+ * @author Kayler
+ * @since 04/08/2016
+ */
 public class SQFVariableReference implements PsiPolyVariantReference {
 	private final SQFVariable var;
 	private final SQFVariable[] targets;

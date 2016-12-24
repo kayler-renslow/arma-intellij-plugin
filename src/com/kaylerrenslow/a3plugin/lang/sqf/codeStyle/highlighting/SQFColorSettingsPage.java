@@ -15,12 +15,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * @author Kayler
  * ColorSettingsPage implementation for SQF language
- * Created on 11/01/2015.
+ *
+ * @author Kayler
+ * @since 11/01/2015
  */
-public class SQFColorSettingsPage implements ColorSettingsPage{
+public class SQFColorSettingsPage implements ColorSettingsPage {
 	private static final Map<String, TextAttributesKey> map = new HashMap<>();
+
 	static {
 		map.put("commentNote", SQFSyntaxHighlighter.COMMENT_NOTE);
 	}

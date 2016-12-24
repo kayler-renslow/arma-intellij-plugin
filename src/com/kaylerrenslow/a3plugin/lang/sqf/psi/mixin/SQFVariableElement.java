@@ -4,7 +4,7 @@ import com.intellij.psi.PsiElement;
 
 /**
  * @author Kayler
- * Created on 03/23/2016.
+ * @since 03/23/2016
  */
-public interface SQFVariableElement extends PsiElement, SQFVariableBase{
+public interface SQFVariableElement extends PsiElement, SQFVariableBase {
 }

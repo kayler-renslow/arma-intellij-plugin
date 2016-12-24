@@ -18,16 +18,20 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- @author Kayler
- SQF Command (e.g. createVehicle or params)
- Createdon 06/03/2016. */
+ * SQF Command (e.g. createVehicle or params)
+ *
+ * @author Kayler
+ * @since 06/03/2016
+ */
 public abstract class SQFCommandElement extends ASTWrapperPsiElement implements PsiNameIdentifierOwner, SQFCommand {
 	public SQFCommandElement(@NotNull ASTNode node) {
 		super(node);
 	}
 
+	/**
+	 * Get the name of the command (e.g. createVehicle or params or findDisplay)
+	 */
 	@Override
-	/**Get the name of the command (e.g. createVehicle or params or findDisplay)*/
 	public String getName() {
 		return getText();
 	}
@@ -43,8 +47,8 @@ public abstract class SQFCommandElement extends ASTWrapperPsiElement implements 
 		ArrayList<ASTNode> nodes = PsiUtil.findDescendantElements(getContainingFile(), this.getNode().getElementType(), null, getName());
 		SQFCommandElement other;
 		ArrayList<SQFCommandReference> refs = new ArrayList<>();
-		for (int i = 0; i < nodes.size(); i++) {
-			other = ((SQFCommandElement) nodes.get(i).getPsi());
+		for (ASTNode node : nodes) {
+			other = ((SQFCommandElement) node.getPsi());
 			refs.add(new SQFCommandReference(this, other));
 		}
 

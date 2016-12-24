@@ -20,9 +20,10 @@ import java.text.DecimalFormat;
 import java.util.Arrays;
 
 /**
+ * This is a JavaFX VBox panel that contains the all Color Picker controls and canvas.
+ *
  * @author Kayler
- *         This is a JavaFX VBox panel that contains the all Color Picker controls and canvas.
- *         Created on 03/29/2016.
+ * @since 03/29/2016
  */
 public class ColorPickerPanel extends VBox {
 	private final String ROOT = "/com/kaylerrenslow/a3plugin/img/";
@@ -46,7 +47,7 @@ public class ColorPickerPanel extends VBox {
 	private final int CANVAS_BACKGROUND_X_POS = (CANVAS_WIDTH - CANVAS_BACKGROUND_WIDTH) / 2;
 	private final int CANVAS_BACKGROUND_Y_POS = (CANVAS_HEIGHT - CANVAS_BACKGROUND_HEIGHT) / 2;
 	private final int CANVAS_FOREGROUND_X_POS = CANVAS_BACKGROUND_X_POS + (int) (CANVAS_BACKGROUND_WIDTH - CANVAS_TEXT_WIDTH) / 2;
-	private final int CANVAS_FOREGROUND_Y_POS = CANVAS_BACKGROUND_Y_POS + (int) (CANVAS_BACKGROUND_HEIGHT - CANVAS_TEXT_HEIGHT) / 2 + (int)CANVAS_TEXT_HEIGHT;
+	private final int CANVAS_FOREGROUND_Y_POS = CANVAS_BACKGROUND_Y_POS + (int) (CANVAS_BACKGROUND_HEIGHT - CANVAS_TEXT_HEIGHT) / 2 + (int) CANVAS_TEXT_HEIGHT;
 
 	private final Color DEFAULT_FOREGROUND = new Color(1, 1, 1, 1);
 	private final Color DEFAULT_BACKGROUND = new Color(0, 0, 0, 0.7);

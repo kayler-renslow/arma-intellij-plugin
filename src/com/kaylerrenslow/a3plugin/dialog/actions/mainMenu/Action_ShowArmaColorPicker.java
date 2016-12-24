@@ -10,9 +10,9 @@ import javafx.scene.Scene;
 import javax.swing.*;
 
 /**
- * @author Kayler
  * This action is invoked when the 'Arma Color Picker' menu option under Arma Plugin is clicked
- * Created on 03/29/2016.
+ * @author Kayler
+ * @since 03/29/2016
  */
 public class Action_ShowArmaColorPicker extends AnAction {
 	@Override

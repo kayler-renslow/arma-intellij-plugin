@@ -8,12 +8,13 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 /**
- * @author Kayler
  * Simple utility class to make a quick message dialog
- * Created on 04/26/2016.
+ *
+ * @author Kayler
+ * @since 04/26/2016
  */
 public class SimpleMessageDialog {
-	public static DialogBuilder newDialog(String title, String message){
+	public static DialogBuilder newDialog(String title, String message) {
 		DialogBuilder db = new DialogBuilder();
 		db.addOkAction();
 		db.setTitle(title);
@@ -21,10 +22,10 @@ public class SimpleMessageDialog {
 		final int MAX_LINE_WIDTH = 15; //number of words before a new line character
 		String[] tokens = message.split("[ ]");
 		int word = 1;
-		for(String token : tokens){
+		for (String token : tokens) {
 			messageCondensed += token + " ";
-			if(word % MAX_LINE_WIDTH == 0){
-				messageCondensed+="\n";
+			if (word % MAX_LINE_WIDTH == 0) {
+				messageCondensed += "\n";
 			}
 			word++;
 		}
@@ -36,12 +37,14 @@ public class SimpleMessageDialog {
 		return db;
 	}
 
-	/** Does the same thing as newDialog except that this will automatically show the dialog
-	 * @param title title of the title
+	/**
+	 * Does the same thing as newDialog except that this will automatically show the dialog
+	 *
+	 * @param title   title of the title
 	 * @param message message to show
 	 * @return the dialog
 	 */
-	public static DialogBuilder showNewDialog(String title, String message){
+	public static DialogBuilder showNewDialog(String title, String message) {
 		DialogBuilder db = newDialog(title, message);
 		db.show();
 		return db;

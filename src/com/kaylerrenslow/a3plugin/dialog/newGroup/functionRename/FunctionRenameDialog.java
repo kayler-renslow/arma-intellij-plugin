@@ -9,9 +9,9 @@ import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import java.awt.*;
 
 /**
- * @author Kayler
  * Creates a synchronous dialog that gets information from the user for renaming a config function
- * Created on 05/08/2016.
+ * @author Kayler
+ * @since 05/08/2016
  */
 public class FunctionRenameDialog {
 	private final Dialog_ConfigFunctionRename dialog;

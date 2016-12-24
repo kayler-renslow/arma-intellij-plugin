@@ -16,7 +16,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 /**
- Created by Kayler on 06/26/2016.
+ * @author Kayler
+ * @since 06/26/2016
  */
 public class SQFArrayEntryDomValue implements GenericDomValue<com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.Key> {
 	private final SQFArrayEntry entry;

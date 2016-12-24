@@ -3,7 +3,8 @@ package com.kaylerrenslow.a3plugin.dialog.util;
 import java.awt.*;
 
 /**
- * Created by Kayler on 04/27/2016.
+ * @author Kayler
+ * @since 04/27/2016
  */
 public class DialogUtil {
 

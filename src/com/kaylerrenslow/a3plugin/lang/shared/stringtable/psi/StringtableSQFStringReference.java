@@ -11,9 +11,11 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- @author Kayler
- Creates a reference that points from SQF string to stringtable.xml key attribute
- Created on 06/25/2016. */
+ * Creates a reference that points from SQF string to stringtable.xml key attribute
+ *
+ * @author Kayler
+ * @since 06/25/2016
+ */
 public class StringtableSQFStringReference implements PsiReference { //extends GenericDomValueReference
 	private final SQFString string;
 	private final XmlAttributeValue keyAttributeValue;

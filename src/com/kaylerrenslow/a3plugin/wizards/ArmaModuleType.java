@@ -12,9 +12,10 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 /**
- * Created by Kayler on 01/01/2016.
+ * @author Kayler
+ * @since 01/01/2016
  */
-public class ArmaModuleType extends ModuleType<ArmaModuleBuilder>{
+public class ArmaModuleType extends ModuleType<ArmaModuleBuilder> {
 	public static final String ID = "arma.moduleType";
 	private static final String NAME = Plugin.resources.getString("plugin.module.name");
 
@@ -22,7 +23,7 @@ public class ArmaModuleType extends ModuleType<ArmaModuleBuilder>{
 		super(ID);
 	}
 
-	public static ArmaModuleType getInstance(){
+	public static ArmaModuleType getInstance() {
 		return (ArmaModuleType) ModuleTypeManager.getInstance().findByID(ID);
 	}
 

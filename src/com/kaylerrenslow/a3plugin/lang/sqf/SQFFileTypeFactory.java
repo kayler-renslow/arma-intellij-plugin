@@ -6,7 +6,7 @@ import org.jetbrains.annotations.NotNull;
 
 /**
  * @author Kayler
- *         Created on 10/31/2015.
+ * @since 10/31/2015
  */
 public class SQFFileTypeFactory extends FileTypeFactory {
 

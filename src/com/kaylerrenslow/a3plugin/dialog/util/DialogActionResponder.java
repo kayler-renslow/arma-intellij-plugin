@@ -2,7 +2,7 @@ package com.kaylerrenslow.a3plugin.dialog.util;
 
 /**
  * @author Kayler
- * Created on 12/30/2015.
+ * @since 12/30/2015
  */
 public interface DialogActionResponder<E, T>{
 

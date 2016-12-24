@@ -4,11 +4,12 @@ import com.intellij.lang.Commenter;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @author Kayler
  * Commenter implementation for SQF language
- * Created on 01/03/2016.
+ *
+ * @author Kayler
+ * @since 01/03/2016
  */
-public class SQFCommenter implements Commenter{
+public class SQFCommenter implements Commenter {
 	@Nullable
 	@Override
 	public String getLineCommentPrefix() {

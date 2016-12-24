@@ -4,7 +4,8 @@ import com.intellij.codeInsight.template.impl.DefaultLiveTemplatesProvider;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 05/07/2016.
+ * @author Kayler
+ * @since 05/07/2016
  */
 public class SQFLiveTemplatesProvider implements DefaultLiveTemplatesProvider {
 	@Override

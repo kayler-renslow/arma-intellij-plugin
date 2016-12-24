@@ -4,11 +4,12 @@ import com.intellij.lang.Commenter;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @author Kayler
  * Commenter implementation for Header language
- * Created on 01/03/2016.
+ *
+ * @author Kayler
+ * @since 01/03/2016
  */
-public class HeaderCommenter implements Commenter{
+public class HeaderCommenter implements Commenter {
 	@Nullable
 	@Override
 	public String getLineCommentPrefix() {

@@ -10,11 +10,12 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @author Kayler
  * Brace matching implementation for SQF language. When certain token is created by user, this will match the closing token. (Example, typing { will result in } being inserted automatically)
- * Created on 03/20/2016.
+ *
+ * @author Kayler
+ * @since 03/20/2016
  */
-public class SQFBraceMatcher implements PairedBraceMatcher{
+public class SQFBraceMatcher implements PairedBraceMatcher {
 
 	private final BracePair[] pairs = new BracePair[]{new BracePair(SQFTypes.LPAREN, SQFTypes.RPAREN, false), new BracePair(SQFTypes.LBRACKET, SQFTypes.RBRACKET, false), new BracePair(SQFTypes.LBRACE, SQFTypes.RBRACE, true)};
 
@@ -31,7 +32,7 @@ public class SQFBraceMatcher implements PairedBraceMatcher{
 	@Override
 	public int getCodeConstructStart(PsiFile file, int openingBraceOffset) {
 		PsiElement element = file.findElementAt(openingBraceOffset);
-		if(element == null || element instanceof PsiFile) return openingBraceOffset;
+		if (element == null || element instanceof PsiFile) return openingBraceOffset;
 		return openingBraceOffset;
 	}
 }

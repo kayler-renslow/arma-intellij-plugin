@@ -4,20 +4,18 @@ import com.intellij.application.options.IndentOptionsEditor;
 import com.intellij.lang.Language;
 import com.intellij.psi.codeStyle.CodeStyleSettingsCustomizable;
 import com.intellij.psi.codeStyle.LanguageCodeStyleSettingsProvider;
-import com.intellij.util.containers.ArrayListSet;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderStatic;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Set;
-
 /**
- * @author Kayler
  * LanguageCodeStyleSettingsProvider extension for Header language. This class decides what options to show in the code formatting options panel.
- * Created on 03/18/2016.
+ *
+ * @author Kayler
+ * @since 03/18/2016
  */
-public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSettingsProvider{
+public class HeaderLanguageCodeStyleSettingsProvider extends LanguageCodeStyleSettingsProvider {
 
 	@NotNull
 	@Override

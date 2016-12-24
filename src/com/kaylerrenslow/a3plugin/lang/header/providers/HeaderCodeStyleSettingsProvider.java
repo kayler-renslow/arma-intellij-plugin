@@ -13,17 +13,18 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * @author Kayler
  * CodeStyleSettingsProvider implementation for Header langauge.
- * Created on 03/18/2016.
+ *
+ * @author Kayler
+ * @since 03/18/2016
  */
-public class HeaderCodeStyleSettingsProvider extends CodeStyleSettingsProvider{
+public class HeaderCodeStyleSettingsProvider extends CodeStyleSettingsProvider {
 	private static final String DISPLAY_NAME = Plugin.resources.getString("lang.header.code_style_settings.display_name");
 
 	@NotNull
 	@Override
 	public Configurable createSettingsPage(CodeStyleSettings settings, CodeStyleSettings originalSettings) {
-		return new CodeStyleAbstractConfigurable(settings, originalSettings, DISPLAY_NAME){
+		return new CodeStyleAbstractConfigurable(settings, originalSettings, DISPLAY_NAME) {
 			@Override
 			protected CodeStyleAbstractPanel createPanel(CodeStyleSettings settings) {
 				return new HeaderCodeStyleMainPanel(getCurrentSettings(), settings);

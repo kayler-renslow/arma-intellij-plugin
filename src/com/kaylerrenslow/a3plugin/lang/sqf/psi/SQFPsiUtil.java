@@ -27,17 +27,19 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- @author Kayler
- Psi utilities for SQF
- Created on 03/20/2016. */
+ * Psi utilities for SQF
+ *
+ * @author Kayler
+ * @since 03/20/2016
+ */
 public class SQFPsiUtil {
 
 
 	/**
-	 Check if the given element is inside a [] spawn {}. For spawn, all variables are created in a different environment
-	 We must iterate over all upper code blocks and see if they are part of a spawn statement. Unlike scope.checkIfSpawn(), this will traverse the tree upwards to the file scope to make sure that the element isn't inside the spawn scope
-
-	 @return the scope that starts the spawn scope ([] spawn {}), or null if not inside spawn
+	 * Check if the given element is inside a [] spawn {}. For spawn, all variables are created in a different environment
+	 * We must iterate over all upper code blocks and see if they are part of a spawn statement. Unlike scope.checkIfSpawn(), this will traverse the tree upwards to the file scope to make sure that the element isn't inside the spawn scope
+	 *
+	 * @return the scope that starts the spawn scope ([] spawn {}), or null if not inside spawn
 	 */
 	@Nullable
 	public static SQFScope checkIfInsideSpawn(@NotNull PsiElement element) {
@@ -60,10 +62,10 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 Checks if the given PsiElement is a BIS function (is of type SQFTypes.VARIABLE or SQFTypes.GLOBAL_VAR and is defined in documentation, false otherwise).
-
-	 @param element element
-	 @return true if the given PsiElement is a BIS function, false otherwise
+	 * Checks if the given PsiElement is a BIS function (is of type SQFTypes.VARIABLE or SQFTypes.GLOBAL_VAR and is defined in documentation, false otherwise).
+	 *
+	 * @param element element
+	 * @return true if the given PsiElement is a BIS function, false otherwise
 	 */
 	public static boolean isBisFunction(@NotNull PsiElement element) {
 		if (PsiUtil.isOfElementType(element, SQFTypes.VARIABLE)) {
@@ -83,10 +85,10 @@ public class SQFPsiUtil {
 
 
 	/**
-	 Gets the containing scope of the psi element. Scope is determined by what code block element is in, or if not in a code block then the file's file scope is returned
-
-	 @param element element to get scope of
-	 @return scope
+	 * Gets the containing scope of the psi element. Scope is determined by what code block element is in, or if not in a code block then the file's file scope is returned
+	 *
+	 * @param element element to get scope of
+	 * @return scope
 	 */
 	@NotNull
 	public static SQFScope getContainingScope(@NotNull PsiElement element) {
@@ -101,11 +103,11 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 Adds all SQFVariables in the current module that is equal to findVar into a list and returns it
-
-	 @param project project
-	 @param findVar global variable
-	 @return list
+	 * Adds all SQFVariables in the current module that is equal to findVar into a list and returns it
+	 *
+	 * @param project project
+	 * @param findVar global variable
+	 * @return list
 	 */
 	@NotNull
 	public static List<SQFVariable> findGlobalVariables(@NotNull Project project, @NotNull SQFVariable findVar) {
@@ -139,12 +141,12 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 Finds all SQFStrings in the module in all SQF files with text equal to quoteText
-
-	 @param project project
-	 @param module current module
-	 @param quoteText text to search for (including quotes)
-	 @return list all strings
+	 * Finds all SQFStrings in the module in all SQF files with text equal to quoteText
+	 *
+	 * @param project   project
+	 * @param module    current module
+	 * @param quoteText text to search for (including quotes)
+	 * @return list all strings
 	 */
 	@NotNull
 	public static List<SQFString> findAllStrings(@NotNull Project project, @NotNull Module module, @NotNull String quoteText) {
@@ -170,11 +172,11 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 Adds all SQFVariables in the current module where the variable name is a config function and the function tag is equal to parameter tag
-
-	 @param module module
-	 @param tag tag to search for
-	 @return list
+	 * Adds all SQFVariables in the current module where the variable name is a config function and the function tag is equal to parameter tag
+	 *
+	 * @param module module
+	 * @param tag    tag to search for
+	 * @return list
 	 */
 	@NotNull
 	public static List<SQFVariable> findConfigFunctionVariablesWithTag(@NotNull Module module, @NotNull String tag) {
@@ -208,12 +210,12 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 Creates a new SQFCommandExpression that is a private[] syntax with new vars appended and returns it
-
-	 @param project project
-	 @param decl the private declaration to append to
-	 @param varNames the names of the new variables to put inside the declaration
-	 @return command expression that is the new private declaration
+	 * Creates a new SQFCommandExpression that is a private[] syntax with new vars appended and returns it
+	 *
+	 * @param project  project
+	 * @param decl     the private declaration to append to
+	 * @param varNames the names of the new variables to put inside the declaration
+	 * @return command expression that is the new private declaration
 	 */
 	@NotNull
 	public static SQFCommandExpression createPrivateDeclFromExisting(@NotNull Project project, @NotNull SQFPrivateDecl decl, @NotNull String... varNames) {
@@ -265,11 +267,11 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 Get a postfix argument of class type. This method will traverse as far right until the end of the expression (for instance, searching expression 'vehicle player setPos' will search all the way to setPos)<br>
-	 Do not
-
-	 @param commandExpression command expression
-	 @return the first element of matched type, or null if none could be found.
+	 * Get a postfix argument of class type. This method will traverse as far right until the end of the expression (for instance, searching expression 'vehicle player setPos' will search all the way to setPos)<br>
+	 * Do not
+	 *
+	 * @param commandExpression command expression
+	 * @return the first element of matched type, or null if none could be found.
 	 */
 	@Nullable
 	public static <T extends PsiElement> T getAPostfixArgument(SQFCommandExpression commandExpression, Class<T> tClass) {
@@ -288,14 +290,14 @@ public class SQFPsiUtil {
 	}
 
 	/**
-	 Get the for-loop {@link SQFScope} instance for the given {@link SQFString}. Example cases for getting for-loop scope:<br>
-	 <ul>
-	 <li>for "_i" from 0 to 2 do { }; //"_i" is {@link SQFString} and the scope will be the one inside the {}</li>
-	 <li>for [{_i=0;},{true},{_i = _i+1}] do { }; //not the kind of for-loop meant for this method
-	 </ul>
-
-	 @param str str to get scope of
-	 @return the scope for the {@link SQFString}, or null if not a part of a valid for-loop
+	 * Get the for-loop {@link SQFScope} instance for the given {@link SQFString}. Example cases for getting for-loop scope:<br>
+	 * <ul>
+	 * <li>for "_i" from 0 to 2 do { }; //"_i" is {@link SQFString} and the scope will be the one inside the {}</li>
+	 * <li>for [{_i=0;},{true},{_i = _i+1}] do { }; //not the kind of for-loop meant for this method
+	 * </ul>
+	 *
+	 * @param str str to get scope of
+	 * @return the scope for the {@link SQFString}, or null if not a part of a valid for-loop
 	 */
 	@Nullable
 	public static SQFScope getForVarScope(@NotNull SQFString str) {

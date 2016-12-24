@@ -8,11 +8,12 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 /**
- * @author Kayler
  * Dialog for About the plugin
- * Created on 12/30/2015.
+ *
+ * @author Kayler
+ * @since 12/30/2015
  */
-public class Dialog_About extends DialogWrapper{
+public class Dialog_About extends DialogWrapper {
 	private static final String TITLE = "About the Arma Intellij Plugin";
 	private static final String TEXT = "";
 

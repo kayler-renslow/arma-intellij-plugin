@@ -11,7 +11,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
- Created by Kayler on 05/05/2016.
+ * @author Kayler
+ * @since 05/05/2016
  */
 public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivatizer> {
 	private final E privateElement;
@@ -19,10 +20,10 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	private final SQFScope declarationScope;
 
 	/**
-	 A private declaration is something that can be declared private inside a given scope. Example is a variable
-
-	 @param privateElement the element that is being declared private
-	 @param privatizer the privatizer linked to this privatization
+	 * A private declaration is something that can be declared private inside a given scope. Example is a variable
+	 *
+	 * @param privateElement the element that is being declared private
+	 * @param privatizer     the privatizer linked to this privatization
 	 */
 	private SQFPrivatization(@NotNull E privateElement, @Nullable T privatizer) {
 		this.privateElement = privateElement;
@@ -31,7 +32,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	}
 
 	/**
-	 Get the element that is being declared private (usually SQFVariable)
+	 * Get the element that is being declared private (usually SQFVariable)
 	 */
 	@NotNull
 	public E getPrivateElement() {
@@ -39,7 +40,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	}
 
 	/**
-	 Get the element that is actually declaring the privatization. Can be null if the privatization is some how inherited
+	 * Get the element that is actually declaring the privatization. Can be null if the privatization is some how inherited
 	 */
 	@Nullable
 	public T getPrivatizer() {
@@ -47,7 +48,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	}
 
 	/**
-	 Get the scope of the declaration element. If the declaration element in this instance is null, it will return the containing scope of the private element
+	 * Get the scope of the declaration element. If the declaration element in this instance is null, it will return the containing scope of the private element
 	 */
 	@NotNull
 	public SQFScope getDeclarationScope() {
@@ -55,12 +56,12 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	}
 
 	/**
-	 Gets a privatization instance for the given variable and given privatizer
-
-	 @param variable variable that is being declared private
-	 @param privatizer privatizer that makes the variable private (all grammar rules that make a variable able to be turned private must implement SQFPrivatizer)
-	 @return new instance
-	 @throws IllegalArgumentException when the privatizer couldn't be matched to a SQFPrivatization class
+	 * Gets a privatization instance for the given variable and given privatizer
+	 *
+	 * @param variable   variable that is being declared private
+	 * @param privatizer privatizer that makes the variable private (all grammar rules that make a variable able to be turned private must implement SQFPrivatizer)
+	 * @return new instance
+	 * @throws IllegalArgumentException when the privatizer couldn't be matched to a SQFPrivatization class
 	 */
 	public static SQFPrivatization getPrivatization(@NotNull SQFVariable variable, @NotNull SQFPrivatizer privatizer) {
 		if (privatizer instanceof SQFPrivateDecl) {
@@ -72,7 +73,7 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 		if (privatizer instanceof SQFPrivateAssignmentPrivatizer) {
 			return new SQFPrivateAssignment(variable, (SQFPrivateAssignmentPrivatizer) privatizer);
 		}
-		if(privatizer instanceof SQFScope){
+		if (privatizer instanceof SQFScope) {
 			return new SQFVarInheritedPrivatization(variable, (SQFScope) privatizer);
 		}
 		throw new IllegalArgumentException("No known implementation class for privatizer element=" + privatizer);
@@ -83,10 +84,10 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 		private final SQFScope declarationScope;
 
 		/**
-		 A variable that is private because it is naturally private to its scope or is always private (magic variables only)
-
-		 @param privateElement the element that is being declared private
-		 @param declarationScope the scope in which it is declared private in
+		 * A variable that is private because it is naturally private to its scope or is always private (magic variables only)
+		 *
+		 * @param privateElement   the element that is being declared private
+		 * @param declarationScope the scope in which it is declared private in
 		 */
 		public SQFVarInheritedPrivatization(@NotNull SQFVariable privateElement, @NotNull SQFScope declarationScope) {
 			super(privateElement, declarationScope);
@@ -104,10 +105,10 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	public static class SQFPrivateDeclClassic extends SQFPrivatization<SQFVariable, SQFPrivateDecl> {
 
 		/**
-		 A classic private declaration between a variable and private ["_var"];
-
-		 @param privateVariable the element that is being declared private
-		 @param declarationElement the element that actually specifies the privatization
+		 * A classic private declaration between a variable and private ["_var"];
+		 *
+		 * @param privateVariable    the element that is being declared private
+		 * @param declarationElement the element that actually specifies the privatization
 		 */
 		public SQFPrivateDeclClassic(@NotNull SQFVariable privateVariable, @NotNull SQFPrivateDecl declarationElement) {
 			super(privateVariable, declarationElement);
@@ -118,10 +119,10 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	public static class SQFPrivateDeclParams extends SQFPrivatization<SQFVariable, SQFParamsStatement> {
 
 		/**
-		 A private declaration between a variable and params["_var"];
-
-		 @param privateVariable the element that is being declared private
-		 @param declarationElement the params statement that makes the variable private
+		 * A private declaration between a variable and params["_var"];
+		 *
+		 * @param privateVariable    the element that is being declared private
+		 * @param declarationElement the params statement that makes the variable private
 		 */
 		public SQFPrivateDeclParams(@NotNull SQFVariable privateVariable, @NotNull SQFParamsStatement declarationElement) {
 			super(privateVariable, declarationElement);
@@ -131,10 +132,10 @@ public abstract class SQFPrivatization<E extends PsiElement, T extends SQFPrivat
 	public static class SQFPrivateAssignment extends SQFPrivatization<SQFVariable, SQFPrivateAssignmentPrivatizer> {
 
 		/**
-		 Used for something like private _example =1;
-
-		 @param privateVariable the element that is being declared private
-		 @param declarationElement the assigment that makes the variable private (private _t = 1)
+		 * Used for something like private _example =1;
+		 *
+		 * @param privateVariable    the element that is being declared private
+		 * @param declarationElement the assigment that makes the variable private (private _t = 1)
 		 */
 		public SQFPrivateAssignment(@NotNull SQFVariable privateVariable, @NotNull SQFPrivateAssignmentPrivatizer declarationElement) {
 			super(privateVariable, declarationElement);

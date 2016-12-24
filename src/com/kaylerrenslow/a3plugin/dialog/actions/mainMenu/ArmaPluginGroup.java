@@ -7,7 +7,8 @@ import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 
 /**
- * Created by Kayler on 04/30/2016.
+ * @author Kayler
+ * @since 04/30/2016
  */
 public class ArmaPluginGroup extends DefaultActionGroup {
 	@Override

@@ -8,9 +8,10 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 /**
- * @author Kayler
  * ItemPresentation for any SQFVariable. This includes local variables, global variables (that are not defined for functions. Use SQFFunctionItemPresentation for functions.), and magic variables
- * Created on 04/08/2016.
+ *
+ * @author Kayler
+ * @since 04/08/2016
  */
 public class SQFVariableItemPresentation implements ItemPresentation {
 	private final SQFVariable var;

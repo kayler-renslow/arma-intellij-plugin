@@ -10,9 +10,11 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import org.jetbrains.annotations.Nullable;
 
 /**
- @author Kayler
- When find usages is called by user, each type of usage is classified as something like 'assignment' or 'function call'. This class handles the naming of found usages.
- Created on 03/23/2016. */
+ * When find usages is called by user, each type of usage is classified as something like 'assignment' or 'function call'. This class handles the naming of found usages.
+ *
+ * @author Kayler
+ * @since 03/23/2016
+ */
 public class ArmaUsageTypeProvider implements UsageTypeProvider {
 
 	private static final UsageType TYPE_VAR_IN_STRING = new UsageType(Plugin.resources.getString("lang.shared.usage_type.var_in_string"));

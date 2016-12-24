@@ -21,9 +21,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- @author Kayler
- PsiElement mixin for SQF grammar file. This mixin is meant for SQFVariables
- Created on 03/19/2016. */
+ * PsiElement mixin for SQF grammar file. This mixin is meant for SQFVariables
+ *
+ * @author Kayler
+ * @since 03/19/2016
+ */
 public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implements SQFVariableNamedElement, SQFVariable {
 	private final IElementType myVariableElementType;
 

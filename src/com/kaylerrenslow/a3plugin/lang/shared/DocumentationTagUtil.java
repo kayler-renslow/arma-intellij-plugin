@@ -12,7 +12,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- Created by Kayler on 06/07/2016.
+ * @author Kayler
+ * @since 06/07/2016.
  */
 public class DocumentationTagUtil {
 	public static void annotateDocumentation(AnnotationHolder annotator, PsiComment comment) {

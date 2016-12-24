@@ -13,11 +13,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
- * @author Kayler
  * FoldingBuilder implementation for SQF language
- * Created on 03/20/2016.
+ *
+ * @author Kayler
+ * @since 03/20/2016
  */
-public class SQFFoldingBuilder implements FoldingBuilder{
+public class SQFFoldingBuilder implements FoldingBuilder {
 	@NotNull
 	@Override
 	public FoldingDescriptor[] buildFoldRegions(@NotNull ASTNode node, @NotNull Document document) {
@@ -28,10 +29,10 @@ public class SQFFoldingBuilder implements FoldingBuilder{
 
 	private void collectFoldingDescriptors(ASTNode node, Document document, ArrayList<FoldingDescriptor> descriptors) {
 		IElementType type = node.getElementType();
-		if ((type == SQFTypes.CODE_BLOCK || type == SQFTypes.BLOCK_COMMENT || type == SQFTypes.ARRAY_VAL) && spansMultipleLines(node, document)){
+		if ((type == SQFTypes.CODE_BLOCK || type == SQFTypes.BLOCK_COMMENT || type == SQFTypes.ARRAY_VAL) && spansMultipleLines(node, document)) {
 			descriptors.add(new FoldingDescriptor(node, node.getTextRange()));
 		}
-		for (ASTNode child : node.getChildren(null)){
+		for (ASTNode child : node.getChildren(null)) {
 			collectFoldingDescriptors(child, document, descriptors);
 		}
 	}
@@ -45,13 +46,13 @@ public class SQFFoldingBuilder implements FoldingBuilder{
 	@Override
 	public String getPlaceholderText(@NotNull ASTNode node) {
 		IElementType type = node.getElementType();
-		if(type == SQFTypes.CODE_BLOCK){
+		if (type == SQFTypes.CODE_BLOCK) {
 			return "{...}";
 		}
-		if(type == SQFTypes.BLOCK_COMMENT){
+		if (type == SQFTypes.BLOCK_COMMENT) {
 			return "/*...*/";
 		}
-		if(type == SQFTypes.ARRAY_VAL){
+		if (type == SQFTypes.ARRAY_VAL) {
 			return "[...]";
 		}
 		return "...";

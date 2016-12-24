@@ -5,9 +5,9 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.kaylerrenslow.a3plugin.dialog.Dialog_PluginProperties;
 
 /**
- * @author Kayler
  * This action is called when Plugin Properties menu option is clicked from Arma Plugin menu
- * Created on 12/27/2015.
+ * @author Kayler
+ * @since 12/27/2015
  */
 public class Action_PluginProperties extends AnAction{
 	public Action_PluginProperties() {

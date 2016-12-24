@@ -26,18 +26,20 @@ import java.util.Collection;
 import java.util.List;
 
 /**
+ * Psi utilities for the Header language
+ *
  * @author Kayler
- *         Created on 03/30/2016.
+ * @since 03/30/2016
  */
 public class HeaderPsiUtil {
 
 	/**
-	 Finds all stringtable keys in the module in all header files with the key's text equal to keyText (doesn't include '$')
-
-	 @param project project
-	 @param module current module
-	 @param keyText stringtable key (excluding '$')
-	 @return list all keys
+	 * Finds all stringtable keys in the module in all header files with the key's text equal to keyText (doesn't include '$')
+	 *
+	 * @param project project
+	 * @param module  current module
+	 * @param keyText stringtable key (excluding '$')
+	 * @return list all keys
 	 */
 	@NotNull
 	public static List<HeaderStringtableKey> findAllStringtableKeys(@NotNull Project project, @NotNull Module module, @NotNull String keyText) {
@@ -45,7 +47,7 @@ public class HeaderPsiUtil {
 		Collection<VirtualFile> files = FileBasedIndex.getInstance().getContainingFiles(FileTypeIndex.NAME, HeaderFileType.INSTANCE, module.getModuleContentScope());
 		for (VirtualFile virtualFile : files) {
 			PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
-			if(!(file instanceof HeaderFile)){
+			if (!(file instanceof HeaderFile)) {
 				continue;
 			}
 			HeaderFile headerFile = (HeaderFile) file;
@@ -512,12 +514,14 @@ public class HeaderPsiUtil {
 		return (HeaderClassDeclaration) createElement(project, text, HeaderTypes.CLASS_DECLARATION);
 	}
 
-	/** Return the class declaration text (doesn't end with semicolon)
-	 * @param className class name
+	/**
+	 * Return the class declaration text (doesn't end with semicolon)
+	 *
+	 * @param className  class name
 	 * @param attributes attributes
 	 * @return class declaration text
 	 */
-	public static String createClassDeclarationText(String className, Attribute[] attributes){
+	public static String createClassDeclarationText(String className, Attribute[] attributes) {
 		String class_decl_f = "class %s {%s}";
 		String attribute_f = "%s=%s;";
 		String attributeText = "";

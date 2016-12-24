@@ -12,7 +12,8 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Created by Kayler on 04/27/2016.
+ * @author Kayler
+ * @since 04/27/2016
  */
 public abstract class HeaderClassStubMixin extends ASTWrapperPsiElement implements PsiNamedElement, HeaderClassStub {
 	public HeaderClassStubMixin(@NotNull ASTNode node) {

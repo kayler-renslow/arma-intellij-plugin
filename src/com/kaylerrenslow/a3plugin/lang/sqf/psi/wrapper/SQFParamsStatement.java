@@ -9,61 +9,67 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- @author Kayler
- Wrapper class that stores a command expression that represents a params expression (e.g. params["_var"] or params[["var", 1]]). The params expression makes variables private.
- Created on 06/04/2016. */
+ * Wrapper class that stores a command expression that represents a params expression (e.g. params["_var"] or params[["var", 1]]). The params expression makes variables private.
+ *
+ * @author Kayler
+ * @since 06/04/2016
+ */
 public class SQFParamsStatement implements SQFPrivatizer {
 	private final SQFCommandExpression paramsCommandExpression;
 	private final SQFArrayVal paramsArray;
 	private final List<SQFPrivateDeclVar> privateDeclVars = new ArrayList<>();
 	private final List<String> varsDefined = new ArrayList<>();
-	
+
 	private SQFParamsStatement(SQFCommandExpression paramsCommandExpression, SQFArrayVal paramsArray) {
 		this.paramsCommandExpression = paramsCommandExpression;
 		this.paramsArray = paramsArray;
 	}
-	
+
 	@Override
 	public PsiElement getPrivatizerElement() {
 		return paramsCommandExpression;
 	}
-	
+
 	/**
-	 Get the array for the params statement
+	 * Get the array for the params statement
 	 */
 	public SQFArrayVal getParamsArray() {
 		return paramsArray;
 	}
-	
+
 	/**
-	 Get a list of all private vars
+	 * Get a list of all private vars
 	 */
 	@Override
 	public List<SQFPrivateDeclVar> getPrivateVars() {
 		return privateDeclVars;
 	}
-	
+
 	/**
-	 Get all variables that are defined inside the params statement (may not contain all private decl vars)
+	 * Get all variables that are defined inside the params statement (may not contain all private decl vars)
 	 */
 	public List<String> getVarsDefined() {
 		return varsDefined;
 	}
-	
-	/** Return true if the variable is defined, false otherwise. (effectively the same thing as getVarsDefined().contains(varName)) */
+
+	/**
+	 * Return true if the variable is defined, false otherwise. (effectively the same thing as getVarsDefined().contains(varName))
+	 */
 	public boolean varIsDefined(String varName) {
 		return varsDefined.contains(varName);
 	}
-	
-	/** Get a params statement instance from the given command expression. Will return null if the expression wasn't a valid params statement */
+
+	/**
+	 * Get a params statement instance from the given command expression. Will return null if the expression wasn't a valid params statement
+	 */
 	@Nullable
 	public static SQFParamsStatement parse(SQFCommandExpression expression) {
 		PsiElement postfix = expression.getPostfixArgument();
 		PsiElement prefix = expression.getPrefixArgument();
 		String commandName = expression.getCommandName();
-		
+
 		SQFParamsStatement paramsStatement = null;
-		
+
 		if (commandName.equals("params")) { //is params statement
 			if (postfix instanceof SQFLiteralExpression) {
 				SQFLiteralExpression literal = (SQFLiteralExpression) postfix;
@@ -73,7 +79,7 @@ public class SQFParamsStatement implements SQFPrivatizer {
 				SQFArrayVal array = literal.getArrayVal();
 				List<SQFLiteralExpression> arrayLiterals = SQFPsiUtil.getExpressionsOfType(array, SQFLiteralExpression.class);
 				paramsStatement = new SQFParamsStatement(expression, array);
-				
+
 				for (SQFLiteralExpression literalExpression : arrayLiterals) { //e.g. iterate over each entry in params ["_var1",[]]
 					if (literalExpression.getString() != null) {
 						paramsStatement.privateDeclVars.add(new SQFPrivateDeclVar(literalExpression.getString(), paramsStatement));
@@ -97,7 +103,7 @@ public class SQFParamsStatement implements SQFPrivatizer {
 						}
 					}
 				}
-				
+
 			}
 		}
 		return paramsStatement;

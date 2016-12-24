@@ -7,13 +7,14 @@ import com.intellij.psi.xml.XmlTag;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Created by Kayler on 04/25/2016.
+ * @author Kayler
+ * @since 04/25/2016
  */
-public class StringtableLookupElementDataObject {
+public class StringTableLookupElementDataObject {
 	private final SmartPsiElementPointer<XmlTag> target;
 	public static final Key<Boolean> KEY_IS_STRINGTABLE_XML = new Key<>("KEY_IS_STRINGTABLE_XML");
 
-	public StringtableLookupElementDataObject(XmlTag targetTag) {
+	public StringTableLookupElementDataObject(XmlTag targetTag) {
 		this.target = SmartPointerManager.getInstance(targetTag.getProject()).createSmartPsiElementPointer(targetTag);
 		this.target.getElement().putUserData(KEY_IS_STRINGTABLE_XML, true);
 	}

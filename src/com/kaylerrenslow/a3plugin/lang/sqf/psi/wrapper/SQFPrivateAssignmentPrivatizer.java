@@ -8,9 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- Created by Kayler on 06/04/2016.
+ * @author Kayler
+ * @since 06/04/2016
  */
-public class SQFPrivateAssignmentPrivatizer implements SQFPrivatizer{
+public class SQFPrivateAssignmentPrivatizer implements SQFPrivatizer {
 	private final SQFAssignment assignment;
 	private final List<SQFPrivateDeclVar> privateVars = new ArrayList<>();
 

@@ -14,11 +14,12 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 /**
+ * FoldingBuilder implementation for Header language. A folding builder helps you to fold the code regions and replace it with specific text.
+ * For example, if a class declaration has a left brace on line 1 and right brace on line 50, it is eligible for code folding.
+ * Code folding is replacing all text within those braces visually with ... for example.
+ *
  * @author Kayler
- *         FoldingBuilder implementation for Header language. A folding builder helps you to fold the code regions and replace it with specific text.
- *         For example, if a class declaration has a left brace on line 1 and right brace on line 50, it is eligible for code folding.
- *         Code folding is replacing all text within those braces visually with ... for example.
- *         Created on 03/20/2016.
+ * @since 03/20/2016
  */
 public class HeaderFoldingBuilder implements FoldingBuilder {
 	@NotNull

@@ -7,15 +7,17 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
 
 /**
- @author Kayler
- Various Documentation utilities
- Created on 04/02/2016. */
+ * Various Documentation utilities
+ *
+ * @author Kayler
+ * @since 04/02/2016
+ */
 public class DocumentationUtil {
 	/**
-	 Places the text inside a pre tag to keep formatting
-
-	 @param docString documentation text
-	 @return reformatted string
+	 * Places the text inside a pre tag to keep formatting
+	 *
+	 * @param docString documentation text
+	 * @return reformatted string
 	 */
 	public static String purtify(String docString) {
 		docString = "<pre>" + docString + "</pre>";

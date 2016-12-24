@@ -16,8 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- @author Kayler
- @since 01/01/2016 */
+ * Psi utilities for methods inside the bnf grammar
+ *
+ * @author Kayler
+ * @see HeaderPsiUtil
+ * @since 01/01/2016
+ */
 public class HeaderPsiUtilForGrammar {
 
 	public static String getKey(HeaderStringtableKey key) {
@@ -133,10 +137,10 @@ public class HeaderPsiUtilForGrammar {
 	}
 
 	/**
-	 Get all attributes inside the class declaration. Attributes are any assignment inside the class. If traverseIncludes is true, it will traverse include statements
-
-	 @param traverseIncludes true if to traverse includes while getting attributes, false if to skip over them
-	 @return array of attributes (assignment expressions)
+	 * Get all attributes inside the class declaration. Attributes are any assignment inside the class. If traverseIncludes is true, it will traverse include statements
+	 *
+	 * @param traverseIncludes true if to traverse includes while getting attributes, false if to skip over them
+	 * @return array of attributes (assignment expressions)
 	 */
 	public static Attribute[] getAttributes(HeaderClassDeclaration decl, boolean traverseIncludes) {
 		ArrayList<Attribute> attributesList = new ArrayList<>();
@@ -225,10 +229,10 @@ public class HeaderPsiUtilForGrammar {
 	}
 
 	/**
-	 Fetches the PsiFile inside the include.
-
-	 @param include HeaderPreInclude instance
-	 @return PsiFile that points to the file included, or null if the include's file path doesn't point to an existing file
+	 * Fetches the PsiFile inside the include.
+	 *
+	 * @param include HeaderPreInclude instance
+	 * @return PsiFile that points to the file included, or null if the include's file path doesn't point to an existing file
 	 */
 	@Nullable
 	public static PsiFile getHeaderFileFromInclude(HeaderPreInclude include) {

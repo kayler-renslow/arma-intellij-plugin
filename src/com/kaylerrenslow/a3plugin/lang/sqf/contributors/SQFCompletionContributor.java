@@ -9,9 +9,11 @@ import com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDocTagsCompletionProvide
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 
 /**
- @author Kayler
- Provides auto completion for SQF related editing
- Created on 01/02/2016. */
+ * Provides auto completion for SQF related editing
+ *
+ * @author Kayler
+ * @since 01/02/2016
+ */
 public class SQFCompletionContributor extends CompletionContributor {
 	public SQFCompletionContributor() {
 		SQFCompletionProvider prov = new SQFCompletionProvider();

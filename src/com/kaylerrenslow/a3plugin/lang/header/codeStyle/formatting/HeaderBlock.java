@@ -8,8 +8,8 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassContent;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassDeclaration;
-import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtilForGrammar;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -18,9 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * AbstractBlock implementation for Header language
+ *
  * @author Kayler
- *         AbstractBlock implementation for Header language
- *         Created on 03/18/2016.
+ * @since 03/18/2016
  */
 class HeaderBlock implements ASTBlock {
 

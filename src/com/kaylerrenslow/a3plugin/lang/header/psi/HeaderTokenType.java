@@ -6,11 +6,12 @@ import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
 import java.util.Hashtable;
 
 /**
- * @author Kayler
  * TokenType for Header language.
- * Created on 10/31/2015.
+ *
+ * @author Kayler
+ * @since 10/31/2015
  */
-public class HeaderTokenType extends IElementType{
+public class HeaderTokenType extends IElementType {
 	private static final Hashtable<String, String> debugNameLookup = new Hashtable<>();
 
 	private String newDebugName;

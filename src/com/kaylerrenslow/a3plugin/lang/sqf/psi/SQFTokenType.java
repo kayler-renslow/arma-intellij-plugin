@@ -6,11 +6,12 @@ import com.kaylerrenslow.a3plugin.lang.sqf.SQFLanguage;
 import java.util.Hashtable;
 
 /**
- * @author Kayler
  * TokenType extension point for SQF language
- * Created on 10/31/2015.
+ *
+ * @author Kayler
+ * @since 10/31/2015
  */
-public class SQFTokenType extends IElementType{
+public class SQFTokenType extends IElementType {
 
 	private static final Hashtable<String, String> debugNameLookup = new Hashtable<>();
 	private final String tokenName;
@@ -53,7 +54,7 @@ public class SQFTokenType extends IElementType{
 		debugNameLookup.put("COLON", ":");
 	}
 
-	private static String getNewDebugName(String debugName){
+	private static String getNewDebugName(String debugName) {
 		String s = debugNameLookup.get(debugName);
 		return s != null ? s : debugName;
 	}
@@ -65,11 +66,11 @@ public class SQFTokenType extends IElementType{
 	}
 
 	@Override
-	public String toString(){
+	public String toString() {
 		return this.newDebugName;
 	}
 
-	public String getTokenName(){
+	public String getTokenName() {
 		return this.tokenName;
 	}
 }

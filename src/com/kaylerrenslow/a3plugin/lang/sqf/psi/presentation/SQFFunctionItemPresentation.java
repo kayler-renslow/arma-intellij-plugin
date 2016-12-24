@@ -8,9 +8,10 @@ import org.jetbrains.annotations.Nullable;
 import javax.swing.*;
 
 /**
- * @author Kayler
  * ItemPresentation for config defined functions
- * Created on 04/08/2016.
+ *
+ * @author Kayler
+ * @since 04/08/2016
  */
 public class SQFFunctionItemPresentation implements ItemPresentation {
 	private final String varName;

@@ -4,14 +4,15 @@ import com.intellij.lang.documentation.DocumentationProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlTag;
-import com.kaylerrenslow.a3plugin.lang.shared.stringtable.Stringtable;
-import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringtableLookupElementDataObject;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringTable;
+import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringTableLookupElementDataObject;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 /**
- * Created by Kayler on 04/09/2016.
+ * @author Kayler
+ * @since 04/09/2016
  */
 public class HeaderDocumentationProvider implements DocumentationProvider {
 	@Nullable
@@ -29,8 +30,8 @@ public class HeaderDocumentationProvider implements DocumentationProvider {
 	@Nullable
 	@Override
 	public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
-		if(element instanceof XmlTag){
-			return Stringtable.getKeyDoc((XmlTag)element);
+		if (element instanceof XmlTag) {
+			return StringTable.getKeyDoc((XmlTag) element);
 		}
 		return null;
 	}
@@ -38,8 +39,8 @@ public class HeaderDocumentationProvider implements DocumentationProvider {
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLookupItem(PsiManager psiManager, Object object, PsiElement element) {
-		if(object instanceof StringtableLookupElementDataObject){
-			return ((StringtableLookupElementDataObject)object).getTargetTag();
+		if (object instanceof StringTableLookupElementDataObject) {
+			return ((StringTableLookupElementDataObject) object).getTargetTag();
 		}
 		return null;
 	}

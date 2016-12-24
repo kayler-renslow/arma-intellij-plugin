@@ -13,9 +13,11 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 
 /**
- @author Kayler
- PsiElement mixin for SQF grammar file. This mixin is meant for PrivateDeclVar PsiElements. (variables in strings next to private keyword)
- Created on 03/23/2016. */
+ * PsiElement mixin for SQF grammar file. This mixin is meant for PrivateDeclVar PsiElements. (variables in strings next to private keyword)
+ *
+ * @author Kayler
+ * @since 03/23/2016
+ */
 public abstract class SQFStringMixin extends ASTWrapperPsiElement implements SQFString {
 
 	public SQFStringMixin(@NotNull ASTNode node) {
