@@ -24,21 +24,15 @@ import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created by Kayler on 08/03/2016.
  */
 public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
-
-    @Nullable
-    @Override
-    protected URL getDescriptionUrl() {
-        return getClass().getResource("/com/kaylerrenslow/a3plugin/inspectionDescriptions/PrivatizationAndDeclaration.html");
-    }
 
     @NotNull
     @Override
@@ -98,9 +92,11 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
             }
 
             int numUsages = 0;
-
+            int numNonStringUsages = 0;
             int numAssignments = 0;
-            boolean isUsedOverride = false;
+            int numSelfAssignments = 0;
+
+            boolean isFunction = false;
             boolean forceDefined = false;
             for (PsiReference reference : references) {
                 PsiPolyVariantReference polyRef = null;
@@ -120,19 +116,29 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
                     if (resolve == null) {
                         continue;
                     }
+
                     numUsages++;
+
                     if (resolve instanceof SQFVariable) {
                         SQFVariable resolveVar = (SQFVariable) resolve;
                         if (resolveVar.isAssigningVariable() && !resolveVar.getMyAssignment().getExpression().getText().equals("nil")) {
                             numAssignments++;
+                        } else {
+                            SQFAssignment assignment = PsiUtil.getFirstAncestorOfType(resolveVar, SQFAssignment.class, null);
+                            if (assignment != null) {
+                                if (assignment.getAssigningVariable().varNameMatches(var)) {
+                                    numSelfAssignments++;
+                                }
+                            }
                         }
                         if (isGlobalVar) {
                             if (SQFStatic.followsSQFFunctionNameRules(resolveVar.getVarName())) {
-                                isUsedOverride = true;
+                                isFunction = true;
                                 numAssignments++;
                                 break;
                             }
                         }
+                        numNonStringUsages++;
                     } else if (resolve instanceof SQFString) {
                         SQFString string = (SQFString) resolve;
                         if (SQFPsiUtil.getForVarScope(string) != null) {
@@ -154,7 +160,8 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
                     }
                 }
             }
-            if (numAssignments == numUsages && !isUsedOverride) {
+
+            if (numAssignments == (numNonStringUsages - numSelfAssignments) && !isFunction) {
                 holder.registerProblem(var, Plugin.resources.getString("lang.sqf.annotator.variable_unused"), ProblemHighlightType.WEAK_WARNING);
             }
             if (numAssignments == 0 && !forceDefined) {
@@ -175,7 +182,7 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
         public void visitScope(@NotNull SQFScope scope) {
             List<SQFPrivateDeclVar> privateVars = scope.getPrivateVars();
             Iterator<SQFPrivateDeclVar> iter = privateVars.iterator();
-            ArrayList<String> vars = new ArrayList<>();
+            List<String> vars = new LinkedList<>();
             int matchedIndex;
             ASTNode currentPrivateVarNode, matchedNode;
             TextRange rangeCurrentNode, rangeMatchedNode;

@@ -1,40 +1,52 @@
 ## Plugin
-**Added**<br>
+**Added**  
 * 
 
-**Changed**<br>
-*
 
-**Fixed**<br>
+**Changed**  
 * 
+
+
+**Fixed**  
+* 
+
 
 ## Shared between languages
-**Added**<br>
+**Added**  
 * 
 
-**Changed**<br>
+
+**Changed**  
 * 
 
-**Fixed**<br>
-*
+
+**Fixed**  
+* 
+
 
 ## SQF
-**Added**<br>
-* SQF file template
+**Added**  
+* 1.66 commands and bis functions
+* documentation tag auto completion (now lists commands for @command, bis functions for @bis, and config functions for @fnc)
 
-**Changed**<br>
-* removed SQF function creation from alt+insert menu (will come back when properly implemented) 
 
-**Fixed**<br>
-* https://github.com/kayler-renslow/arma-intellij-plugin/issues/31
-* https://github.com/kayler-renslow/arma-intellij-plugin/issues/35
+**Changed**  
+*  
+
+
+**Fixed**  
+* privatization inspection description missing
+* unused vars inspection wasn't taking into account self assignments
+
 
 ## Header
-**Added**<br>
+**Added**  
 * 
 
-**Changed**<br>
+
+**Changed**  
 * 
 
-**Fixed**<br>
+
+**Fixed**  
 * 

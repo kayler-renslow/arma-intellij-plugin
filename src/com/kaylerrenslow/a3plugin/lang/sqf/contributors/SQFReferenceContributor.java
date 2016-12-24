@@ -24,9 +24,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- @author Kayler
- Registers to Intellij which references provider implementations are for SQF language
- Created on 03/20/2016. */
+ * @author Kayler
+ *         Registers to Intellij which references provider implementations are for SQF language
+ *         Created on 03/20/2016.
+ */
 public class SQFReferenceContributor extends PsiReferenceContributor {
 	@Override
 	public void registerReferenceProviders(@NotNull PsiReferenceRegistrar registrar) {
@@ -110,9 +111,9 @@ public class SQFReferenceContributor extends PsiReferenceContributor {
 	}
 
 	/**
-	 @author Kayler
-	 PsiReferenceProvider extension point for SQF language. This provides PSIReferences for given PsiElements, if applicable to them
-	 Created on 03/23/2016.
+	 * @author Kayler
+	 *         PsiReferenceProvider extension point for SQF language. This provides PSIReferences for given PsiElements, if applicable to them
+	 *         Created on 03/23/2016.
 	 */
 	private static class SQFVariableReferenceProvider extends PsiReferenceProvider {
 

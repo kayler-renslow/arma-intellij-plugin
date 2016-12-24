@@ -575,6 +575,8 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "diag_captureSlowFrame" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "diag_codePerformance" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "diag_drawMode" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "diag_enable" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "diag_enabled" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "diag_fps" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "diag_fpsMin" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "diag_frameNo" { return SQFTypes.COMMAND_TOKEN; }
@@ -584,6 +586,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "diag_mergeConfigFile" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "diag_recordTurretLimits" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "diag_tickTime" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "diag_toggle" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "dialog" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "diarySubjectExists" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "didJIP" { return SQFTypes.COMMAND_TOKEN; }
@@ -765,6 +768,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "fromEditor" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "fuel" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "fullCrew" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "gearIDCAmmoCount" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "gearSlotAmmoCount" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "gearSlotData" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "get3DENActionState" { return SQFTypes.COMMAND_TOKEN; }
@@ -832,6 +836,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "getMissionConfig" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getMissionConfigValue" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getMissionDLCs" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "getMissionLayerEntities" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getModelInfo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getMousePosition" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "getNumber" { return SQFTypes.COMMAND_TOKEN; }
@@ -937,6 +942,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "importance" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "in" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "inArea" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "inAreaArray" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "incapacitatedState" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "independent" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "inflame" { return SQFTypes.COMMAND_TOKEN; }
@@ -998,6 +1004,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "isPlayer" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isRealTime" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isRemoteExecuted" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "isRemoteExecutedJIP" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isServer" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isShowing3DIcons" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "isSprintAllowed" { return SQFTypes.COMMAND_TOKEN; }
@@ -1507,6 +1514,8 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "selectionNames" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "selectionPosition" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "selectLeader" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "selectMax" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "selectMin" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "selectNoPlayer" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "selectPlayer" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "selectRandom" { return SQFTypes.COMMAND_TOKEN; }
@@ -2059,6 +2068,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "waypointType" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "waypointVisible" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "weaponAccessories" { return SQFTypes.COMMAND_TOKEN; }
+<YYINITIAL> "weaponAccessoriesCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "weaponCargo" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "weaponDirection" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "weaponInertia" { return SQFTypes.COMMAND_TOKEN; }
@@ -2082,6 +2092,7 @@ MACRO = "#" {MACRO_TEXT}
 <YYINITIAL> "worldToModel" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "worldToModelVisual" { return SQFTypes.COMMAND_TOKEN; }
 <YYINITIAL> "worldToScreen" { return SQFTypes.COMMAND_TOKEN; }
+
 
 
 

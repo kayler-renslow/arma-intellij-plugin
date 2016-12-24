@@ -57,6 +57,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	@Nullable
 	@Override
 	public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
+		if (element == null) {
+			return null;
+		}
 		if (element instanceof XmlTag) {
 			return Stringtable.getKeyDoc((XmlTag) element);
 		}

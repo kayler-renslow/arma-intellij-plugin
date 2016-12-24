@@ -7,11 +7,39 @@
 	</vendor>
 	<description>
 		Plugin that offers syntax checking of SQF files, syntax highlighting, find usages, refactor renaming, and more
-		various features for Arma 3.
+		various features for the video game Arma 3.
 	</description>
 
 	<change-notes>
-		Changelog is available at the GitHub page: https://github.com/kayler-renslow/arma-intellij-plugin/releases
+		Changelog is also available at the GitHub page: &lt;a
+		href="https://github.com/kayler-renslow/arma-intellij-plugin/releases"&gt;https://github.com/kayler-renslow/arma-intellij-plugin/releases&lt;/a&gt;
+		&lt;br&gt;
+		&lt;br&gt;
+
+		&lt;p&gt;&lt;strong&gt;Version:&lt;/strong&gt; 1.0.7&lt;br&gt;&lt;strong&gt;Release Date:&lt;/strong&gt;
+		December 25, 2016&lt;/p&gt;
+		&lt;h2 id="sqf"&gt;SQF&lt;/h2&gt;
+		&lt;p&gt;&lt;strong&gt;Added&lt;/strong&gt; &lt;/p&gt;
+		&lt;ul&gt;
+		&lt;li&gt;SQF file template (Main Menu-&gt;File-&gt;Settings-&gt;Editor-&gt;File and Code Templates and template
+		name is &quot;SQF File&quot;)&lt;/li&gt;
+		&lt;li&gt;1.66 commands and BIS functions&lt;/li&gt;
+		&lt;li&gt;documentation tag auto completion (now lists commands for @command, bis functions for @bis, and config
+		functions for @fnc)&lt;/li&gt;
+		&lt;/ul&gt;
+		&lt;p&gt;&lt;strong&gt;Changed&lt;/strong&gt; &lt;/p&gt;
+		&lt;ul&gt;
+		&lt;li&gt;removed SQF function creation from alt+insert menu (will come back when properly implemented) &lt;/li&gt;
+		&lt;/ul&gt;
+		&lt;p&gt;&lt;strong&gt;Fixed&lt;/strong&gt; &lt;/p&gt;
+		&lt;ul&gt;
+		&lt;li&gt;&lt;a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/31"&gt;https://github.com/kayler-renslow/arma-intellij-plugin/issues/31&lt;/a&gt;
+		(new SQF file not automatically opened)&lt;/li&gt;
+		&lt;li&gt;&lt;a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/35"&gt;https://github.com/kayler-renslow/arma-intellij-plugin/issues/35&lt;/a&gt;
+		(for loop syntax error with step -1)&lt;/li&gt;
+		&lt;li&gt;unused vars inspection wasn&#39;t taking into account self assignments&lt;/li&gt;
+		&lt;/ul&gt;
+
 	</change-notes>
 
 	<idea-version since-build="131"/>
@@ -25,7 +53,9 @@
 		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDocumentationProvider"/>
 		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFCommenter"/>
 		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFAnnotator"/>
-		<localInspection language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.inspections.PrivatizationAndDeclarationInspection" enabledByDefault="true" groupName="Arma SQF" displayName=""/>
+		<localInspection language="Arma.SQF"
+						 implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.inspections.PrivatizationAndDeclarationInspection"
+						 enabledByDefault="true" groupName="Arma SQF"/>
 		<lang.findUsagesProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFFindUsagesProvider"/>
 		<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.sqf.contributors.SQFReferenceContributor"/>
 		<lang.refactoringSupport language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFRefactoringSupportProvider"/>
@@ -61,7 +91,11 @@
 		<!--<languageInjector implementation="com.kaylerrenslow.a3plugin.lang.shared.HeaderInSQFInjector" />-->
 
 		<!-- File Templates-->
-		<internalFileTemplate name="SQF File"/>
+		<!-- NOTE TO SELF:
+			Any internal file template can't be created from file->new.
+			You can place internal file templates in fileTemplates/internal and normal file templates in directory fileTemplates.
+			https://intellij-support.jetbrains.com/hc/en-us/community/posts/207280245-File-Templates-in-plugin
+		-->
 
 		<!-- Live Templates-->
 		<liveTemplateContext implementation="com.kaylerrenslow.a3plugin.liveTemplates.SQFLiveTemplateContext" />
@@ -79,10 +113,6 @@
 	<project-components>
 		<component>
 			<implementation-class>com.kaylerrenslow.a3plugin.components.versionChecker.PluginVersionChecker</implementation-class>
-		</component>
-		<component>
-			<implementation-class>com.kaylerrenslow.a3plugin.components.FileTemplateProjectComponent
-			</implementation-class>
 		</component>
 	</project-components>
 
