@@ -33,6 +33,7 @@ To install the plugin, you can [install it from disk](https://www.jetbrains.com/
 * Step 2: Locate the "Arma Intellij Plugin.jar" (file name may have version info like v1.0.7)
 * Step 3: Click OK button when you located the plugin jar and then Restart IntelliJ IDEA
 * Step 4: You're good to go!
+
 #### Install From JetBrains Plugin Repository
 * Step 1: In IntelliJ Settings Dialog, click on "Plugins", click **Browse Repositories**.
 * Step 2: Search for "Arma Intellij Plugin"
