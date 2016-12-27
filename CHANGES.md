@@ -4,7 +4,7 @@
 
 
 **Changed**  
-* 
+* readme includes installation details
 
 
 **Fixed**  
@@ -34,7 +34,7 @@
 
 
 **Fixed**  
-* 
+* unary expression
 
 
 ## Header

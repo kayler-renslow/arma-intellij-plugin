@@ -59,7 +59,7 @@ private add_group_ ::= add_expression | sub_expression
 private mul_group_ ::= mul_expression | div_expression | mod_expression
 private conditional_group_::= bool_and_expression | bool_or_expression | bool_not_expression
 
-unary_expression ::= (PLUS | MINUS) (literal_expression | paren_expression)
+unary_expression ::= (PLUS | MINUS) (expression)
 
 literal_expression ::= string
                     | macro_call //must come before variable
