@@ -1,10 +1,10 @@
 ## Plugin
 **Added**  
-* 
+* generated parsers and lexers for header and SQF
 
 
 **Changed**  
-* 
+* removed raw command text from lexer and replaced with something better
 
 
 **Fixed**  

@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -44,6 +45,12 @@ public class SQFStatic {
 	public static final TokenSet COMMENTS = TokenSet.create(SQFTypes.INLINE_COMMENT);
 	public static final TokenSet NUMBER_LITERALS = TokenSet.create(SQFTypes.DEC_LITERAL, SQFTypes.INTEGER_LITERAL);
 	public static final TokenSet IDENTIFIERS = TokenSet.create(SQFTypes.GLOBAL_VAR, SQFTypes.LOCAL_VAR, SQFTypes.VARIABLE);
+	public static final Comparator<? super CharSequence> STRING_COMPARATOR = new Comparator<CharSequence>() {
+		@Override
+		public int compare(CharSequence o1, CharSequence o2) {
+			return o1.toString().compareTo(o2.toString());
+		}
+	};
 
 
 	static {
