@@ -1,6 +1,7 @@
 package com.kaylerrenslow.a3plugin.util;
 
 import java.io.BufferedInputStream;
+import java.io.InputStream;
 
 /**
  * Reads files.
@@ -22,25 +23,22 @@ public class FileReader {
 	 * @param path build path to file
 	 * @return String with all content inside
 	 */
-	public static String getText(String path) {
-		BufferedInputStream bis = new BufferedInputStream(INSTANCE.getClass().getResourceAsStream(path));
-		int size = 0;
+	public static String getText(String path) throws IllegalArgumentException {
+		InputStream stm = INSTANCE.getClass().getResourceAsStream(path);
+		if (stm == null) {
+			throw new IllegalArgumentException("path '" + path + "' resource not found");
+		}
 		byte[] data;
 		String s;
 		try {
-			while (bis.read() != -1) {
-				size++;
-			}
-			bis.close();
-			data = new byte[size];
-			bis = new BufferedInputStream(INSTANCE.getClass().getResourceAsStream(path));
-
-			for (int i = 0; i < data.length; i++) {
-				data[i] = (byte) bis.read();
-			}
+			BufferedInputStream bis = new BufferedInputStream(stm);
+			data = new byte[bis.available()];
+			bis.read(data, 0, data.length);
 			s = new String(data);
+			bis.close();
 
 		} catch (Exception e) {
+			e.printStackTrace(System.out);
 			s = "" + INSTANCE.getClass() + ">> error occurred retrieving file " + path;
 		}
 		return s.replaceAll("\r\n", "\n"); //required or Intellij will flip out

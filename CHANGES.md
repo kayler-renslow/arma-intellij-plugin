@@ -1,10 +1,10 @@
 ## Plugin
 **Added**  
-* generated parsers and lexers for header and SQF
+* 
 
 
 **Changed**  
-* removed raw command text from lexer and replaced with something better
+* 
 
 
 **Fixed**  
@@ -26,11 +26,11 @@
 
 ## SQF
 **Added**  
-* 
+* command camelCase inspection
 
 
 **Changed**  
-*  
+* commands can now be non-camel case
 
 
 **Fixed**  

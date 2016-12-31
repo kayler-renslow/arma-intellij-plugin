@@ -247,6 +247,12 @@ public class SQFPsiUtil {
 		return PsiUtil.findDescendantElements(file, type, null).get(0).getPsi();
 	}
 
+	@NotNull
+	public static <T extends PsiElement> T createElement(@NotNull Project project, @NotNull String text, @NotNull Class<T> psiClass) {
+		SQFFile file = createFile(project, text);
+		return PsiUtil.findDescendantElementsOfInstance(file, psiClass, null).get(0);
+	}
+
 	public static SQFString createNewStringLiteral(Project project, String textWithoutQuotes) {
 		return (SQFString) createElement(project, "\"" + textWithoutQuotes + "\"", SQFTypes.STRING);
 	}

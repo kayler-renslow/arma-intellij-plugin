@@ -700,11 +700,12 @@ class SQFLexer implements FlexLexer {
             }
           case 41: break;
           case 3: 
-            { int i = Collections.binarySearch(SQFStatic.LIST_COMMANDS, yytext(), SQFStatic.STRING_COMPARATOR);
-    if(i < 0){
-        return SQFTypes.GLOBAL_VAR;
+            { for(String command : SQFStatic.LIST_COMMANDS){  //don't use binary search so that we can do ignore case search
+        if(command.equalsIgnoreCase(yytext().toString())){
+            return SQFTypes.COMMAND_TOKEN;
+        }
     }
-    return SQFTypes.COMMAND_TOKEN;
+    return SQFTypes.GLOBAL_VAR;
             }
           case 42: break;
           case 4: 

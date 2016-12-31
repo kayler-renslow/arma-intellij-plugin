@@ -221,7 +221,7 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 			private final SmartPsiElementPointer<SQFScope> varScopePointer;
 			private final SmartPsiElementPointer<SQFVariable> fixVarPointer;
 
-			SQFAnnotatorFixNotPrivate(SQFVariable var, SQFScope declScope) {
+			public SQFAnnotatorFixNotPrivate(SQFVariable var, SQFScope declScope) {
 				this.fixVarPointer = SmartPointerManager.getInstance(var.getProject()).createSmartPsiElementPointer(var, var.getContainingFile());
 				this.varScopePointer = SmartPointerManager.getInstance(var.getProject()).createSmartPsiElementPointer(declScope, declScope.getContainingFile());
 			}

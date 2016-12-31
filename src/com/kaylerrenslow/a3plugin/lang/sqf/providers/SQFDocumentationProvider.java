@@ -6,7 +6,6 @@ import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.module.Module;
 import com.intellij.psi.*;
 import com.intellij.psi.xml.XmlTag;
-import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderClassDeclaration;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
@@ -30,8 +29,7 @@ import java.util.List;
  * @since 01/03/2016
  */
 public class SQFDocumentationProvider extends DocumentationProviderEx {
-	private static final String BIS_WIKI_URL_PREFIX = Plugin.resources.getString("plugin.doc.sqf.wiki_URL_prefix");
-	private static final String EXTERNAL_LINK_NOTIFICATION = Plugin.resources.getString("plugin.doc.sqf.wiki_doc_external_link_notification_string_format");
+
 	/**
 	 * Used for BIS function documentation links. This comes after the psi element protocol in anchor tags. Example use case: &lt;a href='psi-element://bis-function:BIS_fnc_MP'&gt;BIS_fnc_MP&lt;/a&gt;
 	 */
@@ -56,7 +54,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	public List<String> getUrlFor(PsiElement element, PsiElement originalElement) {
 		List<String> lst = new ArrayList<>();
 		if (SQFStatic.isCommand(element.getNode().getElementType()) || SQFStatic.isBisFunction(element.getText())) {
-			lst.add(getWikiUrl(element.getText()));
+			lst.add(SQFStatic.getWikiUrl(element.getText()));
 			return lst;
 		}
 		return null;
@@ -196,27 +194,12 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	}
 
 	private static String generateCommandDoc(String commandName) {
-		String doc = String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(commandName));
-		try {
-			doc += SQFStatic.getCommandDocumentation(commandName);
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
-		}
-		return doc;
+		return SQFStatic.getCommandDocumentation(commandName);
 	}
 
 	private static String generateFunctionDoc(String functionName) {
-		String doc = String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(functionName));
-		try {
-			doc += SQFStatic.getBISFunctionDocumentation(functionName);
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
-		}
-		return doc;
-	}
+		return SQFStatic.getBISFunctionDocumentation(functionName);
 
-	private static String getWikiUrl(String wikiLinkName) {
-		return BIS_WIKI_URL_PREFIX + wikiLinkName;
 	}
 
 }

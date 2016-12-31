@@ -12,7 +12,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -32,6 +31,13 @@ public class SQFStatic {
 	private static final String COMMANDS_DOC_FILE_LOOKUP = COMMANDS_DOC_FILE_DIR + "lookup.list";
 	private static final String BIS_FUNCTIONS_DOC_FILE_LOOKUP = BIS_FUNCTIONS_DOC_FILE_DIR + "lookup.list";
 
+	private static final String BIS_WIKI_URL_PREFIX = Plugin.resources.getString("plugin.doc.sqf.wiki_URL_prefix");
+	private static final String EXTERNAL_LINK_NOTIFICATION = Plugin.resources.getString("plugin.doc.sqf.wiki_doc_external_link_notification_string_format");
+
+
+	/**
+	 * Has all commands stored in their camelCase form
+	 */
 	public static final List<String> LIST_COMMANDS = TextFileListToList.getListFromStream(ResourceGetter.getResourceAsStream(COMMANDS_DOC_FILE_LOOKUP), new ArrayList<>());
 	public static final List<String> LIST_BIS_FUNCTIONS = TextFileListToList.getListFromStream(ResourceGetter.getResourceAsStream(BIS_FUNCTIONS_DOC_FILE_LOOKUP), new ArrayList<>());
 
@@ -45,12 +51,6 @@ public class SQFStatic {
 	public static final TokenSet COMMENTS = TokenSet.create(SQFTypes.INLINE_COMMENT);
 	public static final TokenSet NUMBER_LITERALS = TokenSet.create(SQFTypes.DEC_LITERAL, SQFTypes.INTEGER_LITERAL);
 	public static final TokenSet IDENTIFIERS = TokenSet.create(SQFTypes.GLOBAL_VAR, SQFTypes.LOCAL_VAR, SQFTypes.VARIABLE);
-	public static final Comparator<? super CharSequence> STRING_COMPARATOR = new Comparator<CharSequence>() {
-		@Override
-		public int compare(CharSequence o1, CharSequence o2) {
-			return o1.toString().compareTo(o2.toString());
-		}
-	};
 
 
 	static {
@@ -171,7 +171,17 @@ public class SQFStatic {
 	}
 
 	public static String getCommandDocumentation(String commandName) {
-		return FileReader.getText(getDocumentationFilePath(commandName));
+		try {
+			return String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(commandName)) + FileReader.getText(getDocumentationFilePath(commandName));
+		} catch (IllegalArgumentException ignore) {
+			for (String command : SQFStatic.LIST_COMMANDS) {
+				if (command.equalsIgnoreCase(commandName)) {
+					return String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(command)) + FileReader.getText(getDocumentationFilePath(command));
+				}
+			}
+
+		}
+		return "Error fetching documentation.";
 	}
 
 	private static String getDocumentationFilePath(String commandName) {
@@ -179,9 +189,13 @@ public class SQFStatic {
 	}
 
 	public static String getBISFunctionDocumentation(String bisFunction) {
-		return FileReader.getText(BIS_FUNCTIONS_DOC_FILE_DIR + bisFunction);
+		String doc = String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(bisFunction));
+		return doc + FileReader.getText(BIS_FUNCTIONS_DOC_FILE_DIR + bisFunction);
 	}
 
+	public static String getWikiUrl(String wikiLinkName) {
+		return BIS_WIKI_URL_PREFIX + wikiLinkName;
+	}
 
 	public static class SQFFunctionTagAndName {
 		public final String tagName;

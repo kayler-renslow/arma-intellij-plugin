@@ -77,11 +77,12 @@ MACRO = "#" {MACRO_TEXT}
 
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }
 <YYINITIAL> {GLOBAL_VAR} {
-    int i = Collections.binarySearch(SQFStatic.LIST_COMMANDS, yytext(), SQFStatic.STRING_COMPARATOR);
-    if(i < 0){
-        return SQFTypes.GLOBAL_VAR;
+    for(String command : SQFStatic.LIST_COMMANDS){  //don't use binary search so that we can do ignore case search
+        if(command.equalsIgnoreCase(yytext().toString())){
+            return SQFTypes.COMMAND_TOKEN;
+        }
     }
-    return SQFTypes.COMMAND_TOKEN;
+    return SQFTypes.GLOBAL_VAR;
 }
 
 <YYINITIAL> "==" { return SQFTypes.EQEQ; }

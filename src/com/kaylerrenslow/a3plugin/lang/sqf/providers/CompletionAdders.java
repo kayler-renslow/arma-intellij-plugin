@@ -40,11 +40,9 @@ public interface CompletionAdders {
 	 * Adds all SQF commands to the completion result
 	 */
 	static void addCommands(@NotNull Project project, @NotNull CompletionResultSet result) {
-		String name;
 		String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.command");
-		for (int i = 0; i < SQFStatic.LIST_COMMANDS.size(); i++) {
-			name = SQFStatic.LIST_COMMANDS.get(i);
-			result.addElement(LookupElementBuilder.createWithSmartPointer(name, SQFPsiUtil.createElement(project, name, SQFTypes.COMMAND)).withIcon(PluginIcons.ICON_SQF_COMMAND).appendTailText(" " + trailText, true));
+		for (String command : SQFStatic.LIST_COMMANDS) {
+			result.addElement(LookupElementBuilder.createWithSmartPointer(command, SQFPsiUtil.createElement(project, command, SQFTypes.COMMAND)).withIcon(PluginIcons.ICON_SQF_COMMAND).appendTailText(" " + trailText, true));
 		}
 	}
 
@@ -52,10 +50,8 @@ public interface CompletionAdders {
 	 * Adds all SQF BIS functions to the result
 	 */
 	static void addBISFunctions(@NotNull Project project, @NotNull CompletionResultSet result) {
-		String functionName;
 		String tailText = Plugin.resources.getString("lang.sqf.completion.tail_text.bis_function");
-		for (int i = 0; i < SQFStatic.LIST_BIS_FUNCTIONS.size(); i++) {
-			functionName = SQFStatic.LIST_BIS_FUNCTIONS.get(i);
+		for (String functionName : SQFStatic.LIST_BIS_FUNCTIONS) {
 			result.addElement(LookupElementBuilder.createWithSmartPointer(functionName, SQFPsiUtil.createElement(project, functionName, SQFTypes.GLOBAL_VAR)).withIcon(PluginIcons.ICON_SQF_FUNCTION).appendTailText(" " + tailText, true));
 		}
 	}
