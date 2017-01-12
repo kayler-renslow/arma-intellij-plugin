@@ -52,6 +52,7 @@ MACRO_NEWLINE = ("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*
 MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
 MACRO_TEXT = {MACRO_CHARACTER}+
 MACRO = "#" {MACRO_TEXT}
+
 %%
 
 <YYINITIAL> {WHITE_SPACE} { return TokenType.WHITE_SPACE; }

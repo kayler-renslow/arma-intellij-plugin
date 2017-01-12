@@ -24,16 +24,16 @@
 
 
 **Fixed**  
-* 
+* better, but still bad pre-processor
 
 
 ### SQF
 **Added**  
-* 
+* command camelCase inspection (checks if command is camel case. if not, alt+enter to make it camel case)
 
 
 **Changed**  
-*  
+* commands can now be non-camel case
 
 
 **Fixed**  

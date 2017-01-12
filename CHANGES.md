@@ -1,4 +1,4 @@
-## Plugin
+### Plugin
 **Added**  
 * 
 
@@ -11,7 +11,7 @@
 * 
 
 
-## Shared between languages
+### Shared between languages
 **Added**  
 * 
 
@@ -24,20 +24,7 @@
 * 
 
 
-## SQF
-**Added**  
-* command camelCase inspection
-
-
-**Changed**  
-* commands can now be non-camel case
-
-
-**Fixed**  
-* 
-
-
-## Header
+### SQF
 **Added**  
 * 
 
@@ -47,4 +34,17 @@
 
 
 **Fixed**  
+* preprocessor does a better job ignoring itself
+
+
+### Header
+**Added**  
 * 
+
+
+**Changed**  
+* 
+
+
+**Fixed**  
+* preprocessor does a better job ignoring itself

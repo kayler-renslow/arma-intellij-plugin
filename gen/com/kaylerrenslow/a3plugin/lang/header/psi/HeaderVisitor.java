@@ -68,23 +68,11 @@ public class HeaderVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitPreDefine(@NotNull HeaderPreDefine o) {
-    visitPsiElement(o);
-  }
-
   public void visitPreEval(@NotNull HeaderPreEval o) {
     visitPsiElement(o);
   }
 
   public void visitPreExec(@NotNull HeaderPreExec o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPreIfdef(@NotNull HeaderPreIfdef o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPreIfndef(@NotNull HeaderPreIfndef o) {
     visitPsiElement(o);
   }
 
@@ -96,7 +84,7 @@ public class HeaderVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitPreUndef(@NotNull HeaderPreUndef o) {
+  public void visitPreMacro(@NotNull HeaderPreMacro o) {
     visitPsiElement(o);
   }
 

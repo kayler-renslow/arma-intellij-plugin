@@ -11,14 +11,14 @@ import static com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.kaylerrenslow.a3plugin.lang.header.psi.*;
 
-public class HeaderPreIfndefImpl extends ASTWrapperPsiElement implements HeaderPreIfndef {
+public class HeaderPreMacroImpl extends ASTWrapperPsiElement implements HeaderPreMacro {
 
-  public HeaderPreIfndefImpl(ASTNode node) {
+  public HeaderPreMacroImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull HeaderVisitor visitor) {
-    visitor.visitPreIfndef(this);
+    visitor.visitPreMacro(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

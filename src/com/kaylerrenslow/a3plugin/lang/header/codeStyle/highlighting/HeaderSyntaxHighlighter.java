@@ -55,14 +55,12 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase {
 	private static final TextAttributesKey[] PAREN_KEYS = new TextAttributesKey[]{PAREN};
 	private static final TextAttributesKey[] COMMA_KEYS = new TextAttributesKey[]{COMMA};
 
-	private static final TextAttributesKey[] PREPROCESSOR_KEYS = new TextAttributesKey[]{PREPROCESSOR};
 	private static final TextAttributesKey[] STRINGTABLE_VALUE_KEYS = new TextAttributesKey[]{STRINGTABLE_VALUE};
 
 	private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
 	private static final IElementType[] OPERATORS = {HeaderTypes.EQ, HeaderTypes.BRACKET_PAIR, HeaderTypes.COLON, HeaderTypes.FSLASH, HeaderTypes.MINUS, HeaderTypes.PLUS};
 	private static final IElementType[] KEYWORDS = {HeaderTypes.CLASS};
-	private static final IElementType[] PREPROCESSORS = {HeaderTypes.PREPROCESS_INCLUDE};
 
 
 	@NotNull
@@ -107,11 +105,6 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase {
 		for (IElementType e : OPERATORS) {
 			if (tokenType.equals(e)) {
 				return OPERATOR_KEYS;
-			}
-		}
-		for (IElementType e : PREPROCESSORS) {
-			if (tokenType.equals(e)) {
-				return PREPROCESSOR_KEYS;
 			}
 		}
 		if (tokenType == HeaderTypes.STRINGTABLE_ENTRY) {

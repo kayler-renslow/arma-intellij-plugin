@@ -28,32 +28,14 @@ public class HeaderPreprocessorImpl extends ASTWrapperPsiElement implements Head
 
   @Override
   @Nullable
-  public HeaderPreDefine getPreDefine() {
-    return findChildByClass(HeaderPreDefine.class);
-  }
-
-  @Override
-  @Nullable
   public HeaderPreExec getPreExec() {
     return findChildByClass(HeaderPreExec.class);
   }
 
   @Override
   @Nullable
-  public HeaderPreIfdef getPreIfdef() {
-    return findChildByClass(HeaderPreIfdef.class);
-  }
-
-  @Override
-  @Nullable
-  public HeaderPreIfndef getPreIfndef() {
-    return findChildByClass(HeaderPreIfndef.class);
-  }
-
-  @Override
-  @Nullable
-  public HeaderPreUndef getPreUndef() {
-    return findChildByClass(HeaderPreUndef.class);
+  public HeaderPreMacro getPreMacro() {
+    return findChildByClass(HeaderPreMacro.class);
   }
 
 }

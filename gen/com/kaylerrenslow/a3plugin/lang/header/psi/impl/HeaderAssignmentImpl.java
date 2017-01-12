@@ -11,7 +11,7 @@ import static com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.kaylerrenslow.a3plugin.lang.header.psi.*;
 
-public class HeaderAssignmentImpl extends ASTWrapperPsiElement implements HeaderAssignment {
+public abstract class HeaderAssignmentImpl extends ASTWrapperPsiElement implements HeaderAssignment {
 
   public HeaderAssignmentImpl(ASTNode node) {
     super(node);

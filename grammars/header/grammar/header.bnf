@@ -62,17 +62,14 @@ class_content ::= LBRACE file_entries RBRACE
 
 //Preprocessor things
 preprocessor_group ::= preprocessor+
-preprocessor ::= pre_include | pre_define | pre_undef | pre_ifdef | pre_ifndef | pre_exec
+preprocessor ::= pre_include | pre_macro | pre_exec
 
-pre_include ::= PREPROCESS_INCLUDE (pre_include_file) {extends("pre_include")=preprocessor methods=[getPathString getHeaderFileFromInclude]}
+pre_include ::= PREPROCESS_INCLUDE pre_include_file {extends("pre_include")=preprocessor methods=[getPathString getHeaderFileFromInclude]}
 pre_include_file ::= STRING_LITERAL | INCLUDE_VALUE_ANGBR
+pre_macro ::= PREPROCESS_MACRO
 
-pre_define ::= PREPROCESS_DEFINE
-pre_undef ::= PREPROCESS_UNDEF
-pre_ifdef ::= PREPROCESS_IF_DEF
-pre_ifndef ::= PREPROCESS_IF_N_DEF
 pre_exec ::= PREPROCESS_EXEC
 pre_eval ::= PREPROCESS_EVAL
 
-macro_function ::= !(pre_exec) IDENTIFIER LPAREN ((value_ | array) (COMMA (value_ | array))*) RPAREN | pre_eval
+macro_function ::= IDENTIFIER LPAREN ((value_ | array) (COMMA (value_ | array))*) RPAREN | pre_eval
 defined_text ::= IDENTIFIER

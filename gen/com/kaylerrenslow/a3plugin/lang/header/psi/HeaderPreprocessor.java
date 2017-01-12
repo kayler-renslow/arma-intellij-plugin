@@ -8,18 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface HeaderPreprocessor extends PsiElement {
 
   @Nullable
-  HeaderPreDefine getPreDefine();
-
-  @Nullable
   HeaderPreExec getPreExec();
 
   @Nullable
-  HeaderPreIfdef getPreIfdef();
-
-  @Nullable
-  HeaderPreIfndef getPreIfndef();
-
-  @Nullable
-  HeaderPreUndef getPreUndef();
+  HeaderPreMacro getPreMacro();
 
 }

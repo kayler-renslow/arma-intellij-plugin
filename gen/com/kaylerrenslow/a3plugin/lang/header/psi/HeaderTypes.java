@@ -25,14 +25,11 @@ public interface HeaderTypes {
   IElementType MACRO_FUNCTION = new HeaderElementType("MACRO_FUNCTION");
   IElementType PREPROCESSOR = new HeaderElementType("PREPROCESSOR");
   IElementType PREPROCESSOR_GROUP = new HeaderElementType("PREPROCESSOR_GROUP");
-  IElementType PRE_DEFINE = new HeaderElementType("PRE_DEFINE");
   IElementType PRE_EVAL = new HeaderElementType("PRE_EVAL");
   IElementType PRE_EXEC = new HeaderElementType("PRE_EXEC");
-  IElementType PRE_IFDEF = new HeaderElementType("PRE_IFDEF");
-  IElementType PRE_IFNDEF = new HeaderElementType("PRE_IFNDEF");
   IElementType PRE_INCLUDE = new HeaderElementType("PRE_INCLUDE");
   IElementType PRE_INCLUDE_FILE = new HeaderElementType("PRE_INCLUDE_FILE");
-  IElementType PRE_UNDEF = new HeaderElementType("PRE_UNDEF");
+  IElementType PRE_MACRO = new HeaderElementType("PRE_MACRO");
   IElementType STRINGTABLE_KEY = new HeaderElementType("STRINGTABLE_KEY");
 
   IElementType ASTERISK = new HeaderTokenType("ASTERISK");
@@ -52,13 +49,10 @@ public interface HeaderTypes {
   IElementType MINUS = new HeaderTokenType("MINUS");
   IElementType NUMBER_LITERAL = new HeaderTokenType("NUMBER_LITERAL");
   IElementType PLUS = new HeaderTokenType("PLUS");
-  IElementType PREPROCESS_DEFINE = new HeaderTokenType("PREPROCESS_DEFINE");
   IElementType PREPROCESS_EVAL = new HeaderTokenType("PREPROCESS_EVAL");
   IElementType PREPROCESS_EXEC = new HeaderTokenType("PREPROCESS_EXEC");
-  IElementType PREPROCESS_IF_DEF = new HeaderTokenType("PREPROCESS_IF_DEF");
-  IElementType PREPROCESS_IF_N_DEF = new HeaderTokenType("PREPROCESS_IF_N_DEF");
   IElementType PREPROCESS_INCLUDE = new HeaderTokenType("PREPROCESS_INCLUDE");
-  IElementType PREPROCESS_UNDEF = new HeaderTokenType("PREPROCESS_UNDEF");
+  IElementType PREPROCESS_MACRO = new HeaderTokenType("PREPROCESS_MACRO");
   IElementType RBRACE = new HeaderTokenType("RBRACE");
   IElementType RPAREN = new HeaderTokenType("RPAREN");
   IElementType SEMICOLON = new HeaderTokenType("SEMICOLON");
@@ -79,9 +73,6 @@ public interface HeaderTypes {
       }
       else if (type == ARRAY_ENTRY) {
         return new HeaderArrayEntryImpl(node);
-      }
-      else if (type == ASSIGNMENT) {
-        return new HeaderAssignmentImpl(node);
       }
       else if (type == ASSIGNMENT_IDENTIFIER) {
         return new HeaderAssignmentIdentifierImpl(node);
@@ -119,20 +110,11 @@ public interface HeaderTypes {
       else if (type == PREPROCESSOR_GROUP) {
         return new HeaderPreprocessorGroupImpl(node);
       }
-      else if (type == PRE_DEFINE) {
-        return new HeaderPreDefineImpl(node);
-      }
       else if (type == PRE_EVAL) {
         return new HeaderPreEvalImpl(node);
       }
       else if (type == PRE_EXEC) {
         return new HeaderPreExecImpl(node);
-      }
-      else if (type == PRE_IFDEF) {
-        return new HeaderPreIfdefImpl(node);
-      }
-      else if (type == PRE_IFNDEF) {
-        return new HeaderPreIfndefImpl(node);
       }
       else if (type == PRE_INCLUDE) {
         return new HeaderPreIncludeImpl(node);
@@ -140,8 +122,8 @@ public interface HeaderTypes {
       else if (type == PRE_INCLUDE_FILE) {
         return new HeaderPreIncludeFileImpl(node);
       }
-      else if (type == PRE_UNDEF) {
-        return new HeaderPreUndefImpl(node);
+      else if (type == PRE_MACRO) {
+        return new HeaderPreMacroImpl(node);
       }
       else if (type == STRINGTABLE_KEY) {
         return new HeaderStringtableKeyImpl(node);

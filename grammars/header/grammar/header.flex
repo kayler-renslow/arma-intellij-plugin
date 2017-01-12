@@ -54,14 +54,13 @@ FUNCTION_TAIL = {WHITE_SPACE}? "(" ([^\r\n()] | "(" [^\r\n()] ")")*? ")"
 EVAL = "__EVAL" {FUNCTION_TAIL}
 EXEC = "__EXEC" {FUNCTION_TAIL}
 
-MACRO_TEXT = {WHITE_SPACE} {MACRO_CHARACTER}+
+INCLUDE = "#include"
 
-DEFINE   = "#define" {MACRO_TEXT}
-UNDEF    = "#undef" {MACRO_TEXT}
-IF_DEF   = "#ifdef" {MACRO_TEXT} {ELSE}? {END_IF}
-IF_N_DEF = "#ifndef" {MACRO_TEXT} {ELSE}? {END_IF}
-ELSE     = "#else" {MACRO_TEXT}
-END_IF   = "#endif"
+MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
+MACRO_TEXT = {MACRO_CHARACTER}+
+MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}
+
+
 %%
 
 <YYINITIAL> {MACRO_NEWLINE} { return TokenType.WHITE_SPACE; }
@@ -79,11 +78,8 @@ END_IF   = "#endif"
 
 <YYINITIAL> "class" { return HeaderTypes.CLASS; }
 
-<YYINITIAL> "#include"  { return HeaderTypes.PREPROCESS_INCLUDE; }
-<YYINITIAL> {DEFINE}  { return HeaderTypes.PREPROCESS_DEFINE; }
-<YYINITIAL> {UNDEF}  { return HeaderTypes.PREPROCESS_UNDEF; }
-<YYINITIAL> {IF_DEF}  { return HeaderTypes.PREPROCESS_IF_DEF; }
-<YYINITIAL> {IF_N_DEF}  { return HeaderTypes.PREPROCESS_IF_N_DEF; }
+<YYINITIAL> {INCLUDE}  { return HeaderTypes.PREPROCESS_INCLUDE; }
+<YYINITIAL> {MACRO}  { return HeaderTypes.PREPROCESS_MACRO; }
 <YYINITIAL> {EXEC} { return HeaderTypes.PREPROCESS_EXEC; }
 <YYINITIAL> {EVAL} { return HeaderTypes.PREPROCESS_EVAL; }
 
