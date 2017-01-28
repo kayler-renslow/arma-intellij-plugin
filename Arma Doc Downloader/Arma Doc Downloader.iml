@@ -10,13 +10,13 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../../Files/jsoup library/jsoup-1.8.3.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jsoup-1.8.3.jar!/" />
         </CLASSES>
         <JAVADOC>
-          <root url="jar://$MODULE_DIR$/../../../../Files/jsoup library/jsoup-1.8.3-javadoc.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jsoup-1.8.3-javadoc.jar!/" />
         </JAVADOC>
         <SOURCES>
-          <root url="jar://$MODULE_DIR$/../../../../Files/jsoup library/jsoup-1.8.3-sources.jar!/" />
+          <root url="jar://$MODULE_DIR$/lib/jsoup-1.8.3-sources.jar!/" />
         </SOURCES>
       </library>
     </orderEntry>
