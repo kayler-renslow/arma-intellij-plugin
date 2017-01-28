@@ -65,6 +65,7 @@ public class SQFStatic {
 		return type == SQFTypes.COMMAND_TOKEN || type == SQFTypes.COMMAND || type == SQFTypes.CASE || type == SQFTypes.CASE_COMMAND;
 	}
 
+
 	/**
 	 * Fetch command syntax for given command. This method will fetch the syntax and params from file and make it readable. Example: "paramName COMMAND paramName2" to "paramName:Number COMMAND paramName2:Number"
 	 *
@@ -116,6 +117,11 @@ public class SQFStatic {
 		return new SQFFunctionTagAndName(tagName, functionClassName);
 	}
 
+	@NotNull
+	public static SQFFunctionTagAndName getFunctionTagAndName(@NotNull SQFVariableName fullFunctionName) {
+		return getFunctionTagAndName(fullFunctionName.textOriginal());
+	}
+
 	/**
 	 * Takes a tag and class name and returns the full SQF callable function name (e.g. tag_fnc_className)
 	 *
@@ -149,25 +155,28 @@ public class SQFStatic {
 		return variable.matches(FUNCTION_NAMING_RULE_REGEX); //don't need to explicitly check if a number starts the variable name since that is asserted by the lexer
 	}
 
+	public static boolean followsSQFFunctionNameRules(@NotNull SQFVariableName name) {
+		return followsSQFFunctionNameRules(name.text());
+	}
+
 	/**
 	 * Return true if the given var name is a BIS function, false if it isn't.
 	 */
 	public static boolean isBisFunction(String varName) {
-		if (!varName.startsWith("BIS_fnc_")) { //do a quick check instead of always doing a bin search.
+		if (!varName.toLowerCase().startsWith("bis_fnc_")) { //do a quick check instead of always doing a bin search.
 			return false;
 		}
 		return Collections.binarySearch(LIST_BIS_FUNCTIONS, varName) >= 0;
 	}
 
 	/**
-	 * Checks if the given variable name is possibly a BIS function (varName starts with BIS_).
+	 * Checks if the given variable name is possibly a BIS function (varName starts with bis_ and isn't case sensitive).
 	 *
 	 * @param varName variable name to check
 	 * @return true if starts with BIS_, false otherwise
 	 */
 	public static boolean isMaybeBISFunction(String varName) {
-		String bis = "BIS_";
-		return varName.startsWith(bis);
+		return varName.toLowerCase().startsWith("bis_");
 	}
 
 	public static String getCommandDocumentation(String commandName) {

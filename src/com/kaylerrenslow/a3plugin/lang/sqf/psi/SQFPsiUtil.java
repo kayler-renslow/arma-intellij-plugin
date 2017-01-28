@@ -69,7 +69,7 @@ public class SQFPsiUtil {
 	 */
 	public static boolean isBisFunction(@NotNull PsiElement element) {
 		if (PsiUtil.isOfElementType(element, SQFTypes.VARIABLE)) {
-			return SQFStatic.isBisFunction(((SQFVariable) element).getVarName());
+			return SQFStatic.isBisFunction(((SQFVariable) element).getVarName().text());
 		}
 		if (PsiUtil.isOfElementType(element, SQFTypes.GLOBAL_VAR)) {
 			SQFStatic.isBisFunction(element.getText());
@@ -199,7 +199,7 @@ public class SQFPsiUtil {
 					continue;
 				}
 				if (SQFStatic.followsSQFFunctionNameRules(var.getVarName())) {
-					SQFStatic.SQFFunctionTagAndName tagAndName = SQFStatic.getFunctionTagAndName(var.getVarName());
+					SQFStatic.SQFFunctionTagAndName tagAndName = SQFStatic.getFunctionTagAndName(var.getVarName().text());
 					if (tagAndName.tagName.equals(tag)) {
 						result.add(var);
 					}

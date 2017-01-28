@@ -69,7 +69,7 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider {
 			if (variable.getParent().getParent() instanceof SQFCommandExpression) {
 				SQFCommandExpression commandExpression = (SQFCommandExpression) variable.getParent().getParent();
 				PsiElement postfixArg = commandExpression.getPostfixArgument();
-				if (postfixArg != null && postfixArg.getText().equals(variable.getVarName())) {
+				if (postfixArg != null && variable.getVarName().nameEquals(postfixArg.getText())) {
 					if (commandExpression.getCommandName().equals("call")) {
 						return TYPE_FUNCTION_CALL;
 					}

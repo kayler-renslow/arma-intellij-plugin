@@ -52,7 +52,7 @@ public class SQFLocalVarsInStringReference implements PsiPolyVariantReference {
 	@NotNull
 	@Override
 	public String getCanonicalText() {
-		return targetVars.get(0).getVarName();
+		return targetVars.get(0).getVarName().text();
 	}
 
 	@Override

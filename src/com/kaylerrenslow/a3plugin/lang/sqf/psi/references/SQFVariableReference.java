@@ -39,7 +39,7 @@ public class SQFVariableReference implements PsiPolyVariantReference {
 
 	@Override
 	public TextRange getRangeInElement() {
-		return TextRange.allOf(var.getVarName());
+		return TextRange.allOf(var.getVarName().text());
 	}
 
 	@Nullable
@@ -51,7 +51,7 @@ public class SQFVariableReference implements PsiPolyVariantReference {
 	@NotNull
 	@Override
 	public String getCanonicalText() {
-		return targets[0].getVarName();
+		return targets[0].getVarName().text();
 	}
 
 	@Override
@@ -68,7 +68,7 @@ public class SQFVariableReference implements PsiPolyVariantReference {
 	public boolean isReferenceTo(PsiElement element) {
 		if (element instanceof SQFString) {
 			SQFString sqfString = (SQFString) element;
-			return sqfString.getNonQuoteText().equals(var.getVarName());
+			return var.getVarName().equals(sqfString.getNonQuoteText());
 		}
 		if (!(element instanceof SQFVariable)) {
 			return false;

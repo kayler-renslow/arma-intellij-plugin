@@ -8,6 +8,7 @@
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/grammars" type="java-resource" relativeOutputPath="com.kaylerrenslow.a3plugin.lang" />
+      <sourceFolder url="file://$MODULE_DIR$/raw_doc" type="java-resource" relativeOutputPath="com.kaylerrenslow.a3plugin.lang.sqf.raw_doc" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

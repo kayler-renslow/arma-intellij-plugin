@@ -15,6 +15,7 @@ import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.privatization.SQFPrivatization;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFParamsStatement;
@@ -127,7 +128,7 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 						} else {
 							SQFAssignment assignment = PsiUtil.getFirstAncestorOfType(resolveVar, SQFAssignment.class, null);
 							if (assignment != null) {
-								if (assignment.getAssigningVariable().varNameMatches(var)) {
+								if (assignment.getAssigningVariable().getVarName().equals(var)) {
 									numSelfAssignments++;
 								}
 							}
@@ -183,7 +184,7 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 		public void visitScope(@NotNull SQFScope scope) {
 			List<SQFPrivateDeclVar> privateVars = scope.getPrivateVars();
 			Iterator<SQFPrivateDeclVar> iter = privateVars.iterator();
-			List<String> vars = new LinkedList<>();
+			List<SQFVariableName> vars = new LinkedList<>();
 			int matchedIndex;
 			ASTNode currentPrivateVarNode, matchedNode;
 			TextRange rangeCurrentNode, rangeMatchedNode;
@@ -253,7 +254,7 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 						for (SQFCommandExpression commandExpression : commandExpressions) {
 							decl = SQFPrivateDecl.parse(commandExpression);
 							if (decl != null) {
-								SQFCommandExpression newDecl = SQFPsiUtil.createPrivateDeclFromExisting(project, decl, fixVar.getVarName());
+								SQFCommandExpression newDecl = SQFPsiUtil.createPrivateDeclFromExisting(project, decl, fixVar.getVarName().textOriginal());
 								decl.getPrivateDeclExpression().replace(newDecl);
 								return;
 							}

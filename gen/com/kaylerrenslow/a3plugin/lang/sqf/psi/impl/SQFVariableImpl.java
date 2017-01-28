@@ -50,12 +50,5 @@ public class SQFVariableImpl extends SQFVariableNamedElementMixin implements SQF
     return SQFPsiImplUtilForGrammar.getPrivatization(this);
   }
 
-  public boolean varNameMatches(String otherName) {
-    return SQFPsiImplUtilForGrammar.varNameMatches(this, otherName);
-  }
-
-  public boolean varNameMatches(SQFVariableBase variable2) {
-    return SQFPsiImplUtilForGrammar.varNameMatches(this, variable2);
-  }
 
 }

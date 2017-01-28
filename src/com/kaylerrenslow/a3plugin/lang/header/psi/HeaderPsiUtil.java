@@ -15,6 +15,7 @@ import com.kaylerrenslow.a3plugin.lang.header.HeaderFileType;
 import com.kaylerrenslow.a3plugin.lang.header.exception.*;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.a3plugin.project.ArmaProjectDataManager;
 import com.kaylerrenslow.a3plugin.util.Attribute;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
@@ -243,7 +244,7 @@ public class HeaderPsiUtil {
 	 * @throws MalformedConfigException            when the config file is incorrectly being used, formatted, or syntactically incorrect
 	 */
 	@Nullable
-	public static HeaderConfigFunction getFunctionFromCfgFunctions(@NotNull PsiFile psiFile, @NotNull String functionName) throws ConfigClassNotDefinedException, DescriptionExtNotDefinedException, FunctionNotDefinedInConfigException, MalformedConfigException {
+	public static HeaderConfigFunction getFunctionFromCfgFunctions(@NotNull PsiFile psiFile, @NotNull SQFVariableName functionName) throws ConfigClassNotDefinedException, DescriptionExtNotDefinedException, FunctionNotDefinedInConfigException, MalformedConfigException {
 		HeaderClassDeclaration cfgFuncs = getCfgFunctions(psiFile);
 		return getFunctionFromCfgFunctionsBody(functionName, cfgFuncs);
 	}
@@ -260,14 +261,14 @@ public class HeaderPsiUtil {
 	 * @throws MalformedConfigException            when the config file is incorrectly being used, formatted, or syntactically incorrect
 	 */
 	@Nullable
-	public static HeaderConfigFunction getFunctionFromCfgFunctions(@NotNull Module module, @NotNull String functionName) throws ConfigClassNotDefinedException, DescriptionExtNotDefinedException, FunctionNotDefinedInConfigException,
+	public static HeaderConfigFunction getFunctionFromCfgFunctions(@NotNull Module module, @NotNull SQFVariableName functionName) throws ConfigClassNotDefinedException, DescriptionExtNotDefinedException, FunctionNotDefinedInConfigException,
 			MalformedConfigException {
 		HeaderClassDeclaration cfgFuncs = getCfgFunctions(module);
 		return getFunctionFromCfgFunctionsBody(functionName, cfgFuncs);
 	}
 
 	@Nullable
-	private static HeaderConfigFunction getFunctionFromCfgFunctionsBody(@NotNull String functionName, HeaderClassDeclaration cfgFuncs) throws FunctionNotDefinedInConfigException, MalformedConfigException {
+	private static HeaderConfigFunction getFunctionFromCfgFunctionsBody(@NotNull SQFVariableName functionName, HeaderClassDeclaration cfgFuncs) throws FunctionNotDefinedInConfigException, MalformedConfigException {
 		//@formatter:off
 		/*
 		  //some functions
@@ -317,12 +318,12 @@ public class HeaderPsiUtil {
 		if (matchedClassesWithTag.size() == 0) { //no classes of depth 1 relative to CfgFunctions have tag attribute, so find the class itself with its className=tagName
 			classWithTag = getClassDeclaration(cfgFuncs, tagName, true, 1, 1);
 			if (classWithTag == null) {
-				throw new FunctionNotDefinedInConfigException(functionName);
+				throw new FunctionNotDefinedInConfigException(functionName.textOriginal());
 			}
 
 			functionClass = getClassDeclaration(classWithTag, functionClassName, true, 2, 2); //get the first function class
 			if (functionClass == null) {
-				throw new FunctionNotDefinedInConfigException(functionName);
+				throw new FunctionNotDefinedInConfigException(functionName.textOriginal());
 			}
 		} else {
 			for (HeaderClassDeclaration matchedTagClass : matchedClassesWithTag) {
@@ -333,7 +334,7 @@ public class HeaderPsiUtil {
 				}
 			}
 			if (functionClass == null) {
-				throw new FunctionNotDefinedInConfigException(functionName);
+				throw new FunctionNotDefinedInConfigException(functionName.textOriginal());
 			}
 		}
 

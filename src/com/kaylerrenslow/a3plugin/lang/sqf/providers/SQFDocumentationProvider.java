@@ -14,6 +14,7 @@ import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringTable;
 import com.kaylerrenslow.a3plugin.lang.shared.stringtable.StringTableLookupElementDataObject;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.util.PluginUtil;
 import org.jetbrains.annotations.NotNull;
@@ -140,7 +141,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 					return null;
 				}
 				String functionName = link.substring(DOC_LINK_PREFIX_USER_FUNCTION.length());
-				HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, functionName);
+				HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, new SQFVariableName(functionName));
 				if (function != null) {
 					if (!function.getFunctionFileExtension().equals(".sqf")) {
 						return function.getClassDeclaration();

@@ -6,7 +6,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableBase;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.privatization.SQFPrivatization;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFParamsStatement;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFPrivateAssignmentPrivatizer;
@@ -152,7 +151,7 @@ public class SQFPsiImplUtilForGrammar {
 				if (assignment.getAssigningVariable() == var) {
 					returnScope = containingScope;
 				}
-				if (assignment.getAssigningVariable().varNameMatches(var)) {
+				if (assignment.getAssigningVariable().getVarName().equals(var)) {
 					//name matches. check to make sure the assignment comes before where var is
 					if (assignment.getNode().getStartOffset() < var.getNode().getStartOffset()) {
 						returnScope = containingScope; //do not return yet. We need to go up as high as possible
@@ -183,7 +182,7 @@ public class SQFPsiImplUtilForGrammar {
 
 		boolean _this = false; //true if var's name = _this
 		if (var.getVariableType() == SQFTypes.LANG_VAR) {
-			if (var.getVarName().equals("_this")) { //_this is either file scope or spawn's statement scope
+			if (var.getVarName().nameEquals("_this")) { //_this is either file scope or spawn's statement scope
 				_this = true;
 			} else {
 				return new SQFPrivatization.SQFVarInheritedPrivatization(var, containingScope);
@@ -245,7 +244,7 @@ public class SQFPsiImplUtilForGrammar {
 								List<SQFStatement> statementList = firstCodeBlock.getLocalScope().getStatementList();
 								for (SQFStatement statement : statementList) {
 									if (statement.getAssignment() != null) {
-										if (statement.getAssignment().getAssigningVariable().varNameMatches(var)) {
+										if (statement.getAssignment().getAssigningVariable().getVarName().equals(var)) {
 											return SQFPrivatization.getPrivatization(var, firstCodeBlock.getLocalScope());
 										}
 									}
@@ -295,16 +294,6 @@ public class SQFPsiImplUtilForGrammar {
 		}
 		return statements;
 	}
-
-
-	public static boolean varNameMatches(SQFVariableBase variable, String otherName) {
-		return variable.getVarName().equals(otherName);
-	}
-
-	public static boolean varNameMatches(SQFVariableBase variable1, SQFVariableBase variable2) {
-		return variable1.varNameMatches(variable2.getVarName());
-	}
-
 
 	/**
 	 * Get all the declared private variables for the given scope. This will not go deeper than the current scope.

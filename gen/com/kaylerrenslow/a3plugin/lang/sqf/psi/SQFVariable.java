@@ -22,8 +22,4 @@ public interface SQFVariable extends SQFVariableNamedElement {
   @Nullable
   SQFPrivatization getPrivatization();
 
-  boolean varNameMatches(String otherName);
-
-  boolean varNameMatches(SQFVariableBase variable2);
-
 }

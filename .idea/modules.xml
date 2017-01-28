@@ -2,10 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/../Arma Command Syntax Tool/Arma Command Syntax Tool.iml" filepath="$PROJECT_DIR$/../Arma Command Syntax Tool/Arma Command Syntax Tool.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../Arma Doc Downloader/Arma Doc Downloader.iml" filepath="$PROJECT_DIR$/../Arma Doc Downloader/Arma Doc Downloader.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Arma Doc Downloader/Arma Doc Downloader.iml" filepath="$PROJECT_DIR$/Arma Doc Downloader/Arma Doc Downloader.iml" />
       <module fileurl="file://$PROJECT_DIR$/Arma Intellij Plugin.iml" filepath="$PROJECT_DIR$/Arma Intellij Plugin.iml" />
-      <module fileurl="file://$PROJECT_DIR$/../PBO Extractor/PBO Extractor.iml" filepath="$PROJECT_DIR$/../PBO Extractor/PBO Extractor.iml" />
     </modules>
   </component>
 </project>

@@ -1,8 +1,10 @@
 package com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper;
 
 import com.intellij.psi.PsiElement;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.privatization.SQFPrivatizer;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -18,7 +20,7 @@ public class SQFParamsStatement implements SQFPrivatizer {
 	private final SQFCommandExpression paramsCommandExpression;
 	private final SQFArrayVal paramsArray;
 	private final List<SQFPrivateDeclVar> privateDeclVars = new ArrayList<>();
-	private final List<String> varsDefined = new ArrayList<>();
+	private final List<SQFVariableName> varsDefined = new ArrayList<>();
 
 	private SQFParamsStatement(SQFCommandExpression paramsCommandExpression, SQFArrayVal paramsArray) {
 		this.paramsCommandExpression = paramsCommandExpression;
@@ -40,6 +42,7 @@ public class SQFParamsStatement implements SQFPrivatizer {
 	/**
 	 * Get a list of all private vars
 	 */
+	@NotNull
 	@Override
 	public List<SQFPrivateDeclVar> getPrivateVars() {
 		return privateDeclVars;
@@ -48,14 +51,15 @@ public class SQFParamsStatement implements SQFPrivatizer {
 	/**
 	 * Get all variables that are defined inside the params statement (may not contain all private decl vars)
 	 */
-	public List<String> getVarsDefined() {
+	@NotNull
+	public List<SQFVariableName> getVarsDefined() {
 		return varsDefined;
 	}
 
 	/**
 	 * Return true if the variable is defined, false otherwise. (effectively the same thing as getVarsDefined().contains(varName))
 	 */
-	public boolean varIsDefined(String varName) {
+	public boolean varIsDefined(@NotNull SQFVariableName varName) {
 		return varsDefined.contains(varName);
 	}
 
@@ -96,7 +100,7 @@ public class SQFParamsStatement implements SQFPrivatizer {
 										if (innerArrayEntries.get(1).getText().equals("nil") && prefix == null) { //params [["_var", nil]]; //nil is lack of a value
 											continue;
 										}
-										paramsStatement.varsDefined.add(possibleString.getString().getNonQuoteText());
+										paramsStatement.varsDefined.add(new SQFVariableName(possibleString.getString().getNonQuoteText()));
 									}
 								}
 							}

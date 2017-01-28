@@ -9,6 +9,7 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.a3plugin.lang.shared.PsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFFunctionItemPresentation;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.presentation.SQFVariableItemPresentation;
@@ -28,10 +29,12 @@ import java.util.ArrayList;
  */
 public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implements SQFVariableNamedElement, SQFVariable {
 	private final IElementType myVariableElementType;
+	private SQFVariableName varName;
 
 	public SQFVariableNamedElementMixin(@NotNull ASTNode node) {
 		super(node);
 		this.myVariableElementType = this.getNode().getFirstChildNode().getElementType();
+		varName = new SQFVariableName(node.getText());
 	}
 
 	@Override
@@ -53,7 +56,7 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 	public ItemPresentation getPresentation() {
 		if (this.isGlobalVariable()) {
 			if (SQFStatic.followsSQFFunctionNameRules(this.getVarName())) {
-				return new SQFFunctionItemPresentation(this.getVarName(), this.getContainingFile());
+				return new SQFFunctionItemPresentation(this.getVarName().text(), this.getContainingFile());
 			}
 		}
 		return new SQFVariableItemPresentation(this);
@@ -66,26 +69,33 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 		SQFScope myDeclarationScope = me.getDeclarationScope();
 
 		//need to search entire file because of for spec case (for[{private _i = 0},{},{}] do{/*_i can be referenced here, but from here _i won't be seen*/})
-		ArrayList<SQFVariable> variables = PsiUtil.findDescendantElementsOfInstance(this.getContainingFile(), SQFVariable.class, null, me.getVarName());
+		ArrayList<SQFVariable> variables = PsiUtil.findDescendantElementsOfInstance(this.getContainingFile(), SQFVariable.class, null);
 		ArrayList<SQFVariable> refVars = new ArrayList<>();
 		for (SQFVariable variable : variables) {
+			if (!variable.getVarName().equals(me.getVarName())) {
+				continue;
+			}
 			if (myDeclarationScope == variable.getDeclarationScope()) {
 				refVars.add(variable);
 			}
 		}
-		final String varNameAsQuote = "\"" + me.getVarName() + "\"";
-
 		//get all for loop strings
-		ArrayList<SQFString> stringMatches = PsiUtil.findDescendantElementsOfInstance(getContainingFile(), SQFString.class, null, varNameAsQuote);
+		ArrayList<SQFString> stringMatches = PsiUtil.findDescendantElementsOfInstance(getContainingFile(), SQFString.class, null);
 		ArrayList<SQFString> strings = new ArrayList<>();
 		for (SQFString string : stringMatches) {
+			if (!me.getVarName().equals(string.getNonQuoteText())) {
+				continue;
+			}
 			if (SQFPsiUtil.getForVarScope(string) == myDeclarationScope) { //compare for-loop scope to declaration scope
 				strings.add(string);
 			}
 		}
 		//get all strings inside declaration scope (can differ from for-loop scope)
-		stringMatches = PsiUtil.findDescendantElementsOfInstance(myDeclarationScope, SQFString.class, null, varNameAsQuote);
+		stringMatches = PsiUtil.findDescendantElementsOfInstance(myDeclarationScope, SQFString.class, null);
 		for (SQFString string : stringMatches) {
+			if (!me.getVarName().equals(string.getNonQuoteText())) {
+				continue;
+			}
 			if (!strings.contains(string)) {
 				strings.add(string);
 			}
@@ -125,7 +135,7 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 
 	@Override
 	public String toString() {
-		return "SQFVariableNamedElementMixin{" + this.getName() + "}";
+		return "SQFVariableNamedElementMixin{" + getVarName() + "}";
 	}
 
 	@Nullable
@@ -136,7 +146,7 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 
 	@Override
 	public String getName() {
-		return getNode().getText();
+		return varName.textOriginal();
 	}
 
 	@Override
@@ -146,11 +156,13 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 		}
 		SQFVariable newVar = SQFPsiUtil.createVariable(this.getProject(), name);
 		this.getParent().getNode().replaceChild(this.getNode(), newVar.getNode());
+		this.varName = new SQFVariableName(name);
 		return newVar;
 	}
 
+	@NotNull
 	@Override
-	public String getVarName() {
-		return this.getName();
+	public SQFVariableName getVarName() {
+		return varName;
 	}
 }
