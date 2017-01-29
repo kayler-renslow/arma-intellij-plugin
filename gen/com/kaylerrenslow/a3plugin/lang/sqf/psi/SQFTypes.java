@@ -34,7 +34,6 @@ public interface SQFTypes {
   IElementType MUL_EXPRESSION = new SQFElementType("MUL_EXPRESSION");
   IElementType PAREN_EXPRESSION = new SQFElementType("PAREN_EXPRESSION");
   IElementType QUEST_STATEMENT = new SQFElementType("QUEST_STATEMENT");
-  IElementType RETURN_STATEMENT = new SQFElementType("RETURN_STATEMENT");
   IElementType STATEMENT = new SQFElementType("STATEMENT");
   IElementType STRING = new SQFElementType("STRING");
   IElementType SUB_EXPRESSION = new SQFElementType("SUB_EXPRESSION");
@@ -157,9 +156,6 @@ public interface SQFTypes {
       }
       else if (type == QUEST_STATEMENT) {
         return new SQFQuestStatementImpl(node);
-      }
-      else if (type == RETURN_STATEMENT) {
-        return new SQFReturnStatementImpl(node);
       }
       else if (type == STATEMENT) {
         return new SQFStatementImpl(node);

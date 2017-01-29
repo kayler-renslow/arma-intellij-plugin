@@ -98,10 +98,6 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider {
 
 		}
 
-		if (PsiUtil.isDescendantOf(variable.getNode(), SQFTypes.RETURN_STATEMENT, null)) {
-			return TYPE_RETURN_STATEMENT;
-		}
-
 		return null; //let intellij decide the name
 	}
 

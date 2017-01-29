@@ -34,6 +34,7 @@
 
 **Changed**  
 * commands can now be non-camel case
+* assignments no longer require semicolon
 
 
 **Fixed**  

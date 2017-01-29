@@ -30,7 +30,7 @@
 
 
 **Changed**  
-* 
+* assignments no longer require semicolon
 
 
 **Fixed**  

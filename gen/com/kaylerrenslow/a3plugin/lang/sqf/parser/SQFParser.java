@@ -59,9 +59,6 @@ public class SQFParser implements PsiParser, LightPsiParser {
     else if (t == QUEST_STATEMENT) {
       r = quest_statement(b, 0);
     }
-    else if (t == RETURN_STATEMENT) {
-      r = return_statement(b, 0);
-    }
     else if (t == STATEMENT) {
       r = statement(b, 0);
     }
@@ -84,7 +81,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(FILE_SCOPE, LOCAL_SCOPE),
     create_token_set_(CASE_COMMAND, COMMAND),
-    create_token_set_(CASE_STATEMENT, QUEST_STATEMENT, RETURN_STATEMENT, STATEMENT),
+    create_token_set_(CASE_STATEMENT, QUEST_STATEMENT, STATEMENT),
     create_token_set_(ADD_EXPRESSION, BOOL_AND_EXPRESSION, BOOL_NOT_EXPRESSION, BOOL_OR_EXPRESSION,
       CODE_BLOCK, COMMAND_EXPRESSION, COMP_EXPRESSION, CONFIG_FETCH_EXPRESSION,
       DIV_EXPRESSION, EXPONENT_EXPRESSION, EXPRESSION, LITERAL_EXPRESSION,
@@ -307,52 +304,32 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // item_* return_statement? (comment )*
+  // items_ (comment )*
   public static boolean file_scope(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "file_scope")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, FILE_SCOPE, "<file scope>");
-    r = file_scope_0(b, l + 1);
+    r = items_(b, l + 1);
     r = r && file_scope_1(b, l + 1);
-    r = r && file_scope_2(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
-  // item_*
-  private static boolean file_scope_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "file_scope_0")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!item_(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "file_scope_0", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // return_statement?
+  // (comment )*
   private static boolean file_scope_1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "file_scope_1")) return false;
-    return_statement(b, l + 1);
-    return true;
-  }
-
-  // (comment )*
-  private static boolean file_scope_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "file_scope_2")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!file_scope_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "file_scope_2", c)) break;
+      if (!file_scope_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "file_scope_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // (comment )
-  private static boolean file_scope_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "file_scope_2_0")) return false;
+  private static boolean file_scope_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "file_scope_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = comment(b, l + 1);
@@ -361,64 +338,85 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // comment | statement
-  static boolean item_(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "item_")) return false;
+  // (comment | statement SEMICOLON)* statement?
+  static boolean items_(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "items_")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = comment(b, l + 1);
-    if (!r) r = statement(b, l + 1);
+    r = items__0(b, l + 1);
+    r = r && items__1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
-  /* ********************************************************** */
-  // item_* return_statement? (comment)*
-  public static boolean local_scope(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "local_scope")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, LOCAL_SCOPE, "<local scope>");
-    r = local_scope_0(b, l + 1);
-    r = r && local_scope_1(b, l + 1);
-    r = r && local_scope_2(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // item_*
-  private static boolean local_scope_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "local_scope_0")) return false;
+  // (comment | statement SEMICOLON)*
+  private static boolean items__0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "items__0")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!item_(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "local_scope_0", c)) break;
+      if (!items__0_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "items__0", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
-  // return_statement?
-  private static boolean local_scope_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "local_scope_1")) return false;
-    return_statement(b, l + 1);
+  // comment | statement SEMICOLON
+  private static boolean items__0_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "items__0_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = comment(b, l + 1);
+    if (!r) r = items__0_0_1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // statement SEMICOLON
+  private static boolean items__0_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "items__0_0_1")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = statement(b, l + 1);
+    r = r && consumeToken(b, SEMICOLON);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // statement?
+  private static boolean items__1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "items__1")) return false;
+    statement(b, l + 1);
     return true;
   }
 
+  /* ********************************************************** */
+  // items_ (comment)*
+  public static boolean local_scope(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "local_scope")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, LOCAL_SCOPE, "<local scope>");
+    r = items_(b, l + 1);
+    r = r && local_scope_1(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
   // (comment)*
-  private static boolean local_scope_2(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "local_scope_2")) return false;
+  private static boolean local_scope_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "local_scope_1")) return false;
     int c = current_position_(b);
     while (true) {
-      if (!local_scope_2_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "local_scope_2", c)) break;
+      if (!local_scope_1_0(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "local_scope_1", c)) break;
       c = current_position_(b);
     }
     return true;
   }
 
   // (comment)
-  private static boolean local_scope_2_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "local_scope_2_0")) return false;
+  private static boolean local_scope_1_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "local_scope_1_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = comment(b, l + 1);
@@ -480,52 +478,22 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // expression SEMICOLON?
-  public static boolean return_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "return_statement")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, RETURN_STATEMENT, "<Return Statement>");
-    r = expression(b, l + 1, -1);
-    r = r && return_statement_1(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // SEMICOLON?
-  private static boolean return_statement_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "return_statement_1")) return false;
-    consumeToken(b, SEMICOLON);
-    return true;
-  }
-
-  /* ********************************************************** */
   // file_scope
   static boolean sqfFile(PsiBuilder b, int l) {
     return file_scope(b, l + 1);
   }
 
   /* ********************************************************** */
-  // ( assignment | case_statement | expression | quest_statement ) SEMICOLON
+  // assignment | case_statement | expression | quest_statement
   public static boolean statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "statement")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, STATEMENT, "<statement>");
-    r = statement_0(b, l + 1);
-    r = r && consumeToken(b, SEMICOLON);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // assignment | case_statement | expression | quest_statement
-  private static boolean statement_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "statement_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _COLLAPSE_, STATEMENT, "<statement>");
     r = assignment(b, l + 1);
     if (!r) r = case_statement(b, l + 1);
     if (!r) r = expression(b, l + 1, -1);
     if (!r) r = quest_statement(b, l + 1);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 

@@ -14,7 +14,6 @@
 
   psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiImplUtilForGrammar"
 
-  name("return_statement")="Return Statement"
   name("macro_call")="Macro Call"
   name("assignment")="Assignment"
   name("expression")="Expression"
@@ -25,17 +24,16 @@
 // @formatter:off
 sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
 
-file_scope ::= item_* return_statement? (comment )* {extends("file_scope")=local_scope}
-local_scope ::= item_* return_statement? (comment)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateVars getStatementsForScope checkIfSpawn getPrivatizerElement getCodeBlock]}
+file_scope ::= items_ (comment )* {extends("file_scope")=local_scope}
+local_scope ::= items_ (comment)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateVars getStatementsForScope checkIfSpawn getPrivatizerElement getCodeBlock]}
 
-private item_ ::= comment | statement
+private items_ ::= (comment | statement SEMICOLON)* statement?
 
 comment ::= INLINE_COMMENT | BLOCK_COMMENT
 variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope isAssigningVariable getMyAssignment getPrivatization varNameMatches]}
 
-statement ::= ( assignment | case_statement | expression | quest_statement ) SEMICOLON //case statement must come before expression or it will think that case is a command
+statement ::= ( assignment | case_statement | expression | quest_statement ) //case statement must come before expression or it will think that case is a command
 
-return_statement ::= expression SEMICOLON?
 quest_statement ::= QUEST expression COLON expression
 case_statement ::= case_command expression (COLON code_block)?
 

@@ -10,7 +10,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableBase;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.privatization.SQFPrivatization;
 
 public class SQFVariableImpl extends SQFVariableNamedElementMixin implements SQFVariable {
@@ -49,6 +48,5 @@ public class SQFVariableImpl extends SQFVariableNamedElementMixin implements SQF
   public SQFPrivatization getPrivatization() {
     return SQFPsiImplUtilForGrammar.getPrivatization(this);
   }
-
 
 }

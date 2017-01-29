@@ -34,20 +34,8 @@ public class SQFStatementImpl extends ASTWrapperPsiElement implements SQFStateme
 
   @Override
   @Nullable
-  public SQFCaseStatement getCaseStatement() {
-    return findChildByClass(SQFCaseStatement.class);
-  }
-
-  @Override
-  @Nullable
   public SQFExpression getExpression() {
     return findChildByClass(SQFExpression.class);
-  }
-
-  @Override
-  @Nullable
-  public SQFQuestStatement getQuestStatement() {
-    return findChildByClass(SQFQuestStatement.class);
   }
 
 }

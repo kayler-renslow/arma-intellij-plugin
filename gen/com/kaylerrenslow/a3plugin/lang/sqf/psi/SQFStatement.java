@@ -11,12 +11,6 @@ public interface SQFStatement extends PsiElement {
   SQFAssignment getAssignment();
 
   @Nullable
-  SQFCaseStatement getCaseStatement();
-
-  @Nullable
   SQFExpression getExpression();
-
-  @Nullable
-  SQFQuestStatement getQuestStatement();
 
 }
