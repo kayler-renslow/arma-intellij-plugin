@@ -10,3 +10,6 @@ Finding scope for sqf variables, especially with loops
     hint str _i; // 100
     ```
 * private doesn't work very well inside spawn
+
+### Minor
+* https://github.com/kayler-renslow/arma-intellij-plugin/issues/37
