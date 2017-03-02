@@ -49,6 +49,7 @@ public interface HeaderTypes {
   IElementType MINUS = new HeaderTokenType("MINUS");
   IElementType NUMBER_LITERAL = new HeaderTokenType("NUMBER_LITERAL");
   IElementType PLUS = new HeaderTokenType("PLUS");
+  IElementType PLUS_EQ = new HeaderTokenType("PLUS_EQ");
   IElementType PREPROCESS_EVAL = new HeaderTokenType("PREPROCESS_EVAL");
   IElementType PREPROCESS_EXEC = new HeaderTokenType("PREPROCESS_EXEC");
   IElementType PREPROCESS_INCLUDE = new HeaderTokenType("PREPROCESS_INCLUDE");

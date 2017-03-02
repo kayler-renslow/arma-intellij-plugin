@@ -58,7 +58,7 @@ INCLUDE = "#include"
 
 MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
 MACRO_TEXT = {MACRO_CHARACTER}+
-MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}
+MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {LINE_TERMINATOR}? {MACRO_TEXT}?
 
 
 %%
@@ -87,6 +87,7 @@ MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}
 
 <YYINITIAL> "="   { return HeaderTypes.EQ; }
 
+<YYINITIAL> "+="   { return HeaderTypes.PLUS_EQ; }
 <YYINITIAL> "+"   { return HeaderTypes.PLUS; }
 <YYINITIAL> "-"   { return HeaderTypes.MINUS; }
 <YYINITIAL> "/"   { return HeaderTypes.FSLASH; }

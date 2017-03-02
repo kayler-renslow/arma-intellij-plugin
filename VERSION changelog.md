@@ -51,4 +51,6 @@
 
 
 **Fixed**  
-* 
+* [header stringtable key created stack overflow](https://github.com/kayler-renslow/arma-intellij-plugin/issues/40)
+* [header didn't support += operator](https://github.com/kayler-renslow/arma-intellij-plugin/issues/41)
+* stringtable keys couldn't be in arrays

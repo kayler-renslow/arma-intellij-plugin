@@ -37,7 +37,6 @@ DEC_LITERAL = ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 HEX_LITERAL = [0] [xX] [0]* {HEX_DIGIT} {1,8}
 HEX_DIGIT   = [0-9a-fA-F]
 
-ESCAPE_SEQUENCE = \\[^\r\n]
 
 STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 
@@ -51,7 +50,7 @@ INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 MACRO_NEWLINE = ("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*
 MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
 MACRO_TEXT = {MACRO_CHARACTER}+
-MACRO = "#" {MACRO_TEXT}
+MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {LINE_TERMINATOR}? {MACRO_TEXT}?
 
 %%
 

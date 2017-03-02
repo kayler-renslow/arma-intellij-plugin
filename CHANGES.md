@@ -30,11 +30,11 @@
 
 
 **Changed**  
-* assignments no longer require semicolon
+* 
 
 
 **Fixed**  
-* preprocessor does a better job ignoring itself
+* 
 
 
 ### Header
@@ -47,4 +47,5 @@
 
 
 **Fixed**  
-* preprocessor does a better job ignoring itself
+* [header didn't support += operator](https://github.com/kayler-renslow/arma-intellij-plugin/issues/41)
+* stringtable keys couldn't be in arrays
