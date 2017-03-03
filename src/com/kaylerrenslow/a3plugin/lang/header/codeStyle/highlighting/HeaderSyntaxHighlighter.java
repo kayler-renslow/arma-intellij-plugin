@@ -59,7 +59,7 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase {
 
 	private static final TextAttributesKey[] EMPTY_KEYS = new TextAttributesKey[0];
 
-	private static final IElementType[] OPERATORS = {HeaderTypes.EQ, HeaderTypes.BRACKET_PAIR, HeaderTypes.COLON, HeaderTypes.FSLASH, HeaderTypes.MINUS, HeaderTypes.PLUS};
+	private static final IElementType[] OPERATORS = {HeaderTypes.EQ, HeaderTypes.BRACKET_PAIR, HeaderTypes.COLON, HeaderTypes.FSLASH, HeaderTypes.MINUS, HeaderTypes.PLUS, HeaderTypes.PLUS_EQ};
 	private static final IElementType[] KEYWORDS = {HeaderTypes.CLASS};
 
 
