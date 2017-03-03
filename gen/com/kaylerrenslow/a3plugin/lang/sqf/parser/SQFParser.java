@@ -304,36 +304,13 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // items_ (comment )*
+  // scope_helper_
   public static boolean file_scope(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "file_scope")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, FILE_SCOPE, "<file scope>");
-    r = items_(b, l + 1);
-    r = r && file_scope_1(b, l + 1);
+    r = scope_helper_(b, l + 1);
     exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // (comment )*
-  private static boolean file_scope_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "file_scope_1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!file_scope_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "file_scope_1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // (comment )
-  private static boolean file_scope_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "file_scope_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = comment(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -391,36 +368,13 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // items_ (comment)*
+  // scope_helper_
   public static boolean local_scope(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "local_scope")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, LOCAL_SCOPE, "<local scope>");
-    r = items_(b, l + 1);
-    r = r && local_scope_1(b, l + 1);
+    r = scope_helper_(b, l + 1);
     exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // (comment)*
-  private static boolean local_scope_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "local_scope_1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!local_scope_1_0(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "local_scope_1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
-  }
-
-  // (comment)
-  private static boolean local_scope_1_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "local_scope_1_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = comment(b, l + 1);
-    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -475,6 +429,30 @@ public class SQFParser implements PsiParser, LightPsiParser {
     r = r && expression(b, l + 1, -1);
     exit_section_(b, m, QUEST_STATEMENT, r);
     return r;
+  }
+
+  /* ********************************************************** */
+  // items_ comment*
+  static boolean scope_helper_(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "scope_helper_")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = items_(b, l + 1);
+    r = r && scope_helper__1(b, l + 1);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  // comment*
+  private static boolean scope_helper__1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "scope_helper__1")) return false;
+    int c = current_position_(b);
+    while (true) {
+      if (!comment(b, l + 1)) break;
+      if (!empty_element_parsed_guard_(b, "scope_helper__1", c)) break;
+      c = current_position_(b);
+    }
+    return true;
   }
 
   /* ********************************************************** */

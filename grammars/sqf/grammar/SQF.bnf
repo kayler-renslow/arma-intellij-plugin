@@ -22,10 +22,11 @@
   extends(".*_statement")=statement
 }
 // @formatter:off
-sqfFile ::= file_scope //need both file_scope and scope or sqfFile will be discarded
+sqfFile ::= file_scope //first rule is private. place file_scope inside and file_scope will be root rule
 
-file_scope ::= items_ (comment )* {extends("file_scope")=local_scope}
-local_scope ::= items_ (comment)* {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateVars getStatementsForScope checkIfSpawn getPrivatizerElement getCodeBlock]}
+file_scope ::= scope_helper_ {extends("file_scope")=local_scope}
+local_scope ::= scope_helper_ {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateVars getStatementsForScope checkIfSpawn getPrivatizerElement getCodeBlock]}
+private scope_helper_ ::= items_ comment*
 
 private items_ ::= (comment | statement SEMICOLON)* statement?
 

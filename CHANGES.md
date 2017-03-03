@@ -47,4 +47,4 @@
 
 
 **Fixed**  
-* added += to syntax highlighter
+* 
