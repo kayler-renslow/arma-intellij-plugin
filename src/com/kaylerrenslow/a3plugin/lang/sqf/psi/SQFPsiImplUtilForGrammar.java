@@ -82,7 +82,7 @@ public class SQFPsiImplUtilForGrammar {
 	}
 
 	public static boolean isDeclaredPrivate(SQFAssignment assignment) {
-		return assignment.getCommand() != null && assignment.getCommand().getText().equals("private");
+		return assignment.getPrivateCommand() != null;
 	}
 
 

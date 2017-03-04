@@ -10,25 +10,19 @@ import com.intellij.psi.util.PsiTreeUtil;
 import static com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes.*;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 
-public class SQFUnaryExpressionImpl extends SQFExpressionImpl implements SQFUnaryExpression {
+public class SQFPrivateCommandImpl extends SQFCommandImpl implements SQFPrivateCommand {
 
-  public SQFUnaryExpressionImpl(ASTNode node) {
+  public SQFPrivateCommandImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SQFVisitor visitor) {
-    visitor.visitUnaryExpression(this);
+    visitor.visitPrivateCommand(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SQFVisitor) accept((SQFVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @Nullable
-  public SQFExpression getExpression() {
-    return findChildByClass(SQFExpression.class);
   }
 
 }

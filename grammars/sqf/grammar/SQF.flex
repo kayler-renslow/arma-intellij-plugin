@@ -73,8 +73,6 @@ MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {LINE_TERMINA
 <YYINITIAL> "_forEachIndex" { return SQFTypes.LANG_VAR; }
 <YYINITIAL> "_exception" { return SQFTypes.LANG_VAR; }
 
-<YYINITIAL> "case" { return SQFTypes.CASE; }
-
 
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }
 <YYINITIAL> {GLOBAL_VAR} {

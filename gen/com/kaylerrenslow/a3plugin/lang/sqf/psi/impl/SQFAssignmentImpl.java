@@ -28,14 +28,14 @@ public class SQFAssignmentImpl extends ASTWrapperPsiElement implements SQFAssign
 
   @Override
   @Nullable
-  public SQFCommand getCommand() {
-    return findChildByClass(SQFCommand.class);
+  public SQFExpression getExpression() {
+    return findChildByClass(SQFExpression.class);
   }
 
   @Override
-  @NotNull
-  public SQFExpression getExpression() {
-    return findNotNullChildByClass(SQFExpression.class);
+  @Nullable
+  public SQFPrivateCommand getPrivateCommand() {
+    return findChildByClass(SQFPrivateCommand.class);
   }
 
   @Override

@@ -11,7 +11,6 @@ import com.kaylerrenslow.a3plugin.Plugin;
 import com.kaylerrenslow.a3plugin.lang.shared.DocumentationTagUtil;
 import com.kaylerrenslow.a3plugin.lang.shared.DocumentationUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighter;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFAssignment;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFCommandExpression;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFLiteralExpression;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVisitor;
@@ -99,16 +98,6 @@ public class SQFAnnotator implements Annotator {
 
 			}
 		}
-
-		@Override
-		public void visitAssignment(@NotNull SQFAssignment o) {
-			if (o.getCommand() != null) {
-				if (!o.getCommand().getText().equals("private")) {
-					expect("private", o.getCommand());
-				}
-			}
-		}
-
 
 	}
 

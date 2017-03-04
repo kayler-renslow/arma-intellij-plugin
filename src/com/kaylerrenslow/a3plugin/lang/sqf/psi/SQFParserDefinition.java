@@ -45,6 +45,13 @@ public class SQFParserDefinition implements ParserDefinition {
 
 	private static final IFileElementType FILE = new IFileElementType(Language.<SQFLanguage>findInstance(SQFLanguage.class));
 
+	/**
+	 * Return true if the given type refers to a command, false otherwise
+	 */
+	public static boolean isCommand(IElementType type) {
+		return type == SQFTypes.COMMAND || type == SQFTypes.COMMAND_TOKEN;
+	}
+
 	@NotNull
 	@Override
 	public Lexer createLexer(Project project) {

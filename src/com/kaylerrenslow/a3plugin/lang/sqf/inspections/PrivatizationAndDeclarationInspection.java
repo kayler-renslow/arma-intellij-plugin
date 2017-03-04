@@ -123,8 +123,12 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 
 					if (resolve instanceof SQFVariable) {
 						SQFVariable resolveVar = (SQFVariable) resolve;
-						if (resolveVar.isAssigningVariable() && !resolveVar.getMyAssignment().getExpression().getText().equals("nil")) {
-							numAssignments++;
+						SQFAssignment varAssignment = resolveVar.isAssigningVariable() ? resolveVar.getMyAssignment() : null;
+						if (varAssignment != null) {
+							SQFExpression assignmentExpression = varAssignment.getExpression();
+							if (assignmentExpression != null && !assignmentExpression.getText().equals("nil")) {
+								numAssignments++;
+							}
 						} else {
 							SQFAssignment assignment = PsiUtil.getFirstAncestorOfType(resolveVar, SQFAssignment.class, null);
 							if (assignment != null) {
@@ -133,6 +137,7 @@ public class PrivatizationAndDeclarationInspection extends LocalInspectionTool {
 								}
 							}
 						}
+
 						if (isGlobalVar) {
 							if (SQFStatic.followsSQFFunctionNameRules(resolveVar.getVarName())) {
 								isFunction = true;

@@ -32,6 +32,7 @@ public interface SQFTypes {
   IElementType MOD_EXPRESSION = new SQFElementType("MOD_EXPRESSION");
   IElementType MUL_EXPRESSION = new SQFElementType("MUL_EXPRESSION");
   IElementType PAREN_EXPRESSION = new SQFElementType("PAREN_EXPRESSION");
+  IElementType PRIVATE_COMMAND = new SQFElementType("PRIVATE_COMMAND");
   IElementType QUEST_STATEMENT = new SQFElementType("QUEST_STATEMENT");
   IElementType STATEMENT = new SQFElementType("STATEMENT");
   IElementType STRING = new SQFElementType("STRING");
@@ -43,7 +44,6 @@ public interface SQFTypes {
   IElementType ASTERISK = new SQFTokenType("ASTERISK");
   IElementType BARBAR = new SQFTokenType("BARBAR");
   IElementType CARET = new SQFTokenType("CARET");
-  IElementType CASE = new SQFTokenType("CASE");
   IElementType COLON = new SQFTokenType("COLON");
   IElementType COMMA = new SQFTokenType("COMMA");
   IElementType COMMAND_TOKEN = new SQFTokenType("COMMAND_TOKEN");
@@ -147,6 +147,9 @@ public interface SQFTypes {
       }
       else if (type == PAREN_EXPRESSION) {
         return new SQFParenExpressionImpl(node);
+      }
+      else if (type == PRIVATE_COMMAND) {
+        return new SQFPrivateCommandImpl(node);
       }
       else if (type == QUEST_STATEMENT) {
         return new SQFQuestStatementImpl(node);

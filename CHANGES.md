@@ -30,7 +30,8 @@
 
 
 **Changed**  
-* changed how comments are parsed (removed from bnf, created elementtype in parser definition)
+* better grammar error handling
+* all commands are now in lookup.list and when a specific command is required, an external rule is used (private assignment, case command)
 
 
 **Fixed**  
@@ -43,7 +44,7 @@
 
 
 **Changed**  
-* changed how comments are parsed (removed from bnf, created elementtype in parser definition) 
+*  
 
 
 **Fixed**  

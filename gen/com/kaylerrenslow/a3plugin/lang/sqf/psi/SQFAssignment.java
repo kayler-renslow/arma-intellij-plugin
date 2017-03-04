@@ -8,10 +8,10 @@ import com.intellij.psi.PsiElement;
 public interface SQFAssignment extends PsiElement {
 
   @Nullable
-  SQFCommand getCommand();
-
-  @NotNull
   SQFExpression getExpression();
+
+  @Nullable
+  SQFPrivateCommand getPrivateCommand();
 
   @NotNull
   SQFVariable getVariable();

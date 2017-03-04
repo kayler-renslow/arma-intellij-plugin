@@ -5,9 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SQFUnaryExpression extends SQFExpression {
-
-  @Nullable
-  SQFExpression getExpression();
+public interface SQFPrivateCommand extends SQFCommand {
 
 }

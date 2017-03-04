@@ -1,8 +1,6 @@
 package com.kaylerrenslow.a3plugin.lang.sqf;
 
-import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.a3plugin.util.FileReader;
 import com.kaylerrenslow.a3plugin.util.ResourceGetter;
 import com.kaylerrenslow.a3plugin.util.TextFileListToList;
@@ -44,18 +42,9 @@ public class SQFStatic {
 
 	private static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
 
-
-
 	static {
 		Collections.sort(LIST_COMMANDS);
 		Collections.sort(LIST_BIS_FUNCTIONS);
-	}
-
-	/**
-	 * Return true if the given type refers to a command, false otherwise
-	 */
-	public static boolean isCommand(IElementType type) {
-		return type == SQFTypes.COMMAND_TOKEN || type == SQFTypes.COMMAND || type == SQFTypes.CASE || type == SQFTypes.CASE_COMMAND;
 	}
 
 

@@ -105,6 +105,10 @@ public class SQFVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitPrivateCommand(@NotNull SQFPrivateCommand o) {
+    visitCommand(o);
+  }
+
   public void visitQuestStatement(@NotNull SQFQuestStatement o) {
     visitStatement(o);
   }

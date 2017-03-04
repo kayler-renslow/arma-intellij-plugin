@@ -8,7 +8,6 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFLexerAdapter;
-import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
@@ -101,7 +100,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase {
 		if (tokenType.equals(SQFTypes.LANG_VAR)) {
 			return MAGIC_VAR_KEYS;
 		}
-		if (SQFStatic.isCommand(tokenType)) {
+		if (SQFParserDefinition.isCommand(tokenType)) {
 			return COMMAND_KEYS;
 		}
 		for (IElementType e : SQFParserDefinition.OPERATORS) {
