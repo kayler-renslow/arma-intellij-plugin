@@ -164,7 +164,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   public static boolean assignment(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignment")) return false;
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, ASSIGNMENT, "<Assignment>");
+    Marker m = enter_section_(b, l, _NONE_, ASSIGNMENT, "<assignment>");
     r = assignment_0(b, l + 1);
     r = r && variable(b, l + 1);
     r = r && assignment_2(b, l + 1);
@@ -371,7 +371,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   public static boolean macro_call(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "macro_call")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, MACRO_CALL, "<Macro Call>");
+    Marker m = enter_section_(b, l, _NONE_, MACRO_CALL, "<macro call>");
     r = variable(b, l + 1);
     r = r && consumeToken(b, LPAREN);
     r = r && expression(b, l + 1, -1);
@@ -460,11 +460,11 @@ public class SQFParser implements PsiParser, LightPsiParser {
   static boolean return_statement_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "return_statement_")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_);
+    Marker m = enter_section_(b);
     r = case_statement(b, l + 1);
     if (!r) r = expression(b, l + 1, -1);
     if (!r) r = quest_statement(b, l + 1);
-    exit_section_(b, l, m, r, false, recover_statement__parser_);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -529,9 +529,9 @@ public class SQFParser implements PsiParser, LightPsiParser {
   // 10: PREFIX(paren_expression)
   public static boolean expression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "expression")) return false;
-    addVariant(b, "<Expression>");
+    addVariant(b, "<expression>");
     boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, "<Expression>");
+    Marker m = enter_section_(b, l, _NONE_, "<expression>");
     r = bool_not_expression(b, l + 1);
     if (!r) r = command_expression(b, l + 1);
     if (!r) r = unary_expression(b, l + 1);
@@ -756,9 +756,4 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  final static Parser recover_statement__parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return recover_statement_(b, l + 1);
-    }
-  };
 }
