@@ -1,6 +1,7 @@
 ### Major
 * Fix case sensitive variables. right now, can't refactor all names that don't match the same case
 Finding scope for sqf variables, especially with loops
+* https://github.com/kayler-renslow/arma-intellij-plugin/issues/39
 
 ### Mild
 * This is broken again (scope)

@@ -10,6 +10,7 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFLanguage;
@@ -25,8 +26,23 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SQFParserDefinition implements ParserDefinition {
 	private static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-	private static final TokenSet COMMENTS = TokenSet.create(SQFTypes.INLINE_COMMENT, SQFTypes.BLOCK_COMMENT);
-	private static final TokenSet STRING_LITERALS = TokenSet.create(SQFTypes.STRING_LITERAL);
+
+	public static final IElementType INLINE_COMMENT = new SQFTokenType("INLINE_COMMENT");
+	public static final IElementType BLOCK_COMMENT = new SQFTokenType("BLOCK_COMMENT");
+	public static final TokenSet COMMENTS = TokenSet.create(
+			INLINE_COMMENT,
+			BLOCK_COMMENT
+	);
+	public static final TokenSet NUMBER_LITERALS = TokenSet.create(SQFTypes.DEC_LITERAL, SQFTypes.INTEGER_LITERAL);
+	public static final TokenSet IDENTIFIERS = TokenSet.create(SQFTypes.GLOBAL_VAR, SQFTypes.LOCAL_VAR, SQFTypes.VARIABLE);
+	public static final TokenSet STRING_LITERALS = TokenSet.create(SQFTypes.STRING_LITERAL);
+	public static final IElementType[] OPERATORS = {
+			SQFTypes.EQEQ, SQFTypes.EQ, SQFTypes.ASTERISK, SQFTypes.NE, SQFTypes.PERC, SQFTypes.PLUS, SQFTypes.MINUS,
+			SQFTypes.FSLASH, SQFTypes.CARET, SQFTypes.GTGT, SQFTypes.GT, SQFTypes.GE, SQFTypes.LT, SQFTypes.LE,
+			SQFTypes.EXCL, SQFTypes.AMPAMP, SQFTypes.BARBAR, SQFTypes.QUEST, SQFTypes.COLON
+	};
+
+
 	private static final IFileElementType FILE = new IFileElementType(Language.<SQFLanguage>findInstance(SQFLanguage.class));
 
 	@NotNull

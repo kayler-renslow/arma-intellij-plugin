@@ -57,10 +57,6 @@ public class SQFVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
-  public void visitComment(@NotNull SQFComment o) {
-    visitPsiElement(o);
-  }
-
   public void visitCompExpression(@NotNull SQFCompExpression o) {
     visitExpression(o);
   }

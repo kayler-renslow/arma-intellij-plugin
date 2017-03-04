@@ -4,6 +4,7 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition;
 
 %%
 
@@ -66,8 +67,8 @@ MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {LINE_TERMINA
 <YYINITIAL> {MACRO_NEWLINE} { return TokenType.WHITE_SPACE; }
 <YYINITIAL> {WHITE_SPACE} { return TokenType.WHITE_SPACE; }
 
-<YYINITIAL> {BLOCK_COMMENT} { return HeaderTypes.BLOCK_COMMENT; }
-<YYINITIAL> {INLINE_COMMENT} { return HeaderTypes.INLINE_COMMENT; }
+<YYINITIAL> {BLOCK_COMMENT} { return HeaderParserDefinition.BLOCK_COMMENT; }
+<YYINITIAL> {INLINE_COMMENT} { return HeaderParserDefinition.INLINE_COMMENT; }
 
 <YYINITIAL> {NUMBER_LITERAL} { return HeaderTypes.NUMBER_LITERAL; }
 <YYINITIAL> {HEX_LITERAL} { return HeaderTypes.HEX_LITERAL; }

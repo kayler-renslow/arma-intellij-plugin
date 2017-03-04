@@ -8,6 +8,7 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLexerAdapter;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -85,7 +86,7 @@ public class HeaderSyntaxHighlighter extends SyntaxHighlighterBase {
 		if (tokenType.equals(HeaderTypes.COMMA)) {
 			return COMMA_KEYS;
 		}
-		if (tokenType.equals(HeaderTypes.INLINE_COMMENT) || tokenType.equals(HeaderTypes.BLOCK_COMMENT)) {
+		if (HeaderParserDefinition.COMMENTS.contains(tokenType)) {
 			return COMMENT_KEYS;
 		}
 		if (tokenType.equals(HeaderTypes.STRING_LITERAL)) {

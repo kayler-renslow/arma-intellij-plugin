@@ -6,6 +6,7 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition;
 import java.util.Collections;
 
 
@@ -814,7 +815,7 @@ class SQFLexer implements FlexLexer {
             }
           case 67: break;
           case 29: 
-            { return SQFTypes.INLINE_COMMENT;
+            { return SQFParserDefinition.INLINE_COMMENT;
             }
           case 68: break;
           case 30: 
@@ -850,7 +851,7 @@ class SQFLexer implements FlexLexer {
             }
           case 76: break;
           case 38: 
-            { return SQFTypes.BLOCK_COMMENT;
+            { return SQFParserDefinition.BLOCK_COMMENT;
             }
           case 77: break;
           case 39: 

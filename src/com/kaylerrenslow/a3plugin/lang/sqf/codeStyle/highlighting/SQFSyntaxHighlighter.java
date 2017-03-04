@@ -9,6 +9,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFLexerAdapter;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,7 +83,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase {
 		if (tokenType.equals(SQFTypes.COMMA)) {
 			return COMMA_KEYS;
 		}
-		if (tokenType.equals(SQFTypes.INLINE_COMMENT) || tokenType.equals(SQFTypes.BLOCK_COMMENT)) {
+		if (SQFParserDefinition.COMMENTS.contains(tokenType)) {
 			return COMMENT_KEYS;
 		}
 		if (tokenType.equals(SQFTypes.STRING_LITERAL)) {
@@ -103,7 +104,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase {
 		if (SQFStatic.isCommand(tokenType)) {
 			return COMMAND_KEYS;
 		}
-		for (IElementType e : SQFStatic.OPERATORS) {
+		for (IElementType e : SQFParserDefinition.OPERATORS) {
 			if (tokenType.equals(e)) {
 				return OPERATOR_KEYS;
 			}

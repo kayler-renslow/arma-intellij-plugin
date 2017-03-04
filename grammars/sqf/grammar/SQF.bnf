@@ -24,13 +24,11 @@
 // @formatter:off
 sqfFile ::= file_scope //first rule is private. place file_scope inside and file_scope will be root rule
 
-file_scope ::= scope_helper_ {extends("file_scope")=local_scope}
-local_scope ::= scope_helper_ {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateVars getStatementsForScope checkIfSpawn getPrivatizerElement getCodeBlock]}
-private scope_helper_ ::= items_ comment*
+file_scope ::= items_ {extends("file_scope")=local_scope}
+local_scope ::= items_ {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateVars getStatementsForScope checkIfSpawn getPrivatizerElement getCodeBlock]}
 
-private items_ ::= (comment | statement SEMICOLON)* statement?
+private items_ ::= (statement SEMICOLON)* statement?
 
-comment ::= INLINE_COMMENT | BLOCK_COMMENT
 variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope isAssigningVariable getMyAssignment getPrivatization varNameMatches]}
 
 statement ::= ( assignment | case_statement | expression | quest_statement ) //case statement must come before expression or it will think that case is a command

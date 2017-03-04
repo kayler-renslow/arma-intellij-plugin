@@ -20,7 +20,6 @@ public interface SQFTypes {
   IElementType CODE_BLOCK = new SQFElementType("CODE_BLOCK");
   IElementType COMMAND = new SQFElementType("COMMAND");
   IElementType COMMAND_EXPRESSION = new SQFElementType("COMMAND_EXPRESSION");
-  IElementType COMMENT = new SQFElementType("COMMENT");
   IElementType COMP_EXPRESSION = new SQFElementType("COMP_EXPRESSION");
   IElementType CONFIG_FETCH_EXPRESSION = new SQFElementType("CONFIG_FETCH_EXPRESSION");
   IElementType DIV_EXPRESSION = new SQFElementType("DIV_EXPRESSION");
@@ -43,7 +42,6 @@ public interface SQFTypes {
   IElementType AMPAMP = new SQFTokenType("AMPAMP");
   IElementType ASTERISK = new SQFTokenType("ASTERISK");
   IElementType BARBAR = new SQFTokenType("BARBAR");
-  IElementType BLOCK_COMMENT = new SQFTokenType("BLOCK_COMMENT");
   IElementType CARET = new SQFTokenType("CARET");
   IElementType CASE = new SQFTokenType("CASE");
   IElementType COLON = new SQFTokenType("COLON");
@@ -59,7 +57,6 @@ public interface SQFTypes {
   IElementType GT = new SQFTokenType("GT");
   IElementType GTGT = new SQFTokenType("GTGT");
   IElementType HEX_LITERAL = new SQFTokenType("HEX_LITERAL");
-  IElementType INLINE_COMMENT = new SQFTokenType("INLINE_COMMENT");
   IElementType INTEGER_LITERAL = new SQFTokenType("INTEGER_LITERAL");
   IElementType LANG_VAR = new SQFTokenType("LANG_VAR");
   IElementType LBRACE = new SQFTokenType("LBRACE");
@@ -117,9 +114,6 @@ public interface SQFTypes {
       }
       else if (type == COMMAND_EXPRESSION) {
         return new SQFCommandExpressionImpl(node);
-      }
-      else if (type == COMMENT) {
-        return new SQFCommentImpl(node);
       }
       else if (type == COMP_EXPRESSION) {
         return new SQFCompExpressionImpl(node);

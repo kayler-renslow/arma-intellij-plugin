@@ -6,6 +6,7 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition;
 
 
 /**
@@ -760,7 +761,7 @@ class HeaderLexer implements FlexLexer {
             }
           case 45: break;
           case 17: 
-            { return HeaderTypes.INLINE_COMMENT;
+            { return HeaderParserDefinition.INLINE_COMMENT;
             }
           case 46: break;
           case 18: 
@@ -784,7 +785,7 @@ class HeaderLexer implements FlexLexer {
             }
           case 51: break;
           case 23: 
-            { return HeaderTypes.BLOCK_COMMENT;
+            { return HeaderParserDefinition.BLOCK_COMMENT;
             }
           case 52: break;
           case 24: 

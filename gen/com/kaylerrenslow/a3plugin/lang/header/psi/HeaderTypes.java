@@ -33,7 +33,6 @@ public interface HeaderTypes {
   IElementType STRINGTABLE_KEY = new HeaderElementType("STRINGTABLE_KEY");
 
   IElementType ASTERISK = new HeaderTokenType("ASTERISK");
-  IElementType BLOCK_COMMENT = new HeaderTokenType("BLOCK_COMMENT");
   IElementType BRACKET_PAIR = new HeaderTokenType("BRACKET_PAIR");
   IElementType CLASS = new HeaderTokenType("CLASS");
   IElementType COLON = new HeaderTokenType("COLON");
@@ -43,7 +42,6 @@ public interface HeaderTypes {
   IElementType HEX_LITERAL = new HeaderTokenType("HEX_LITERAL");
   IElementType IDENTIFIER = new HeaderTokenType("IDENTIFIER");
   IElementType INCLUDE_VALUE_ANGBR = new HeaderTokenType("INCLUDE_VALUE_ANGBR");
-  IElementType INLINE_COMMENT = new HeaderTokenType("INLINE_COMMENT");
   IElementType LBRACE = new HeaderTokenType("LBRACE");
   IElementType LPAREN = new HeaderTokenType("LPAREN");
   IElementType MINUS = new HeaderTokenType("MINUS");

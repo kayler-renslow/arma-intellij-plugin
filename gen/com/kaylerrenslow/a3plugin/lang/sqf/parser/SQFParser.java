@@ -41,9 +41,6 @@ public class SQFParser implements PsiParser, LightPsiParser {
     else if (t == COMMAND) {
       r = command(b, 0);
     }
-    else if (t == COMMENT) {
-      r = comment(b, 0);
-    }
     else if (t == EXPRESSION) {
       r = expression(b, 0, -1);
     }
@@ -291,31 +288,18 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // INLINE_COMMENT | BLOCK_COMMENT
-  public static boolean comment(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "comment")) return false;
-    if (!nextTokenIs(b, "<comment>", BLOCK_COMMENT, INLINE_COMMENT)) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _NONE_, COMMENT, "<comment>");
-    r = consumeToken(b, INLINE_COMMENT);
-    if (!r) r = consumeToken(b, BLOCK_COMMENT);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  /* ********************************************************** */
-  // scope_helper_
+  // items_
   public static boolean file_scope(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "file_scope")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, FILE_SCOPE, "<file scope>");
-    r = scope_helper_(b, l + 1);
+    r = items_(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   /* ********************************************************** */
-  // (comment | statement SEMICOLON)* statement?
+  // (statement SEMICOLON)* statement?
   static boolean items_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "items_")) return false;
     boolean r;
@@ -326,7 +310,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (comment | statement SEMICOLON)*
+  // (statement SEMICOLON)*
   private static boolean items__0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "items__0")) return false;
     int c = current_position_(b);
@@ -338,20 +322,9 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  // comment | statement SEMICOLON
+  // statement SEMICOLON
   private static boolean items__0_0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "items__0_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = comment(b, l + 1);
-    if (!r) r = items__0_0_1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // statement SEMICOLON
-  private static boolean items__0_0_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "items__0_0_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = statement(b, l + 1);
@@ -368,12 +341,12 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // scope_helper_
+  // items_
   public static boolean local_scope(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "local_scope")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, LOCAL_SCOPE, "<local scope>");
-    r = scope_helper_(b, l + 1);
+    r = items_(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -429,30 +402,6 @@ public class SQFParser implements PsiParser, LightPsiParser {
     r = r && expression(b, l + 1, -1);
     exit_section_(b, m, QUEST_STATEMENT, r);
     return r;
-  }
-
-  /* ********************************************************** */
-  // items_ comment*
-  static boolean scope_helper_(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "scope_helper_")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = items_(b, l + 1);
-    r = r && scope_helper__1(b, l + 1);
-    exit_section_(b, m, null, r);
-    return r;
-  }
-
-  // comment*
-  private static boolean scope_helper__1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "scope_helper__1")) return false;
-    int c = current_position_(b);
-    while (true) {
-      if (!comment(b, l + 1)) break;
-      if (!empty_element_parsed_guard_(b, "scope_helper__1", c)) break;
-      c = current_position_(b);
-    }
-    return true;
   }
 
   /* ********************************************************** */

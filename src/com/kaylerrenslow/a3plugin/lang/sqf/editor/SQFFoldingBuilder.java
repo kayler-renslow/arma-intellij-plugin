@@ -6,6 +6,7 @@ import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.tree.IElementType;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,7 @@ public class SQFFoldingBuilder implements FoldingBuilder {
 
 	private void collectFoldingDescriptors(ASTNode node, Document document, ArrayList<FoldingDescriptor> descriptors) {
 		IElementType type = node.getElementType();
-		if ((type == SQFTypes.CODE_BLOCK || type == SQFTypes.BLOCK_COMMENT || type == SQFTypes.ARRAY_VAL) && spansMultipleLines(node, document)) {
+		if ((type == SQFTypes.CODE_BLOCK || type == SQFParserDefinition.BLOCK_COMMENT || type == SQFTypes.ARRAY_VAL) && spansMultipleLines(node, document)) {
 			descriptors.add(new FoldingDescriptor(node, node.getTextRange()));
 		}
 		for (ASTNode child : node.getChildren(null)) {
@@ -49,7 +50,7 @@ public class SQFFoldingBuilder implements FoldingBuilder {
 		if (type == SQFTypes.CODE_BLOCK) {
 			return "{...}";
 		}
-		if (type == SQFTypes.BLOCK_COMMENT) {
+		if (type == SQFParserDefinition.BLOCK_COMMENT) {
 			return "/*...*/";
 		}
 		if (type == SQFTypes.ARRAY_VAL) {

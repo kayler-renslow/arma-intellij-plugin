@@ -4,6 +4,7 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition;
 import java.util.Collections;
 
 %%
@@ -57,8 +58,8 @@ MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {LINE_TERMINA
 <YYINITIAL> {WHITE_SPACE} { return TokenType.WHITE_SPACE; }
 <YYINITIAL> {MACRO} { return TokenType.WHITE_SPACE; }
 
-<YYINITIAL> {BLOCK_COMMENT} { return SQFTypes.BLOCK_COMMENT; }
-<YYINITIAL> {INLINE_COMMENT} { return SQFTypes.INLINE_COMMENT; }
+<YYINITIAL> {BLOCK_COMMENT} { return SQFParserDefinition.BLOCK_COMMENT; }
+<YYINITIAL> {INLINE_COMMENT} { return SQFParserDefinition.INLINE_COMMENT; }
 
 <YYINITIAL> {HEX_LITERAL} { return SQFTypes.HEX_LITERAL; }
 <YYINITIAL> {INTEGER_LITERAL} { return SQFTypes.INTEGER_LITERAL; }

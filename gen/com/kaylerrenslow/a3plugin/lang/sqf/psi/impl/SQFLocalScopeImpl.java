@@ -30,12 +30,6 @@ public class SQFLocalScopeImpl extends ASTWrapperPsiElement implements SQFLocalS
 
   @Override
   @NotNull
-  public List<SQFComment> getCommentList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SQFComment.class);
-  }
-
-  @Override
-  @NotNull
   public List<SQFStatement> getStatementList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SQFStatement.class);
   }

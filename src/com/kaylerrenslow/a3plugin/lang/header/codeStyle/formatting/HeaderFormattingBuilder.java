@@ -9,6 +9,7 @@ import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CommonCodeStyleSettings;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -42,8 +43,8 @@ public class HeaderFormattingBuilder implements FormattingModelBuilder {
 				.withinPairInside(HeaderTypes.LBRACE, HeaderTypes.RBRACE, HeaderTypes.ARRAY).spaceIf(commonSettings.SPACE_WITHIN_ARRAY_INITIALIZER_BRACES)
 				.betweenInside(HeaderTypes.CLASS_STUB, HeaderTypes.CLASS_CONTENT, HeaderTypes.CLASS_DECLARATION).spaceIf(commonSettings.SPACE_BEFORE_CLASS_LBRACE)
 				.beforeInside(HeaderTypes.LBRACE, HeaderTypes.CLASS_CONTENT).spaceIf(commonSettings.SPACE_BEFORE_CLASS_LBRACE)
-				.before(HeaderTypes.INLINE_COMMENT).spaceIf(true)
-				.before(HeaderTypes.BLOCK_COMMENT).spaceIf(true)
+				.before(HeaderParserDefinition.INLINE_COMMENT).spaceIf(true)
+				.before(HeaderParserDefinition.BLOCK_COMMENT).spaceIf(true)
 				;
 		//@formatter:on
 	}

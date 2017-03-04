@@ -6,8 +6,8 @@ import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFLexerAdapter;
-import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFCommand;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFString;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,12 @@ public class SQFFindUsagesProvider implements FindUsagesProvider {
 	@Nullable
 	@Override
 	public WordsScanner getWordsScanner() {
-		return new DefaultWordsScanner(new SQFLexerAdapter(), SQFStatic.IDENTIFIERS, SQFStatic.COMMENTS, SQFStatic.NUMBER_LITERALS);
+		return new DefaultWordsScanner(
+				new SQFLexerAdapter(),
+				SQFParserDefinition.IDENTIFIERS,
+				SQFParserDefinition.COMMENTS,
+				SQFParserDefinition.NUMBER_LITERALS
+		);
 	}
 
 	@Override

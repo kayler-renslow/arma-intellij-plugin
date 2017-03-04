@@ -3,7 +3,7 @@ package com.kaylerrenslow.a3plugin.lang.shared;
 import com.intellij.codeInsight.documentation.DocumentationManagerProtocol;
 import com.intellij.psi.PsiComment;
 import com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDocumentationProvider;
-import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -44,7 +44,7 @@ public class DocumentationUtil {
 
 	@NotNull
 	public static String getCommentContent(@NotNull PsiComment comment) {
-		if (comment.getNode().getElementType() == SQFTypes.INLINE_COMMENT) {
+		if (comment.getNode().getElementType() == SQFParserDefinition.INLINE_COMMENT) {
 			if (comment.getText().length() <= 2) {
 				return "";
 			}

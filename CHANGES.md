@@ -30,7 +30,7 @@
 
 
 **Changed**  
-* 
+* changed how comments are parsed (removed from bnf, created elementtype in parser definition)
 
 
 **Fixed**  
@@ -43,7 +43,7 @@
 
 
 **Changed**  
-* 
+* changed how comments are parsed (removed from bnf, created elementtype in parser definition) 
 
 
 **Fixed**  

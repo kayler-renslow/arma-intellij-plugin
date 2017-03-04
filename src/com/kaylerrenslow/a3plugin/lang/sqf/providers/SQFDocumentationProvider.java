@@ -76,7 +76,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		if (SQFStatic.isBisFunction(element.getText())) {
 			return generateFunctionDoc(element.getText());
 		}
-		if (PsiUtil.isOfElementType(element, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(element, SQFTypes.BLOCK_COMMENT)) {
+		if (PsiUtil.isOfElementType(element, SQFParserDefinition.INLINE_COMMENT) || PsiUtil.isOfElementType(element, SQFParserDefinition.BLOCK_COMMENT)) {
 			PsiComment comment = (PsiComment) element;
 			return DocumentationUtil.purtify(DocumentationUtil.getCommentContent(comment));
 		}
@@ -185,7 +185,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	@Nullable
 	private PsiElement getInlineComment(@NotNull Editor editor, ASTNode statementNode) {
 		ASTNode commentNode = PsiUtil.getNextSiblingNotWhitespace(statementNode);
-		if (PsiUtil.isOfElementType(commentNode, SQFTypes.INLINE_COMMENT) || PsiUtil.isOfElementType(commentNode, SQFTypes.BLOCK_COMMENT)) {
+		if (PsiUtil.isOfElementType(commentNode, SQFParserDefinition.INLINE_COMMENT) || PsiUtil.isOfElementType(commentNode, SQFParserDefinition.BLOCK_COMMENT)) {
 			if (editor.getDocument().getLineNumber(statementNode.getStartOffset()) != editor.getDocument().getLineNumber(commentNode.getStartOffset())) { //comment not on same line
 				return null;
 			}

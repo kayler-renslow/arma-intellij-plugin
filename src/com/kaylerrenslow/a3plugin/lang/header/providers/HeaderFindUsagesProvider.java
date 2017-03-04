@@ -6,7 +6,7 @@ import com.intellij.lang.findUsages.FindUsagesProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLexerAdapter;
-import com.kaylerrenslow.a3plugin.lang.header.HeaderStatic;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderStringtableKey;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -19,7 +19,12 @@ public class HeaderFindUsagesProvider implements FindUsagesProvider {
 	@Nullable
 	@Override
 	public WordsScanner getWordsScanner() {
-		return new DefaultWordsScanner(new HeaderLexerAdapter(), HeaderStatic.IDENTIFERS, HeaderStatic.COMMENTS, HeaderStatic.LITERALS);
+		return new DefaultWordsScanner(
+				new HeaderLexerAdapter(),
+				HeaderParserDefinition.IDENTIFERS,
+				HeaderParserDefinition.COMMENTS,
+				HeaderParserDefinition.LITERALS
+		);
 	}
 
 	@Override

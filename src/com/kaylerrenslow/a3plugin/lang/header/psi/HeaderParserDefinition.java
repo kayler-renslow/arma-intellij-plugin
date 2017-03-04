@@ -10,6 +10,7 @@ import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.TokenType;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.a3plugin.lang.header.HeaderLanguage;
@@ -25,8 +26,14 @@ import org.jetbrains.annotations.NotNull;
  */
 public class HeaderParserDefinition implements ParserDefinition {
 	private static final TokenSet WHITE_SPACES = TokenSet.create(TokenType.WHITE_SPACE);
-	private static final TokenSet COMMENTS = TokenSet.create(HeaderTypes.INLINE_COMMENT, HeaderTypes.BLOCK_COMMENT);
-	private static final TokenSet STRINGS = TokenSet.create(HeaderTypes.STRING_LITERAL);
+
+	public static final IElementType BLOCK_COMMENT = new HeaderTokenType("BLOCK_COMMENT");
+	public static final IElementType INLINE_COMMENT = new HeaderTokenType("INLINE_COMMENT");
+	public static final TokenSet STRINGS = TokenSet.create(HeaderTypes.STRING_LITERAL);
+	public static final TokenSet IDENTIFERS = TokenSet.create(HeaderTypes.IDENTIFIER);
+	public static final TokenSet COMMENTS = TokenSet.create(BLOCK_COMMENT, INLINE_COMMENT);
+	public static final TokenSet LITERALS = TokenSet.create(HeaderTypes.HEX_LITERAL, HeaderTypes.NUMBER_LITERAL);
+
 	private static final IFileElementType FILE = new IFileElementType(Language.<HeaderLanguage>findInstance(HeaderLanguage.class));
 
 	@NotNull

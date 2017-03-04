@@ -6,6 +6,7 @@ import com.intellij.lang.folding.FoldingDescriptor;
 import com.intellij.openapi.editor.Document;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.tree.IElementType;
+import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPreprocessorGroup;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +33,7 @@ public class HeaderFoldingBuilder implements FoldingBuilder {
 
 	private void collectFoldingDescriptors(ASTNode node, Document document, ArrayList<FoldingDescriptor> descriptors) {
 		IElementType type = node.getElementType();
-		if ((type == HeaderTypes.ARRAY || type == HeaderTypes.CLASS_CONTENT || type == HeaderTypes.BLOCK_COMMENT || type == HeaderTypes.PREPROCESSOR_GROUP) && spansMultipleLines(node, document)) {
+		if ((type == HeaderTypes.ARRAY || type == HeaderTypes.CLASS_CONTENT || type == HeaderParserDefinition.BLOCK_COMMENT || type == HeaderTypes.PREPROCESSOR_GROUP) && spansMultipleLines(node, document)) {
 			descriptors.add(new FoldingDescriptor(node, TextRange.from(node.getStartOffset(), node.getTextLength())));
 		}
 		for (ASTNode child : node.getChildren(null)) {
@@ -52,7 +53,7 @@ public class HeaderFoldingBuilder implements FoldingBuilder {
 		if (type == HeaderTypes.ARRAY || type == HeaderTypes.CLASS_CONTENT) {
 			return "{...}";
 		}
-		if (type == HeaderTypes.BLOCK_COMMENT) {
+		if (type == HeaderParserDefinition.BLOCK_COMMENT) {
 			return "/*...*/";
 		}
 		if (type == HeaderTypes.PREPROCESSOR_GROUP) {

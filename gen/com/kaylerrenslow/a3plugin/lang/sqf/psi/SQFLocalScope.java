@@ -10,9 +10,6 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFPrivateDeclVar;
 public interface SQFLocalScope extends SQFScope {
 
   @NotNull
-  List<SQFComment> getCommentList();
-
-  @NotNull
   List<SQFStatement> getStatementList();
 
   List<SQFPrivateDeclVar> getPrivateVars();
