@@ -29,12 +29,12 @@ import java.util.ArrayList;
  */
 public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement implements SQFVariableNamedElement, SQFVariable {
 	private final IElementType myVariableElementType;
-	private SQFVariableName varName;
+	private SQFVariableName varNameCached;
 
 	public SQFVariableNamedElementMixin(@NotNull ASTNode node) {
 		super(node);
 		this.myVariableElementType = this.getNode().getFirstChildNode().getElementType();
-		varName = new SQFVariableName(node.getText());
+		varNameCached = new SQFVariableName(node.getText());
 	}
 
 	@Override
@@ -146,7 +146,7 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 
 	@Override
 	public String getName() {
-		return varName.textOriginal();
+		return getText();
 	}
 
 	@Override
@@ -156,13 +156,17 @@ public abstract class SQFVariableNamedElementMixin extends ASTWrapperPsiElement 
 		}
 		SQFVariable newVar = SQFPsiUtil.createVariable(this.getProject(), name);
 		this.getParent().getNode().replaceChild(this.getNode(), newVar.getNode());
-		this.varName = new SQFVariableName(name);
+		this.varNameCached = new SQFVariableName(name);
 		return newVar;
 	}
 
 	@NotNull
 	@Override
 	public SQFVariableName getVarName() {
-		return varName;
+		if (getText().equals(varNameCached.textOriginal())) {
+			return varNameCached;
+		}
+		varNameCached = new SQFVariableName(getText());
+		return varNameCached;
 	}
 }

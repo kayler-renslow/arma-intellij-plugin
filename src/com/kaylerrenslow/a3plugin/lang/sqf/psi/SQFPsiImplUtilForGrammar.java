@@ -43,6 +43,9 @@ public class SQFPsiImplUtilForGrammar {
 		while (cur.getElementType() != SQFTypes.COMMAND) {
 			if (cur.getElementType() == SQFTypes.UNARY_EXPRESSION) {
 				SQFUnaryExpression unaryExpression = (SQFUnaryExpression) cur.getPsi();
+				if (unaryExpression.getExpression() == null) {
+					return null;
+				}
 				cur = unaryExpression.getExpression().getNode(); //no need to jump outside after next if statement since this is technically the prefix command
 			}
 			if (cur.getElementType() != TokenType.WHITE_SPACE) {
@@ -238,14 +241,16 @@ public class SQFPsiImplUtilForGrammar {
 					}
 
 					if (array != null) { //definitely not the for spec loop if null
-						SQFCodeBlock firstCodeBlock = array.getArrayEntryList().get(0).getCodeBlock();
-						if (firstCodeBlock != null) {
-							if (firstCodeBlock.getLocalScope() != null) { //may be formatted wrong since no type checking
-								List<SQFStatement> statementList = firstCodeBlock.getLocalScope().getStatementList();
-								for (SQFStatement statement : statementList) {
-									if (statement.getAssignment() != null) {
-										if (statement.getAssignment().getAssigningVariable().getVarName().equals(var)) {
-											return SQFPrivatization.getPrivatization(var, firstCodeBlock.getLocalScope());
+						if (array.getArrayEntryList().size() > 0) {
+							SQFCodeBlock firstCodeBlock = array.getArrayEntryList().get(0).getCodeBlock();
+							if (firstCodeBlock != null) {
+								if (firstCodeBlock.getLocalScope() != null) { //may be formatted wrong since no type checking
+									List<SQFStatement> statementList = firstCodeBlock.getLocalScope().getStatementList();
+									for (SQFStatement statement : statementList) {
+										if (statement.getAssignment() != null) {
+											if (statement.getAssignment().getAssigningVariable().getVarName().equals(var)) {
+												return SQFPrivatization.getPrivatization(var, firstCodeBlock.getLocalScope());
+											}
 										}
 									}
 								}
@@ -259,7 +264,7 @@ public class SQFPsiImplUtilForGrammar {
 		List<SQFPrivateDeclVar> privateDeclaredVarsForScope = containingScope.getPrivateVars();
 		SQFScope privatizedScope = containingScope;
 
-		while (privatizedScope != null) {
+		while (true) {
 			if (insideSpawn && privatizedScope == spawnScope) { //inside spawn and not declared private elsewhere
 				return new SQFPrivatization.SQFVarInheritedPrivatization(var, spawnScope); //can't escape the spawn's environment
 			}

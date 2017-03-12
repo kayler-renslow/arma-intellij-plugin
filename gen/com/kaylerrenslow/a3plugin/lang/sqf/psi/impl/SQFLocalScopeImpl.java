@@ -29,24 +29,6 @@ public class SQFLocalScopeImpl extends ASTWrapperPsiElement implements SQFLocalS
   }
 
   @Override
-  @Nullable
-  public SQFCaseStatement getCaseStatement() {
-    return findChildByClass(SQFCaseStatement.class);
-  }
-
-  @Override
-  @Nullable
-  public SQFExpression getExpression() {
-    return findChildByClass(SQFExpression.class);
-  }
-
-  @Override
-  @Nullable
-  public SQFQuestStatement getQuestStatement() {
-    return findChildByClass(SQFQuestStatement.class);
-  }
-
-  @Override
   @NotNull
   public List<SQFStatement> getStatementList() {
     return PsiTreeUtil.getChildrenOfTypeAsList(this, SQFStatement.class);

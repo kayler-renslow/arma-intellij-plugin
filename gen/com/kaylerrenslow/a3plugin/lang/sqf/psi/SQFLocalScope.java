@@ -9,15 +9,6 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.wrapper.SQFPrivateDeclVar;
 
 public interface SQFLocalScope extends SQFScope {
 
-  @Nullable
-  SQFCaseStatement getCaseStatement();
-
-  @Nullable
-  SQFExpression getExpression();
-
-  @Nullable
-  SQFQuestStatement getQuestStatement();
-
   @NotNull
   List<SQFStatement> getStatementList();
 

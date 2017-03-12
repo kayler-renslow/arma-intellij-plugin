@@ -113,6 +113,10 @@ public class SQFVisitor extends PsiElementVisitor {
     visitStatement(o);
   }
 
+  public void visitReturnStatement(@NotNull SQFReturnStatement o) {
+    visitStatement(o);
+  }
+
   public void visitStatement(@NotNull SQFStatement o) {
     visitPsiElement(o);
   }

@@ -28,14 +28,12 @@ sqfFile ::= file_scope //first rule is private. place file_scope inside and file
 file_scope ::= items_ {extends("file_scope")=local_scope}
 local_scope ::= items_ {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateVars getStatementsForScope checkIfSpawn getPrivatizerElement getCodeBlock]}
 
-private items_ ::= (statement SEMICOLON)* return_statement_?
+private items_ ::= (statement SEMICOLON )* return_statement?
 
 variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope isAssigningVariable getMyAssignment getPrivatization]}
 
 statement ::= ( assignment | case_statement | expression | quest_statement )//case statement must come before expression or it will think that case is a command
-private recover_statement_ ::= !(expression | statement | QUEST | command)
-
-private return_statement_ ::= case_statement | expression | quest_statement
+return_statement ::= variable | ( assignment | case_statement | expression | quest_statement ) {extends("return_statement")=statement}
 
 quest_statement ::= QUEST expression COLON expression {pin=1}
 
@@ -100,7 +98,8 @@ string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.
 
 macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
 
-array_val ::= (LBRACKET RBRACKET) | (LBRACKET array_entry (COMMA array_entry)* RBRACKET )
+array_val ::= (LBRACKET RBRACKET) | (LBRACKET array_entry comma_array_* RBRACKET )
+private comma_array_ ::= COMMA array_entry
 array_entry ::= expression {methods=[getCodeBlock]}
 
 code_block ::= (LBRACE RBRACE)| (LBRACE local_scope RBRACE)
