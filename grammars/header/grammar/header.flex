@@ -22,9 +22,6 @@ IDENTIFIER = [:jletter:] [:jletterdigit:]*
 
 LINE_TERMINATOR = \r | \n | \r\n
 INPUT_CHARACTER = [^\r\n]
-MACRO_NEWLINE = ("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*
-MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
-
 
 WHITE_SPACE = ([ \t\f] | {LINE_TERMINATOR})+
 
@@ -57,14 +54,13 @@ EXEC = "__EXEC" {FUNCTION_TAIL}
 
 INCLUDE = "#include"
 
-MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
+MACRO_CHARACTER = [^\r\n] | (("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*)
 MACRO_TEXT = {MACRO_CHARACTER}+
-MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {LINE_TERMINATOR}? {MACRO_TEXT}?
+MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}?
 
 
 %%
 
-<YYINITIAL> {MACRO_NEWLINE} { return TokenType.WHITE_SPACE; }
 <YYINITIAL> {WHITE_SPACE} { return TokenType.WHITE_SPACE; }
 
 <YYINITIAL> {BLOCK_COMMENT} { return HeaderParserDefinition.BLOCK_COMMENT; }

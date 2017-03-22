@@ -48,10 +48,9 @@ BLOCK_COMMENT = "/*" [^*] ~"*/" | "/*" "*"+ "/" | "/*" {COMMENT_CONTENT} "*"+ "/
 
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 
-MACRO_NEWLINE = ("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*
-MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
+MACRO_CHARACTER = [^\r\n] | (("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*)
 MACRO_TEXT = {MACRO_CHARACTER}+
-MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {LINE_TERMINATOR}? {MACRO_TEXT}?
+MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}?
 
 %%
 
