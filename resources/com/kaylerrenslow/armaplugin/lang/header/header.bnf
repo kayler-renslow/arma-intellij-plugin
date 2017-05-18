@@ -1,0 +1,64 @@
+{
+  parserClass="com.kaylerrenslow.armaplugin.lang.header.parser.HeaderParser"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Header"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.kaylerrenslow.armaplugin.lang.header.psi"
+  psiImplPackage="com.kaylerrenslow.armaplugin.lang.header.psi.impl" //comment out the import statement in the HeaderTypes class if the impl package isn't used
+
+  elementTypeHolderClass="com.kaylerrenslow.armaplugin.lang.header.psi.HeaderTypes"
+  elementTypeClass="com.kaylerrenslow.armaplugin.lang.header.psi.HeaderElementType"
+  tokenTypeClass="com.kaylerrenslow.armaplugin.lang.header.psi.HeaderTokenType"
+
+//  psiImplUtilClass="com.kaylerrenslow.armapluginin.lang.header.psi.HeaderPsiUtilForGrammar"
+}
+// @formatter:off
+headerFile ::= entry_*
+
+private entry_ ::= preprocessor_command | ((assignment | array_assignment | header_class) SEMICOLON)
+
+assignment ::= IDENTIFIER EQ expression
+array_assignment ::= IDENTIFIER BRACKET_PAIR (EQ | PLUS_EQ) array
+
+header_class ::= CLASS IDENTIFIER (COLON IDENTIFIER)? LBRACE (entry_)* RBRACE
+
+expression ::= add_expression_
+private add_expression_ ::= mult_expression_ PLUS add_expression_
+				 | mult_expression_ MINUS add_expression_
+				 | mult_expression_
+
+private mult_expression_ ::= term_ ASTERISK mult_expression_
+				  | term_ FSLASH mult_expression_
+				  | term_
+
+private term_ ::= (PLUS | MINUS)?
+                (
+                    NUMBER_LITERAL
+                    | HEX_LITERAL
+                    | IDENTIFIER
+                    | STRING_LITERAL
+                    | LPAREN expression RPAREN
+                )
+
+array ::= LBRACE (array_entry_ (COMMA array_entry_)*)? RBRACE
+array_entry_ ::= array | expression
+
+preprocessor_command ::= preprocessor_include
+                       | preprocessor_define
+                       | preprocessor_undef
+                       | preprocessor_ifdef
+                       | preprocessor_ifndef
+                       | preprocessor_else
+                       | preprocessor_endif
+
+preprocessor_include ::= PRE_INCLUDE (STRING_LITERAL | INCLUDE_VALUE_ANGBR) {extends("preprocessor_include")=preprocessor_command}
+preprocessor_define ::= PRE_DEFINE IDENTIFIER PRE_DEFINE_BODY {extends("preprocessor_define")=preprocessor_command}
+preprocessor_undef ::= PRE_UNDEF IDENTIFIER {extends("preprocessor_undef")=preprocessor_command}
+preprocessor_ifdef ::= PRE_IFDEF IDENTIFIER {extends("preprocessor_ifdef")=preprocessor_command}
+preprocessor_ifndef ::= PRE_IFNDEF IDENTIFIER {extends("preprocessor_ifndef")=preprocessor_command}
+preprocessor_else ::= PRE_ELSE {extends("preprocessor_else")=preprocessor_command}
+preprocessor_endif ::= PRE_ENDIF {extends("preprocessor_endif")=preprocessor_command}
+
+

@@ -1,0 +1,8 @@
+// This is a generated file. Not intended for manual editing.
+package com.kaylerrenslow.armaplugin.lang.sqf.psi;
+
+import com.intellij.psi.PsiElement;
+
+public interface SQFVariable extends PsiElement {
+
+}

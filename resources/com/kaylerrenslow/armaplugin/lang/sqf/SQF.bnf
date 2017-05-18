@@ -1,0 +1,129 @@
+{
+  parserClass="com.kaylerrenslow.armaplugin.lang.sqf.parser.SQFParser"
+  parserUtilClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserUtil"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="SQF"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.kaylerrenslow.armaplugin.lang.sqf.psi"
+  psiImplPackage="com.kaylerrenslow.armaplugin.lang.sqf.psi.impl"
+
+  elementTypeHolderClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes"
+  elementTypeClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFElementType"
+  tokenTypeClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTokenType"
+
+//  psiImplUtilClass="com.kaylerrenslow.armapluginin.lang.sqf.psi.SQFPsiImplUtilForGrammar"
+
+  extends(".*expression")=expression
+  //consumeTokenMethod(".*expression|expression")="consumeTokenFast" //https://github.com/JetBrains/Grammar-Kit/blob/master/HOWTO.md#24-compact-expression-parsing-with-priorities
+  extends(".*_statement")=statement
+}
+//rules ending with _ is just to make it clear that they are private rules.
+//private rules do not exist in the AST
+
+
+//todo use stubs. check StubBasedPsiElementBase class for more information on it
+
+// @formatter:off
+sqfFile ::= file_scope //first rule is private. place file_scope inside and file_scope will be root rule
+
+//file_scope is the scope for the entire SQF file. There will be only 1 file_scope per sqf file
+file_scope ::= items_ {extends("file_scope")=local_scope}
+//local_scope is a scope inside a code block (and is also the parent class of file_scope)
+local_scope ::= items_
+//items_ is a helper for file_scope and local_scope
+private items_ ::= (statement SEMICOLON )* return_statement?
+
+code_block ::= LBRACE local_scope? RBRACE
+
+//a variable is a global variable, local variable, or a lang variable (_x, _this, ...)
+variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR
+
+//a statement is a line of code that has a semicolon after it, however, if there is 1 statement, then semicolon is optional
+statement ::= ( assignment_statement | case_statement | expression | quest_statement )//case statement must come before expression or it will think that case is a command
+//a return statement is a statement that has NO semicolon and is the last statement in a scope
+return_statement ::= variable | ( assignment_statement | case_statement | expression | quest_statement )
+
+quest_statement ::= QUEST expression COLON expression {pin=1}
+case_statement ::= case_command expression (COLON code_block)? {pin=1}
+
+//in SQF, it isn't possible to do a=a=a=a, so making it an expression will create issues
+assignment_statement ::= private_command? variable EQ expression {pin=3 recoverWhile=assignment_statement_recover_}
+private assignment_statement_recover_ ::= !(EQ)
+
+//expression
+    expression ::= conditional_group_
+                | add_group_
+                | comp_expression
+                | mul_group_
+                | exponent_expression
+                | config_fetch_expression
+                | command_expression
+
+                 //keep below command expression, otherwise the command may not be
+                 // matched since a command can have a unary expression as an argument
+                | unary_expression
+
+                | code_block_expression
+                | literal_expression
+                | paren_expression
+
+    code_block_expression ::= code_block
+
+    private add_group_ ::= add_expression | sub_expression
+    private mul_group_ ::= mul_expression | div_expression | mod_expression
+    private conditional_group_::= bool_and_expression | bool_or_expression | bool_not_expression
+
+    unary_expression ::= (PLUS | MINUS) expression
+
+    add_expression ::= expression PLUS expression
+    sub_expression ::= expression MINUS expression
+    mul_expression ::= expression ASTERISK expression
+    div_expression ::= expression FSLASH expression
+    mod_expression ::= expression PERC expression
+
+    bool_and_expression ::= expression AMPAMP expression
+    bool_or_expression ::= expression BARBAR expression
+    bool_not_expression::= EXCL expression
+
+    comp_expression ::= expression (EQEQ | NE | LT | LE | GT | GE) expression
+
+    config_fetch_expression ::= expression (FSLASH | GTGT) expression
+
+    exponent_expression ::= expression (CARET expression)+
+
+    literal_expression ::= string
+                        | variable
+                        | array
+                        | INTEGER_LITERAL
+                        | DEC_LITERAL
+                        | HEX_LITERAL
+
+    paren_expression ::= LPAREN expression RPAREN
+
+    //command expression (includes a standalone command token)
+        command_expression ::= command_before? command command_after?
+        //We are excluding expression from this because it will be infinite left recursion
+        //due to command_expression constantly being matched.
+
+        //The prefix and postfix arguments of commands is inconsistent.
+        //The type checker will have to handle if command_before or command_after is a prefix argument,
+        //postfix argument, or is an argument of the child/parent command. (I know. It's weird.)
+        command_before ::= code_block | unary_expression | paren_expression | literal_expression
+        command_after ::= expression | (code_block expression?)
+    //end command expression
+//end expression
+
+//command tokens
+    command ::= COMMAND_TOKEN
+    //we need a separate rule for case and private
+    //the "case" and "private" tokens are COMMAND_TOKEN types, but we want custom types (i.e. CASE_COMMAND)
+    //so that we can check if (for example) "case" is the COMMAND_TOKEN and not any arbitrary COMMAND_TOKEN (like abs)
+    case_command ::= <<external_rule_case_command 0>> {extends("case_command")=command}
+    private_command ::= <<external_rule_private_command 0>> {extends("private_command")=command}
+//end command
+
+//values
+string ::= STRING_LITERAL
+array ::= LBRACKET (expression (COMMA expression)*)? RBRACKET {pin=1}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<idea-plugin version="2">
+<idea-plugin>
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
 	<version>2.0.0</version>
@@ -9,17 +9,20 @@
 	<description>
 
 	</description>
-
-	<change-notes></change-notes>
 	<idea-version since-build="131"/>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- SQF Language -->
-		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.sqf.SQFFileTypeFactory"/>
-		<lang.parserDefinition language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition"/>
+		<fileTypeFactory implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFFileTypeFactory"/>
+		<lang.parserDefinition language="Arma.SQF"
+							   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserDefinition"/>
 
 		<!-- Header Language -->
-		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>
-		<lang.parserDefinition language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition"/>
+		<fileTypeFactory implementation="com.kaylerrenslow.armaplugin.lang.header.HeaderFileTypeFactory"/>
+		<lang.parserDefinition language="Arma.Header"
+							   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.HeaderParserDefinition"/>
 	</extensions>
+
+
+	<change-notes></change-notes>
 
 </idea-plugin>
