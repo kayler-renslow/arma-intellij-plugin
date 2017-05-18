@@ -8,6 +8,9 @@ import com.intellij.psi.PsiElement;
 public interface SQFReturnStatement extends SQFStatement {
 
   @Nullable
+  SQFAssignmentStatement getAssignmentStatement();
+
+  @Nullable
   SQFCaseStatement getCaseStatement();
 
   @Nullable

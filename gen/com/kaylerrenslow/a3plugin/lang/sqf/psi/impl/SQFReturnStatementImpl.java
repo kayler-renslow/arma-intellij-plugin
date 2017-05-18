@@ -27,6 +27,12 @@ public class SQFReturnStatementImpl extends SQFStatementImpl implements SQFRetur
 
   @Override
   @Nullable
+  public SQFAssignmentStatement getAssignmentStatement() {
+    return findChildByClass(SQFAssignmentStatement.class);
+  }
+
+  @Override
+  @Nullable
   public SQFCaseStatement getCaseStatement() {
     return findChildByClass(SQFCaseStatement.class);
   }

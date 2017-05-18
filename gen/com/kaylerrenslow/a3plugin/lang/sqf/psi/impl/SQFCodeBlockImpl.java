@@ -8,9 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.*;
 
-public class SQFCodeBlockImpl extends SQFExpressionImpl implements SQFCodeBlock {
+public class SQFCodeBlockImpl extends ASTWrapperPsiElement implements SQFCodeBlock {
 
   public SQFCodeBlockImpl(ASTNode node) {
     super(node);

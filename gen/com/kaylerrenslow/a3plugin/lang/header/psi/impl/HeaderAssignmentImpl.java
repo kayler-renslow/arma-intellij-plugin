@@ -11,7 +11,7 @@ import static com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes.*;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.kaylerrenslow.a3plugin.lang.header.psi.*;
 
-public abstract class HeaderAssignmentImpl extends ASTWrapperPsiElement implements HeaderAssignment {
+public class HeaderAssignmentImpl extends ASTWrapperPsiElement implements HeaderAssignment {
 
   public HeaderAssignmentImpl(ASTNode node) {
     super(node);
@@ -24,6 +24,12 @@ public abstract class HeaderAssignmentImpl extends ASTWrapperPsiElement implemen
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof HeaderVisitor) accept((HeaderVisitor)visitor);
     else super.accept(visitor);
+  }
+
+  @Override
+  @NotNull
+  public HeaderExpression getExpression() {
+    return findNotNullChildByClass(HeaderExpression.class);
   }
 
 }

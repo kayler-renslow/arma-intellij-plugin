@@ -27,14 +27,8 @@ public class SQFLiteralExpressionImpl extends SQFExpressionImpl implements SQFLi
 
   @Override
   @Nullable
-  public SQFArrayVal getArrayVal() {
-    return findChildByClass(SQFArrayVal.class);
-  }
-
-  @Override
-  @Nullable
-  public SQFMacroCall getMacroCall() {
-    return findChildByClass(SQFMacroCall.class);
+  public SQFArray getArray() {
+    return findChildByClass(SQFArray.class);
   }
 
   @Override

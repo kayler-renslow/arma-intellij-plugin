@@ -32,9 +32,9 @@ public class SQFCaseStatementImpl extends SQFStatementImpl implements SQFCaseSta
   }
 
   @Override
-  @NotNull
-  public List<SQFExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SQFExpression.class);
+  @Nullable
+  public SQFCodeBlock getCodeBlock() {
+    return findChildByClass(SQFCodeBlock.class);
   }
 
 }

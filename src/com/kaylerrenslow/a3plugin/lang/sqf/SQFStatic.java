@@ -4,7 +4,6 @@ import com.kaylerrenslow.a3plugin.util.TextFileListToList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,8 +31,8 @@ public class SQFStatic {
 	/**
 	 * Has all commands stored in their camelCase form
 	 */
-	public static final List<String> LIST_COMMANDS = TextFileListToList.getListFromStream(SQFStatic.class.getResourceAsStream(COMMANDS_DOC_FILE_LOOKUP), new ArrayList<>());
-	public static final List<String> LIST_BIS_FUNCTIONS = TextFileListToList.getListFromStream(SQFStatic.class.getResourceAsStream(BIS_FUNCTIONS_DOC_FILE_LOOKUP), new ArrayList<>());
+	public static final List<String> LIST_COMMANDS = TextFileListToList.getListFromStream(SQFStatic.class.getResourceAsStream(COMMANDS_DOC_FILE_LOOKUP));
+	public static final List<String> LIST_BIS_FUNCTIONS = TextFileListToList.getListFromStream(SQFStatic.class.getResourceAsStream(BIS_FUNCTIONS_DOC_FILE_LOOKUP));
 
 	private static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
 

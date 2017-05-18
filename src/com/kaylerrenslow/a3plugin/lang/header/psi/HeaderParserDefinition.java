@@ -85,4 +85,5 @@ public class HeaderParserDefinition implements ParserDefinition {
 	public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
 		return SpaceRequirements.MAY;
 	}
+
 }

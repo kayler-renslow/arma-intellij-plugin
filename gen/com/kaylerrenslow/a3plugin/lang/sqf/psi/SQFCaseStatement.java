@@ -10,7 +10,7 @@ public interface SQFCaseStatement extends SQFStatement {
   @NotNull
   SQFCaseCommand getCaseCommand();
 
-  @NotNull
-  List<SQFExpression> getExpressionList();
+  @Nullable
+  SQFCodeBlock getCodeBlock();
 
 }

@@ -10,7 +10,10 @@ public interface SQFCommandExpression extends SQFExpression {
   @NotNull
   SQFCommand getCommand();
 
-  @NotNull
-  List<SQFExpression> getExpressionList();
+  @Nullable
+  SQFCommandAfter getCommandAfter();
+
+  @Nullable
+  SQFCommandBefore getCommandBefore();
 
 }

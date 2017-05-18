@@ -17,8 +17,9 @@ import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition;
     return;
 %eof}
 
-STRINGTABLE_ENTRY = "$STR_" [:jletter:] [:jletterdigit:]*
-IDENTIFIER = [:jletter:] [:jletterdigit:]*
+IDENTIFIER = {LETTER} {LETTER_OR_DIGIT}*
+LETTER = [:jletter:] | "$" | "##" //## is for preprocessor
+LETTER_OR_DIGIT = [:jletterdigit:] | "$" | "##"
 
 LINE_TERMINATOR = \r | \n | \r\n
 INPUT_CHARACTER = [^\r\n]
@@ -41,23 +42,20 @@ NUMBER_LITERAL = {INTEGER_LITERAL} | {DEC_LITERAL}
 HEX_LITERAL = [0] [xX] [0]* {HEX_DIGIT} {1,8}
 HEX_DIGIT   = [0-9a-fA-F]
 
-ESCAPE_SEQUENCE = \\[^\r\n]
-
 STRING_PART = "\"" ~"\"" //if you ever decide to allow single quotes for strings, you must go back and change the search for config function tags, since tag="tag" != tag='tag'
 STRING_LITERAL = {STRING_PART}+
 
+INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | \\[^\r\n])* ">"
 
-INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | {ESCAPE_SEQUENCE})* ">"
-FUNCTION_TAIL = {WHITE_SPACE}? "(" ([^\r\n()] | "(" [^\r\n()] ")")*? ")"
-EVAL = "__EVAL" {FUNCTION_TAIL}
-EXEC = "__EXEC" {FUNCTION_TAIL}
+PRE_INCLUDE = "#include"
+PRE_DEFINE = "#define"
+PRE_UNDEF = "#undef"
+PRE_IFDEF = "#ifdef"
+PRE_IFNDEF = "#ifndef"
+PRE_ELSE = "#else"
+PRE_ENDIF = "#endif"
 
-INCLUDE = "#include"
-
-MACRO_CHARACTER = [^\r\n] | (("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*)
-MACRO_TEXT = {MACRO_CHARACTER}+
-MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}?
-
+PRE_DEFINE_BODY = "" // the body of a #define todo
 
 %%
 
@@ -69,16 +67,19 @@ MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}?
 <YYINITIAL> {NUMBER_LITERAL} { return HeaderTypes.NUMBER_LITERAL; }
 <YYINITIAL> {HEX_LITERAL} { return HeaderTypes.HEX_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return HeaderTypes.STRING_LITERAL; }
-<YYINITIAL> {INCLUDE_VALUE_ANGBR} { return HeaderTypes.INCLUDE_VALUE_ANGBR; }
-
-<YYINITIAL> {STRINGTABLE_ENTRY} { return HeaderTypes.STRINGTABLE_ENTRY; }
 
 <YYINITIAL> "class" { return HeaderTypes.CLASS; }
 
-<YYINITIAL> {INCLUDE}  { return HeaderTypes.PREPROCESS_INCLUDE; }
-<YYINITIAL> {MACRO}  { return HeaderTypes.PREPROCESS_MACRO; }
-<YYINITIAL> {EXEC} { return HeaderTypes.PREPROCESS_EXEC; }
-<YYINITIAL> {EVAL} { return HeaderTypes.PREPROCESS_EVAL; }
+<YYINITIAL> {INCLUDE_VALUE_ANGBR} { return HeaderTypes.INCLUDE_VALUE_ANGBR; }
+<YYINITIAL> {PRE_DEFINE_BODY}  { return HeaderTypes.PRE_DEFINE_BODY; }
+<YYINITIAL> {PRE_INCLUDE}  { return HeaderTypes.PRE_INCLUDE; }
+<YYINITIAL> {PRE_DEFINE}  { return HeaderTypes.PRE_DEFINE; }
+<YYINITIAL> {PRE_UNDEF}  { return HeaderTypes.PRE_UNDEF; }
+<YYINITIAL> {PRE_IFDEF}  { return HeaderTypes.PRE_IFDEF; }
+<YYINITIAL> {PRE_IFNDEF}  { return HeaderTypes.PRE_IFNDEF; }
+<YYINITIAL> {PRE_ELSE}  { return HeaderTypes.PRE_ELSE; }
+<YYINITIAL> {PRE_ENDIF}  { return HeaderTypes.PRE_ENDIF; }
+
 
 <YYINITIAL> {IDENTIFIER} { return HeaderTypes.IDENTIFIER; }
 

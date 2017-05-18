@@ -9,16 +9,18 @@ import com.kaylerrenslow.a3plugin.lang.sqf.psi.impl.*;
 public interface SQFTypes {
 
   IElementType ADD_EXPRESSION = new SQFElementType("ADD_EXPRESSION");
-  IElementType ARRAY_ENTRY = new SQFElementType("ARRAY_ENTRY");
-  IElementType ARRAY_VAL = new SQFElementType("ARRAY_VAL");
-  IElementType ASSIGNMENT = new SQFElementType("ASSIGNMENT");
+  IElementType ARRAY = new SQFElementType("ARRAY");
+  IElementType ASSIGNMENT_STATEMENT = new SQFElementType("ASSIGNMENT_STATEMENT");
   IElementType BOOL_AND_EXPRESSION = new SQFElementType("BOOL_AND_EXPRESSION");
   IElementType BOOL_NOT_EXPRESSION = new SQFElementType("BOOL_NOT_EXPRESSION");
   IElementType BOOL_OR_EXPRESSION = new SQFElementType("BOOL_OR_EXPRESSION");
   IElementType CASE_COMMAND = new SQFElementType("CASE_COMMAND");
   IElementType CASE_STATEMENT = new SQFElementType("CASE_STATEMENT");
   IElementType CODE_BLOCK = new SQFElementType("CODE_BLOCK");
+  IElementType CODE_BLOCK_EXPRESSION = new SQFElementType("CODE_BLOCK_EXPRESSION");
   IElementType COMMAND = new SQFElementType("COMMAND");
+  IElementType COMMAND_AFTER = new SQFElementType("COMMAND_AFTER");
+  IElementType COMMAND_BEFORE = new SQFElementType("COMMAND_BEFORE");
   IElementType COMMAND_EXPRESSION = new SQFElementType("COMMAND_EXPRESSION");
   IElementType COMP_EXPRESSION = new SQFElementType("COMP_EXPRESSION");
   IElementType CONFIG_FETCH_EXPRESSION = new SQFElementType("CONFIG_FETCH_EXPRESSION");
@@ -28,7 +30,6 @@ public interface SQFTypes {
   IElementType FILE_SCOPE = new SQFElementType("FILE_SCOPE");
   IElementType LITERAL_EXPRESSION = new SQFElementType("LITERAL_EXPRESSION");
   IElementType LOCAL_SCOPE = new SQFElementType("LOCAL_SCOPE");
-  IElementType MACRO_CALL = new SQFElementType("MACRO_CALL");
   IElementType MOD_EXPRESSION = new SQFElementType("MOD_EXPRESSION");
   IElementType MUL_EXPRESSION = new SQFElementType("MUL_EXPRESSION");
   IElementType PAREN_EXPRESSION = new SQFElementType("PAREN_EXPRESSION");
@@ -83,14 +84,11 @@ public interface SQFTypes {
        if (type == ADD_EXPRESSION) {
         return new SQFAddExpressionImpl(node);
       }
-      else if (type == ARRAY_ENTRY) {
-        return new SQFArrayEntryImpl(node);
+      else if (type == ARRAY) {
+        return new SQFArrayImpl(node);
       }
-      else if (type == ARRAY_VAL) {
-        return new SQFArrayValImpl(node);
-      }
-      else if (type == ASSIGNMENT) {
-        return new SQFAssignmentImpl(node);
+      else if (type == ASSIGNMENT_STATEMENT) {
+        return new SQFAssignmentStatementImpl(node);
       }
       else if (type == BOOL_AND_EXPRESSION) {
         return new SQFBoolAndExpressionImpl(node);
@@ -110,8 +108,17 @@ public interface SQFTypes {
       else if (type == CODE_BLOCK) {
         return new SQFCodeBlockImpl(node);
       }
+      else if (type == CODE_BLOCK_EXPRESSION) {
+        return new SQFCodeBlockExpressionImpl(node);
+      }
       else if (type == COMMAND) {
         return new SQFCommandImpl(node);
+      }
+      else if (type == COMMAND_AFTER) {
+        return new SQFCommandAfterImpl(node);
+      }
+      else if (type == COMMAND_BEFORE) {
+        return new SQFCommandBeforeImpl(node);
       }
       else if (type == COMMAND_EXPRESSION) {
         return new SQFCommandExpressionImpl(node);
@@ -136,9 +143,6 @@ public interface SQFTypes {
       }
       else if (type == LOCAL_SCOPE) {
         return new SQFLocalScopeImpl(node);
-      }
-      else if (type == MACRO_CALL) {
-        return new SQFMacroCallImpl(node);
       }
       else if (type == MOD_EXPRESSION) {
         return new SQFModExpressionImpl(node);

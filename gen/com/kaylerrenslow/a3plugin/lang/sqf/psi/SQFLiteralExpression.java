@@ -8,10 +8,7 @@ import com.intellij.psi.PsiElement;
 public interface SQFLiteralExpression extends SQFExpression {
 
   @Nullable
-  SQFArrayVal getArrayVal();
-
-  @Nullable
-  SQFMacroCall getMacroCall();
+  SQFArray getArray();
 
   @Nullable
   SQFString getString();

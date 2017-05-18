@@ -8,9 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.kaylerrenslow.a3plugin.lang.header.psi.*;
 
-public class HeaderArrayAssignmentImpl extends HeaderAssignmentImpl implements HeaderArrayAssignment {
+public class HeaderArrayAssignmentImpl extends ASTWrapperPsiElement implements HeaderArrayAssignment {
 
   public HeaderArrayAssignmentImpl(ASTNode node) {
     super(node);
@@ -29,12 +30,6 @@ public class HeaderArrayAssignmentImpl extends HeaderAssignmentImpl implements H
   @NotNull
   public HeaderArray getArray() {
     return findNotNullChildByClass(HeaderArray.class);
-  }
-
-  @Override
-  @NotNull
-  public HeaderAssignmentIdentifier getAssignmentIdentifier() {
-    return findNotNullChildByClass(HeaderAssignmentIdentifier.class);
   }
 
 }

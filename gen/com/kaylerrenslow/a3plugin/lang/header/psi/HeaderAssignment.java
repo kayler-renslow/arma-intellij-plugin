@@ -7,4 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface HeaderAssignment extends PsiElement {
 
+  @NotNull
+  HeaderExpression getExpression();
+
 }

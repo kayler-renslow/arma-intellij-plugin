@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface HeaderArray extends PsiElement {
 
-  @Nullable
-  HeaderArrayBody getArrayBody();
+  @NotNull
+  List<HeaderArrayEntry_> getArrayEntry_List();
 
 }

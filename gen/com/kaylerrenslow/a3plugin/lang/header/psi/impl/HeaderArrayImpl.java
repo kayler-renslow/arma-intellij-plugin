@@ -27,9 +27,9 @@ public class HeaderArrayImpl extends ASTWrapperPsiElement implements HeaderArray
   }
 
   @Override
-  @Nullable
-  public HeaderArrayBody getArrayBody() {
-    return findChildByClass(HeaderArrayBody.class);
+  @NotNull
+  public List<HeaderArrayEntry_> getArrayEntry_List() {
+    return PsiTreeUtil.getChildrenOfTypeAsList(this, HeaderArrayEntry_.class);
   }
 
 }

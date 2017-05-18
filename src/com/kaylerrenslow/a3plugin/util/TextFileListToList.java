@@ -2,9 +2,10 @@ package com.kaylerrenslow.a3plugin.util;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 /**
  * @author Kayler
@@ -24,39 +25,23 @@ public class TextFileListToList {
 	 * </p>
 	 *
 	 * @param is   InputStream that is linked to the list file
-	 * @param list list to add the contents to
 	 * @return list of the contents or null if a problem occurred
 	 */
-	public static List<String> getListFromStream(@NotNull InputStream is, @NotNull List<String> list) {
-		try {
-			InputStreamReader reader = new InputStreamReader(is);
-			String current = "";
-			char c;
-			while (!reader.finished()) {
-				c = reader.readWithCast();
-				if (c != '#') {
-					if (!reader.lastReadIsNewline()) {
-						current += c;
-					}
-					while (!reader.finished()) { // read non-commented line
-						c = reader.readWithCast();
-						if (reader.lastReadIsNewline()) {
-							list.add(current);
-							current = "";
-							break;
-						}
-						current += c;
-					}
-				}
-
+	@NotNull
+	public static List<String> getListFromStream(@NotNull InputStream is) {
+		Scanner scanner = new Scanner(is);
+		ArrayList<String> list = new ArrayList<>();
+		while (scanner.hasNextLine()) {
+			String l = scanner.nextLine();
+			if (l.startsWith("#")) {
+				continue;
 			}
-			reader.closeStream();
-		} catch (IOException e) {
-			e.printStackTrace(System.out);
-			throw new RuntimeException("Couldn't read stream. Reason: " + e.getMessage());
+			list.add(l);
 		}
+		scanner.close();
 
-		return list;
+		//trim off any unnecessary stuff inside the list by adding all elements into new list
+		return new ArrayList<>(list);
 	}
 
 }

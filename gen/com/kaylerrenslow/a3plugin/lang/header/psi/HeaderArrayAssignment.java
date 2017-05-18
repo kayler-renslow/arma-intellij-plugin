@@ -5,12 +5,9 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface HeaderArrayAssignment extends HeaderAssignment {
+public interface HeaderArrayAssignment extends PsiElement {
 
   @NotNull
   HeaderArray getArray();
-
-  @NotNull
-  HeaderAssignmentIdentifier getAssignmentIdentifier();
 
 }

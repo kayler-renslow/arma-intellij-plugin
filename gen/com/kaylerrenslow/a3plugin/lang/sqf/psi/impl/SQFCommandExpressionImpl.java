@@ -32,9 +32,15 @@ public class SQFCommandExpressionImpl extends SQFExpressionImpl implements SQFCo
   }
 
   @Override
-  @NotNull
-  public List<SQFExpression> getExpressionList() {
-    return PsiTreeUtil.getChildrenOfTypeAsList(this, SQFExpression.class);
+  @Nullable
+  public SQFCommandAfter getCommandAfter() {
+    return findChildByClass(SQFCommandAfter.class);
+  }
+
+  @Override
+  @Nullable
+  public SQFCommandBefore getCommandBefore() {
+    return findChildByClass(SQFCommandBefore.class);
   }
 
 }

@@ -12,14 +12,10 @@ public class HeaderVisitor extends PsiElementVisitor {
   }
 
   public void visitArrayAssignment(@NotNull HeaderArrayAssignment o) {
-    visitAssignment(o);
-  }
-
-  public void visitArrayBody(@NotNull HeaderArrayBody o) {
     visitPsiElement(o);
   }
 
-  public void visitArrayEntry(@NotNull HeaderArrayEntry o) {
+  public void visitArrayEntry_(@NotNull HeaderArrayEntry_ o) {
     visitPsiElement(o);
   }
 
@@ -27,76 +23,44 @@ public class HeaderVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
-  public void visitAssignmentIdentifier(@NotNull HeaderAssignmentIdentifier o) {
-    visitPsiElement(o);
-  }
-
-  public void visitBasicAssignment(@NotNull HeaderBasicAssignment o) {
-    visitAssignment(o);
-  }
-
-  public void visitClassContent(@NotNull HeaderClassContent o) {
-    visitPsiElement(o);
-  }
-
-  public void visitClassDeclaration(@NotNull HeaderClassDeclaration o) {
-    visitPsiElement(o);
-  }
-
-  public void visitClassStub(@NotNull HeaderClassStub o) {
-    visitPsiElement(o);
-  }
-
-  public void visitDefinedText(@NotNull HeaderDefinedText o) {
-    visitPsiElement(o);
-  }
-
   public void visitExpression(@NotNull HeaderExpression o) {
     visitPsiElement(o);
   }
 
-  public void visitFileEntries(@NotNull HeaderFileEntries o) {
+  public void visitHeaderClass(@NotNull HeaderHeaderClass o) {
     visitPsiElement(o);
   }
 
-  public void visitFileEntry(@NotNull HeaderFileEntry o) {
+  public void visitPreprocessorCommand(@NotNull HeaderPreprocessorCommand o) {
     visitPsiElement(o);
   }
 
-  public void visitMacroFunction(@NotNull HeaderMacroFunction o) {
-    visitPsiElement(o);
+  public void visitPreprocessorDefine(@NotNull HeaderPreprocessorDefine o) {
+    visitPreprocessorCommand(o);
   }
 
-  public void visitPreEval(@NotNull HeaderPreEval o) {
-    visitPsiElement(o);
+  public void visitPreprocessorElse(@NotNull HeaderPreprocessorElse o) {
+    visitPreprocessorCommand(o);
   }
 
-  public void visitPreExec(@NotNull HeaderPreExec o) {
-    visitPsiElement(o);
+  public void visitPreprocessorEndif(@NotNull HeaderPreprocessorEndif o) {
+    visitPreprocessorCommand(o);
   }
 
-  public void visitPreInclude(@NotNull HeaderPreInclude o) {
-    visitPreprocessor(o);
+  public void visitPreprocessorIfdef(@NotNull HeaderPreprocessorIfdef o) {
+    visitPreprocessorCommand(o);
   }
 
-  public void visitPreIncludeFile(@NotNull HeaderPreIncludeFile o) {
-    visitPsiElement(o);
+  public void visitPreprocessorIfndef(@NotNull HeaderPreprocessorIfndef o) {
+    visitPreprocessorCommand(o);
   }
 
-  public void visitPreMacro(@NotNull HeaderPreMacro o) {
-    visitPsiElement(o);
+  public void visitPreprocessorInclude(@NotNull HeaderPreprocessorInclude o) {
+    visitPreprocessorCommand(o);
   }
 
-  public void visitPreprocessor(@NotNull HeaderPreprocessor o) {
-    visitPsiElement(o);
-  }
-
-  public void visitPreprocessorGroup(@NotNull HeaderPreprocessorGroup o) {
-    visitPsiElement(o);
-  }
-
-  public void visitStringtableKey(@NotNull HeaderStringtableKey o) {
-    visitPsiElement(o);
+  public void visitPreprocessorUndef(@NotNull HeaderPreprocessorUndef o) {
+    visitPreprocessorCommand(o);
   }
 
   public void visitPsiElement(@NotNull PsiElement o) {

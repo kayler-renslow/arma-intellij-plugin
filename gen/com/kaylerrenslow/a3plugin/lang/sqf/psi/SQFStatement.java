@@ -8,9 +8,6 @@ import com.intellij.psi.PsiElement;
 public interface SQFStatement extends PsiElement {
 
   @Nullable
-  SQFAssignment getAssignment();
-
-  @Nullable
   SQFExpression getExpression();
 
 }

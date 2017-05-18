@@ -11,16 +11,12 @@ public class SQFVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
-  public void visitArrayEntry(@NotNull SQFArrayEntry o) {
+  public void visitArray(@NotNull SQFArray o) {
     visitPsiElement(o);
   }
 
-  public void visitArrayVal(@NotNull SQFArrayVal o) {
-    visitPsiElement(o);
-  }
-
-  public void visitAssignment(@NotNull SQFAssignment o) {
-    visitPsiElement(o);
+  public void visitAssignmentStatement(@NotNull SQFAssignmentStatement o) {
+    visitStatement(o);
   }
 
   public void visitBoolAndExpression(@NotNull SQFBoolAndExpression o) {
@@ -44,10 +40,22 @@ public class SQFVisitor extends PsiElementVisitor {
   }
 
   public void visitCodeBlock(@NotNull SQFCodeBlock o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCodeBlockExpression(@NotNull SQFCodeBlockExpression o) {
     visitExpression(o);
   }
 
   public void visitCommand(@NotNull SQFCommand o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCommandAfter(@NotNull SQFCommandAfter o) {
+    visitPsiElement(o);
+  }
+
+  public void visitCommandBefore(@NotNull SQFCommandBefore o) {
     visitPsiElement(o);
   }
 
@@ -84,10 +92,6 @@ public class SQFVisitor extends PsiElementVisitor {
   }
 
   public void visitLocalScope(@NotNull SQFLocalScope o) {
-    visitPsiElement(o);
-  }
-
-  public void visitMacroCall(@NotNull SQFMacroCall o) {
     visitPsiElement(o);
   }
 

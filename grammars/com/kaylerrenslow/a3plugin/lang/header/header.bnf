@@ -15,31 +15,16 @@
 //  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtilForGrammar"
 }
 // @formatter:off
-headerFile ::= file_entry*
+headerFile ::= entry_*
 
-file_entries ::= file_entry*
+private entry_ ::= preprocessor_command | ((assignment | array_assignment | header_class) SEMICOLON)
 
-file_entry ::= preprocessor_group | statement_
+assignment ::= IDENTIFIER EQ expression
+array_assignment ::= IDENTIFIER BRACKET_PAIR (EQ | PLUS_EQ) array
 
-private statement_ ::= (assignment | class_declaration) SEMICOLON | macro_function SEMICOLON? | defined_text SEMICOLON?
-
-private number_ ::= NUMBER_LITERAL | HEX_LITERAL
-private value_ ::= STRING_LITERAL | number_ | IDENTIFIER | macro_function
-
-array ::= LBRACE array_body? RBRACE
-array_body ::= array_entry (COMMA array_entry)*
-array_entry ::= expression | value_ | array | stringtable_key
-
-assignment_identifier ::= IDENTIFIER
-
-stringtable_key ::= STRINGTABLE_ENTRY //{implements="com.intellij.psi.PsiNamedElement"}
-
-assignment ::= basic_assignment | array_assignment
-basic_assignment ::= assignment_identifier EQ (stringtable_key | expression | value_) {extends("basic_assignment")=assignment}
-array_assignment ::= assignment_identifier BRACKET_PAIR (EQ | PLUS_EQ) array {extends("array_assignment")=assignment}
+header_class ::= CLASS IDENTIFIER (COLON IDENTIFIER)? LBRACE (entry_)* RBRACE
 
 expression ::= add_expression_
-
 private add_expression_ ::= mult_expression_ PLUS add_expression_
 				 | mult_expression_ MINUS add_expression_
 				 | mult_expression_
@@ -48,28 +33,32 @@ private mult_expression_ ::= term_ ASTERISK mult_expression_
 				  | term_ FSLASH mult_expression_
 				  | term_
 
-private term_ ::= (PLUS | MINUS)? (
-			number_
-            | IDENTIFIER
-			| LPAREN expression RPAREN
-		  )
+private term_ ::= (PLUS | MINUS)?
+                (
+                    NUMBER_LITERAL
+                    | HEX_LITERAL
+                    | IDENTIFIER
+                    | STRING_LITERAL
+                    | LPAREN expression RPAREN
+                )
+
+array ::= LBRACE (array_entry_ (COMMA array_entry_)*)? RBRACE
+array_entry_ ::= array | expression
+
+preprocessor_command ::= preprocessor_include
+                       | preprocessor_define
+                       | preprocessor_undef
+                       | preprocessor_ifdef
+                       | preprocessor_ifndef
+                       | preprocessor_else
+                       | preprocessor_endif
+
+preprocessor_include ::= PRE_INCLUDE (STRING_LITERAL | INCLUDE_VALUE_ANGBR) {extends("preprocessor_include")=preprocessor_command}
+preprocessor_define ::= PRE_DEFINE IDENTIFIER PRE_DEFINE_BODY {extends("preprocessor_define")=preprocessor_command}
+preprocessor_undef ::= PRE_UNDEF IDENTIFIER {extends("preprocessor_undef")=preprocessor_command}
+preprocessor_ifdef ::= PRE_IFDEF IDENTIFIER {extends("preprocessor_ifdef")=preprocessor_command}
+preprocessor_ifndef ::= PRE_IFNDEF IDENTIFIER {extends("preprocessor_ifndef")=preprocessor_command}
+preprocessor_else ::= PRE_ELSE {extends("preprocessor_else")=preprocessor_command}
+preprocessor_endif ::= PRE_ENDIF {extends("preprocessor_endif")=preprocessor_command}
 
 
-class_declaration ::= class_stub class_content?
-class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? //{implements="com.intellij.psi.PsiNamedElement"}
-
-class_content ::= LBRACE file_entries RBRACE
-
-//Preprocessor things
-preprocessor_group ::= preprocessor+
-preprocessor ::= pre_include | pre_macro | pre_exec
-
-pre_include ::= PREPROCESS_INCLUDE pre_include_file {extends("pre_include")=preprocessor}
-pre_include_file ::= STRING_LITERAL | INCLUDE_VALUE_ANGBR
-pre_macro ::= PREPROCESS_MACRO
-
-pre_exec ::= PREPROCESS_EXEC
-pre_eval ::= PREPROCESS_EVAL
-
-macro_function ::= IDENTIFIER LPAREN ((value_ | array) (COMMA (value_ | array))*) RPAREN | pre_eval
-defined_text ::= IDENTIFIER
