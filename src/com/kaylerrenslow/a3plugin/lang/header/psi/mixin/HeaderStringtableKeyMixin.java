@@ -56,7 +56,7 @@ public abstract class HeaderStringtableKeyMixin extends ASTWrapperPsiElement imp
 				return new PsiReference[]{new HeaderStringtableKeyReference(this, key.getKeyXmlValue())};
 			}
 		}
-		return super.getReferences();
+		return PsiReference.EMPTY_ARRAY;
 	}
 
 	@Override

@@ -28,7 +28,7 @@ private value_ ::= STRING_LITERAL | number_ | IDENTIFIER | macro_function
 
 array ::= LBRACE array_body? RBRACE
 array_body ::= array_entry (COMMA array_entry)*
-array_entry ::= expression | value_ | array
+array_entry ::= expression | value_ | array | stringtable_key
 
 assignment_identifier ::= IDENTIFIER
 
@@ -36,7 +36,7 @@ stringtable_key ::= STRINGTABLE_ENTRY {mixin="com.kaylerrenslow.a3plugin.lang.he
 
 assignment ::= basic_assignment | array_assignment {methods=[getAssigningVariable getAssigningValue getAssigningIdentifierNode]}
 basic_assignment ::= assignment_identifier EQ (stringtable_key | expression | value_) {extends("basic_assignment")=assignment}
-array_assignment ::= assignment_identifier BRACKET_PAIR EQ array {extends("array_assignment")=assignment}
+array_assignment ::= assignment_identifier BRACKET_PAIR (EQ | PLUS_EQ) array {extends("array_assignment")=assignment}
 
 expression ::= add_expression_
 

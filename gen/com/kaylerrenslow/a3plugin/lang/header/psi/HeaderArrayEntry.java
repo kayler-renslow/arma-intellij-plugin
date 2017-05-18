@@ -16,4 +16,7 @@ public interface HeaderArrayEntry extends PsiElement {
   @Nullable
   HeaderMacroFunction getMacroFunction();
 
+  @Nullable
+  HeaderStringtableKey getStringtableKey();
+
 }

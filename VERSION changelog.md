@@ -1,4 +1,4 @@
-**Version:** tbd  
+**Version:** 1.0.8  
 **Release Date:** tbd
 
 ### Plugin
@@ -50,4 +50,6 @@
 
 
 **Fixed**  
-* 
+* [header stringtable key created stack overflow](https://github.com/kayler-renslow/arma-intellij-plugin/issues/40)
+* [header didn't support += operator](https://github.com/kayler-renslow/arma-intellij-plugin/issues/41)
+* stringtable keys couldn't be in arrays

@@ -44,4 +44,10 @@ public class HeaderArrayEntryImpl extends ASTWrapperPsiElement implements Header
     return findChildByClass(HeaderMacroFunction.class);
   }
 
+  @Override
+  @Nullable
+  public HeaderStringtableKey getStringtableKey() {
+    return findChildByClass(HeaderStringtableKey.class);
+  }
+
 }

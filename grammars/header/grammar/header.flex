@@ -85,6 +85,7 @@ MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}
 
 <YYINITIAL> {IDENTIFIER} { return HeaderTypes.IDENTIFIER; }
 
+<YYINITIAL> "+="   { return HeaderTypes.PLUS_EQ; }
 <YYINITIAL> "="   { return HeaderTypes.EQ; }
 
 <YYINITIAL> "+"   { return HeaderTypes.PLUS; }

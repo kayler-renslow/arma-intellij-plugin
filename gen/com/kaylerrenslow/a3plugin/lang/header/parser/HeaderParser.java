@@ -168,16 +168,28 @@ public class HeaderParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // assignment_identifier BRACKET_PAIR EQ array
+  // assignment_identifier BRACKET_PAIR (EQ | PLUS_EQ) array
   public static boolean array_assignment(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "array_assignment")) return false;
     if (!nextTokenIs(b, IDENTIFIER)) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = assignment_identifier(b, l + 1);
-    r = r && consumeTokens(b, 0, BRACKET_PAIR, EQ);
+    r = r && consumeToken(b, BRACKET_PAIR);
+    r = r && array_assignment_2(b, l + 1);
     r = r && array(b, l + 1);
     exit_section_(b, m, ARRAY_ASSIGNMENT, r);
+    return r;
+  }
+
+  // EQ | PLUS_EQ
+  private static boolean array_assignment_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "array_assignment_2")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, EQ);
+    if (!r) r = consumeToken(b, PLUS_EQ);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -217,7 +229,7 @@ public class HeaderParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // expression | value_ | array
+  // expression | value_ | array | stringtable_key
   public static boolean array_entry(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "array_entry")) return false;
     boolean r;
@@ -225,6 +237,7 @@ public class HeaderParser implements PsiParser, LightPsiParser {
     r = expression(b, l + 1);
     if (!r) r = value_(b, l + 1);
     if (!r) r = array(b, l + 1);
+    if (!r) r = stringtable_key(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

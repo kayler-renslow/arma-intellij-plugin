@@ -25,7 +25,7 @@ import java.util.List;
 public class HeaderPsiUtilForGrammar {
 
 	public static String getKey(HeaderStringtableKey key) {
-		return key.getText().substring(1).replaceFirst("[sS][tT][rR]_", "str_");
+		return key.getNode().getText().substring(1).replaceFirst("[sS][tT][rR]_", "str_");
 	}
 
 	public static boolean bracesAreEmpty(HeaderClassDeclaration classDeclaration) {
