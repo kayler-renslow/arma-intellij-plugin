@@ -1,138 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <idea-plugin version="2">
-	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
+	<id>com.kaylerrenslow.armaintellijplugin.id</id>
 	<name>Arma Intellij Plugin</name>
 	<version>1.0.7</version>
 	<vendor email="armaintellijplugin@kaylerrenslow.com" url="https://github.com/kayler-renslow/arma-intellij-plugin">
 		Kayler Renslow
 	</vendor>
 	<description>
-		Plugin that offers syntax checking of SQF files, syntax highlighting, find usages, refactor renaming, and more
-		various features for the video game Arma 3.
+
 	</description>
 
-	<change-notes>
-		Changelog is also available at the GitHub page: &lt;a
-		href="https://github.com/kayler-renslow/arma-intellij-plugin/releases"&gt;https://github.com/kayler-renslow/arma-intellij-plugin/releases&lt;/a&gt;
-		&lt;br&gt;
-		&lt;br&gt;
-
-		&lt;p&gt;&lt;strong&gt;Release Date:&lt;/strong&gt;
-		December 25, 2016&lt;/p&gt;
-		&lt;h2 id="sqf"&gt;SQF&lt;/h2&gt;
-		&lt;p&gt;&lt;strong&gt;Added&lt;/strong&gt; &lt;/p&gt;
-		&lt;ul&gt;
-		&lt;li&gt;SQF file template (Main Menu-&gt;File-&gt;Settings-&gt;Editor-&gt;File and Code Templates and template
-		name is &quot;SQF File&quot;)&lt;/li&gt;
-		&lt;li&gt;1.66 commands and BIS functions&lt;/li&gt;
-		&lt;li&gt;documentation tag auto completion (now lists commands for @command, bis functions for @bis, and config
-		functions for @fnc)&lt;/li&gt;
-		&lt;/ul&gt;
-		&lt;p&gt;&lt;strong&gt;Changed&lt;/strong&gt; &lt;/p&gt;
-		&lt;ul&gt;
-		&lt;li&gt;removed SQF function creation from alt+insert menu (will come back when properly implemented) &lt;/li&gt;
-		&lt;/ul&gt;
-		&lt;p&gt;&lt;strong&gt;Fixed&lt;/strong&gt; &lt;/p&gt;
-		&lt;ul&gt;
-		&lt;li&gt;&lt;a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/31"&gt;https://github.com/kayler-renslow/arma-intellij-plugin/issues/31&lt;/a&gt;
-		(new SQF file not automatically opened)&lt;/li&gt;
-		&lt;li&gt;&lt;a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/35"&gt;https://github.com/kayler-renslow/arma-intellij-plugin/issues/35&lt;/a&gt;
-		(for loop syntax error with step -1)&lt;/li&gt;
-		&lt;li&gt;unused vars inspection wasn&#39;t taking into account self assignments&lt;/li&gt;
-		&lt;/ul&gt;
-
-	</change-notes>
-
+	<change-notes></change-notes>
 	<idea-version since-build="131"/>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- SQF Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.sqf.SQFFileTypeFactory"/>
 		<lang.parserDefinition language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserDefinition"/>
-		<lang.syntaxHighlighterFactory language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFSyntaxHighlighterFactory"/>
-		<colorSettingsPage implementation="com.kaylerrenslow.a3plugin.lang.sqf.codeStyle.highlighting.SQFColorSettingsPage"/>
-		<completion.contributor language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.contributors.SQFCompletionContributor"/>
-		<lang.documentationProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFDocumentationProvider"/>
-		<lang.commenter language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFCommenter"/>
-		<annotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFAnnotator"/>
-		<localInspection language="Arma.SQF"
-						 implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.inspections.PrivatizationAndDeclarationInspection"
-						 enabledByDefault="true" groupName="Arma SQF"/>
-		<localInspection language="Arma.SQF"
-						 implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.inspections.CommandCamelCaseInspection"
-						 enabledByDefault="true" groupName="Arma SQF"/>
-		<lang.findUsagesProvider language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFFindUsagesProvider"/>
-		<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.sqf.contributors.SQFReferenceContributor"/>
-		<lang.refactoringSupport language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.providers.SQFRefactoringSupportProvider"/>
-		<lang.braceMatcher language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFBraceMatcher" />
-		<lang.foldingBuilder language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFFoldingBuilder" />
-		<!--<codeInsight.parameterInfo language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.editor.SQFParameterInfo" />-->
-		<renameHandler implementation="com.kaylerrenslow.a3plugin.lang.sqf.contributors.SQFRenameHandler"/>
-		<!--<lang.quoteHandler language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.sqf.contributors.SQFQuoteHandler" />-->
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.a3plugin.lang.header.HeaderFileTypeFactory"/>
 		<lang.parserDefinition language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderParserDefinition"/>
-		<lang.syntaxHighlighterFactory language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderSyntaxHighlighterFactory"/>
-		<colorSettingsPage implementation="com.kaylerrenslow.a3plugin.lang.header.codeStyle.highlighting.HeaderColorSettingsPage"/>
-		<completion.contributor language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.contributors.HeaderCompletionContributor"/>
-		<lang.commenter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderCommenter"/>
-		<!--<lang.formatter language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.codeStyle.formatting.HeaderFormattingBuilder"/>-->
-		<!--<codeStyleSettingsProvider  implementation="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderCodeStyleSettingsProvider"/>-->
-		<langCodeStyleSettingsProvider implementation="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderLanguageCodeStyleSettingsProvider"/>
-		<lang.braceMatcher language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderBraceMatcher" />
-		<lang.foldingBuilder language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderFoldingBuilder" />
-		<annotator language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.editor.HeaderAnnotator"/>
-		<lang.documentationProvider language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderDocumentationProvider"/>
-		<lang.findUsagesProvider language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.header.providers.HeaderFindUsagesProvider"/>
-
-		<!-- Shared for Languages -->
-		<usageTypeProvider implementation="com.kaylerrenslow.a3plugin.lang.shared.ArmaUsageTypeProvider"/>
-		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/a3plugin/armaPluginColorSchemes.xml" />
-		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/a3plugin/armaPluginColorSchemes.xml" />
-		<lang.documentationProvider language="XML" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.XMLDocumentationProvider"/>
-		<externalAnnotator language="Arma.Header" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.SharedExternalAnnotator"/>
-		<externalAnnotator language="Arma.SQF" implementationClass="com.kaylerrenslow.a3plugin.lang.shared.SharedExternalAnnotator"/>
-		<!--<languageInjector implementation="com.kaylerrenslow.a3plugin.lang.shared.HeaderInSQFInjector" />-->
-
-		<!-- File Templates-->
-		<!-- NOTE TO SELF:
-			Any internal file template can't be created from file->new.
-			You can place internal file templates in fileTemplates/internal and normal file templates in directory fileTemplates.
-			https://intellij-support.jetbrains.com/hc/en-us/community/posts/207280245-File-Templates-in-plugin
-		-->
-
-		<!-- Live Templates-->
-		<liveTemplateContext implementation="com.kaylerrenslow.a3plugin.liveTemplates.SQFLiveTemplateContext" />
-		<defaultLiveTemplatesProvider implementation="com.kaylerrenslow.a3plugin.liveTemplates.SQFLiveTemplatesProvider" />
-
-		<!-- StringTable-->
-		<dom.fileDescription
-				implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.dom.StringTableDomFileDescription"/>
-		<psi.referenceContributor implementation="com.kaylerrenslow.a3plugin.lang.shared.stringtable.psi.StringtableReferenceContributor"/>
-
-		<!-- Other things-->
-		<moduleBuilder builderClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleBuilder" />
-		<moduleType implementationClass="com.kaylerrenslow.a3plugin.wizards.ArmaModuleType" id="arma.moduleType" />
 	</extensions>
-
-	<project-components>
-		<component>
-			<implementation-class>com.kaylerrenslow.a3plugin.components.versionChecker.PluginVersionChecker</implementation-class>
-		</component>
-	</project-components>
-
-	<actions>
-		<group id="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.group" text="_Arma Plugin" description="Arma Plugin Menu" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.ArmaPluginGroup">
-			<add-to-group group-id="MainMenu" anchor="last" />
-			<action id="a3plugin.action.mm.pluginProps" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_PluginProperties" text="Plugin Properties" description="Configure Arma Plugin Properties" />
-			<action id="a3plugin.action.mm.wiki_scripting" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowScriptingWiki" text="Arma 3 Wiki for Scripting Commands" description="View the Wiki page for Arma 3 scripting commands" />
-			<action id="a3plugin.action.mm.wiki_home" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowWikiHomepage" text="Arma 3 Wiki Homepage" description="View the Wiki home page for Arma 3" />
-			<action id="a3plugin.action.mm.color_picker" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_ShowArmaColorPicker" text="Arma Color Picker" description="Arma Color Picker" />
-			<action id="a3plugin.action.mm.about" class="com.kaylerrenslow.a3plugin.dialog.actions.mainMenu.Action_About" text="About" description="About" />
-		</group>
-		<!--<action id="a3plugin.action.newGroup.new_SQF_function" class="com.kaylerrenslow.a3plugin.dialog.actions.newGroup.Action_NewSQFFunction" text="New SQF Function"	description="Create a new SQF Function" icon="/com/kaylerrenslow/a3plugin/icons/function.png">-->
-		<!--<add-to-group group-id="NewGroup1" anchor="first"/>-->
-		<!--</action>-->
-	</actions>
-
 
 </idea-plugin>

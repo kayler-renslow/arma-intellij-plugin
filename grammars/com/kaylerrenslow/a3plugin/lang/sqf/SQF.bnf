@@ -1,0 +1,105 @@
+{
+  parserClass="com.kaylerrenslow.a3plugin.lang.sqf.parser.SQFParser"
+  parserUtilClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFParserUtil"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="SQF"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.kaylerrenslow.a3plugin.lang.sqf.psi"
+  psiImplPackage="com.kaylerrenslow.a3plugin.lang.sqf.psi.impl"
+
+  elementTypeHolderClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes"
+  elementTypeClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFElementType"
+  tokenTypeClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTokenType"
+
+  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiImplUtilForGrammar"
+
+  name("macro_call")="macro call"
+  name("assignment")="assignment"
+  name("expression")="expression"
+  extends(".*expression|code_block")=expression
+  consumeTokenMethod(".*expression|expression")="consumeTokenFast" //https://github.com/JetBrains/Grammar-Kit/blob/master/HOWTO.md#24-compact-expression-parsing-with-priorities
+  extends(".*_statement")=statement
+}
+// @formatter:off
+sqfFile ::= file_scope //first rule is private. place file_scope inside and file_scope will be root rule
+
+file_scope ::= items_ {extends("file_scope")=local_scope}
+local_scope ::= items_ {implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFScope" methods=[getPrivateVars getStatementsForScope checkIfSpawn getPrivatizerElement getCodeBlock]}
+
+private items_ ::= (statement SEMICOLON )* return_statement?
+
+variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElementMixin" implements="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFVariableNamedElement" methods=[followsSQFFunctionNameRules getDeclarationScope isAssigningVariable getMyAssignment getPrivatization]}
+
+statement ::= ( assignment | case_statement | expression | quest_statement )//case statement must come before expression or it will think that case is a command
+return_statement ::= variable | ( assignment | case_statement | expression | quest_statement ) {extends("return_statement")=statement}
+
+quest_statement ::= QUEST expression COLON expression {pin=1}
+
+case_statement ::= case_command expression (COLON code_block)? {pin=1}
+case_command ::= <<external_rule_case_command 0>> {extends("case_command")=command}
+
+assignment ::= private_command? variable !(LPAREN | command) EQ expression {pin=3 methods=[getAssigningVariable isDeclaredPrivate]} //look for !(LPAREN | command) so that we can pin and not confuse with macro_call and command expression
+private_command ::= <<external_rule_private_command 0>> {extends("private_command")=command}
+
+expression ::= conditional_group_
+            | add_group_
+            | comp_expression
+            | mul_group_
+            | exponent_expression
+            | config_fetch_expression
+            | command_expression
+            | unary_expression //keep below command expression
+            | literal_expression
+            | code_block
+            | paren_expression
+
+
+
+private add_group_ ::= add_expression | sub_expression
+private mul_group_ ::= mul_expression | div_expression | mod_expression
+private conditional_group_::= bool_and_expression | bool_or_expression | bool_not_expression
+
+unary_expression ::= (PLUS | MINUS) expression
+
+literal_expression ::= string
+                    | macro_call //must come before variable
+                    | variable
+                    | INTEGER_LITERAL
+                    | array_val
+                    | DEC_LITERAL
+                    | HEX_LITERAL
+
+add_expression ::= expression PLUS expression
+sub_expression ::= expression MINUS expression
+mul_expression ::= expression ASTERISK expression
+div_expression ::= expression FSLASH expression
+mod_expression ::= expression PERC expression
+
+bool_and_expression ::= expression AMPAMP expression
+bool_or_expression ::= expression BARBAR expression
+bool_not_expression::= EXCL expression
+
+comp_expression ::= expression (EQEQ | NE | LT | LE | GT | GE) expression
+
+config_fetch_expression ::= expression (FSLASH | GTGT) expression
+
+exponent_expression ::= expression (CARET expression)+
+command_expression ::= command_prefix_arg_? command command_postfix_arg_? { methods=[getCommandName getPrefixArgument getPostfixArgument]}
+private command_prefix_arg_ ::= code_block | unary_expression | paren_expression | literal_expression
+private command_postfix_arg_ ::= expression | (code_block expression?)
+
+paren_expression ::= LPAREN expression RPAREN
+
+command ::= COMMAND_TOKEN {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFCommandElement" implements="com.intellij.psi.PsiNameIdentifierOwner" methods=[]}
+
+string ::= STRING_LITERAL {mixin="com.kaylerrenslow.a3plugin.lang.sqf.psi.mixin.SQFStringMixin" methods=[getNonQuoteText getNonQuoteRangeRelativeToFile getNonQuoteRangeRelativeToElement]}
+
+macro_call ::= variable LPAREN expression (COMMA expression)* RPAREN
+
+array_val ::= (LBRACKET RBRACKET) | (LBRACKET array_entry comma_array_* RBRACKET )
+private comma_array_ ::= COMMA array_entry
+array_entry ::= expression {methods=[getCodeBlock]}
+
+code_block ::= (LBRACE RBRACE)| (LBRACE local_scope RBRACE)

@@ -5,3 +5,6 @@
     * We would also have a shared annotator that would look for these tokens and provide proper coloring and error checking
     * We need to figure out how to provide references for them though
 * header lexer could not match input when doing analyze->inspect code
+
+
+* in the future, the type/syntax checker should be able to detect when a Cfg* entry is needed and search description.ext for the classnames

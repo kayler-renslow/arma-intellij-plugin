@@ -1,8 +1,5 @@
 package com.kaylerrenslow.a3plugin.lang.sqf;
 
-import com.kaylerrenslow.a3plugin.Plugin;
-import com.kaylerrenslow.a3plugin.util.FileReader;
-import com.kaylerrenslow.a3plugin.util.ResourceGetter;
 import com.kaylerrenslow.a3plugin.util.TextFileListToList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -17,10 +14,10 @@ import java.util.List;
  */
 public class SQFStatic {
 	static final String NAME = "Arma.SQF";
-	public static final String NAME_FOR_DISPLAY = Plugin.resources.getString("lang.sqf.name_for_display");
-	public static final String DESCRIPTION = Plugin.resources.getString("lang.sqf.description");
-	static final String FILE_EXTENSION = Plugin.resources.getString("lang.sqf.file_extension");
-	static final String FILE_EXTENSION_DEFAULT = Plugin.resources.getString("lang.sqf.file_extension_default");
+	//	public static final String NAME_FOR_DISPLAY = Plugin.resources.getString("lang.sqf.name_for_display");
+	public static final String DESCRIPTION = "SQFStatic.description";
+	static final String FILE_EXTENSION = "sqf";
+	static final String FILE_EXTENSION_DEFAULT = ".sqf";
 
 	private static final String COMMANDS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/commands-doc/";
 	private static final String BIS_FUNCTIONS_DOC_FILE_DIR = "/com/kaylerrenslow/a3plugin/lang/sqf/raw_doc/bis-functions-doc/";
@@ -28,17 +25,15 @@ public class SQFStatic {
 	private static final String COMMANDS_DOC_FILE_LOOKUP = COMMANDS_DOC_FILE_DIR + "lookup.list";
 	private static final String BIS_FUNCTIONS_DOC_FILE_LOOKUP = BIS_FUNCTIONS_DOC_FILE_DIR + "lookup.list";
 
-	private static final String BIS_WIKI_URL_PREFIX = Plugin.resources.getString("plugin.doc.sqf.wiki_URL_prefix");
-	private static final String EXTERNAL_LINK_NOTIFICATION = Plugin.resources.getString("plugin.doc.sqf.wiki_doc_external_link_notification_string_format");
+	private static final String BIS_WIKI_URL_PREFIX = "https://community.bistudio.com/wiki/";
+	private static final String EXTERNAL_LINK_NOTIFICATION = "<b>Online Wiki link: <a href='%1$s' style='color:008800'>%1$s</a></b><p>Green links are external links.</p>";
 
 
 	/**
 	 * Has all commands stored in their camelCase form
 	 */
-	public static final List<String> LIST_COMMANDS = TextFileListToList.getListFromStream(ResourceGetter.getResourceAsStream(COMMANDS_DOC_FILE_LOOKUP), new ArrayList<>());
-	public static final List<String> LIST_BIS_FUNCTIONS = TextFileListToList.getListFromStream(ResourceGetter.getResourceAsStream(BIS_FUNCTIONS_DOC_FILE_LOOKUP), new ArrayList<>());
-
-	public static final String SQF_SAMPLE_CODE_TEXT = FileReader.getText("/com/kaylerrenslow/a3plugin/lang/sqf/codeStyle/sqfSampleCode.sqf");
+	public static final List<String> LIST_COMMANDS = TextFileListToList.getListFromStream(SQFStatic.class.getResourceAsStream(COMMANDS_DOC_FILE_LOOKUP), new ArrayList<>());
+	public static final List<String> LIST_BIS_FUNCTIONS = TextFileListToList.getListFromStream(SQFStatic.class.getResourceAsStream(BIS_FUNCTIONS_DOC_FILE_LOOKUP), new ArrayList<>());
 
 	private static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
 
@@ -151,42 +146,6 @@ public class SQFStatic {
 		return Collections.binarySearch(LIST_BIS_FUNCTIONS, varName) >= 0;
 	}
 
-	/**
-	 * Checks if the given variable name is possibly a BIS function (varName starts with bis_ and isn't case sensitive).
-	 *
-	 * @param varName variable name to check
-	 * @return true if starts with BIS_, false otherwise
-	 */
-	public static boolean isMaybeBISFunction(String varName) {
-		return varName.toLowerCase().startsWith("bis_");
-	}
-
-	public static String getCommandDocumentation(String commandName) {
-		try {
-			return String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(commandName)) + FileReader.getText(getDocumentationFilePath(commandName));
-		} catch (IllegalArgumentException ignore) {
-			for (String command : SQFStatic.LIST_COMMANDS) {
-				if (command.equalsIgnoreCase(commandName)) {
-					return String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(command)) + FileReader.getText(getDocumentationFilePath(command));
-				}
-			}
-
-		}
-		return "Error fetching documentation.";
-	}
-
-	private static String getDocumentationFilePath(String commandName) {
-		return COMMANDS_DOC_FILE_DIR + commandName;
-	}
-
-	public static String getBISFunctionDocumentation(String bisFunction) {
-		String doc = String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(bisFunction));
-		return doc + FileReader.getText(BIS_FUNCTIONS_DOC_FILE_DIR + bisFunction);
-	}
-
-	public static String getWikiUrl(String wikiLinkName) {
-		return BIS_WIKI_URL_PREFIX + wikiLinkName;
-	}
 
 	public static class SQFFunctionTagAndName {
 		public final String tagName;

@@ -1,8 +1,0 @@
-<templateSet group="SQF">
-    <template name="callf" value="[$PARAM$] call $END$;" description="Call a config function" toReformat="false" toShortenFQNames="true">
-        <variable name="PARAM" expression="" defaultValue="_var" alwaysStopAt="true" />
-        <context>
-            <option name="SQF_CONTEXT" value="true" />
-        </context>
-    </template>
-</templateSet>

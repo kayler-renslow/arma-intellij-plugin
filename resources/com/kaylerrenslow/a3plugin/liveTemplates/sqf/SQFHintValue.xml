@@ -1,8 +1,0 @@
-<templateSet group="SQF">
-    <template name="hintvalue" value="hint format[&quot;%1&quot;, $PARAM$];$END$" description="Hint format a value" toReformat="false" toShortenFQNames="true">
-        <variable name="PARAM" expression="" defaultValue="0" alwaysStopAt="true" />
-        <context>
-            <option name="SQF_CONTEXT" value="true" />
-        </context>
-    </template>
-</templateSet>

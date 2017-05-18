@@ -17,7 +17,7 @@
 
 
 **Changed**  
-* preprocessor doesn't allow newline before macro text
+*
 
 
 **Fixed**  

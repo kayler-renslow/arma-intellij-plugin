@@ -1,7 +1,6 @@
 package com.kaylerrenslow.a3plugin;
 
 import com.intellij.openapi.util.IconLoader;
-import com.kaylerrenslow.a3plugin.util.ResourceGetter;
 
 import javax.swing.*;
 
@@ -20,8 +19,6 @@ public class PluginIcons {
 	public static final Icon ICON_SQF_FUNCTION = IconLoader.getIcon(path("icons/function.png"));
 
 	public static final Icon ICON_HEADER = IconLoader.getIcon(path("icons/header.png"));
-
-	public static final ImageIcon ARMA_LOGO = new ImageIcon(ResourceGetter.getResourceAsURL(path("img/arma-logo.png")));
 
 	private static String path(String p) {
 		return "/com/kaylerrenslow/a3plugin/" + p;
