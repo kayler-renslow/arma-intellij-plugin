@@ -1,5 +1,5 @@
 **Version:** 1.0.8  
-**Release Date:** tbd
+**Release Date:** May 18, 2017
 
 ### Plugin
 **Added**  

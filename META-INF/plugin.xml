@@ -11,35 +11,40 @@
 	</description>
 
 	<change-notes>
-		Changelog is also available at the GitHub page: &lt;a
-		href="https://github.com/kayler-renslow/arma-intellij-plugin/releases"&gt;https://github.com/kayler-renslow/arma-intellij-plugin/releases&lt;/a&gt;
-		&lt;br&gt;
-		&lt;br&gt;
-
-		&lt;p&gt;&lt;strong&gt;Release Date:&lt;/strong&gt;
-		December 25, 2016&lt;/p&gt;
-		&lt;h2 id="sqf"&gt;SQF&lt;/h2&gt;
-		&lt;p&gt;&lt;strong&gt;Added&lt;/strong&gt; &lt;/p&gt;
-		&lt;ul&gt;
-		&lt;li&gt;SQF file template (Main Menu-&gt;File-&gt;Settings-&gt;Editor-&gt;File and Code Templates and template
-		name is &quot;SQF File&quot;)&lt;/li&gt;
-		&lt;li&gt;1.66 commands and BIS functions&lt;/li&gt;
-		&lt;li&gt;documentation tag auto completion (now lists commands for @command, bis functions for @bis, and config
-		functions for @fnc)&lt;/li&gt;
-		&lt;/ul&gt;
-		&lt;p&gt;&lt;strong&gt;Changed&lt;/strong&gt; &lt;/p&gt;
-		&lt;ul&gt;
-		&lt;li&gt;removed SQF function creation from alt+insert menu (will come back when properly implemented) &lt;/li&gt;
-		&lt;/ul&gt;
-		&lt;p&gt;&lt;strong&gt;Fixed&lt;/strong&gt; &lt;/p&gt;
-		&lt;ul&gt;
-		&lt;li&gt;&lt;a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/31"&gt;https://github.com/kayler-renslow/arma-intellij-plugin/issues/31&lt;/a&gt;
-		(new SQF file not automatically opened)&lt;/li&gt;
-		&lt;li&gt;&lt;a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/35"&gt;https://github.com/kayler-renslow/arma-intellij-plugin/issues/35&lt;/a&gt;
-		(for loop syntax error with step -1)&lt;/li&gt;
-		&lt;li&gt;unused vars inspection wasn&#39;t taking into account self assignments&lt;/li&gt;
-		&lt;/ul&gt;
-
+		<![CDATA[
+			Changelog is also available at the GitHub page:
+			<a href="https://github.com/kayler-renslow/arma-intellij-plugin/releases">
+			https://github.com/kayler-renslow/arma-intellij-plugin/releases&
+			</a>
+			<br><br>
+			<h3>Version 1.0.8 - Released May 18, 2017</h3>
+			<h3 id="shared-between-languages">Shared between languages</h3>
+			<p><strong>Fixed</strong>  </p>
+			<ul>
+			<li>better, but still bad pre-processor</li>
+			</ul>
+			<h3 id="sqf">SQF</h3>
+			<p><strong>Added</strong>  </p>
+			<ul>
+			<li>command camelCase inspection (checks if command is camel case. if not, alt+enter to make it camel case)</li>
+			<li>new Arma 3 commands from the wiki</li>
+			</ul>
+			<p><strong>Changed</strong>  </p>
+			<ul>
+			<li>commands can now be non-camel case</li>
+			</ul>
+			<p><strong>Fixed</strong>  </p>
+			<ul>
+			<li>unary expression</li>
+			</ul>
+			<h3 id="header">Header</h3>
+			<p><strong>Fixed</strong>  </p>
+			<ul>
+			<li><a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/40">header stringtable key created stack overflow</a></li>
+			<li><a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/41">header didn&#39;t support += operator</a></li>
+			<li>stringtable keys couldn&#39;t be in arrays</li>
+			</ul>
+		]]>
 	</change-notes>
 
 	<idea-version since-build="131"/>

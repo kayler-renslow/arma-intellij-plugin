@@ -58,7 +58,7 @@ INCLUDE = "#include"
 
 MACRO_CHARACTER = [^\r\n] | {MACRO_NEWLINE}
 MACRO_TEXT = {MACRO_CHARACTER}+
-MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}
+MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}?
 
 
 %%
