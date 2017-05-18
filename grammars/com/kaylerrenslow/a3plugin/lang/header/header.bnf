@@ -12,7 +12,7 @@
   elementTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderElementType"
   tokenTypeClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderTokenType"
 
-  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtilForGrammar"
+//  psiImplUtilClass="com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtilForGrammar"
 }
 // @formatter:off
 headerFile ::= file_entry*
@@ -32,9 +32,9 @@ array_entry ::= expression | value_ | array | stringtable_key
 
 assignment_identifier ::= IDENTIFIER
 
-stringtable_key ::= STRINGTABLE_ENTRY {mixin="com.kaylerrenslow.a3plugin.lang.header.psi.mixin.HeaderStringtableKeyMixin" implements="com.intellij.psi.PsiNamedElement" methods=[getKey]}
+stringtable_key ::= STRINGTABLE_ENTRY //{implements="com.intellij.psi.PsiNamedElement"}
 
-assignment ::= basic_assignment | array_assignment {methods=[getAssigningVariable getAssigningValue getAssigningIdentifierNode]}
+assignment ::= basic_assignment | array_assignment
 basic_assignment ::= assignment_identifier EQ (stringtable_key | expression | value_) {extends("basic_assignment")=assignment}
 array_assignment ::= assignment_identifier BRACKET_PAIR (EQ | PLUS_EQ) array {extends("array_assignment")=assignment}
 
@@ -55,8 +55,8 @@ private term_ ::= (PLUS | MINUS)? (
 		  )
 
 
-class_declaration ::= class_stub class_content? {methods=[getClassName getExtendClassName getAttributes hasAttributes setAttribute getClassNameNode removeBracesIfEmpty bracesAreEmpty removeFromTree createClassContent addFileEntry addClassDeclaration]}
-class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? {mixin="com.kaylerrenslow.a3plugin.lang.header.psi.mixin.HeaderClassStubMixin" implements="com.intellij.psi.PsiNamedElement" methods=[getClassName getExtendClassName getClassNameNode]}
+class_declaration ::= class_stub class_content?
+class_stub ::= CLASS IDENTIFIER (COLON IDENTIFIER)? //{implements="com.intellij.psi.PsiNamedElement"}
 
 class_content ::= LBRACE file_entries RBRACE
 
@@ -64,7 +64,7 @@ class_content ::= LBRACE file_entries RBRACE
 preprocessor_group ::= preprocessor+
 preprocessor ::= pre_include | pre_macro | pre_exec
 
-pre_include ::= PREPROCESS_INCLUDE pre_include_file {extends("pre_include")=preprocessor methods=[getPathString getHeaderFileFromInclude]}
+pre_include ::= PREPROCESS_INCLUDE pre_include_file {extends("pre_include")=preprocessor}
 pre_include_file ::= STRING_LITERAL | INCLUDE_VALUE_ANGBR
 pre_macro ::= PREPROCESS_MACRO
 
