@@ -1,6 +1,7 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.psi.tree.IElementType;
+import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderElementType;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFLanguage;
 
 import java.util.Hashtable;
@@ -11,7 +12,7 @@ import java.util.Hashtable;
  *
  * @author Kayler
  * @since 10/31/2015
- * @see SQFElementType
+ * @see HeaderElementType
  */
 public class SQFTokenType extends IElementType {
 

@@ -16,7 +16,7 @@ public class SQFVisitor extends PsiElementVisitor {
   }
 
   public void visitAssignmentStatement(@NotNull SQFAssignmentStatement o) {
-    visitStatement(o);
+    visitPsiElement(o);
   }
 
   public void visitBoolAndExpression(@NotNull SQFBoolAndExpression o) {
@@ -36,7 +36,7 @@ public class SQFVisitor extends PsiElementVisitor {
   }
 
   public void visitCaseStatement(@NotNull SQFCaseStatement o) {
-    visitStatement(o);
+    visitPsiElement(o);
   }
 
   public void visitCodeBlock(@NotNull SQFCodeBlock o) {
@@ -112,7 +112,7 @@ public class SQFVisitor extends PsiElementVisitor {
   }
 
   public void visitQuestStatement(@NotNull SQFQuestStatement o) {
-    visitStatement(o);
+    visitPsiElement(o);
   }
 
   public void visitStatement(@NotNull SQFStatement o) {

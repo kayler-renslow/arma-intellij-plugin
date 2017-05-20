@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SQFCaseStatement extends SQFStatement {
+public interface SQFCaseStatement extends PsiElement {
 
   @NotNull
   SQFCaseCommand getCaseCommand();

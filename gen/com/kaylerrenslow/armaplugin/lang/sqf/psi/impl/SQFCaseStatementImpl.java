@@ -8,9 +8,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes.*;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.*;
 
-public class SQFCaseStatementImpl extends SQFStatementImpl implements SQFCaseStatement {
+public class SQFCaseStatementImpl extends ASTWrapperPsiElement implements SQFCaseStatement {
 
   public SQFCaseStatementImpl(ASTNode node) {
     super(node);

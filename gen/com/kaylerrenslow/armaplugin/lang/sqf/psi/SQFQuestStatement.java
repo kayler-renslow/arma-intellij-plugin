@@ -5,7 +5,7 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SQFQuestStatement extends SQFStatement {
+public interface SQFQuestStatement extends PsiElement {
 
   @NotNull
   List<SQFExpression> getExpressionList();

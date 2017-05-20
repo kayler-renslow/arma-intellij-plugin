@@ -17,7 +17,7 @@
 
   extends(".*expression")=expression
   //consumeTokenMethod(".*expression|expression")="consumeTokenFast" //https://github.com/JetBrains/Grammar-Kit/blob/master/HOWTO.md#24-compact-expression-parsing-with-priorities
-  extends(".*_statement")=statement
+  //extends(".*_statement")=statement
 }
 //rules ending with _ is just to make it clear that they are private rules.
 //private rules do not exist in the AST
@@ -117,7 +117,7 @@ assignment_statement ::= private_command? variable
         //Keep "code_block expression" before "expression" because there is code_block_expression.
         //We don't want to match a code_block and ignore the following expression
         //for cases like if () then {} else{};
-        command_after ::= (code_block expression?) | expression
+        command_after ::= expression | (code_block expression?)
     //end command expression
 //end expression
 
