@@ -9,7 +9,7 @@ import java.util.Collections;
 
 %%
 
-%class SQFLexer
+%public %class SQFLexer
 %implements FlexLexer
 %unicode
 %function advance
@@ -65,14 +65,6 @@ MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}?
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; }
 
-
-<YYINITIAL> "this" { return SQFTypes.LANG_VAR; }
-<YYINITIAL> "_this" { return SQFTypes.LANG_VAR; }
-<YYINITIAL> "_x" { return SQFTypes.LANG_VAR; }
-<YYINITIAL> "_forEachIndex" { return SQFTypes.LANG_VAR; }
-<YYINITIAL> "_exception" { return SQFTypes.LANG_VAR; }
-
-
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }
 <YYINITIAL> {GLOBAL_VAR} {
     for(String command : SQFStatic.LIST_COMMANDS){  //don't use binary search so that we can do ignore case search
@@ -106,10 +98,10 @@ MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}?
 
 <YYINITIAL> "("   { return SQFTypes.LPAREN; }
 <YYINITIAL> ")"   { return SQFTypes.RPAREN; }
-<YYINITIAL> "{"   { return SQFTypes.LBRACE; }
-<YYINITIAL> "}"   { return SQFTypes.RBRACE; }
-<YYINITIAL> "["   { return SQFTypes.LBRACKET; }
-<YYINITIAL> "]"   { return SQFTypes.RBRACKET; }
+<YYINITIAL> "{"   { return SQFTypes.L_CURLY_BRACE; }
+<YYINITIAL> "}"   { return SQFTypes.R_CURLY_BRACE; }
+<YYINITIAL> "["   { return SQFTypes.L_SQ_BRACKET; }
+<YYINITIAL> "]"   { return SQFTypes.R_SQ_BRACKET; }
 <YYINITIAL> ","   { return SQFTypes.COMMA; }
 <YYINITIAL> ";"   { return SQFTypes.SEMICOLON; }
 

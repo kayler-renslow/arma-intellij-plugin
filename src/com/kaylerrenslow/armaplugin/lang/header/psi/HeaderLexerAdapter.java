@@ -1,6 +1,7 @@
-package com.kaylerrenslow.armaplugin.lang.header;
+package com.kaylerrenslow.armaplugin.lang.header.psi;
 
 import com.intellij.lexer.FlexAdapter;
+import com.kaylerrenslow.armaplugin.lang.header.HeaderLexer;
 
 /**
  * Creates JFlex lexer for Header language

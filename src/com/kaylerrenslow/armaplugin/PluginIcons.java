@@ -21,6 +21,6 @@ public class PluginIcons {
 	public static final Icon ICON_HEADER = IconLoader.getIcon(path("icons/header.png"));
 
 	private static String path(String p) {
-		return "/com/kaylerrenslow/a3plugin/" + p;
+		return "/com/kaylerrenslow/armaplugin/" + p;
 	}
 }

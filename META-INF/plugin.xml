@@ -15,11 +15,19 @@
 		<fileTypeFactory implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFFileTypeFactory"/>
 		<lang.parserDefinition language="Arma.SQF"
 							   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserDefinition"/>
+		<lang.syntaxHighlighterFactory language="Arma.SQF"
+									   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.codestyle.SQFSyntaxHighlighterFactory"/>
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.armaplugin.lang.header.HeaderFileTypeFactory"/>
 		<lang.parserDefinition language="Arma.Header"
 							   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.HeaderParserDefinition"/>
+
+
+		<!-- Misc -->
+		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/armaplugin/armaPluginColorSchemes.xml"/>
+		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/armaplugin/armaPluginColorSchemes.xml"/>
+
 	</extensions>
 
 

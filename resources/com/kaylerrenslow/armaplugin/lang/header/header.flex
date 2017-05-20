@@ -8,7 +8,7 @@ import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderParserDefinition;
 
 %%
 
-%class HeaderLexer
+%public %class HeaderLexer
 %implements FlexLexer
 %unicode
 %function advance
@@ -17,6 +17,8 @@ import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderParserDefinition;
     return;
 %eof}
 
+//the ## will be handled later with psi
+// (i.e. NAME##thing: getText() will return NAME concatenated with thing and the ## will be removed)
 IDENTIFIER = {LETTER} {LETTER_OR_DIGIT}*
 LETTER = [:jletter:] | "$" | "##" //## is for preprocessor
 LETTER_OR_DIGIT = [:jletterdigit:] | "$" | "##"
@@ -56,6 +58,8 @@ PRE_ELSE = "#else"
 PRE_ENDIF = "#endif"
 
 PRE_DEFINE_BODY = "" // the body of a #define todo
+
+//for preprocessor, we can try and create the element needed from the define macro's body. if can't be created, syntax error
 
 %%
 

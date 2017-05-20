@@ -8,10 +8,12 @@ import org.jetbrains.annotations.NotNull;
 import static com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes.COMMAND_TOKEN;
 
 /**
+ * Custom rules for SQF parser
  * @author Kayler
  * @since 03/04/2017
  */
 public class SQFParserUtil extends GeneratedParserUtilBase {
+
 	public static boolean external_rule_private_command(PsiBuilder b, int l, int ignore) {
 		return command_rule(b, l, "private", SQFTypes.PRIVATE_COMMAND);
 	}

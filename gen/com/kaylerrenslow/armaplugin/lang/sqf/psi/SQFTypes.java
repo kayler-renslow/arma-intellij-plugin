@@ -35,7 +35,6 @@ public interface SQFTypes {
   IElementType PAREN_EXPRESSION = new SQFElementType("PAREN_EXPRESSION");
   IElementType PRIVATE_COMMAND = new SQFElementType("PRIVATE_COMMAND");
   IElementType QUEST_STATEMENT = new SQFElementType("QUEST_STATEMENT");
-  IElementType RETURN_STATEMENT = new SQFElementType("RETURN_STATEMENT");
   IElementType STATEMENT = new SQFElementType("STATEMENT");
   IElementType STRING = new SQFElementType("STRING");
   IElementType SUB_EXPRESSION = new SQFElementType("SUB_EXPRESSION");
@@ -60,21 +59,20 @@ public interface SQFTypes {
   IElementType GTGT = new SQFTokenType("GTGT");
   IElementType HEX_LITERAL = new SQFTokenType("HEX_LITERAL");
   IElementType INTEGER_LITERAL = new SQFTokenType("INTEGER_LITERAL");
-  IElementType LANG_VAR = new SQFTokenType("LANG_VAR");
-  IElementType LBRACE = new SQFTokenType("LBRACE");
-  IElementType LBRACKET = new SQFTokenType("LBRACKET");
   IElementType LE = new SQFTokenType("LE");
   IElementType LOCAL_VAR = new SQFTokenType("LOCAL_VAR");
   IElementType LPAREN = new SQFTokenType("LPAREN");
   IElementType LT = new SQFTokenType("LT");
+  IElementType L_CURLY_BRACE = new SQFTokenType("L_CURLY_BRACE");
+  IElementType L_SQ_BRACKET = new SQFTokenType("L_SQ_BRACKET");
   IElementType MINUS = new SQFTokenType("MINUS");
   IElementType NE = new SQFTokenType("NE");
   IElementType PERC = new SQFTokenType("PERC");
   IElementType PLUS = new SQFTokenType("PLUS");
   IElementType QUEST = new SQFTokenType("QUEST");
-  IElementType RBRACE = new SQFTokenType("RBRACE");
-  IElementType RBRACKET = new SQFTokenType("RBRACKET");
   IElementType RPAREN = new SQFTokenType("RPAREN");
+  IElementType R_CURLY_BRACE = new SQFTokenType("R_CURLY_BRACE");
+  IElementType R_SQ_BRACKET = new SQFTokenType("R_SQ_BRACKET");
   IElementType SEMICOLON = new SQFTokenType("SEMICOLON");
   IElementType STRING_LITERAL = new SQFTokenType("STRING_LITERAL");
 
@@ -158,9 +156,6 @@ public interface SQFTypes {
       }
       else if (type == QUEST_STATEMENT) {
         return new SQFQuestStatementImpl(node);
-      }
-      else if (type == RETURN_STATEMENT) {
-        return new SQFReturnStatementImpl(node);
       }
       else if (type == STATEMENT) {
         return new SQFStatementImpl(node);

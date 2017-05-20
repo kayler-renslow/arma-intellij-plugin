@@ -14,7 +14,7 @@ import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderParserDefinition;
  * <a href="http://www.jflex.de/">JFlex</a> 1.7.0-SNAPSHOT
  * from the specification file <tt>header.flex</tt>
  */
-class HeaderLexer implements FlexLexer {
+public class HeaderLexer implements FlexLexer {
 
   /** This character denotes the end of file */
   public static final int YYEOF = -1;
@@ -396,7 +396,7 @@ class HeaderLexer implements FlexLexer {
    *
    * @param   in  the java.io.Reader to read input from.
    */
-  HeaderLexer(java.io.Reader in) {
+  public HeaderLexer(java.io.Reader in) {
     this.zzReader = in;
   }
 

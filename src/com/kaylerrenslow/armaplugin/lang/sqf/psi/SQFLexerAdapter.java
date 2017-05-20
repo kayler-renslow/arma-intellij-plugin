@@ -1,6 +1,7 @@
-package com.kaylerrenslow.armaplugin.lang.sqf;
+package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.lexer.FlexAdapter;
+import com.kaylerrenslow.armaplugin.lang.sqf.SQFLexer;
 
 /**
  * Creates a new SQF JFlex lexer

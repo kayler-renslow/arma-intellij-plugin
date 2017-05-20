@@ -14,7 +14,6 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderLanguage;
-import com.kaylerrenslow.armaplugin.lang.header.HeaderLexerAdapter;
 import com.kaylerrenslow.armaplugin.lang.header.parser.HeaderParser;
 import org.jetbrains.annotations.NotNull;
 

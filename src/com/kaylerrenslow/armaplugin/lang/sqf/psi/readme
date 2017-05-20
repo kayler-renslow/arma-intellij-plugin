@@ -1,0 +1,7 @@
+This package is for anything Psi related. This includes parsing and lexing classes.
+
+Things that should be in this package and sub packages:
+    * Anything that references PsiElements
+    * Parser and Lexer utility classes, as well as the Parser and Lexer for SQF
+    * Inspections and Annotators
+    * Code style related classes (highlighters, formatters, etc)

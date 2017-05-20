@@ -1,11 +1,10 @@
 ### Plugin
 **Added**  
-* resource bundles for SQF, Header, and plugin 
+*  
 
 
 **Changed**  
-* renamed root package from a3plugin to armaplugin
-* moved a lot of crap out of SQFStatic and HeaderStatic
+* 
 
 
 **Fixed**  
@@ -27,7 +26,7 @@
 
 ### SQF
 **Added**  
-* 
+* syntax highlighter is back
 
 
 **Changed**  

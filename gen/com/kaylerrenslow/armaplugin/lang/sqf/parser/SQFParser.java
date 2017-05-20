@@ -62,9 +62,6 @@ public class SQFParser implements PsiParser, LightPsiParser {
     else if (t == QUEST_STATEMENT) {
       r = quest_statement(b, 0);
     }
-    else if (t == RETURN_STATEMENT) {
-      r = return_statement(b, 0);
-    }
     else if (t == STATEMENT) {
       r = statement(b, 0);
     }
@@ -87,8 +84,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(FILE_SCOPE, LOCAL_SCOPE),
     create_token_set_(CASE_COMMAND, COMMAND, PRIVATE_COMMAND),
-    create_token_set_(ASSIGNMENT_STATEMENT, CASE_STATEMENT, QUEST_STATEMENT, RETURN_STATEMENT,
-      STATEMENT),
+    create_token_set_(ASSIGNMENT_STATEMENT, CASE_STATEMENT, QUEST_STATEMENT, STATEMENT),
     create_token_set_(ADD_EXPRESSION, BOOL_AND_EXPRESSION, BOOL_NOT_EXPRESSION, BOOL_OR_EXPRESSION,
       CODE_BLOCK_EXPRESSION, COMMAND_EXPRESSION, COMP_EXPRESSION, CONFIG_FETCH_EXPRESSION,
       DIV_EXPRESSION, EXPONENT_EXPRESSION, EXPRESSION, LITERAL_EXPRESSION,
@@ -97,18 +93,17 @@ public class SQFParser implements PsiParser, LightPsiParser {
   };
 
   /* ********************************************************** */
-  // LBRACKET (expression (COMMA expression)*)? RBRACKET
+  // L_SQ_BRACKET (expression (COMMA expression)*)? R_SQ_BRACKET
   public static boolean array(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "array")) return false;
-    if (!nextTokenIs(b, LBRACKET)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, ARRAY, null);
-    r = consumeToken(b, LBRACKET);
-    p = r; // pin = 1
-    r = r && report_error_(b, array_1(b, l + 1));
-    r = p && consumeToken(b, RBRACKET) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    if (!nextTokenIs(b, L_SQ_BRACKET)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, L_SQ_BRACKET);
+    r = r && array_1(b, l + 1);
+    r = r && consumeToken(b, R_SQ_BRACKET);
+    exit_section_(b, m, ARRAY, r);
+    return r;
   }
 
   // (expression (COMMA expression)*)?
@@ -153,18 +148,20 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // private_command? variable EQ expression
+  // private_command? variable
+  //                         !(command /*make sure not to expect part of a command expression*/)
+  //                         EQ expression
   public static boolean assignment_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "assignment_statement")) return false;
-    boolean r, p;
+    boolean r;
     Marker m = enter_section_(b, l, _NONE_, ASSIGNMENT_STATEMENT, "<assignment statement>");
     r = assignment_statement_0(b, l + 1);
     r = r && variable(b, l + 1);
+    r = r && assignment_statement_2(b, l + 1);
     r = r && consumeToken(b, EQ);
-    p = r; // pin = 3
     r = r && expression(b, l + 1, -1);
-    exit_section_(b, l, m, r, p, assignment_statement_recover__parser_);
-    return r || p;
+    exit_section_(b, l, m, r, false, null);
+    return r;
   }
 
   // private_command?
@@ -174,14 +171,23 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  /* ********************************************************** */
-  // !(EQ)
-  static boolean assignment_statement_recover_(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "assignment_statement_recover_")) return false;
+  // !(command /*make sure not to expect part of a command expression*/)
+  private static boolean assignment_statement_2(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment_statement_2")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NOT_);
-    r = !consumeToken(b, EQ);
+    r = !assignment_statement_2_0(b, l + 1);
     exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  // (command /*make sure not to expect part of a command expression*/)
+  private static boolean assignment_statement_2_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "assignment_statement_2_0")) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = command(b, l + 1);
+    exit_section_(b, m, null, r);
     return r;
   }
 
@@ -200,14 +206,13 @@ public class SQFParser implements PsiParser, LightPsiParser {
   // case_command expression (COLON code_block)?
   public static boolean case_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "case_statement")) return false;
-    boolean r, p;
+    boolean r;
     Marker m = enter_section_(b, l, _NONE_, CASE_STATEMENT, "<case statement>");
     r = case_command(b, l + 1);
-    p = r; // pin = 1
-    r = r && report_error_(b, expression(b, l + 1, -1));
-    r = p && case_statement_2(b, l + 1) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    r = r && expression(b, l + 1, -1);
+    r = r && case_statement_2(b, l + 1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
   }
 
   // (COLON code_block)?
@@ -229,15 +234,15 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // LBRACE local_scope? RBRACE
+  // L_CURLY_BRACE local_scope? R_CURLY_BRACE
   public static boolean code_block(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "code_block")) return false;
-    if (!nextTokenIs(b, LBRACE)) return false;
+    if (!nextTokenIs(b, L_CURLY_BRACE)) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = consumeToken(b, LBRACE);
+    r = consumeToken(b, L_CURLY_BRACE);
     r = r && code_block_1(b, l + 1);
-    r = r && consumeToken(b, RBRACE);
+    r = r && consumeToken(b, R_CURLY_BRACE);
     exit_section_(b, m, CODE_BLOCK, r);
     return r;
   }
@@ -262,42 +267,42 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // expression | (code_block expression?)
+  // (code_block expression?) | expression
   public static boolean command_after(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "command_after")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, COMMAND_AFTER, "<command after>");
-    r = expression(b, l + 1, -1);
-    if (!r) r = command_after_1(b, l + 1);
+    r = command_after_0(b, l + 1);
+    if (!r) r = expression(b, l + 1, -1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
 
   // code_block expression?
-  private static boolean command_after_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "command_after_1")) return false;
+  private static boolean command_after_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "command_after_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = code_block(b, l + 1);
-    r = r && command_after_1_1(b, l + 1);
+    r = r && command_after_0_1(b, l + 1);
     exit_section_(b, m, null, r);
     return r;
   }
 
   // expression?
-  private static boolean command_after_1_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "command_after_1_1")) return false;
+  private static boolean command_after_0_1(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "command_after_0_1")) return false;
     expression(b, l + 1, -1);
     return true;
   }
 
   /* ********************************************************** */
-  // code_block | unary_expression | paren_expression | literal_expression
+  // code_block_expression | unary_expression | paren_expression | literal_expression
   public static boolean command_before(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "command_before")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, COMMAND_BEFORE, "<command before>");
-    r = code_block(b, l + 1);
+    r = code_block_expression(b, l + 1);
     if (!r) r = unary_expression(b, l + 1);
     if (!r) r = paren_expression(b, l + 1);
     if (!r) r = literal_expression(b, l + 1);
@@ -317,7 +322,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (statement SEMICOLON )* return_statement?
+  // (statement SEMICOLON)* statement?
   static boolean items_(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "items_")) return false;
     boolean r;
@@ -328,7 +333,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // (statement SEMICOLON )*
+  // (statement SEMICOLON)*
   private static boolean items__0(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "items__0")) return false;
     int c = current_position_(b);
@@ -351,10 +356,10 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // return_statement?
+  // statement?
   private static boolean items__1(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "items__1")) return false;
-    return_statement(b, l + 1);
+    statement(b, l + 1);
     return true;
   }
 
@@ -385,39 +390,13 @@ public class SQFParser implements PsiParser, LightPsiParser {
   public static boolean quest_statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "quest_statement")) return false;
     if (!nextTokenIs(b, QUEST)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, QUEST_STATEMENT, null);
-    r = consumeToken(b, QUEST);
-    p = r; // pin = 1
-    r = r && report_error_(b, expression(b, l + 1, -1));
-    r = p && report_error_(b, consumeToken(b, COLON)) && r;
-    r = p && expression(b, l + 1, -1) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
-  }
-
-  /* ********************************************************** */
-  // variable | ( assignment_statement | case_statement | expression | quest_statement )
-  public static boolean return_statement(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "return_statement")) return false;
-    boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, RETURN_STATEMENT, "<return statement>");
-    r = variable(b, l + 1);
-    if (!r) r = return_statement_1(b, l + 1);
-    exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // assignment_statement | case_statement | expression | quest_statement
-  private static boolean return_statement_1(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "return_statement_1")) return false;
     boolean r;
     Marker m = enter_section_(b);
-    r = assignment_statement(b, l + 1);
-    if (!r) r = case_statement(b, l + 1);
-    if (!r) r = expression(b, l + 1, -1);
-    if (!r) r = quest_statement(b, l + 1);
-    exit_section_(b, m, null, r);
+    r = consumeToken(b, QUEST);
+    r = r && expression(b, l + 1, -1);
+    r = r && consumeToken(b, COLON);
+    r = r && expression(b, l + 1, -1);
+    exit_section_(b, m, QUEST_STATEMENT, r);
     return r;
   }
 
@@ -454,14 +433,14 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // GLOBAL_VAR | LOCAL_VAR | LANG_VAR
+  // GLOBAL_VAR | LOCAL_VAR
   public static boolean variable(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "variable")) return false;
+    if (!nextTokenIs(b, "<variable>", GLOBAL_VAR, LOCAL_VAR)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, VARIABLE, "<variable>");
     r = consumeToken(b, GLOBAL_VAR);
     if (!r) r = consumeToken(b, LOCAL_VAR);
-    if (!r) r = consumeToken(b, LANG_VAR);
     exit_section_(b, l, m, r, false, null);
     return r;
   }
@@ -477,8 +456,8 @@ public class SQFParser implements PsiParser, LightPsiParser {
   // 5: BINARY(config_fetch_expression)
   // 6: ATOM(command_expression)
   // 7: PREFIX(unary_expression)
-  // 8: ATOM(code_block_expression)
-  // 9: ATOM(literal_expression)
+  // 8: ATOM(literal_expression)
+  // 9: ATOM(code_block_expression)
   // 10: PREFIX(paren_expression)
   public static boolean expression(PsiBuilder b, int l, int g) {
     if (!recursion_guard_(b, l, "expression")) return false;
@@ -488,8 +467,8 @@ public class SQFParser implements PsiParser, LightPsiParser {
     r = bool_not_expression(b, l + 1);
     if (!r) r = command_expression(b, l + 1);
     if (!r) r = unary_expression(b, l + 1);
-    if (!r) r = code_block_expression(b, l + 1);
     if (!r) r = literal_expression(b, l + 1);
+    if (!r) r = code_block_expression(b, l + 1);
     if (!r) r = paren_expression(b, l + 1);
     p = r;
     r = r && expression_0(b, l + 1, g);
@@ -640,17 +619,6 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return r;
   }
 
-  // code_block
-  public static boolean code_block_expression(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "code_block_expression")) return false;
-    if (!nextTokenIsSmart(b, LBRACE)) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = code_block(b, l + 1);
-    exit_section_(b, m, CODE_BLOCK_EXPRESSION, r);
-    return r;
-  }
-
   // string
   //                         | variable
   //                         | array
@@ -671,6 +639,17 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return r;
   }
 
+  // code_block
+  public static boolean code_block_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "code_block_expression")) return false;
+    if (!nextTokenIsSmart(b, L_CURLY_BRACE)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = code_block(b, l + 1);
+    exit_section_(b, m, CODE_BLOCK_EXPRESSION, r);
+    return r;
+  }
+
   public static boolean paren_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "paren_expression")) return false;
     if (!nextTokenIsSmart(b, LPAREN)) return false;
@@ -684,9 +663,4 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return r || p;
   }
 
-  final static Parser assignment_statement_recover__parser_ = new Parser() {
-    public boolean parse(PsiBuilder b, int l) {
-      return assignment_statement_recover_(b, l + 1);
-    }
-  };
 }

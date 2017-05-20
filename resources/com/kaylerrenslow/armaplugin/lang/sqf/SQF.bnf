@@ -33,24 +33,25 @@ file_scope ::= items_ {extends("file_scope")=local_scope}
 //local_scope is a scope inside a code block (and is also the parent class of file_scope)
 local_scope ::= items_
 //items_ is a helper for file_scope and local_scope
-private items_ ::= (statement SEMICOLON )* return_statement?
+private items_ ::= (statement SEMICOLON)* statement?
 
-code_block ::= LBRACE local_scope? RBRACE
+code_block ::= L_CURLY_BRACE local_scope? R_CURLY_BRACE
 
-//a variable is a global variable, local variable, or a lang variable (_x, _this, ...)
-variable ::= GLOBAL_VAR | LOCAL_VAR | LANG_VAR
+//a variable is a global variable or local variable
+variable ::= GLOBAL_VAR | LOCAL_VAR
 
 //a statement is a line of code that has a semicolon after it, however, if there is 1 statement, then semicolon is optional
 statement ::= ( assignment_statement | case_statement | expression | quest_statement )//case statement must come before expression or it will think that case is a command
 //a return statement is a statement that has NO semicolon and is the last statement in a scope
-return_statement ::= variable | ( assignment_statement | case_statement | expression | quest_statement )
+//return_statement ::= variable | ( assignment_statement | case_statement | expression | quest_statement )
 
-quest_statement ::= QUEST expression COLON expression {pin=1}
-case_statement ::= case_command expression (COLON code_block)? {pin=1}
+quest_statement ::= QUEST expression COLON expression
+case_statement ::= case_command expression (COLON code_block)?
 
 //in SQF, it isn't possible to do a=a=a=a, so making it an expression will create issues
-assignment_statement ::= private_command? variable EQ expression {pin=3 recoverWhile=assignment_statement_recover_}
-private assignment_statement_recover_ ::= !(EQ)
+assignment_statement ::= private_command? variable
+                        !(command /*make sure not to expect part of a command expression*/)
+                        EQ expression
 
 //expression
     expression ::= conditional_group_
@@ -59,14 +60,15 @@ private assignment_statement_recover_ ::= !(EQ)
                 | mul_group_
                 | exponent_expression
                 | config_fetch_expression
+
                 | command_expression
 
                  //keep below command expression, otherwise the command may not be
                  // matched since a command can have a unary expression as an argument
                 | unary_expression
 
-                | code_block_expression
                 | literal_expression
+                | code_block_expression
                 | paren_expression
 
     code_block_expression ::= code_block
@@ -110,8 +112,12 @@ private assignment_statement_recover_ ::= !(EQ)
         //The prefix and postfix arguments of commands is inconsistent.
         //The type checker will have to handle if command_before or command_after is a prefix argument,
         //postfix argument, or is an argument of the child/parent command. (I know. It's weird.)
-        command_before ::= code_block | unary_expression | paren_expression | literal_expression
-        command_after ::= expression | (code_block expression?)
+        command_before ::= code_block_expression | unary_expression | paren_expression | literal_expression
+
+        //Keep "code_block expression" before "expression" because there is code_block_expression.
+        //We don't want to match a code_block and ignore the following expression
+        //for cases like if () then {} else{};
+        command_after ::= (code_block expression?) | expression
     //end command expression
 //end expression
 
@@ -126,4 +132,4 @@ private assignment_statement_recover_ ::= !(EQ)
 
 //values
 string ::= STRING_LITERAL
-array ::= LBRACKET (expression (COMMA expression)*)? RBRACKET {pin=1}
+array ::= L_SQ_BRACKET (expression (COMMA expression)*)? R_SQ_BRACKET

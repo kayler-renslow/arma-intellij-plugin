@@ -1,0 +1,31 @@
+<?xml version='1.0'?>
+<list>
+	<!--
+	This file is for syntax highlighters. IntelliJ will do some magic to load this stuff.
+	The name attribute for the option tag is a TextAttributesKey name for syntax highlighters.
+	See SQFSyntaxHighlighter for example use cases.
+	-->
+
+	<!-- Shared -->
+	<option name="ARMA_BAD_WORD">
+		<value>
+			<option name="EFFECT_TYPE" value="2"/>
+			<option name="EFFECT_COLOR" value="FF0000"/>
+		</value>
+	</option>
+
+	<!-- SQF -->
+	<option name="ARMA_SQF_COMMAND">
+		<value>
+			<option name="FOREGROUND" value="BBB529"/>
+		</value>
+	</option>
+	<option name="ARMA_SQF_MAGIC_VARIABLE">
+		<value>
+			<option name="FOREGROUND" value="FF4A00"/>
+			<option name="FONT_TYPE" value="2"/>
+		</value>
+	</option>
+
+	<!-- Header -->
+</list>

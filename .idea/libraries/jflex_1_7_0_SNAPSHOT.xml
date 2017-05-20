@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="jflex-1.7.0-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/jflex-1.7.0-SNAPSHOT.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

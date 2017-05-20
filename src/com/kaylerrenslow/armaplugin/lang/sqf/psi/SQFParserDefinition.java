@@ -14,12 +14,13 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFLanguage;
-import com.kaylerrenslow.armaplugin.lang.sqf.SQFLexerAdapter;
 import com.kaylerrenslow.armaplugin.lang.sqf.parser.SQFParser;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Creates JFlex lexer and Psi parser for SQF language
+ * Creates JFlex lexer and Psi parser for SQF language.
+ *
+ * Custom IElementTypes/SQFTokenTypes for SQF language are also created here (they are usually for the Lexer).
  *
  * @author Kayler
  * @since 10/31/2015
@@ -33,9 +34,11 @@ public class SQFParserDefinition implements ParserDefinition {
 			INLINE_COMMENT,
 			BLOCK_COMMENT
 	);
+
 	public static final TokenSet NUMBER_LITERALS = TokenSet.create(SQFTypes.DEC_LITERAL, SQFTypes.INTEGER_LITERAL);
 	public static final TokenSet IDENTIFIERS = TokenSet.create(SQFTypes.GLOBAL_VAR, SQFTypes.LOCAL_VAR, SQFTypes.VARIABLE);
 	public static final TokenSet STRING_LITERALS = TokenSet.create(SQFTypes.STRING_LITERAL);
+
 	public static final IElementType[] OPERATORS = {
 			SQFTypes.EQEQ, SQFTypes.EQ, SQFTypes.ASTERISK, SQFTypes.NE, SQFTypes.PERC, SQFTypes.PLUS, SQFTypes.MINUS,
 			SQFTypes.FSLASH, SQFTypes.CARET, SQFTypes.GTGT, SQFTypes.GT, SQFTypes.GE, SQFTypes.LT, SQFTypes.LE,
@@ -46,9 +49,9 @@ public class SQFParserDefinition implements ParserDefinition {
 	private static final IFileElementType FILE = new IFileElementType(Language.<SQFLanguage>findInstance(SQFLanguage.class));
 
 	/**
-	 * Return true if the given type refers to a command, false otherwise
+	 * @return true if the given type refers to a command, false otherwise
 	 */
-	public static boolean isCommand(IElementType type) {
+	public static boolean isCommand(@NotNull IElementType type) {
 		return type == SQFTypes.COMMAND || type == SQFTypes.COMMAND_TOKEN;
 	}
 

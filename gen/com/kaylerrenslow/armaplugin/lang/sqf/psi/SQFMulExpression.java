@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import java.util.List;
 import org.jetbrains.annotations.*;
+import com.intellij.psi.PsiElement;
 
 public interface SQFMulExpression extends SQFExpression {
 
