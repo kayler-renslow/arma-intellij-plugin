@@ -19,8 +19,8 @@ import java.util.Collections;
 %eof}
 
 
-LOCAL_VAR = [_][:jletterdigit:]*
-GLOBAL_VAR = [:jletter:] [:jletterdigit:]*
+LOCAL_VAR = [_]([:jletterdigit:] | "##" [:jletterdigit:])*
+GLOBAL_VAR = [:jletter:] ([:jletterdigit:] | "##" [:jletterdigit:])*
 
 LINE_TERMINATOR = \r|\n|\r\n
 INPUT_CHARACTER = [^\r\n]
@@ -38,13 +38,10 @@ DEC_LITERAL = ({DEC_SIGNIFICAND} | {DEC_EXPONENT})
 HEX_LITERAL = [0] [xX] [0]* {HEX_DIGIT} {1,8}
 HEX_DIGIT   = [0-9a-fA-F]
 
-
 STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 
-BLOCK_COMMENT = \/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+\/
-
 COMMENT_CONTENT = ( [^*] | \*+ [^/*] )*
-BLOCK_COMMENT = "/*" [^*] ~"*/" | "/*" "*"+ "/" | "/*" {COMMENT_CONTENT} "*"+ "/"
+BLOCK_COMMENT = "/*" ~"*/"
 
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 

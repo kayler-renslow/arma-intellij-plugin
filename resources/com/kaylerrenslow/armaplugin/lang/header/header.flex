@@ -19,9 +19,8 @@ import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderParserDefinition;
 
 //the ## will be handled later with psi
 // (i.e. NAME##thing: getText() will return NAME concatenated with thing and the ## will be removed)
-IDENTIFIER = {LETTER} {LETTER_OR_DIGIT}*
-LETTER = [:jletter:] | "$" | "##" //## is for preprocessor
-LETTER_OR_DIGIT = [:jletterdigit:] | "$" | "##"
+IDENTIFIER = [:jletter:] ([:jletterdigit:] | "##" [:jletterdigit:])* //## is for preprocessor
+
 
 LINE_TERMINATOR = \r | \n | \r\n
 INPUT_CHARACTER = [^\r\n]
@@ -47,23 +46,14 @@ HEX_DIGIT   = [0-9a-fA-F]
 STRING_PART = "\"" ~"\"" //if you ever decide to allow single quotes for strings, you must go back and change the search for config function tags, since tag="tag" != tag='tag'
 STRING_LITERAL = {STRING_PART}+
 
-INCLUDE_VALUE_ANGBR = "<" ([^\r\n] | \\[^\r\n])* ">"
-
-PRE_INCLUDE = "#include"
-PRE_DEFINE = "#define"
-PRE_UNDEF = "#undef"
-PRE_IFDEF = "#ifdef"
-PRE_IFNDEF = "#ifndef"
-PRE_ELSE = "#else"
-PRE_ENDIF = "#endif"
-
-PRE_DEFINE_BODY = "" // the body of a #define todo
-
-//for preprocessor, we can try and create the element needed from the define macro's body. if can't be created, syntax error
+MACRO_CHARACTER = [^\r\n] | (("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*)
+MACRO_TEXT = {MACRO_CHARACTER}+
+MACRO = "#"([a-zA-Z_0-9$]+) {MACRO_TEXT}?
 
 %%
 
 <YYINITIAL> {WHITE_SPACE} { return TokenType.WHITE_SPACE; }
+<YYINITIAL> {MACRO} { return HeaderTypes.MACRO; }
 
 <YYINITIAL> {BLOCK_COMMENT} { return HeaderParserDefinition.BLOCK_COMMENT; }
 <YYINITIAL> {INLINE_COMMENT} { return HeaderParserDefinition.INLINE_COMMENT; }
@@ -73,17 +63,6 @@ PRE_DEFINE_BODY = "" // the body of a #define todo
 <YYINITIAL> {STRING_LITERAL} { return HeaderTypes.STRING_LITERAL; }
 
 <YYINITIAL> "class" { return HeaderTypes.CLASS; }
-
-<YYINITIAL> {INCLUDE_VALUE_ANGBR} { return HeaderTypes.INCLUDE_VALUE_ANGBR; }
-<YYINITIAL> {PRE_DEFINE_BODY}  { return HeaderTypes.PRE_DEFINE_BODY; }
-<YYINITIAL> {PRE_INCLUDE}  { return HeaderTypes.PRE_INCLUDE; }
-<YYINITIAL> {PRE_DEFINE}  { return HeaderTypes.PRE_DEFINE; }
-<YYINITIAL> {PRE_UNDEF}  { return HeaderTypes.PRE_UNDEF; }
-<YYINITIAL> {PRE_IFDEF}  { return HeaderTypes.PRE_IFDEF; }
-<YYINITIAL> {PRE_IFNDEF}  { return HeaderTypes.PRE_IFNDEF; }
-<YYINITIAL> {PRE_ELSE}  { return HeaderTypes.PRE_ELSE; }
-<YYINITIAL> {PRE_ENDIF}  { return HeaderTypes.PRE_ENDIF; }
-
 
 <YYINITIAL> {IDENTIFIER} { return HeaderTypes.IDENTIFIER; }
 

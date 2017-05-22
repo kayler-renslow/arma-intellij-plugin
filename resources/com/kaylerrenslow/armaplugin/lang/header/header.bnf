@@ -6,7 +6,7 @@
   psiClassPrefix="Header"
   psiImplClassSuffix="Impl"
   psiPackage="com.kaylerrenslow.armaplugin.lang.header.psi"
-  psiImplPackage="com.kaylerrenslow.armaplugin.lang.header.psi.impl" //comment out the import statement in the HeaderTypes class if the impl package isn't used
+//  psiImplPackage="com.kaylerrenslow.armaplugin.lang.header.psi.impl" //comment out the import statement in the HeaderTypes class if the impl package isn't used
 
   elementTypeHolderClass="com.kaylerrenslow.armaplugin.lang.header.psi.HeaderTypes"
   elementTypeClass="com.kaylerrenslow.armaplugin.lang.header.psi.HeaderElementType"
@@ -15,50 +15,38 @@
 //  psiImplUtilClass="com.kaylerrenslow.armapluginin.lang.header.psi.HeaderPsiUtilForGrammar"
 }
 // @formatter:off
-headerFile ::= entry_*
 
-private entry_ ::= preprocessor_command | ((assignment | array_assignment | header_class) SEMICOLON)
+/*
+The header file consists of tokens in any order.
+We do not care about how the code is written because all header files are parsed with a different parser.
+The reasons for having two parsers is as follows:
+    * It will be extremely difficult and complex to have a parser that is compatible with psi
+      (psi allows editing the AST without reconstructing the entire thing).
+    * Arma's preprocessor allows for inline sqf with the __EXEC and __EVAL macro for config/header files.
+      With regular SQF files, __EXEC and __EVAL aren't available, so the preprocessed output is more easily determined
+      since variables and conditions can't be made inside the macro itself (__EXEC can run code and check for conditions).
+    * In order to get the final result of the header file with __EXEC and __EVAL considered, it will need to be
+      completely preprocessed. Why? Classes can be defined with a mixture of other macros that are included from
+      another file. What makes that worse is that #undef can undefined macros.
+    * By having a different different parser that will completely preprocess the file and then parse it, it will allow:
+        * User can see the preprocessed result.
+        * We don't need to worry about referencing preprocessor macros and just retrieve raw classes and values.
+        * Referencing the config/header file should statistically happen more times than the user editing the config/header file.
+          Why spend so much of the CPU dynamically preprocessing (which is expensive) when only 1 preprocess needs to happen?
+    * So, the primary reason is because of __EXEC and __EVAL. They can dynamically change the preprocess output
+      by simply including a different file.
+    * Also, the user shouldn't be making that many changes to the config/header files. The user will be mostly working
+      with SQF.
 
-assignment ::= IDENTIFIER EQ expression
-array_assignment ::= IDENTIFIER BRACKET_PAIR (EQ | PLUS_EQ) array
+    * In short, I'm lazy. ;)
+*/
 
-header_class ::= CLASS IDENTIFIER (COLON IDENTIFIER)? LBRACE (entry_)* RBRACE
+headerFile ::= token_*
 
-expression ::= add_expression_
-private add_expression_ ::= mult_expression_ PLUS add_expression_
-				 | mult_expression_ MINUS add_expression_
-				 | mult_expression_
-
-private mult_expression_ ::= term_ ASTERISK mult_expression_
-				  | term_ FSLASH mult_expression_
-				  | term_
-
-private term_ ::= (PLUS | MINUS)?
-                (
-                    NUMBER_LITERAL
-                    | HEX_LITERAL
-                    | IDENTIFIER
-                    | STRING_LITERAL
-                    | LPAREN expression RPAREN
-                )
-
-array ::= LBRACE (array_entry_ (COMMA array_entry_)*)? RBRACE
-array_entry_ ::= array | expression
-
-preprocessor_command ::= preprocessor_include
-                       | preprocessor_define
-                       | preprocessor_undef
-                       | preprocessor_ifdef
-                       | preprocessor_ifndef
-                       | preprocessor_else
-                       | preprocessor_endif
-
-preprocessor_include ::= PRE_INCLUDE (STRING_LITERAL | INCLUDE_VALUE_ANGBR) {extends("preprocessor_include")=preprocessor_command}
-preprocessor_define ::= PRE_DEFINE IDENTIFIER PRE_DEFINE_BODY {extends("preprocessor_define")=preprocessor_command}
-preprocessor_undef ::= PRE_UNDEF IDENTIFIER {extends("preprocessor_undef")=preprocessor_command}
-preprocessor_ifdef ::= PRE_IFDEF IDENTIFIER {extends("preprocessor_ifdef")=preprocessor_command}
-preprocessor_ifndef ::= PRE_IFNDEF IDENTIFIER {extends("preprocessor_ifndef")=preprocessor_command}
-preprocessor_else ::= PRE_ELSE {extends("preprocessor_else")=preprocessor_command}
-preprocessor_endif ::= PRE_ENDIF {extends("preprocessor_endif")=preprocessor_command}
-
+private token_ ::= (/*numbers and string*/ NUMBER_LITERAL | HEX_LITERAL | STRING_LITERAL)
+                 | (/*keywords*/ CLASS)
+                 | (/*operators*/ EQ | PLUS_EQ | PLUS | MINUS | FSLASH | ASTERISK)
+                 | (/*symbols*/  LBRACE | RBRACE | LPAREN | RPAREN | BRACKET_PAIR | COMMA | COLON | SEMICOLON)
+                 | (/*preprocessor*/ MACRO)
+                 | (/*variables*/ IDENTIFIER)
 

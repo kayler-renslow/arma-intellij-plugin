@@ -8,3 +8,5 @@
 
 
 * in the future, the type/syntax checker should be able to detect when a Cfg* entry is needed and search description.ext for the classnames
+
+* **For caching command syntaxes, use the optimal cpu memory model we did in OS class**

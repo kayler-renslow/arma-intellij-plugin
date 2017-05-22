@@ -26,7 +26,7 @@
 
 ### SQF
 **Added**  
-* syntax highlighter is back
+* 
 
 
 **Changed**  
@@ -43,7 +43,7 @@
 
 
 **Changed**  
-*  
+* the parser is much less strict now
 
 
 **Fixed**  
