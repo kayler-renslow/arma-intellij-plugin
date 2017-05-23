@@ -80,97 +80,97 @@ public interface SQFTypes {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
        if (type == ADD_EXPRESSION) {
-        return new SQFAddExpressionImpl(node);
+        return new SQFPsiAddExpressionImpl(node);
       }
       else if (type == ARRAY) {
-        return new SQFArrayImpl(node);
+        return new SQFPsiArrayImpl(node);
       }
       else if (type == ASSIGNMENT_STATEMENT) {
-        return new SQFAssignmentStatementImpl(node);
+        return new SQFPsiAssignmentStatementImpl(node);
       }
       else if (type == BOOL_AND_EXPRESSION) {
-        return new SQFBoolAndExpressionImpl(node);
+        return new SQFPsiBoolAndExpressionImpl(node);
       }
       else if (type == BOOL_NOT_EXPRESSION) {
-        return new SQFBoolNotExpressionImpl(node);
+        return new SQFPsiBoolNotExpressionImpl(node);
       }
       else if (type == BOOL_OR_EXPRESSION) {
-        return new SQFBoolOrExpressionImpl(node);
+        return new SQFPsiBoolOrExpressionImpl(node);
       }
       else if (type == CASE_COMMAND) {
-        return new SQFCaseCommandImpl(node);
+        return new SQFPsiCaseCommandImpl(node);
       }
       else if (type == CASE_STATEMENT) {
-        return new SQFCaseStatementImpl(node);
+        return new SQFPsiCaseStatementImpl(node);
       }
       else if (type == CODE_BLOCK) {
-        return new SQFCodeBlockImpl(node);
+        return new SQFPsiCodeBlockImpl(node);
       }
       else if (type == CODE_BLOCK_EXPRESSION) {
-        return new SQFCodeBlockExpressionImpl(node);
+        return new SQFPsiCodeBlockExpressionImpl(node);
       }
       else if (type == COMMAND) {
-        return new SQFCommandImpl(node);
+        return new SQFPsiCommandImpl(node);
       }
       else if (type == COMMAND_AFTER) {
-        return new SQFCommandAfterImpl(node);
+        return new SQFPsiCommandAfterImpl(node);
       }
       else if (type == COMMAND_BEFORE) {
-        return new SQFCommandBeforeImpl(node);
+        return new SQFPsiCommandBeforeImpl(node);
       }
       else if (type == COMMAND_EXPRESSION) {
-        return new SQFCommandExpressionImpl(node);
+        return new SQFPsiCommandExpressionImpl(node);
       }
       else if (type == COMP_EXPRESSION) {
-        return new SQFCompExpressionImpl(node);
+        return new SQFPsiCompExpressionImpl(node);
       }
       else if (type == CONFIG_FETCH_EXPRESSION) {
-        return new SQFConfigFetchExpressionImpl(node);
+        return new SQFPsiConfigFetchExpressionImpl(node);
       }
       else if (type == DIV_EXPRESSION) {
-        return new SQFDivExpressionImpl(node);
+        return new SQFPsiDivExpressionImpl(node);
       }
       else if (type == EXPONENT_EXPRESSION) {
-        return new SQFExponentExpressionImpl(node);
+        return new SQFPsiExponentExpressionImpl(node);
       }
       else if (type == FILE_SCOPE) {
-        return new SQFFileScopeImpl(node);
+        return new SQFPsiFileScopeImpl(node);
       }
       else if (type == LITERAL_EXPRESSION) {
-        return new SQFLiteralExpressionImpl(node);
+        return new SQFPsiLiteralExpressionImpl(node);
       }
       else if (type == LOCAL_SCOPE) {
-        return new SQFLocalScopeImpl(node);
+        return new SQFPsiLocalScopeImpl(node);
       }
       else if (type == MOD_EXPRESSION) {
-        return new SQFModExpressionImpl(node);
+        return new SQFPsiModExpressionImpl(node);
       }
       else if (type == MUL_EXPRESSION) {
-        return new SQFMulExpressionImpl(node);
+        return new SQFPsiMulExpressionImpl(node);
       }
       else if (type == PAREN_EXPRESSION) {
-        return new SQFParenExpressionImpl(node);
+        return new SQFPsiParenExpressionImpl(node);
       }
       else if (type == PRIVATE_COMMAND) {
-        return new SQFPrivateCommandImpl(node);
+        return new SQFPsiPrivateCommandImpl(node);
       }
       else if (type == QUEST_STATEMENT) {
-        return new SQFQuestStatementImpl(node);
+        return new SQFPsiQuestStatementImpl(node);
       }
       else if (type == STATEMENT) {
-        return new SQFStatementImpl(node);
+        return new SQFPsiStatementImpl(node);
       }
       else if (type == STRING) {
-        return new SQFStringImpl(node);
+        return new SQFPsiStringImpl(node);
       }
       else if (type == SUB_EXPRESSION) {
-        return new SQFSubExpressionImpl(node);
+        return new SQFPsiSubExpressionImpl(node);
       }
       else if (type == UNARY_EXPRESSION) {
-        return new SQFUnaryExpressionImpl(node);
+        return new SQFPsiUnaryExpressionImpl(node);
       }
       else if (type == VARIABLE) {
-        return new SQFVariableImpl(node);
+        return new SQFPsiVariableImpl(node);
       }
       throw new AssertionError("Unknown element type: " + type);
     }

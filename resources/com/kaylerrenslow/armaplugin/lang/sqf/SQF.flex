@@ -40,14 +40,12 @@ HEX_DIGIT   = [0-9a-fA-F]
 
 STRING_LITERAL = ("\"\""|"\""([^\"]+|\"\")+"\"") | ("''" | "'"([^']+|'')+"'")
 
-COMMENT_CONTENT = ( [^*] | \*+ [^/*] )*
 BLOCK_COMMENT = "/*" ~"*/"
-
 INLINE_COMMENT = "//" {INPUT_CHARACTER}*
 
 MACRO_CHARACTER = [^\r\n] | (("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*)
 MACRO_TEXT = {MACRO_CHARACTER}+
-MACRO = "#"("define"| "undef"| "ifdef"| "ifndef"| "else"| "endif") {MACRO_TEXT}?
+MACRO = "#"([a-zA-Z_0-9$]+) {MACRO_TEXT}?
 
 %%
 

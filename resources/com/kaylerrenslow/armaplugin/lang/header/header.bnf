@@ -27,7 +27,9 @@ The reasons for having two parsers is as follows:
       since variables and conditions can't be made inside the macro itself (__EXEC can run code and check for conditions).
     * In order to get the final result of the header file with __EXEC and __EVAL considered, it will need to be
       completely preprocessed. Why? Classes can be defined with a mixture of other macros that are included from
-      another file. What makes that worse is that #undef can undefined macros.
+      another file. The __EXEC macro can assignment variables and each variable is dependent on its last assignment or condition.
+      So, to determine the final result of all __EXEC macros, the full file would need to be preprocessed.
+      What makes that worse is that #undef can undefined macros.
     * By having a different different parser that will completely preprocess the file and then parse it, it will allow:
         * User can see the preprocessed result.
         * We don't need to worry about referencing preprocessor macros and just retrieve raw classes and values.
