@@ -1,8 +1,15 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author Kayler
  * @since 05/23/2017
  */
-public class SQFMultExpression implements SQFExpression {
+public class SQFMultExpression extends ASTWrapperPsiElement implements SQFExpression {
+	public SQFMultExpression(@NotNull ASTNode node) {
+		super(node);
+	}
 }

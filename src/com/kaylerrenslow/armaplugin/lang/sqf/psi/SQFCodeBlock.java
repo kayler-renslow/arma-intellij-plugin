@@ -1,8 +1,20 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
+import org.jetbrains.annotations.NotNull;
+
 /**
  * @author Kayler
  * @since 05/23/2017
  */
-public class SQFCodeBlock {
+public class SQFCodeBlock extends ASTWrapperPsiElement {
+	public SQFCodeBlock(@NotNull ASTNode node) {
+		super(node);
+	}
+
+	@NotNull
+	public SQFLocalScope getScope() {
+		return null;
+	}
 }
