@@ -9,6 +9,7 @@ import com.kaylerrenslow.a3plugin.PluginIcons;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderConfigFunction;
 import com.kaylerrenslow.a3plugin.lang.header.psi.HeaderPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.SQFStatic;
+import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFCommand;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFPsiUtil;
 import com.kaylerrenslow.a3plugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
@@ -42,7 +43,14 @@ public interface CompletionAdders {
 	static void addCommands(@NotNull Project project, @NotNull CompletionResultSet result) {
 		String trailText = Plugin.resources.getString("lang.sqf.completion.tail_text.command");
 		for (String command : SQFStatic.LIST_COMMANDS) {
-			result.addElement(LookupElementBuilder.createWithSmartPointer(command, SQFPsiUtil.createElement(project, command, SQFTypes.COMMAND)).withIcon(PluginIcons.ICON_SQF_COMMAND).appendTailText(" " + trailText, true));
+			try {
+				//using SQFCommand.class instead of SQFTypes.COMMAND because case and private are their own element types
+				result.addElement(LookupElementBuilder.createWithSmartPointer(command, SQFPsiUtil.createElement(project, command, SQFCommand.class))
+						.withIcon(PluginIcons.ICON_SQF_COMMAND)
+						.appendTailText(" " + trailText, true));
+			} catch (IndexOutOfBoundsException e) {
+				System.out.println("CompletionAdders.addCommands IndexOutOfBoundsException on command=" + command);
+			}
 		}
 	}
 
