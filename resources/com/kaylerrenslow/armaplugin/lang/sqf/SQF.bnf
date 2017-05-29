@@ -116,9 +116,7 @@ assignment_statement ::= private_command? variable
         //postfix argument, or is an argument of the child/parent command. (I know. It's weird.)
         command_before ::= code_block_expression | unary_expression | paren_expression | literal_expression
 
-        //Keep "code_block expression" before "expression" because there is code_block_expression.
-        //We don't want to match a code_block and ignore the following expression
-        //for cases like if () then {} else{};
+        //"code_block expression?" is for cases like if () then {} else{};
         command_after ::= expression | (code_block expression?)
     //end command expression
 //end expression

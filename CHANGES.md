@@ -30,7 +30,7 @@
 
 
 **Changed**  
-* made the classes from previous commit extend ASTWrapperPsiElement
+* 
 
 
 **Fixed**  

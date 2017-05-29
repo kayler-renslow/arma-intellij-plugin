@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kayler
@@ -13,7 +14,7 @@ public class SQFCodeBlock extends ASTWrapperPsiElement {
 		super(node);
 	}
 
-	@NotNull
+	@Nullable
 	public SQFLocalScope getScope() {
 		return null;
 	}

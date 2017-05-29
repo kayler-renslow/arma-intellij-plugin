@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kayler
@@ -18,8 +19,14 @@ public class SQFAssignmentStatement extends ASTWrapperPsiElement implements SQFS
 		return null;
 	}
 
-	@NotNull
+	//will return null since assignment can be matched as soon as = is discovered
+	@Nullable
 	public SQFExpression getExpression() {
 		return null;
+	}
+
+	public boolean isPrivate() {
+		//todo
+		throw new UnsupportedOperationException();
 	}
 }
