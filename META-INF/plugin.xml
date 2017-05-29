@@ -1,7 +1,7 @@
 <idea-plugin version="2">
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma Intellij Plugin</name>
-	<version>1.0.8</version>
+	<version>1.0.9</version>
 	<vendor email="armaintellijplugin@kaylerrenslow.com" url="https://github.com/kayler-renslow/arma-intellij-plugin">
 		Kayler Renslow
 	</vendor>
@@ -17,32 +17,11 @@
 			https://github.com/kayler-renslow/arma-intellij-plugin/releases&
 			</a>
 			<br><br>
-			<h3>Version 1.0.8 - Released May 18, 2017</h3>
-			<h3 id="shared-between-languages">Shared between languages</h3>
-			<p><strong>Fixed</strong>  </p>
-			<ul>
-			<li>better, but still bad pre-processor</li>
-			</ul>
+			<h3>Version 1.0.9 - Released May 29, 2017</h3>
 			<h3 id="sqf">SQF</h3>
-			<p><strong>Added</strong>  </p>
-			<ul>
-			<li>command camelCase inspection (checks if command is camel case. if not, alt+enter to make it camel case)</li>
-			<li>new Arma 3 commands from the wiki</li>
-			</ul>
-			<p><strong>Changed</strong>  </p>
-			<ul>
-			<li>commands can now be non-camel case</li>
-			</ul>
 			<p><strong>Fixed</strong>  </p>
 			<ul>
-			<li>unary expression</li>
-			</ul>
-			<h3 id="header">Header</h3>
-			<p><strong>Fixed</strong>  </p>
-			<ul>
-			<li><a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/40">header stringtable key created stack overflow</a></li>
-			<li><a href="https://github.com/kayler-renslow/arma-intellij-plugin/issues/41">header didn&#39;t support += operator</a></li>
-			<li>stringtable keys couldn&#39;t be in arrays</li>
+			<li>github issue #39 (auto completion was throwing exception)</li>
 			</ul>
 		]]>
 	</change-notes>
