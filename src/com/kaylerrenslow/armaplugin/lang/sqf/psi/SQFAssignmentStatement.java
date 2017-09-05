@@ -16,7 +16,7 @@ public class SQFAssignmentStatement extends ASTWrapperPsiElement implements SQFS
 	}
 
 	@NotNull
-	public SQFVariable getVariable() {
+	public SQFVariable getVar() {
 		SQFVariable var = PsiTreeUtil.getChildOfType(this, SQFVariable.class);
 		if (var == null) {
 			throw new IllegalStateException("var shouldn't be null");
@@ -28,7 +28,7 @@ public class SQFAssignmentStatement extends ASTWrapperPsiElement implements SQFS
 	 * @return the {@link SQFExpression} instance, or will return null since assignment can be matched as soon as = is discovered
 	 */
 	@Nullable
-	public SQFExpression getExpression() {
+	public SQFExpression getExpr() {
 		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
 	}
 

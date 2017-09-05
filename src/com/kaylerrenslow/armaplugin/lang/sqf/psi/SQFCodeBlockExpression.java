@@ -15,7 +15,7 @@ public class SQFCodeBlockExpression extends ASTWrapperPsiElement implements SQFE
 	}
 
 	@NotNull
-	public SQFCodeBlock getCodeBlock() {
+	public SQFCodeBlock getBlock() {
 		SQFCodeBlock block = PsiTreeUtil.getChildOfType(this, SQFCodeBlock.class);
 		if (block == null) {
 			throw new IllegalStateException("the block returned shouldn't be null");

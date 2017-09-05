@@ -28,7 +28,7 @@ public class SQFCaseStatement extends ASTWrapperPsiElement implements SQFStateme
 	 * @return the code block, or null if doesn't exist. Can return null because case 0; is valid
 	 */
 	@Nullable
-	public SQFCodeBlock getCodeBlock() {
+	public SQFCodeBlock getBlock() {
 		return PsiTreeUtil.getChildOfType(this, SQFCodeBlock.class);
 	}
 }

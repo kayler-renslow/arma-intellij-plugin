@@ -16,7 +16,7 @@ public class SQFUnaryExpression extends ASTWrapperPsiElement implements SQFExpre
 	}
 
 	@Nullable
-	public SQFExpression getExpression() {
+	public SQFExpression getExpr() {
 		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
 	}
 }

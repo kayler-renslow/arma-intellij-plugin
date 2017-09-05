@@ -17,7 +17,7 @@ public class SQFExponentExpression extends ASTWrapperPsiElement implements SQFEx
 	}
 
 	@NotNull
-	public List<SQFExpression> getExpressionList() {
+	public List<SQFExpression> getExprList() {
 		return PsiTreeUtil.getChildrenOfTypeAsList(this, SQFExpression.class);
 	}
 }
