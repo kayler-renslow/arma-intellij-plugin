@@ -15,17 +15,23 @@ public class SQFVariable extends ASTWrapperPsiElement {
 	}
 
 	@NotNull
-	public SQFVariableName getVarName() {
-		return null;
+	public SQFVariableName getVarNameObj() {
+		return new SQFVariableName(getVarName());
 	}
 
+	@NotNull
+	public String getVarName() {
+		return getText();
+	}
+
+	@Deprecated
 	public boolean isLocal() {
 		//todo
 		throw new UnsupportedOperationException();
 	}
 
+	@Deprecated
 	public boolean isMagicVar() {
-		//todo
-		throw new UnsupportedOperationException();
+		return SQFVariableName.isMagicVar(getVarName());
 	}
 }

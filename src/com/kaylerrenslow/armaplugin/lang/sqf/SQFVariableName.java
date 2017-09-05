@@ -30,6 +30,20 @@ public class SQFVariableName {
 		return name1.equalsIgnoreCase(name2);
 	}
 
+	public static boolean isMagicVar(@NotNull String varName) {
+		String[] vars = {"_x", "_this", "this", "_exception", "_forEachIndex"};
+		for (String magicVar : vars) {
+			if (magicVar.equalsIgnoreCase(varName)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean isMagicVar() {
+		return isMagicVar(this.name);
+	}
+
 	/**
 	 * invokes {@link #nameEquals(String, String)} with {@link #text()} and name
 	 */

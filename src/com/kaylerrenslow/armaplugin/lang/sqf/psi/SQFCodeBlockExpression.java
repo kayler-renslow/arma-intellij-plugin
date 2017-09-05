@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,6 +16,10 @@ public class SQFCodeBlockExpression extends ASTWrapperPsiElement implements SQFE
 
 	@NotNull
 	public SQFCodeBlock getCodeBlock() {
-		return null;
+		SQFCodeBlock block = PsiTreeUtil.getChildOfType(this, SQFCodeBlock.class);
+		if (block == null) {
+			throw new IllegalStateException("the block returned shouldn't be null");
+		}
+		return block;
 	}
 }

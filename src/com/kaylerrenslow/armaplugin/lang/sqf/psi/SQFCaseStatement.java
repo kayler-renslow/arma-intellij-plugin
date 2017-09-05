@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,16 +15,20 @@ public class SQFCaseStatement extends ASTWrapperPsiElement implements SQFStateme
 		super(node);
 	}
 
-	//can return null because of pin
+	/**
+	 * @return the expression or null if doesn't exist. Will return null because of pin in grammar.
+	 */
 	@Nullable
 	public SQFExpression getCondition() {
-		return null;
+		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
 	}
 
 
-	//can return null because case 0; is valid
+	/**
+	 * @return the code block, or null if doesn't exist. Can return null because case 0; is valid
+	 */
 	@Nullable
 	public SQFCodeBlock getCodeBlock() {
-		return null;
+		return PsiTreeUtil.getChildOfType(this, SQFCodeBlock.class);
 	}
 }

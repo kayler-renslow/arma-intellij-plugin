@@ -22,7 +22,7 @@
   //consumeTokenMethod(".*expression|expression")="consumeTokenFast" //https://github.com/JetBrains/Grammar-Kit/blob/master/HOWTO.md#24-compact-expression-parsing-with-priorities
   //extends(".*_statement")=statement
 }
-//Question: Why do some rules end with _? I is just to make it clear that they are private rules.
+//Question: Why do some rules end with _? Answer: It is just to make it clear that they are private rules.
 
 
 //todo use stubs. check StubBasedPsiElementBase class for more information on it
@@ -31,29 +31,29 @@
 sqfFile ::= file_scope //first rule is private. place file_scope inside and file_scope will be root rule
 
 //file_scope is the scope for the entire SQF file. There will be only 1 file_scope per sqf file
-file_scope ::= items_
+file_scope ::= items_ {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFFileScope"}
 //local_scope is a scope inside a code block (and is also the parent class of file_scope)
-local_scope ::= items_
+local_scope ::= items_  {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFLocalScope"}
 //items_ is a helper for file_scope and local_scope
 private items_ ::= (statement SEMICOLON)* statement?
 
-code_block ::= L_CURLY_BRACE local_scope? R_CURLY_BRACE {pin=1}
+code_block ::= L_CURLY_BRACE local_scope? R_CURLY_BRACE {pin=1 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCodeBlock"}
 
 //a variable is a global variable or local variable
-variable ::= GLOBAL_VAR | LOCAL_VAR
+variable ::= GLOBAL_VAR | LOCAL_VAR {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFVariable"}
 
 //a statement is a line of code that has a semicolon after it, however, if there is 1 statement, then semicolon is optional
-statement ::= ( assignment_statement | case_statement | expression | quest_statement )//case statement must come before expression or it will think that case is a command
+statement ::= ( assignment_statement | case_statement | expression | quest_statement ) //case statement must come before expression or it will think that case is a command
 //a return statement is a statement that has NO semicolon and is the last statement in a scope
 //return_statement ::= variable | ( assignment_statement | case_statement | expression | quest_statement )
 
-quest_statement ::= QUEST expression COLON expression {pin=1}
-case_statement ::= case_command expression (COLON code_block)? {pin=1}
+quest_statement ::= QUEST expression COLON expression {pin=1 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFQuestStatement"}
+case_statement ::= case_command expression (COLON code_block)? {pin=1 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCaseStatement"}
 
 //in SQF, it isn't possible to do a=a=a=a, so making it an expression will create issues
 assignment_statement ::= private_command? variable
                         !(command /*make sure not to expect part of a command expression*/)
-                        EQ expression {pin=4}
+                        EQ expression {pin=4 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFAssignmentStatement"}
 
 //expression
     expression ::= conditional_group_
@@ -73,41 +73,41 @@ assignment_statement ::= private_command? variable
                 | code_block_expression
                 | paren_expression
 
-    code_block_expression ::= code_block
+    code_block_expression ::= code_block {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCodeBlockExpression"}
 
     private add_group_ ::= add_expression | sub_expression
     private mul_group_ ::= mul_expression | div_expression | mod_expression
     private conditional_group_::= bool_and_expression | bool_or_expression | bool_not_expression
 
-    unary_expression ::= (PLUS | MINUS) expression
+    unary_expression ::= (PLUS | MINUS) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFUnaryExpression"}
 
-    add_expression ::= expression PLUS expression
-    sub_expression ::= expression MINUS expression
-    mul_expression ::= expression ASTERISK expression
-    div_expression ::= expression FSLASH expression
-    mod_expression ::= expression PERC expression
+    add_expression ::= expression PLUS expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFAddExpression"}
+    sub_expression ::= expression MINUS expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSubExpression"}
+    mul_expression ::= expression ASTERISK expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFMultExpression"}
+    div_expression ::= expression FSLASH expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFDivExpression"}
+    mod_expression ::= expression PERC expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFModExpression"}
 
-    bool_and_expression ::= expression AMPAMP expression
-    bool_or_expression ::= expression BARBAR expression
-    bool_not_expression::= EXCL expression
+    bool_and_expression ::= expression AMPAMP expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFBoolAndExpression"}
+    bool_or_expression ::= expression BARBAR expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFBoolOrExpression"}
+    bool_not_expression::= EXCL expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFBoolNotExpression"}
 
-    comp_expression ::= expression (EQEQ | NE | LT | LE | GT | GE) expression
+    comp_expression ::= expression (EQEQ | NE | LT | LE | GT | GE) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCompExpression"}
 
-    config_fetch_expression ::= expression (FSLASH | GTGT) expression
+    config_fetch_expression ::= expression (FSLASH | GTGT) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFConfigFetchExpression"}
 
-    exponent_expression ::= expression (CARET expression)+
+    exponent_expression ::= expression (CARET expression)+ {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExponentExpression"}
 
     literal_expression ::= string
                         | variable
                         | array
                         | INTEGER_LITERAL
                         | DEC_LITERAL
-                        | HEX_LITERAL
+                        | HEX_LITERAL {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFLiteralExpression"}
 
-    paren_expression ::= LPAREN expression RPAREN
+    paren_expression ::= LPAREN expression RPAREN {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParenExpression"}
 
     //command expression (includes a standalone command token)
-        command_expression ::= command_before? command command_after? {pin=2}
+        command_expression ::= command_before? command command_after? {pin=2} {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandExpression"}
         //We are excluding expression from this because it will be infinite left recursion
         //due to command_expression constantly being matched.
 
@@ -122,7 +122,7 @@ assignment_statement ::= private_command? variable
 //end expression
 
 //command tokens
-    command ::= COMMAND_TOKEN
+    command ::= COMMAND_TOKEN {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommand"}
     //we need a separate rule for case and private
     //the "case" and "private" tokens are COMMAND_TOKEN types, but we want custom types (i.e. CASE_COMMAND)
     //so that we can check if (for example) "case" is the COMMAND_TOKEN and not any arbitrary COMMAND_TOKEN (like abs)
@@ -131,5 +131,5 @@ assignment_statement ::= private_command? variable
 //end command
 
 //values
-string ::= STRING_LITERAL
-array ::= L_SQ_BRACKET (expression (COMMA expression)*)? R_SQ_BRACKET {pin=1}
+string ::= STRING_LITERAL {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFString"}
+array ::= L_SQ_BRACKET (expression (COMMA expression)*)? R_SQ_BRACKET {pin=1 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFArray"}

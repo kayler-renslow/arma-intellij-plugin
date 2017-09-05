@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,15 +17,25 @@ public class SQFAssignmentStatement extends ASTWrapperPsiElement implements SQFS
 
 	@NotNull
 	public SQFVariable getVariable() {
-		return null;
+		SQFVariable var = PsiTreeUtil.getChildOfType(this, SQFVariable.class);
+		if (var == null) {
+			throw new IllegalStateException("var shouldn't be null");
+		}
+		return var;
 	}
 
-	//will return null since assignment can be matched as soon as = is discovered
+	/**
+	 * @return the {@link SQFExpression} instance, or will return null since assignment can be matched as soon as = is discovered
+	 */
 	@Nullable
 	public SQFExpression getExpression() {
-		return null;
+		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
 	}
 
+	/**
+	 * @deprecated un-deprecate this when implemented
+	 */
+	@Deprecated
 	public boolean isPrivate() {
 		//todo
 		throw new UnsupportedOperationException();

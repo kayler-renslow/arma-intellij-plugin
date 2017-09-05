@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Kayler
  * @since 05/23/2017
  */
-public class SQFBoolNotExpression extends ASTWrapperPsiElement implements SQFExpression {
+public class SQFBoolNotExpression extends ASTWrapperPsiElement implements SQFBinaryExpression {
 	public SQFBoolNotExpression(@NotNull ASTNode node) {
 		super(node);
 	}

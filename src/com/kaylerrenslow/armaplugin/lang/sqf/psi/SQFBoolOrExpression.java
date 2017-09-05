@@ -8,20 +8,8 @@ import org.jetbrains.annotations.NotNull;
  * @author Kayler
  * @since 05/23/2017
  */
-public class SQFBoolOrExpression extends ASTWrapperPsiElement implements SQFExpression, SQFBinaryExpression {
+public class SQFBoolOrExpression extends ASTWrapperPsiElement implements SQFBinaryExpression {
 	public SQFBoolOrExpression(@NotNull ASTNode node) {
 		super(node);
-	}
-
-	@NotNull
-	@Override
-	public SQFExpression getLeft() {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public SQFExpression getRight() {
-		return null;
 	}
 }

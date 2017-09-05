@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -16,6 +17,6 @@ public class SQFCodeBlock extends ASTWrapperPsiElement {
 
 	@Nullable
 	public SQFLocalScope getScope() {
-		return null;
+		return PsiTreeUtil.getChildOfType(this, SQFLocalScope.class);
 	}
 }

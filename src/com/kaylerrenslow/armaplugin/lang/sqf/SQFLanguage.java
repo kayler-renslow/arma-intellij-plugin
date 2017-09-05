@@ -10,9 +10,10 @@ import com.intellij.lang.Language;
  */
 public class SQFLanguage extends Language {
 	public static final SQFLanguage INSTANCE = new SQFLanguage();
+	public static final String ID = "Arma.SQF";
 
 	public SQFLanguage() {
-		super("Arma.SQF");
+		super(ID);
 	}
 
 }
