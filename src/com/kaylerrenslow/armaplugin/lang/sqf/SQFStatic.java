@@ -32,12 +32,12 @@ public class SQFStatic {
 	 * Source code package path to get to command documentation (append command name, as it appears in the wiki, to get documentation)
 	 */
 	@NotNull
-	private static final String COMMANDS_DOC_FILE_DIR = "/com/kaylerrenslow/armaplugin/lang/sqf/raw_doc/commands-doc/";
+	public static final String COMMANDS_DOC_FILE_DIR = "/com/kaylerrenslow/armaplugin/lang/sqf/raw_doc/commands-doc/";
 	/**
 	 * Source code package path to get to BIS function documentation (append function name, as it appears in the wiki, to get documentation)
 	 */
 	@NotNull
-	private static final String BIS_FUNCTIONS_DOC_FILE_DIR = "/com/kaylerrenslow/armaplugin/lang/sqf/raw_doc/bis-functions-doc/";
+	public static final String BIS_FUNCTIONS_DOC_FILE_DIR = "/com/kaylerrenslow/armaplugin/lang/sqf/raw_doc/bis-functions-doc/";
 
 	/**
 	 * The file that contains all commands for SQF
@@ -54,9 +54,8 @@ public class SQFStatic {
 	 * Wiki URL prefix. Append a command name to get the wiki page
 	 */
 	@NotNull
-	private static final String BIS_WIKI_URL_PREFIX = "https://community.bistudio.com/wiki/";
-	@NotNull
-	private static final String EXTERNAL_LINK_NOTIFICATION = getSQFBundle().getString("SQFStatic.external-wiki-link");
+	public static final String BIS_WIKI_URL_PREFIX = "https://community.bistudio.com/wiki/";
+
 
 
 	/**
