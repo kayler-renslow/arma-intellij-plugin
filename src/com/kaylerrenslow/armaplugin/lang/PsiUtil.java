@@ -1,7 +1,11 @@
 package com.kaylerrenslow.armaplugin.lang;
 
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
@@ -17,6 +21,19 @@ import java.util.function.Function;
  * @since 09/06/2017
  */
 public class PsiUtil {
+
+	/**
+	 * Creates and returns a PsiFile with the given text of the given file type.
+	 *
+	 * @throws ClassCastException when the PsiFile created couldn't be cast to T
+	 */
+	@NotNull
+	public static <T extends PsiFile> T createFile(@NotNull Project project, @NotNull String text, @NotNull FileType fileType) {
+		String fileName = "fake_sqf_file.sqf";
+		return (T) PsiFileFactory.getInstance(project).createFileFromText(fileName, fileType, text);
+	}
+
+	@NotNull
 	public static ASTNode getFirstDescendantNode(PsiElement element) {
 		ASTNode cursor = element.getNode();
 		while (cursor.getFirstChildNode() != null) {

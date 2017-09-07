@@ -17,6 +17,7 @@
 							   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserDefinition"/>
 		<lang.syntaxHighlighterFactory language="Arma.SQF"
 									   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.codestyle.SQFSyntaxHighlighterFactory"/>
+		<documentationProvider implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFDocumentationProvider"/>
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.armaplugin.lang.header.HeaderFileTypeFactory"/>

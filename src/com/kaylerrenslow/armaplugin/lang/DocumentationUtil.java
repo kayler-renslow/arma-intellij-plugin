@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class DocumentationUtil {
 	/**
-	 * Places the text inside a pre tag to keep formatting
+	 * Places the text inside a pre tag to keep formatting. Also inserts documentation window links
 	 *
 	 * @param docString documentation text
 	 * @return reformatted string

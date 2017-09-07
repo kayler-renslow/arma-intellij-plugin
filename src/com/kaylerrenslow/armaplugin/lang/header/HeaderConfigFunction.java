@@ -1,8 +1,6 @@
 package com.kaylerrenslow.armaplugin.lang.header;
 
-import com.intellij.openapi.module.Module;
-import com.intellij.psi.PsiDirectory;
-import com.intellij.psi.PsiFile;
+import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderClass;
 import com.kaylerrenslow.armaplugin.PluginIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,19 +14,19 @@ import javax.swing.*;
 public class HeaderConfigFunction {
 	private final String tagName, filePath, fileNameNoExt, functionFileExtension;
 	private final boolean appendFn_;
-	private final String className;
+	private final HeaderClass headerClass;
 
 	/**
 	 * This class is a wrapper class for a function that was defined inside the missionConfigFile (description.ext >> CfgFunctions)
 	 *
-	 * @param className               the class name of the function in the config
+	 * @param headerClass             the {@link HeaderClass} instance
 	 * @param containingDirectoryPath file path to the function that is defined in the config (defined from file="exampleFileDir")
 	 * @param fileNameNoExt           file name of the function, or null if determined by the function class name
 	 * @param tagName                 the prefix tag for the function. This is defined in the config with tag="something" (or if not defined, it is the first child class of CfgFunctions)
 	 * @param functionFileExtension   file extension (.sqf, .fsm)
 	 */
-	public HeaderConfigFunction(@NotNull String className, @NotNull String containingDirectoryPath, @Nullable String fileNameNoExt, @NotNull String tagName, @Nullable String functionFileExtension) {
-		this.className = className;
+	public HeaderConfigFunction(@NotNull HeaderClass headerClass, @NotNull String containingDirectoryPath, @Nullable String fileNameNoExt, @NotNull String tagName, @Nullable String functionFileExtension) {
+		this.headerClass = headerClass;
 		this.filePath = containingDirectoryPath;
 		this.tagName = tagName;
 		if (functionFileExtension == null) {
@@ -47,7 +45,7 @@ public class HeaderConfigFunction {
 
 	@NotNull
 	public String getFunctionClassName() {
-		return this.className;
+		return this.headerClass.getClassName();
 	}
 
 	@NotNull
@@ -87,6 +85,7 @@ public class HeaderConfigFunction {
 	/**
 	 * @return the file name for this function. Can be something like: fn_function.sqf or hello.sqf
 	 */
+	@NotNull
 	public String getFunctionFileName() {
 		return this.fileNameNoExt + this.functionFileExtension;
 	}
@@ -98,7 +97,7 @@ public class HeaderConfigFunction {
 	 * @param functionFileExtension extension (.sqf, .ext)
 	 * @return file name
 	 */
-	public static String getFunctionFileName(String functionClassName, String functionFileExtension) {
+	public static String getFunctionFileName(@NotNull String functionClassName, @NotNull String functionFileExtension) {
 		return "fn_" + functionClassName + functionFileExtension;
 	}
 
@@ -110,26 +109,13 @@ public class HeaderConfigFunction {
 		return (this.filePath + "/" + this.fileNameNoExt + this.functionFileExtension).replaceAll("\\\\", "/");
 	}
 
-
 	@NotNull
 	public static Icon getIcon() {
 		return PluginIcons.ICON_SQF_FUNCTION;
 	}
 
-	/**
-	 * Get the psi file associated with this function
-	 */
-	@Nullable
-	public PsiFile getPsiFile() {
-		PsiDirectory rootMissionDirectory;
-		try {
-			Module module = PluginUtil.getModuleForPsiFile(getClassDeclaration().getContainingFile());
-			rootMissionDirectory = ArmaProjectDataManager.getInstance().getDataForModule(module).getRootMissionDirectory();
-		} catch (DescriptionExtNotDefinedException e) {
-			e.printStackTrace(System.out);
-			return null;
-		}
-		return PluginUtil.findFileByPath(FilePath.getFilePathFromString(getFullRelativePath(), FilePath.DEFAULT_DELIMETER), rootMissionDirectory);
-
+	@NotNull
+	public HeaderClass getHeaderClass() {
+		return headerClass;
 	}
 }
