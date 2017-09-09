@@ -1,12 +1,9 @@
 package com.kaylerrenslow.armaplugin.lang;
 
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectFileIndex;
-import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiFile;
 import com.intellij.psi.search.FileTypeIndex;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFFileType;
 import org.jetbrains.annotations.NotNull;
@@ -19,14 +16,15 @@ import java.util.Collection;
  * @since 09/07/2017
  */
 public class PluginUtil {
+	/**
+	 * Gets the root config file (either description.ext or config.cpp (case sensitivity doesn't matter)), or null if neither could be found
+	 *
+	 * @param psiElement a PsiElement used to determine what module the root config file is located in
+	 * @return the VirtualFile instance, or null if the root config file couldn't be found
+	 */
 	@Nullable
-	public static VirtualFile getDescriptionExtVirtualFile(@NotNull Project project, @NotNull PsiElement element) {
-		ProjectFileIndex index = ProjectRootManager.getInstance(project).getFileIndex();
-		PsiFile psiFile = element.getContainingFile();
-		if (psiFile == null) {
-			return null;
-		}
-		Module module = index.getModuleForFile(psiFile.getVirtualFile(), false);
+	public static VirtualFile getRootConfigVirtualFile(@NotNull PsiElement psiElement) {
+		Module module = ModuleUtil.findModuleForPsiElement(psiElement);
 		if (module == null) {
 			return null;
 		}
@@ -35,6 +33,10 @@ public class PluginUtil {
 			if (virtFile.getName().equalsIgnoreCase("description.ext")) {
 				return virtFile;
 			}
+			if (virtFile.getName().equalsIgnoreCase("config.cpp")) {
+				return virtFile;
+			}
+
 		}
 		return null;
 	}

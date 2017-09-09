@@ -117,11 +117,11 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 //			} catch (MalformedURLException e) {
 //				e.printStackTrace();
 //			}
-			VirtualFile descExtVirtFile = PluginUtil.getDescriptionExtVirtualFile(psiManager.getProject(), element);
-			if (descExtVirtFile == null) {
+			VirtualFile rootConfigVirtFile = PluginUtil.getRootConfigVirtualFile(element);
+			if (rootConfigVirtFile == null) {
 				return null;
 			}
-			VirtualFile functionVirtFile = descExtVirtFile.findFileByRelativePath(function.getFullRelativePath());
+			VirtualFile functionVirtFile = rootConfigVirtFile.findFileByRelativePath(function.getFullRelativePath());
 			if (functionVirtFile == null) {
 				return null;
 			}
@@ -133,13 +133,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLink(PsiManager psiManager, String link, PsiElement context) {
-		try {
-			if (link.startsWith(DOC_LINK_PREFIX_COMMAND)) {
-				SQFFile file = PsiUtil.createFile(psiManager.getProject(), link.substring(DOC_LINK_PREFIX_COMMAND.length()), SQFFileType.INSTANCE);
-				return PsiUtil.findFirstDescendantElement(file, SQFCommand.class);
-			}
-		} catch (Exception e) { //for when the commands are inside the documentation but not registered as a SQFTypes.COMMAND because lexer is not up to date
-			e.printStackTrace(System.out);
+		if (link.startsWith(DOC_LINK_PREFIX_COMMAND)) {
+			SQFFile file = PsiUtil.createFile(psiManager.getProject(), link.substring(DOC_LINK_PREFIX_COMMAND.length()), SQFFileType.INSTANCE);
+			return PsiUtil.findFirstDescendantElement(file, SQFCommand.class);
 		}
 		if (link.startsWith(DOC_LINK_PREFIX_BIS_FUNCTION)) {
 			SQFFile file = PsiUtil.createFile(psiManager.getProject(), link.substring(DOC_LINK_PREFIX_BIS_FUNCTION.length()), SQFFileType.INSTANCE);
@@ -168,7 +164,8 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 
 	@Override
 	@Nullable
-	public PsiElement getCustomDocumentationElement(@NotNull final Editor editor, @NotNull final PsiFile file, @Nullable PsiElement contextElement) {
+	public PsiElement getCustomDocumentationElement(@NotNull final Editor editor, @NotNull final PsiFile file,
+													@Nullable PsiElement contextElement) {
 		if (contextElement == null) {
 			return null;
 		}

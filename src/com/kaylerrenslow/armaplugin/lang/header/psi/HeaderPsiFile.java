@@ -15,8 +15,8 @@ import javax.swing.*;
  * @author Kayler
  * @since 10/31/2015
  */
-public class HeaderFile extends PsiFileBase {
-	public HeaderFile(FileViewProvider viewProvider) {
+public class HeaderPsiFile extends PsiFileBase {
+	public HeaderPsiFile(FileViewProvider viewProvider) {
 		super(viewProvider, HeaderLanguage.INSTANCE);
 	}
 

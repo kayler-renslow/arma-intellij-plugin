@@ -29,7 +29,7 @@
 
 ### SQF
 **Added**  
-* semicolons are no longer required for assignments
+* 
 
 
 **Changed**  

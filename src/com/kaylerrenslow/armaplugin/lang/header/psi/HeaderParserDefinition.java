@@ -77,7 +77,7 @@ public class HeaderParserDefinition implements ParserDefinition {
 
 	@Override
 	public PsiFile createFile(FileViewProvider viewProvider) {
-		return new HeaderFile(viewProvider);
+		return new HeaderPsiFile(viewProvider);
 	}
 
 	@Override
