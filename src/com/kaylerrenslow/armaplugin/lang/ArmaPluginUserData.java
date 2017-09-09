@@ -6,13 +6,11 @@ import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
-import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParseException;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
@@ -64,10 +62,8 @@ public class ArmaPluginUserData {
 			try {
 				moduleData.setRootConfigHeaderFile(HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(imlDir.getPath() + "/armaplugin-temp")));
 				moduleData.setReparseRootConfigHeaderFile(true);
-			} catch (IOException e) {
-				return null;
-			} catch (HeaderParseException e) {
-				System.out.println("HeaderParseException:" + e.getMessage());
+			} catch (Exception e) {
+				System.out.println("Header Parse Exception:" + e.getMessage());
 				return null;
 			}
 			return moduleData.getRootConfigHeaderFile();
@@ -75,7 +71,7 @@ public class ArmaPluginUserData {
 	}
 
 	@Nullable
-	public ArmaPluginModuleData getModuleData(@NotNull PsiElement elementFromModule) {
+	private ArmaPluginModuleData getModuleData(@NotNull PsiElement elementFromModule) {
 		Module module = ModuleUtil.findModuleForPsiElement(elementFromModule);
 		if (module == null) {
 			return null;

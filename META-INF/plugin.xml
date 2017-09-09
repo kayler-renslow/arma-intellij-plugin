@@ -18,6 +18,8 @@
 		<lang.syntaxHighlighterFactory language="Arma.SQF"
 									   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.codestyle.SQFSyntaxHighlighterFactory"/>
 		<documentationProvider implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFDocumentationProvider"/>
+		<completion.contributor language="Arma.SQF"
+								implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.SQFCompletionContributor"/>
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.armaplugin.lang.header.HeaderFileTypeFactory"/>

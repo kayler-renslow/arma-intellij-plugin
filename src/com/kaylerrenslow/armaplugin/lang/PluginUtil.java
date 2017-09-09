@@ -5,7 +5,7 @@ import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.FileTypeIndex;
-import com.kaylerrenslow.armaplugin.lang.sqf.SQFFileType;
+import com.kaylerrenslow.armaplugin.lang.header.HeaderFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -28,7 +28,7 @@ public class PluginUtil {
 		if (module == null) {
 			return null;
 		}
-		Collection<VirtualFile> files = FileTypeIndex.getFiles(SQFFileType.INSTANCE, module.getModuleContentScope());
+		Collection<VirtualFile> files = FileTypeIndex.getFiles(HeaderFileType.INSTANCE, module.getModuleContentScope());
 		for (VirtualFile virtFile : files) {
 			if (virtFile.getName().equalsIgnoreCase("description.ext")) {
 				return virtFile;

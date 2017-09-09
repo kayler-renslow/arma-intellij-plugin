@@ -14,6 +14,6 @@ public class HeaderFileTypeFactory extends FileTypeFactory {
 
 	@Override
 	public void createFileTypes(@NotNull FileTypeConsumer consumer) {
-		consumer.consume(HeaderFileType.INSTANCE, "h;hh;hpp;ext");
+		consumer.consume(HeaderFileType.INSTANCE, "h;hh;hpp;ext;cpp");
 	}
 }
