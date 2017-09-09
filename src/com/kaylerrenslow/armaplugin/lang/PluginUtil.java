@@ -19,12 +19,12 @@ public class PluginUtil {
 	/**
 	 * Gets the root config file (either description.ext or config.cpp (case sensitivity doesn't matter)), or null if neither could be found
 	 *
-	 * @param psiElement a PsiElement used to determine what module the root config file is located in
+	 * @param elementFromModule a PsiElement used to determine what module the root config file is located in
 	 * @return the VirtualFile instance, or null if the root config file couldn't be found
 	 */
 	@Nullable
-	public static VirtualFile getRootConfigVirtualFile(@NotNull PsiElement psiElement) {
-		Module module = ModuleUtil.findModuleForPsiElement(psiElement);
+	public static VirtualFile getRootConfigVirtualFile(@NotNull PsiElement elementFromModule) {
+		Module module = ModuleUtil.findModuleForPsiElement(elementFromModule);
 		if (module == null) {
 			return null;
 		}

@@ -2,8 +2,8 @@ package com.kaylerrenslow.armaplugin.lang;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
-import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParseException;
@@ -31,25 +31,23 @@ public class ArmaPluginUserData {
 	private final Map<Module, ArmaPluginModuleData> moduleMap = new IdentityHashMap<>();
 
 	/**
+	 * Get the {@link HeaderFile} instance. If it is null or out of date (file was updated), this method will reparse the file.
+	 *
 	 * @return the root config file. This will be either description.ext (for missions) or config.cpp (for addons/mods)
 	 */
 	@Nullable
-	public HeaderFile getRootConfigHeaderFile(@NotNull PsiFile fileFromModule) {
+	public HeaderFile getRootConfigHeaderFile(@NotNull PsiElement elementFromModule) {
 		synchronized (this) {
-			Module module = ModuleUtil.findModuleForPsiElement(fileFromModule);
-			if (module == null) {
+			ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
+			if (moduleData == null) {
 				return null;
 			}
-			ArmaPluginModuleData moduleData = moduleMap.computeIfAbsent(module, module1 -> {
-				return new ArmaPluginModuleData();
-			});
-
-			if (!moduleData.reparseRootConfigHeaderFile && moduleData.rootConfigHeaderFile != null) {
-				return moduleData.rootConfigHeaderFile;
+			if (!moduleData.reparseRootConfigHeaderFile() && moduleData.getRootConfigHeaderFile() != null) {
+				return moduleData.getRootConfigHeaderFile();
 			}
 
 			//find a place to save parse data
-			VirtualFile imlVirtFile = module.getModuleFile();
+			VirtualFile imlVirtFile = moduleData.getModule().getModuleFile();
 			if (imlVirtFile == null) {
 				return null;
 			}
@@ -57,27 +55,40 @@ public class ArmaPluginUserData {
 			if (imlDir == null) {
 				return null;
 			}
-			VirtualFile rootConfigVirtualFile = PluginUtil.getRootConfigVirtualFile(fileFromModule);
+			VirtualFile rootConfigVirtualFile = PluginUtil.getRootConfigVirtualFile(elementFromModule);
 			if (rootConfigVirtualFile == null) {
 				return null;
 			}
 
 			//parse the root config
 			try {
-				moduleData.rootConfigHeaderFile = HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(imlDir.getPath() + "/armaplugin-temp"));
-				moduleData.reparseRootConfigHeaderFile = false;
+				moduleData.setRootConfigHeaderFile(HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(imlDir.getPath() + "/armaplugin-temp")));
+				moduleData.setReparseRootConfigHeaderFile(true);
 			} catch (IOException e) {
 				return null;
 			} catch (HeaderParseException e) {
 				System.out.println("HeaderParseException:" + e.getMessage());
 				return null;
 			}
-			return moduleData.rootConfigHeaderFile;
+			return moduleData.getRootConfigHeaderFile();
 		}
 	}
 
+	@Nullable
+	public ArmaPluginModuleData getModuleData(@NotNull PsiElement elementFromModule) {
+		Module module = ModuleUtil.findModuleForPsiElement(elementFromModule);
+		if (module == null) {
+			return null;
+		}
+		return moduleMap.computeIfAbsent(module, module1 -> {
+			return new ArmaPluginModuleData(module);
+		});
+	}
+
 	/**
-	 * Invoke when the root config file ({@link #getRootConfigHeaderFile(Project, PsiFile)})
+	 * Invoke when the root config file ({@link #getRootConfigHeaderFile(PsiElement)}) has been edited.
+	 * Note that this doesn't do any reparsing and instead tells {@link #getRootConfigHeaderFile(PsiElement)} that it's cached
+	 * {@link HeaderFile} is no longer valid and it should reparse.
 	 */
 	void reparseRootConfig(@NotNull PsiFile fileFromModule) {
 		synchronized (this) {
@@ -86,15 +97,10 @@ public class ArmaPluginUserData {
 				return;
 			}
 			ArmaPluginModuleData moduleData = moduleMap.computeIfAbsent(module, module1 -> {
-				return new ArmaPluginModuleData();
+				return new ArmaPluginModuleData(module);
 			});
-			moduleData.reparseRootConfigHeaderFile = true;
+			moduleData.setReparseRootConfigHeaderFile(true);
 		}
-	}
-
-	private static class ArmaPluginModuleData {
-		private HeaderFile rootConfigHeaderFile;
-		private boolean reparseRootConfigHeaderFile = true;
 	}
 
 }

@@ -10,10 +10,15 @@ import org.jetbrains.annotations.NotNull;
  * @since 09/08/2017
  */
 public class TreeChangePreprocessor implements PsiTreeChangePreprocessor {
+	private long lastUpdate = 0;
+
 	@Override
 	public void treeChanged(@NotNull PsiTreeChangeEventImpl event) {
-		if (event.getFile() instanceof HeaderPsiFile) {
-			ArmaPluginUserData.getInstance().reparseRootConfig(event.getFile());
+		if (System.currentTimeMillis() - lastUpdate >= 1000) { //prevent flooding since every keystroke will invoke this method
+			if (event.getFile() instanceof HeaderPsiFile) {
+				ArmaPluginUserData.getInstance().reparseRootConfig(event.getFile());
+			}
 		}
+		lastUpdate = System.currentTimeMillis();
 	}
 }
