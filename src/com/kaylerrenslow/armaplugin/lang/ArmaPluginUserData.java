@@ -7,6 +7,8 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
+import com.kaylerrenslow.armaDialogCreator.util.ReadOnlyList;
+import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,12 +31,13 @@ public class ArmaPluginUserData {
 	private final Map<Module, ArmaPluginModuleData> moduleMap = new IdentityHashMap<>();
 
 	/**
-	 * Get the {@link HeaderFile} instance. If it is null or out of date (file was updated), this method will reparse the file.
+	 * Get the {@link HeaderFile} instance.
+	 * Note: this method will reparse only if it is unset or out of date (file was updated).
 	 *
 	 * @return the root config file. This will be either description.ext (for missions) or config.cpp (for addons/mods)
 	 */
 	@Nullable
-	public HeaderFile getRootConfigHeaderFile(@NotNull PsiElement elementFromModule) {
+	public HeaderFile parseAndGetRootConfigHeaderFile(@NotNull PsiElement elementFromModule) {
 		synchronized (this) {
 			ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
 			if (moduleData == null) {
@@ -61,12 +64,26 @@ public class ArmaPluginUserData {
 			//parse the root config
 			try {
 				moduleData.setRootConfigHeaderFile(HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(imlDir.getPath() + "/armaplugin-temp")));
-				moduleData.setReparseRootConfigHeaderFile(true);
+				moduleData.setReparseRootConfigHeaderFile(false);
 			} catch (Exception e) {
 				System.out.println("Header Parse Exception:" + e.getMessage());
 				return null;
 			}
 			return moduleData.getRootConfigHeaderFile();
+		}
+	}
+
+	@Nullable
+	public ReadOnlyList<HeaderConfigFunction> getAllConfigFunctions(@NotNull PsiElement elementFromModule) {
+		synchronized (this) {
+			ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
+			if (moduleData == null) {
+				return null;
+			}
+			if (moduleData.getRootConfigHeaderFile() == null) {
+				parseAndGetRootConfigHeaderFile(elementFromModule);
+			}
+			return moduleData.getAllConfigFunctions();
 		}
 	}
 
@@ -82,8 +99,8 @@ public class ArmaPluginUserData {
 	}
 
 	/**
-	 * Invoke when the root config file ({@link #getRootConfigHeaderFile(PsiElement)}) has been edited.
-	 * Note that this doesn't do any reparsing and instead tells {@link #getRootConfigHeaderFile(PsiElement)} that it's cached
+	 * Invoke when the root config file ({@link #parseAndGetRootConfigHeaderFile(PsiElement)}) has been edited.
+	 * Note that this doesn't do any reparsing and instead tells {@link #parseAndGetRootConfigHeaderFile(PsiElement)} that it's cached
 	 * {@link HeaderFile} is no longer valid and it should reparse.
 	 */
 	void reparseRootConfig(@NotNull PsiFile fileFromModule) {

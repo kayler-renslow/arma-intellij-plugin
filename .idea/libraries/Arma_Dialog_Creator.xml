@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Arma Dialog Creator">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/adc.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/lib/adc-javadoc.zip!/javadoc" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

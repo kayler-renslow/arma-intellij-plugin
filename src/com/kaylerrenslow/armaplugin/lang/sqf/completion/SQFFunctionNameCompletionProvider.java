@@ -3,9 +3,11 @@ package com.kaylerrenslow.armaplugin.lang.sqf.completion;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.util.ProcessingContext;
-import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
+import com.kaylerrenslow.armaDialogCreator.util.ReadOnlyList;
 import com.kaylerrenslow.armaplugin.lang.ArmaPluginUserData;
+import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -15,9 +17,12 @@ import org.jetbrains.annotations.NotNull;
 public class SQFFunctionNameCompletionProvider extends CompletionProvider<CompletionParameters> {
 	@Override
 	protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext context, @NotNull CompletionResultSet result) {
-		HeaderFile headerFile = ArmaPluginUserData.getInstance().getRootConfigHeaderFile(parameters.getOriginalFile());
-		if (headerFile != null) {
-			System.out.println(headerFile.getAsString());
+		ReadOnlyList<HeaderConfigFunction> allConfigFunctions = ArmaPluginUserData.getInstance().getAllConfigFunctions(parameters.getOriginalFile());
+		if (allConfigFunctions == null) {
+			return;
+		}
+		for (HeaderConfigFunction function : allConfigFunctions) {
+			result.addElement(LookupElementBuilder.create(function).withIcon(HeaderConfigFunction.getIcon()).withPresentableText(function.getCallableName()));
 		}
 	}
 }

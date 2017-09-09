@@ -12,7 +12,12 @@ import javax.swing.*;
  * @since 09/06/2017
  */
 public class HeaderConfigFunction {
-	private final String tagName, filePath, fileNameNoExt, functionFileExtension;
+	private final String tagName;
+	@NotNull
+	private final HeaderClass tagClass;
+	private final String filePath;
+	private final String fileNameNoExt;
+	private final String functionFileExtension;
 	private final boolean appendFn_;
 	private final HeaderClass headerClass;
 
@@ -23,12 +28,15 @@ public class HeaderConfigFunction {
 	 * @param containingDirectoryPath file path to the function that is defined in the config (defined from file="exampleFileDir")
 	 * @param fileNameNoExt           file name of the function, or null if determined by the function class name
 	 * @param tagName                 the prefix tag for the function. This is defined in the config with tag="something" (or if not defined, it is the first child class of CfgFunctions)
+	 * @param tagClass                the {@link HeaderClass} instance that owns the "tag" attribute/assignment
 	 * @param functionFileExtension   file extension (.sqf, .fsm)
 	 */
-	public HeaderConfigFunction(@NotNull HeaderClass headerClass, @NotNull String containingDirectoryPath, @Nullable String fileNameNoExt, @NotNull String tagName, @Nullable String functionFileExtension) {
+	public HeaderConfigFunction(@NotNull HeaderClass headerClass, @NotNull String containingDirectoryPath,
+								@Nullable String fileNameNoExt, @NotNull String tagName, @NotNull HeaderClass tagClass, @Nullable String functionFileExtension) {
 		this.headerClass = headerClass;
 		this.filePath = containingDirectoryPath;
 		this.tagName = tagName;
+		this.tagClass = tagClass;
 		if (functionFileExtension == null) {
 			this.functionFileExtension = ".sqf";
 		} else {
@@ -43,6 +51,14 @@ public class HeaderConfigFunction {
 
 	}
 
+	/**
+	 * @return the {@link HeaderClass} instance that owns the "tag" attribute/assignment
+	 */
+	@NotNull
+	public HeaderClass getTagClass() {
+		return tagClass;
+	}
+
 	@NotNull
 	public String getFunctionClassName() {
 		return this.headerClass.getClassName();
@@ -53,6 +69,7 @@ public class HeaderConfigFunction {
 		return this.tagName;
 	}
 
+	/**@return e.g. tagName_fnc_functionClassName*/
 	@NotNull
 	public String getCallableName() {
 		return tagName + "_fnc_" + getFunctionClassName();
@@ -117,5 +134,10 @@ public class HeaderConfigFunction {
 	@NotNull
 	public HeaderClass getHeaderClass() {
 		return headerClass;
+	}
+
+	@Override
+	public String toString() {
+		return getCallableName();
 	}
 }
