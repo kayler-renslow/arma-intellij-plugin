@@ -22,7 +22,7 @@ public class ArmaPluginModuleData {
 		this.module = module;
 	}
 
-	boolean reparseRootConfigHeaderFile() {
+	boolean shouldReparseRootConfigHeaderFile() {
 		return reparseRootConfigHeaderFile;
 	}
 

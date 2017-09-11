@@ -118,10 +118,12 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 //				e.printStackTrace();
 //			}
 			VirtualFile rootConfigVirtFile = PluginUtil.getRootConfigVirtualFile(element);
+			System.out.println("SQFDocumentationProvider.getDocumentationElementForLookupItem rootConfigVirtFile=" + rootConfigVirtFile);
 			if (rootConfigVirtFile == null) {
 				return null;
 			}
 			VirtualFile functionVirtFile = rootConfigVirtFile.findFileByRelativePath(function.getFullRelativePath());
+			System.out.println("SQFDocumentationProvider.getDocumentationElementForLookupItem functionVirtFile=" + functionVirtFile);
 			if (functionVirtFile == null) {
 				return null;
 			}
