@@ -15,7 +15,7 @@ import java.util.Collection;
  * @author Kayler
  * @since 09/07/2017
  */
-public class PluginUtil {
+public class ArmaPluginUtil {
 	/**
 	 * Gets the root config file (either description.ext or config.cpp (case sensitivity doesn't matter)), or null if neither could be found
 	 *

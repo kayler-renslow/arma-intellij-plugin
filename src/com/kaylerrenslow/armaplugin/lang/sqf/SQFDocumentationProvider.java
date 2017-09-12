@@ -1,14 +1,21 @@
 package com.kaylerrenslow.armaplugin.lang.sqf;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.lang.documentation.DocumentationProviderEx;
 import com.intellij.openapi.editor.Editor;
 import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiComment;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderClass;
+import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
+import com.kaylerrenslow.armaplugin.lang.ArmaPluginUserData;
+import com.kaylerrenslow.armaplugin.lang.ArmaPluginUtil;
 import com.kaylerrenslow.armaplugin.lang.DocumentationUtil;
-import com.kaylerrenslow.armaplugin.lang.PluginUtil;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
+import com.kaylerrenslow.armaplugin.lang.header.GenericConfigException;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
+import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunctionUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.*;
 import com.kaylerrenslow.armaplugin.util.FileResourceContentExtractor;
 import org.jetbrains.annotations.NotNull;
@@ -87,9 +94,6 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 			}
 			return null;
 		}
-//		if (element instanceof HeaderClassDeclaration) {
-//			return element.getText().replaceAll("[\t]+", " ");
-//		}
 		return null;
 	}
 
@@ -110,20 +114,11 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 			if (!function.getFunctionFileExtension().equals(".sqf")) {
 				return null;
 			}
-//			String url = "";
-//			try {
-//				URL urlobj = new URL(new URL("file:"), function.getFullRelativePath());
-//				url = urlobj.toString();
-//			} catch (MalformedURLException e) {
-//				e.printStackTrace();
-//			}
-			VirtualFile rootConfigVirtFile = PluginUtil.getRootConfigVirtualFile(element);
-			System.out.println("SQFDocumentationProvider.getDocumentationElementForLookupItem rootConfigVirtFile=" + rootConfigVirtFile);
+			VirtualFile rootConfigVirtFile = ArmaPluginUtil.getRootConfigVirtualFile(element);
 			if (rootConfigVirtFile == null) {
 				return null;
 			}
-			VirtualFile functionVirtFile = rootConfigVirtFile.findFileByRelativePath(function.getFullRelativePath());
-			System.out.println("SQFDocumentationProvider.getDocumentationElementForLookupItem functionVirtFile=" + functionVirtFile);
+			VirtualFile functionVirtFile = HeaderConfigFunctionUtil.locateConfigFunctionVirtualFile(rootConfigVirtFile, function);
 			if (functionVirtFile == null) {
 				return null;
 			}
@@ -144,22 +139,34 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 			return PsiUtil.findFirstDescendantElement(file, SQFVariable.class);
 		}
 		if (link.startsWith(DOC_LINK_PREFIX_USER_FUNCTION)) {
-//			try {
-//				Module module = PluginUtil.getModuleForPsiFile(context.getContainingFile());
-//				if (module == null) {
-//					return null;
-//				}
-//				String functionName = link.substring(DOC_LINK_PREFIX_USER_FUNCTION.length());
-//				HeaderConfigFunction function = HeaderPsiUtil.getFunctionFromCfgFunctions(module, new SQFVariableName(functionName));
-//				if (function != null) {
-//					if (!function.getFunctionFileExtension().equals(".sqf")) {
-//						return function.getClassDeclaration();
-//					}
-//					return function.getPsiFile();
-//				}
-//			} catch (Exception e) {
-//				e.printStackTrace(System.out);
-//			}
+			if (context == null) {
+				return null;
+			}
+			String functionName = link.substring(DOC_LINK_PREFIX_USER_FUNCTION.length());
+			HeaderFile headerFile = ArmaPluginUserData.getInstance().parseAndGetRootConfigHeaderFile(context);
+			if (headerFile == null) {
+				return null;
+			}
+			HeaderClass cfgFunctions;
+			HeaderConfigFunction function;
+			try {
+				cfgFunctions = HeaderConfigFunctionUtil.getCfgFunctions(headerFile);
+				function = HeaderConfigFunctionUtil.getFunctionFromCfgFunctionsBody(new SQFVariableName(functionName), cfgFunctions);
+				if (function == null) {
+					return null;
+				}
+			} catch (GenericConfigException e) {
+				return null;
+			}
+			VirtualFile rootConfigVirtFile = ArmaPluginUtil.getRootConfigVirtualFile(context);
+			if (rootConfigVirtFile == null) {
+				return null;
+			}
+			VirtualFile functionVirtFile = HeaderConfigFunctionUtil.locateConfigFunctionVirtualFile(rootConfigVirtFile, function);
+			if (functionVirtFile == null) {
+				return null;
+			}
+			return psiManager.findFile(functionVirtFile);
 		}
 		return null;
 	}
@@ -174,45 +181,21 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		if (SQFParserDefinition.isCommand(contextElement.getNode().getElementType())) {
 			return contextElement;
 		}
-
-		if (PsiUtil.isOfElementType(contextElement, SQFTypes.LOCAL_VAR)) { //this code works, but only when the selected statement has the comment
-			SQFVariable var = (SQFVariable) (contextElement.getParent());
-			PsiReference[] references = var.getReferences();
-			for (PsiReference reference : references) {
-//				if (reference.getElement().getParent() instanceof SQFAssignment) {
-//					SQFStatement statement = (SQFStatement) reference.getElement().getParent().getParent();
-//					PsiElement comment = getInlineComment(editor, statement.getNode());
-//					if (comment != null) {
-//						return comment;
-//					}
-//				}
-			}
-		}
-
 		return null;
 	}
 
-	@Nullable
-	private PsiElement getInlineComment(@NotNull Editor editor, ASTNode statementNode) {
-		ASTNode commentNode = PsiUtil.getNextSiblingNotWhitespace(statementNode);
-		if (PsiUtil.isOfElementType(commentNode, SQFParserDefinition.INLINE_COMMENT) || PsiUtil.isOfElementType(commentNode, SQFParserDefinition.BLOCK_COMMENT)) {
-			if (editor.getDocument().getLineNumber(statementNode.getStartOffset()) != editor.getDocument().getLineNumber(commentNode.getStartOffset())) { //comment not on same line
-				return null;
-			}
-			return commentNode.getPsi();
-		}
-		return null;
-	}
-
-	private static String generateCommandDoc(String commandName) {
+	@NotNull
+	private static String generateCommandDoc(@NotNull String commandName) {
 		return getCommandDocumentation(commandName);
 	}
 
-	private static String generateFunctionDoc(String functionName) {
+	@NotNull
+	private static String generateFunctionDoc(@NotNull String functionName) {
 		return getBISFunctionDocumentation(functionName);
 	}
 
-	public static String getCommandDocumentation(String commandName) {
+	@NotNull
+	public static String getCommandDocumentation(@NotNull String commandName) {
 		try {
 			return String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(commandName)) + FileResourceContentExtractor.extract(getDocumentationFilePath(commandName));
 		} catch (IllegalArgumentException ignore) {
@@ -226,16 +209,19 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		return "Error fetching documentation.";
 	}
 
-	private static String getDocumentationFilePath(String commandName) {
+	@NotNull
+	private static String getDocumentationFilePath(@NotNull String commandName) {
 		return SQFStatic.COMMANDS_DOC_FILE_DIR + commandName;
 	}
 
-	public static String getBISFunctionDocumentation(String bisFunction) {
+	@NotNull
+	public static String getBISFunctionDocumentation(@NotNull String bisFunction) {
 		String doc = String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(bisFunction));
 		return doc + FileResourceContentExtractor.extract(SQFStatic.BIS_FUNCTIONS_DOC_FILE_DIR + bisFunction);
 	}
 
-	public static String getWikiUrl(String wikiLinkName) {
+	@NotNull
+	public static String getWikiUrl(@NotNull String wikiLinkName) {
 		return SQFStatic.BIS_WIKI_URL_PREFIX + wikiLinkName;
 	}
 

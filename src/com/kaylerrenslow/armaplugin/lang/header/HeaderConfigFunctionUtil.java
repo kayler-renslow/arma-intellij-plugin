@@ -1,5 +1,6 @@
 package com.kaylerrenslow.armaplugin.lang.header;
 
+import com.intellij.openapi.vfs.VirtualFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.*;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
@@ -30,6 +31,22 @@ public class HeaderConfigFunctionUtil {
 			throw new ConfigClassNotDefinedException("CfgFunctions");
 		}
 		return cfgFunctions;
+	}
+
+	/**
+	 * Get a {@link VirtualFile} instance that points to the {@link HeaderConfigFunction}'s implementation
+	 *
+	 * @param rootConfigVirtualFile a VirtualFile that points to config.cpp or description.ext
+	 * @param function              the function
+	 * @return the VirtualFile instance, or null if couldn't be located
+	 */
+	@Nullable
+	public static VirtualFile locateConfigFunctionVirtualFile(@NotNull VirtualFile rootConfigVirtualFile, @NotNull HeaderConfigFunction function) {
+		VirtualFile rootConfigDir = rootConfigVirtualFile.getParent();
+		if (rootConfigDir == null) {
+			return null;
+		}
+		return rootConfigDir.findFileByRelativePath(function.getFullRelativePath());
 	}
 
 	@NotNull
@@ -73,7 +90,7 @@ public class HeaderConfigFunctionUtil {
 	 * @throws MalformedConfigException
 	 */
 	@Nullable
-	private static HeaderConfigFunction getFunctionFromCfgFunctionsBody(@NotNull SQFVariableName functionName,
+	public static HeaderConfigFunction getFunctionFromCfgFunctionsBody(@NotNull SQFVariableName functionName,
 																		@NotNull HeaderClass cfgFuncs)
 			throws FunctionNotDefinedInConfigException, MalformedConfigException {
 		//@formatter:off
@@ -267,7 +284,7 @@ public class HeaderConfigFunctionUtil {
 	 * @return HeaderClassDeclaration, or null if one couldn't be found
 	 */
 	@Nullable
-	public static HeaderClass getClassDeclaration(@NotNull HeaderClass start, @NotNull String className, int minSearchDepth, int maxSearchDepth) {
+	private static HeaderClass getClassDeclaration(@NotNull HeaderClass start, @NotNull String className, int minSearchDepth, int maxSearchDepth) {
 		List<HeaderClass> decls = getClassDeclarationsWithEntriesEqual(start, className, null, new ArrayList<>(), minSearchDepth, maxSearchDepth, 0);
 
 		if (decls.size() == 0) {

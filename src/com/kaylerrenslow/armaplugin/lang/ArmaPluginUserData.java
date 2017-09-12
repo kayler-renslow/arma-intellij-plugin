@@ -12,6 +12,7 @@ import com.intellij.psi.util.PsiUtil;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
 import com.kaylerrenslow.armaDialogCreator.util.ReadOnlyList;
+import com.kaylerrenslow.armaplugin.ArmaPlugin;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderPsiFile;
 import org.jetbrains.annotations.NotNull;
@@ -55,15 +56,11 @@ public class ArmaPluginUserData {
 			}
 
 			//find a place to save parse data
-			VirtualFile imlVirtFile = moduleData.getModule().getModuleFile();
-			if (imlVirtFile == null) {
+			String tempDirectoryPath = ArmaPlugin.getPathToTempDirectory(moduleData.getModule());
+			if (tempDirectoryPath == null) {
 				return null;
 			}
-			VirtualFile imlDir = imlVirtFile.getParent();
-			if (imlDir == null) {
-				return null;
-			}
-			VirtualFile rootConfigVirtualFile = PluginUtil.getRootConfigVirtualFile(elementFromModule);
+			VirtualFile rootConfigVirtualFile = ArmaPluginUtil.getRootConfigVirtualFile(elementFromModule);
 			if (rootConfigVirtualFile == null) {
 				return null;
 			}
@@ -71,7 +68,7 @@ public class ArmaPluginUserData {
 			//the contents in the header files aren't always saved to file by intellij by the time this method is invoked,
 			//so we are going to force save the documents
 			CompletableFuture<HeaderFile> future = new CompletableFuture<>();
-			//this works but is super slow. the transaction is taking a while to be executed
+			//todo this works but is super slow. the transaction is taking a while to be executed
 			TransactionGuard.submitTransaction(() -> {/*Disposable class here*/}, /*Runnable*/() -> {
 				FileDocumentManager manager = FileDocumentManager.getInstance();
 				for (Document document : manager.getUnsavedDocuments()) {
@@ -87,7 +84,7 @@ public class ArmaPluginUserData {
 
 				//parse the root config
 				try {
-					moduleData.setRootConfigHeaderFile(HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(imlDir.getPath() + "/armaplugin-temp")));
+					moduleData.setRootConfigHeaderFile(HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(tempDirectoryPath)));
 					moduleData.setReparseRootConfigHeaderFile(false);
 					future.complete(moduleData.getRootConfigHeaderFile());
 				} catch (Exception e) {
