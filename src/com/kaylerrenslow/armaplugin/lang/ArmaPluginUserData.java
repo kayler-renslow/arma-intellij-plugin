@@ -22,7 +22,6 @@ import java.io.File;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Kayler
@@ -56,8 +55,8 @@ public class ArmaPluginUserData {
 			}
 
 			//find a place to save parse data
-			String tempDirectoryPath = ArmaPlugin.getPathToTempDirectory(moduleData.getModule());
-			if (tempDirectoryPath == null) {
+			String imlDir = ArmaPlugin.getPathToTempDirectory(moduleData.getModule());
+			if (imlDir == null) {
 				return null;
 			}
 			VirtualFile rootConfigVirtualFile = ArmaPluginUtil.getRootConfigVirtualFile(elementFromModule);
@@ -68,7 +67,6 @@ public class ArmaPluginUserData {
 			//the contents in the header files aren't always saved to file by intellij by the time this method is invoked,
 			//so we are going to force save the documents
 			CompletableFuture<HeaderFile> future = new CompletableFuture<>();
-			//todo this works but is super slow. the transaction is taking a while to be executed
 			TransactionGuard.submitTransaction(() -> {/*Disposable class here*/}, /*Runnable*/() -> {
 				FileDocumentManager manager = FileDocumentManager.getInstance();
 				for (Document document : manager.getUnsavedDocuments()) {
@@ -78,15 +76,24 @@ public class ArmaPluginUserData {
 					}
 					PsiFile psiFile = PsiUtil.getPsiFile(moduleData.getModule().getProject(), virtFile);
 					if (psiFile instanceof HeaderPsiFile) {
-						manager.saveDocumentAsIs(document);
+						manager.saveDocument(document);
 					}
 				}
 
 				//parse the root config
 				try {
-					moduleData.setRootConfigHeaderFile(HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(tempDirectoryPath)));
+					moduleData.setRootConfigHeaderFile(HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(imlDir)));
 					moduleData.setReparseRootConfigHeaderFile(false);
 					future.complete(moduleData.getRootConfigHeaderFile());
+
+//					new DialogWrapper(elementFromModule.getProject()){
+//						@Override
+//						protected JComponent createCenterPanel() {
+//							init();
+//							this.createDefaultActions();
+//							return new JLabel("preprocessed");
+//						}
+//					}.show();
 				} catch (Exception e) {
 					System.out.println("Header Parse Exception:" + e.getMessage());
 					future.complete(null);
@@ -95,12 +102,8 @@ public class ArmaPluginUserData {
 			});
 
 			//using a future to ensure memory visibility
-			try {
-//				return future.getNow(null);
-				return future.get(15, TimeUnit.SECONDS);
-			} catch (Exception e) {
-				return null;
-			}
+			//note: using .get() or .get(long,TimeUnit) is making the transaction take a very long time.
+			return future.getNow(null);
 		}
 	}
 

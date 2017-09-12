@@ -26,7 +26,18 @@
 		<lang.parserDefinition language="Arma.Header"
 							   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.HeaderParserDefinition"/>
 		<psi.treeChangePreprocessor implementation="com.kaylerrenslow.armaplugin.lang.TreeChangePreprocessor"/>
+		<lang.syntaxHighlighterFactory language="Arma.Header"
+									   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderSyntaxHighlighterFactory"/>
+		<annotator language="Arma.Header"
+				   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderIncludeColorizerAnnotator"/>
 
+		<!-- Shared -->
+		<annotator language="Arma.Header"
+				   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderIncludeColorizerAnnotator"/>
+		<annotator language="Arma.Header"
+				   implementationClass="com.kaylerrenslow.armaplugin.lang.DocumentationTagsAnnotator"/>
+		<annotator language="Arma.SQF"
+				   implementationClass="com.kaylerrenslow.armaplugin.lang.DocumentationTagsAnnotator"/>
 
 		<!-- Misc -->
 		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/armaplugin/armaPluginColorSchemes.xml"/>
