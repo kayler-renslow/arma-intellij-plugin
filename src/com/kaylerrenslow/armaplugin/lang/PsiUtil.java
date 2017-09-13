@@ -44,7 +44,7 @@ public class PsiUtil {
 
 	/**
 	 * Traverses the entire ast tree with BFS, starting from start. Each node that is found will be sent to finder.
-	 * It is also possible to stop the traversal at any time with finder
+	 * It is also possible to stop the traversal at any time with finder by returning true in it
 	 *
 	 * @param start  starting ASTNode
 	 * @param finder TraversalObjectFinder
@@ -170,32 +170,6 @@ public class PsiUtil {
 			isChild = parent.getElementType() == type && (textContent == null || parent.getText().equals(textContent));
 		}
 		return parent;
-	}
-
-	/**
-	 * Checks if the given node has an ancestor that inherits from the given class. If there is one, this method will return that ancestor. Otherwise, it will return null.<br>
-	 * If textContent is not null, this method will also check if the ancestor is of correct type and ancestor's text is equal to textContent.
-	 *
-	 * @param start       where to start traversing upwards
-	 * @param clazz       type to check
-	 * @param textContent null if to disregard text of ancestor, otherwise check if ancestor's text is equal to textContent
-	 * @return node's ancestor if ancestor is of IElementType type if node's ancestor's text matches textContent. If textContent is null, text can be anything for ancestor.
-	 */
-	@Nullable
-	public static <T extends PsiElement> T getFirstAncestorOfType(@NotNull PsiElement start, @NotNull Class<T> clazz, @Nullable String textContent) {
-		PsiElement parent = start.getParent();
-		boolean isChild = false;
-		while (parent != null && !isChild) {
-			parent = parent.getParent();
-			if (parent == null) {
-				break;
-			}
-			isChild = clazz.isInstance(parent) && (textContent == null || parent.getText().equals(textContent));
-		}
-		if (isChild) {
-			return (T) parent;
-		}
-		return null;
 	}
 
 

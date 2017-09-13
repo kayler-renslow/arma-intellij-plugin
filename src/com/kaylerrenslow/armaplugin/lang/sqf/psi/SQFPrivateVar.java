@@ -28,7 +28,7 @@ public class SQFPrivateVar {
 	}
 
 	@NotNull
-	public SQFVariableName getVariableName() {
+	public SQFVariableName getVariableNameObj() {
 		return variableName;
 	}
 

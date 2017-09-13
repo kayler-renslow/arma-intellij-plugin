@@ -7,6 +7,7 @@ import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
+import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFString;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -21,7 +22,7 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 	@NotNull
 	public abstract SQFVariableName getVariableNameObj();
 
-	class IdentifierReference extends SQFVariableReference {
+	public static class IdentifierReference extends SQFVariableReference {
 		@NotNull
 		private final SQFVariable variable;
 		@NotNull
@@ -97,39 +98,53 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 		}
 	}
 
-	class StringReference extends SQFVariableReference {
+	public static class StringReference extends SQFVariableReference {
+		@NotNull
+		private final SQFVariable variable;
+		@NotNull
+		private final List<SQFString> targets;
+		@NotNull
+		private final ResolveResult[] resolveResults;
+
+		public StringReference(@NotNull SQFVariable variable, @NotNull List<SQFString> targets) {
+			this.variable = variable;
+			this.targets = targets;
+
+			resolveResults = PsiElementResolveResult.createResults(targets);
+		}
+
 		@NotNull
 		@Override
 		public SQFVariableName getVariableNameObj() {
-			return null;
+			return variable.getVarNameObj();
 		}
 
 		@NotNull
 		@Override
 		public ResolveResult[] multiResolve(boolean incompleteCode) {
-			return new ResolveResult[0];
+			return resolveResults;
 		}
 
 		@Override
 		public PsiElement getElement() {
-			return null;
+			return variable;
 		}
 
 		@Override
 		public TextRange getRangeInElement() {
-			return null;
+			return TextRange.allOf(variable.getVarName());
 		}
 
 		@Nullable
 		@Override
 		public PsiElement resolve() {
-			return null;
+			return targets.get(0);
 		}
 
 		@NotNull
 		@Override
 		public String getCanonicalText() {
-			return null;
+			return variable.getVarName();
 		}
 
 		@Override
@@ -144,7 +159,7 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 
 		@Override
 		public boolean isReferenceTo(PsiElement element) {
-			return false;
+			return element == variable || targets.contains(element);
 		}
 
 		@NotNull

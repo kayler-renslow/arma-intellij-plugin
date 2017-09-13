@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -17,6 +18,6 @@ public class SQFArray extends ASTWrapperPsiElement {
 
 	@NotNull
 	public List<SQFExpression> getExpressions() {
-		return null;
+		return PsiTreeUtil.getChildrenOfTypeAsList(this, SQFExpression.class);
 	}
 }

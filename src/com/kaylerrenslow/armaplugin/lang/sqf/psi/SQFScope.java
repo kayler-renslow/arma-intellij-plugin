@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import org.jetbrains.annotations.NotNull;
@@ -28,7 +29,7 @@ public interface SQFScope extends PsiElement {
 		List<SQFPrivateVar> varInstances = getPrivateVarInstances();
 		Set<SQFVariableName> vars = new HashSet<>(varInstances.size());
 		for (SQFPrivateVar var : varInstances) {
-			vars.add(var.getVariableName());
+			vars.add(var.getVariableNameObj());
 		}
 		return vars;
 	}
@@ -53,7 +54,10 @@ public interface SQFScope extends PsiElement {
 			}
 			for (SQFPrivateVar privateVar : declaredPrivateVars) {
 				if (privateVar.getMaxScope() == this) {
-					vars.add(privateVar);
+					if (privateVar.getElement().getTextOffset() < this.getTextOffset()) {
+						//only private vars coming before the scope should be available in the scope
+						vars.add(privateVar);
+					}
 				}
 				/* Logic of this loop:
 				*  If the variable is declared private in a statement, it may be declared private in another scope that isn't this scope.
@@ -74,7 +78,7 @@ public interface SQFScope extends PsiElement {
 		for (SQFPrivateVar parentDeclaredPrivateVar : containingScope.getPrivateVarInstances()) {
 			//copy over private vars
 			for (SQFPrivateVar myPrivateVar : vars) {
-				if (parentDeclaredPrivateVar.getVariableName().equals(myPrivateVar.getVariableName())) {
+				if (parentDeclaredPrivateVar.getVariableNameObj().equals(myPrivateVar.getVariableNameObj())) {
 					//if declared private in this scope, we don't want the containing scope's private vars that match
 					continue;
 				}
@@ -93,15 +97,22 @@ public interface SQFScope extends PsiElement {
 		}
 		SQFVariableName variableName = variable.getVarNameObj();
 		SQFScope variableMaxScope = null;
-		for (SQFPrivateVar privateVar : getContainingScope(variable).getPrivateVarInstances()) {
-			if (!privateVar.getVariableName().equals(variableName)) {
-				continue;
+		if (variable.isLocal() && !variable.isMagicVar()) {
+			for (SQFPrivateVar privateVar : getContainingScope(variable).getPrivateVarInstances()) {
+				if (!privateVar.getVariableNameObj().equals(variableName)) {
+					continue;
+				}
+				variableMaxScope = privateVar.getMaxScope(); //this is the scope that the variable exists in
+				break;
 			}
-			variableMaxScope = privateVar.getMaxScope(); //this is the scope that the variable exists in
-			break;
-		}
-		if (variableMaxScope == null /*not declared private*/) {
-			variableMaxScope = SQFScope.getContainingScope(variable.getContainingFile());
+			if (variableMaxScope == null /*not declared private*/) {
+				variableMaxScope = SQFScope.getContainingScope(file);
+			}
+		} else if (variable.isMagicVar()) {
+			variableMaxScope = SQFScope.getContainingScope(variable);
+		} else {
+			//global var
+			variableMaxScope = SQFScope.getContainingScope(file);
 		}
 
 		maxScope:
@@ -110,19 +121,44 @@ public interface SQFScope extends PsiElement {
 				continue;
 			}
 			SQFStatement statement = (SQFStatement) element;
-			List<SQFPrivateVar> declaredPrivateVars = statement.getDeclaredPrivateVars();
-			if (declaredPrivateVars != null) {
-				for (SQFPrivateVar maxScopePrivateVar : declaredPrivateVars) {
-					if (maxScopePrivateVar.getVariableName().equals(variableName)
-							&& maxScopePrivateVar.getMaxScope() != variableMaxScope) {
-						//if the variable is made private in any descendant scopes, we don't want to reference those
-						//because the max scopes don't match
-						continue maxScope;
+			if (variable.isLocal()) {
+				//no need to do the following code if the variable is global
+				List<SQFPrivateVar> declaredPrivateVars = statement.getDeclaredPrivateVars();
+				if (declaredPrivateVars != null) {
+					for (SQFPrivateVar maxScopePrivateVar : declaredPrivateVars) {
+						if (maxScopePrivateVar.getVariableNameObj().equals(variableName)
+								&& maxScopePrivateVar.getMaxScope() != variableMaxScope) {
+							//if the variable is made private in any descendant scopes, we don't want to reference those
+							//because the max scopes don't match
+							continue maxScope;
+						}
 					}
 				}
 			}
-			//todo get variable references from statement
-
+			List<SQFVariable> varTargets = new ArrayList<>();
+			List<SQFString> stringTargets = new ArrayList<>();
+			PsiUtil.traverseBreadthFirstSearch(statement.getNode(), astNode -> {
+				PsiElement nodeAsPsi = astNode.getPsi();
+				if (nodeAsPsi instanceof SQFVariable) {
+					SQFVariable sqfVariable = (SQFVariable) nodeAsPsi;
+					if (SQFVariableName.nameEquals(sqfVariable.getVarName(), variable.getVarName())) {
+						varTargets.add((SQFVariable) nodeAsPsi);
+					}
+				} else if (nodeAsPsi instanceof SQFString) {
+					SQFString string = (SQFString) nodeAsPsi;
+					if (SQFVariableName.nameEquals(string.getNonQuoteText(), variable.getVarName())) {
+						stringTargets.add((SQFString) nodeAsPsi);
+					}
+				}
+				return false;
+			});
+			if (!varTargets.isEmpty()) {
+				vars.add(new SQFVariableReference.IdentifierReference(variable, varTargets));
+			}
+			if (!stringTargets.isEmpty()) {
+				vars.add(new SQFVariableReference.StringReference(variable, stringTargets));
+			}
+			//todo will intellij like how we are creating references to variables that have case insensitive names?
 		}
 		return vars;
 	}
