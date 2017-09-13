@@ -11,11 +11,9 @@ import org.jetbrains.annotations.NotNull;
  * @since 01/28/2017
  */
 public class SQFVariableName {
-	private final String name;
 	private final String original;
 
 	public SQFVariableName(@NotNull String name) {
-		this.name = name.toLowerCase();
 		this.original = name;
 	}
 
@@ -41,36 +39,36 @@ public class SQFVariableName {
 	}
 
 	public boolean isMagicVar() {
-		return isMagicVar(this.name);
+		return isMagicVar(this.text());
 	}
 
 	/**
 	 * invokes {@link #nameEquals(String, String)} with {@link #text()} and name
 	 */
 	public boolean nameEquals(@NotNull String name) {
-		return nameEquals(this.name, name);
+		return nameEquals(this.text(), name);
 	}
 
 	/**
 	 * Return true if {@link #text()}.startsWith(s.toLowerCase())
 	 */
 	public boolean startsWith(@NotNull String s) {
-		return name.startsWith(s.toLowerCase());
+		return text().startsWith(s.toLowerCase());
 	}
 
 	/**
 	 * Return true if {@link #text()}.contains(s.toLowerCase())
 	 */
 	public boolean contains(@NotNull String s) {
-		return name.contains(s.toLowerCase());
+		return text().contains(s.toLowerCase());
 	}
 
 	/**
-	 * Get the variable name in lower-case form
+	 * @return the variable name in lowercase form
 	 */
 	@NotNull
 	public String text() {
-		return name;
+		return original.toLowerCase();
 	}
 
 	/**
@@ -99,7 +97,7 @@ public class SQFVariableName {
 		}
 		if (o instanceof SQFVariableName) {
 			SQFVariableName other = (SQFVariableName) o;
-			return this.name.equals(other.name);
+			return this.text().equals(other.text());
 		}
 		return false;
 	}

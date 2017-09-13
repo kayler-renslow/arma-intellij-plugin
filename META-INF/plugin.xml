@@ -33,8 +33,6 @@
 
 		<!-- Shared -->
 		<annotator language="Arma.Header"
-				   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderIncludeColorizerAnnotator"/>
-		<annotator language="Arma.Header"
 				   implementationClass="com.kaylerrenslow.armaplugin.lang.DocumentationTagsAnnotator"/>
 		<annotator language="Arma.SQF"
 				   implementationClass="com.kaylerrenslow.armaplugin.lang.DocumentationTagsAnnotator"/>

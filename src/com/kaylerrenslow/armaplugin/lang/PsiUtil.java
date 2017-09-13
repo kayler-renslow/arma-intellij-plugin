@@ -34,7 +34,7 @@ public class PsiUtil {
 	}
 
 	@NotNull
-	public static ASTNode getFirstDescendantNode(PsiElement element) {
+	public static ASTNode getFirstDescendantNode(@NotNull PsiElement element) {
 		ASTNode cursor = element.getNode();
 		while (cursor.getFirstChildNode() != null) {
 			cursor = cursor.getFirstChildNode();
@@ -198,27 +198,6 @@ public class PsiUtil {
 		return null;
 	}
 
-	/**
-	 * Checks if IElementType of both nodes are the same. Returns false if either are null.
-	 *
-	 * @param node1 ASTNode
-	 * @param node2 ASTNode
-	 * @return true if node1's element type is node2's element type, false otherwise
-	 */
-	public static boolean isSameElementType(ASTNode node1, ASTNode node2) {
-		return node1 != null && node2 != null && node1.getElementType() == node1.getElementType();
-	}
-
-	/**
-	 * Checks if IElementType of both elements are the same. Returns false if either are null.
-	 *
-	 * @param psiElement1 PsiElement
-	 * @param psiElement2 PsiElement
-	 * @return true if psiElement's element type is node2's element type, false otherwise
-	 */
-	public static boolean isSameElementType(PsiElement psiElement1, PsiElement psiElement2) {
-		return isSameElementType(psiElement1.getNode(), psiElement2.getNode());
-	}
 
 	/**
 	 * Checks if the given ASTNode is of IElementType et
@@ -242,7 +221,6 @@ public class PsiUtil {
 		return pe != null && isOfElementType(pe.getNode(), et);
 	}
 
-
 	@Nullable
 	public static <T extends PsiElement> T findFirstDescendantElement(@NotNull PsiElement element, @NotNull Class<T> type) {
 		PsiElement child = element.getFirstChild();
@@ -259,46 +237,22 @@ public class PsiUtil {
 		return null;
 	}
 
-	/**
-	 * Traverses the entire AST tree of the given ASTNode and returns the first ASTNode that matches IElementType type
-	 *
-	 * @param node    ASTNode to traverse
-	 * @param type    IElement the type to find in the AST tree
-	 * @param content text to match inside the node, or null if doesn't matter
-	 * @return ASTNode that is the first of type, or null if none was found
-	 */
-	@Nullable
-	public static ASTNode findFirstDescendantElement(@NotNull ASTNode node, @NotNull IElementType type, @Nullable String content) {
-		if (isOfElementType(node, type)) {
-			if (content != null && node.getText().equals(content)) {
-				return node;
-			} else if (content != null) {
-				return null;
-			}
-			return node;
-		}
-		ASTNode[] children = node.getChildren(null);
-		ASTNode astNode;
-		for (ASTNode child : children) {
-			astNode = findFirstDescendantElement(child, type, content);
-			if (astNode != null) {
-				return astNode;
-			}
-		}
-		return null;
-	}
 
-	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(@NotNull PsiElement rootElement, @NotNull Class<E> type, @Nullable PsiElement cursor, @Nullable String textContent) {
+	@NotNull
+	public static <E extends PsiElement> List<E> findDescendantElementsOfInstance(@NotNull PsiElement rootElement,
+																				  @NotNull Class<E> type,
+																				  @Nullable PsiElement cursor,
+																				  @Nullable String textContent) {
 		ArrayList<E> list = new ArrayList<>();
-		findDescdantElementsOfInstance(rootElement, type, cursor, textContent, list);
+		findDescendantElementsOfInstance(rootElement, type, cursor, textContent, list);
 		return list;
 	}
 
-	public static <E extends PsiElement> ArrayList<E> findDescendantElementsOfInstance(@NotNull PsiElement rootElement, @NotNull Class<E> type, @Nullable PsiElement cursor) {
-		return findDescendantElementsOfInstance(rootElement, type, cursor, null);
-	}
-
-	private static <E extends PsiElement> void findDescdantElementsOfInstance(PsiElement rootElement, Class<?> type, PsiElement cursor, String textContent, ArrayList<E> list) {
+	private static <E extends PsiElement> void findDescendantElementsOfInstance(@NotNull PsiElement rootElement,
+																				@NotNull Class<?> type,
+																				@Nullable PsiElement cursor,
+																				@Nullable String textContent,
+																				@NotNull List<E> list) {
 		PsiElement child = rootElement.getFirstChild();
 		while (child != null) {
 			if (cursor != null && child == cursor) {
@@ -307,90 +261,12 @@ public class PsiUtil {
 			if (type.isAssignableFrom(child.getClass()) && (textContent == null || child.getText().equals(textContent))) {
 				list.add((E) child);
 			}
-			findDescdantElementsOfInstance(child, type, cursor, textContent, list);
+			findDescendantElementsOfInstance(child, type, cursor, textContent, list);
 			child = child.getNextSibling();
 		}
 	}
 
-	/**
-	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
-	 *
-	 * @param element PsiElement to traverse
-	 * @param toFind  IElement the type to find in the AST tree
-	 * @param cursor  the node that is already discovered since the user's mouse is over it (can be null)
-	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
-	 */
-	public static ArrayList<ASTNode> findDescendantElements(PsiElement element, IElementType toFind, ASTNode cursor) {
-		return findDescendantElements(element, toFind, cursor, null);
-	}
 
-	/**
-	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list and the ASTNode's text equals textContent
-	 *
-	 * @param element     PsiElement to traverse
-	 * @param toFind      IElement the type to find in the AST tree
-	 * @param cursor      the node that is already discovered since the user's mouse is over it (can be null)
-	 * @param textContent text to look for in ASTNode (null if doesn't matter)
-	 * @return ArrayList containing all ASTNodes that mach the IElementType toFind
-	 */
-	public static ArrayList<ASTNode> findDescendantElements(PsiElement element, IElementType toFind, ASTNode cursor, @Nullable String textContent) {
-		ArrayList<ASTNode> list = new ArrayList<>();
-		traverseElement(list, element, toFind, cursor, textContent);
-		return list;
-	}
-
-	/**
-	 * Traverses the entire AST tree of the given PsiElement and adds all ASTNodes that match the type of toFind to a list
-	 *
-	 * @param list        list to add each ASTNode to that matches toFind's type
-	 * @param element     PsiElement to traverse
-	 * @param toFind      IElement the type to find in the AST tree
-	 * @param cursor      the node that is already discovered since the user's mouse is over it (can be null)
-	 * @param textContent text to look for in ASTNode (null if doesn't matter)
-	 */
-	private static void traverseElement(ArrayList<ASTNode> list, PsiElement element, IElementType toFind, ASTNode cursor, String textContent) {
-		ASTNode[] children = element.getNode().getChildren(null);
-		for (ASTNode node : children) {
-			traverseASTNode(list, toFind, cursor, node, textContent);
-		}
-	}
-
-	/**
-	 * Traverses all children of discoveredElement and adds ASTNode's that mach type of toFind to list
-	 *
-	 * @param list              list of all elements of type toFind
-	 * @param toFind            element type to find
-	 * @param cursor            the ASTNode that has the mouse over it (can be null)
-	 * @param discoveredElement previously discovered ASTNode
-	 * @param textContent       text to look for in ASTNode (null if doesn't matter)
-	 */
-	private static void traverseASTNode(ArrayList<ASTNode> list, IElementType toFind, ASTNode cursor, ASTNode discoveredElement, String textContent) {
-		if (textContent == null) {
-			elementDiscovered(list, toFind, cursor, discoveredElement);
-		} else if (discoveredElement.getText().equals(textContent)) {
-			elementDiscovered(list, toFind, cursor, discoveredElement);
-		}
-		ASTNode[] children = discoveredElement.getChildren(null);
-		for (ASTNode node : children) {
-			traverseASTNode(list, toFind, cursor, node, textContent);
-		}
-	}
-
-	private static void elementDiscovered(ArrayList<ASTNode> elements, IElementType toFind, ASTNode cursor, ASTNode discoveredElement) {
-		if (PsiUtil.isOfElementType(discoveredElement, toFind)) {
-			addToList(elements, discoveredElement, cursor);
-		}
-	}
-
-	private static void addToList(List<ASTNode> list, ASTNode n, ASTNode cursor) {
-		if (n == null) {
-			return;
-		}
-		if (n == cursor) {
-			return;
-		}
-		list.add(n);
-	}
 
 
 	/**
@@ -401,7 +277,7 @@ public class PsiUtil {
 	 * @return list of all children
 	 */
 	@NotNull
-	public static <T extends PsiElement> List<T> findChildrenOfType(PsiElement element, Class<T> psiClass) {
+	public static <T extends PsiElement> List<T> findChildrenOfType(@NotNull PsiElement element, @NotNull Class<T> psiClass) {
 		List<T> list = new ArrayList<T>();
 		PsiElement[] children = element.getChildren();
 		for (PsiElement child : children) {

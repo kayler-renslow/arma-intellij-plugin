@@ -63,7 +63,8 @@ public class DocumentationUtil {
 	 * @param docString documentation text
 	 * @return reformatted string
 	 */
-	public static String purtify(String docString) {
+	@NotNull
+	public static String purtify(@NotNull String docString) {
 		docString = "<pre>" + docString + "</pre>";
 		docString = insertCommandLinks(docString);
 		docString = insertBisLinks(docString);
