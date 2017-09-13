@@ -83,6 +83,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(CASE_COMMAND, COMMAND, PRIVATE_COMMAND),
+    create_token_set_(ASSIGNMENT_STATEMENT, CASE_STATEMENT, QUEST_STATEMENT, STATEMENT),
     create_token_set_(ADD_EXPRESSION, BOOL_AND_EXPRESSION, BOOL_NOT_EXPRESSION, BOOL_OR_EXPRESSION,
       CODE_BLOCK_EXPRESSION, COMMAND_EXPRESSION, COMP_EXPRESSION, CONFIG_FETCH_EXPRESSION,
       DIV_EXPRESSION, EXPONENT_EXPRESSION, EXPRESSION, LITERAL_EXPRESSION,
@@ -414,7 +415,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   public static boolean statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "statement")) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _NONE_, STATEMENT, "<statement>");
+    Marker m = enter_section_(b, l, _COLLAPSE_, STATEMENT, "<statement>");
     r = assignment_statement(b, l + 1);
     if (!r) r = case_statement(b, l + 1);
     if (!r) r = expression(b, l + 1, -1);

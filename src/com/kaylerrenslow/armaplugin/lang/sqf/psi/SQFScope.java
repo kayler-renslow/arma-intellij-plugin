@@ -14,7 +14,7 @@ import java.util.Set;
  * @author Kayler
  * @since 05/23/2017
  */
-public interface SQFScope {
+public interface SQFScope extends PsiElement {
 	/**
 	 * This will return all variables that are private in this scope.
 	 * This doesn't guarantee that all of them were declared private in this scope!
@@ -41,7 +41,20 @@ public interface SQFScope {
 	@NotNull
 	default List<SQFPrivateVar> getPrivateVarInstances() {
 		List<SQFPrivateVar> vars = new ArrayList<>();
-		//todo
+		PsiFile file = getContainingFile();
+		SQFScope fileScope = getContainingScope(file);
+		for (PsiElement element : fileScope.getChildren()) {
+			if (!(element instanceof SQFStatement)) {
+				continue;
+			}
+			SQFStatement statement = (SQFStatement) element;
+			List<SQFPrivateVar> declaredPrivateVars = statement.getDeclaredPrivateVars();
+			if (declaredPrivateVars == null) {
+				continue;
+			}
+			//todo traverse each private var and check if its scope subsumes this scope
+			//todo we should let any child scopes know about private vars of their parents (except in spawn statements)
+		}
 		return vars;
 	}
 
@@ -53,6 +66,8 @@ public interface SQFScope {
 			throw new IllegalArgumentException("variable doesn't have a containing file");
 		}
 		SQFScope containingScope = getContainingScope(variable);
+
+		//todo get all variables that exist in this scope and return them
 		return vars;
 	}
 
@@ -73,8 +88,9 @@ public interface SQFScope {
 		if (element instanceof SQFFile) {
 			SQFFileScope fileScope = ((SQFFile) element).findChildByClass(SQFFileScope.class);
 			if (fileScope == null) {
-				throw new IllegalStateException("no FileScope for file " + element);
+				throw new IllegalStateException("no SQFFileScope for file " + element);
 			}
+			return fileScope;
 		}
 		if (element instanceof SQFFileScope) {
 			return (SQFScope) element;
@@ -92,7 +108,7 @@ public interface SQFScope {
 		}
 		SQFFileScope fileScope = ((SQFFile) file).findChildByClass(SQFFileScope.class);
 		if (fileScope == null) {
-			throw new IllegalStateException("no FileScope for element " + element);
+			throw new IllegalStateException("no SQFFileScope for file " + file);
 		}
 		return fileScope;
 	}

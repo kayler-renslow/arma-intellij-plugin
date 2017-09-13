@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,11 +34,14 @@ public class SQFAssignmentStatement extends ASTWrapperPsiElement implements SQFS
 	}
 
 	/**
-	 * @deprecated un-deprecate this when implemented
+	 * @return true if the assignment starts with "private", false otherwise
 	 */
-	@Deprecated
 	public boolean isPrivate() {
-		//todo
-		throw new UnsupportedOperationException();
+		for (PsiElement child : getChildren()) {
+			if (child.getText().equalsIgnoreCase("private")) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

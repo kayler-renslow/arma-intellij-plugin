@@ -1,7 +1,6 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.psi.PsiElement;
-import com.intellij.structuralsearch.plugin.util.SmartPsiPointer;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,7 +12,7 @@ public class SQFPrivateVar {
 	@NotNull
 	private final SQFVariableName variableName;
 	@NotNull
-	private final SmartPsiPointer elementPointer;
+	private final PsiElement element;
 
 	/**
 	 * @param variableName the variable name
@@ -21,7 +20,7 @@ public class SQFPrivateVar {
 	 */
 	public SQFPrivateVar(@NotNull SQFVariableName variableName, @NotNull PsiElement element) {
 		this.variableName = variableName;
-		this.elementPointer = new SmartPsiPointer(element);
+		this.element = element;
 	}
 
 	@NotNull
@@ -29,14 +28,17 @@ public class SQFPrivateVar {
 		return variableName;
 	}
 
+	/**
+	 * @return the PsiElement that contains the variable name. This is either a {@link SQFString} or {@link SQFVariable}
+	 */
 	@NotNull
-	public SmartPsiPointer getElementPointer() {
-		return elementPointer;
+	public PsiElement getElement() {
+		return element;
 	}
 
 	@Override
 	public int hashCode() {
-		return variableName.text().hashCode() + 31 * elementPointer.hashCode();
+		return variableName.text().hashCode() + 31 * element.hashCode();
 	}
 
 	@Override
@@ -46,7 +48,7 @@ public class SQFPrivateVar {
 		}
 		if (o instanceof SQFPrivateVar) {
 			SQFPrivateVar other = (SQFPrivateVar) o;
-			return variableName.equals(other.variableName) && elementPointer.equals(other.elementPointer);
+			return variableName.equals(other.variableName) && element.equals(other.element);
 		}
 		return false;
 	}

@@ -20,7 +20,7 @@
 
   extends(".*expression")=expression
   //consumeTokenMethod(".*expression|expression")="consumeTokenFast" //https://github.com/JetBrains/Grammar-Kit/blob/master/HOWTO.md#24-compact-expression-parsing-with-priorities
-  //extends(".*_statement")=statement
+  extends(".*_statement")=statement
 }
 //Question: Why do some rules end with _? Answer: It is just to make it clear that they are private rules.
 
@@ -107,7 +107,7 @@ assignment_statement ::= private_command? variable
     paren_expression ::= LPAREN expression RPAREN {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParenExpression"}
 
     //command expression (includes a standalone command token)
-        command_expression ::= command_before? command command_after? {pin=2} {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandExpression"}
+        command_expression ::= command_before? command command_after? {pin=2 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandExpression"}
         //We are excluding expression from this because it will be infinite left recursion
         //due to command_expression constantly being matched.
 
