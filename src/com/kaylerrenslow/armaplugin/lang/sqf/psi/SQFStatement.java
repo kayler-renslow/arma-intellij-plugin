@@ -3,8 +3,8 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -23,6 +23,7 @@ public interface SQFStatement extends PsiElement {
 		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
 	}
 
+
 	/**
 	 * Gets all private vars declared private in this statement.
 	 * This method will return null if the statement is incapable of making variables private. This method will return an empty list
@@ -40,7 +41,7 @@ public interface SQFStatement extends PsiElement {
 			}
 		}
 		if (this.getExpr() instanceof SQFCommandExpression) {
-			SQFCommandExpression expr = (SQFCommandExpression) this;
+			SQFCommandExpression expr = (SQFCommandExpression) this.getExpr();
 			List<SQFPrivateVar> vars = new ArrayList<>();
 			switch (expr.getSQFCommand().getCommandName().toLowerCase()) {
 				case "private": {

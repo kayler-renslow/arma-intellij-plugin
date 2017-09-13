@@ -155,8 +155,8 @@ public interface SQFScope extends PsiElement {
 			if (!varTargets.isEmpty()) {
 				vars.add(new SQFVariableReference.IdentifierReference(variable, varTargets));
 			}
-			if (!stringTargets.isEmpty()) {
-				vars.add(new SQFVariableReference.StringReference(variable, stringTargets));
+			for (SQFString string : stringTargets) {
+				vars.add(new SQFVariableReference.StringReference(string, varTargets));
 			}
 			//todo will intellij like how we are creating references to variables that have case insensitive names?
 		}

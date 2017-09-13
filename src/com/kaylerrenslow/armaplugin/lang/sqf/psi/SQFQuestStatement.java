@@ -20,8 +20,11 @@ public class SQFQuestStatement extends ASTWrapperPsiElement implements SQFStatem
 		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
 	}
 
+	/**
+	 * @return the expression or null if doesn't exist. Will return null because of pin in grammar.
+	 */
 	@Nullable
-	public SQFExpression getExpression() {
-		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
+	public SQFPsiExpression getExpression() {
+		return PsiTreeUtil.getChildOfType(this, SQFPsiExpression.class);
 	}
 }

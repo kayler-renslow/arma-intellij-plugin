@@ -100,14 +100,14 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 
 	public static class StringReference extends SQFVariableReference {
 		@NotNull
-		private final SQFVariable variable;
+		private final SQFString string;
 		@NotNull
-		private final List<SQFString> targets;
+		private final List<SQFVariable> targets;
 		@NotNull
 		private final ResolveResult[] resolveResults;
 
-		public StringReference(@NotNull SQFVariable variable, @NotNull List<SQFString> targets) {
-			this.variable = variable;
+		public StringReference(@NotNull SQFString string, @NotNull List<SQFVariable> targets) {
+			this.string = string;
 			this.targets = targets;
 
 			resolveResults = PsiElementResolveResult.createResults(targets);
@@ -116,7 +116,7 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 		@NotNull
 		@Override
 		public SQFVariableName getVariableNameObj() {
-			return variable.getVarNameObj();
+			return targets.get(0).getVarNameObj();
 		}
 
 		@NotNull
@@ -127,12 +127,12 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 
 		@Override
 		public PsiElement getElement() {
-			return variable;
+			return string;
 		}
 
 		@Override
 		public TextRange getRangeInElement() {
-			return TextRange.allOf(variable.getVarName());
+			return string.getNonQuoteRangeRelativeToElement();
 		}
 
 		@Nullable
@@ -144,7 +144,7 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 		@NotNull
 		@Override
 		public String getCanonicalText() {
-			return variable.getVarName();
+			return targets.get(0).getVarName();
 		}
 
 		@Override
@@ -159,7 +159,7 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 
 		@Override
 		public boolean isReferenceTo(PsiElement element) {
-			return element == variable || targets.contains(element);
+			return element == string || targets.contains(element);
 		}
 
 		@NotNull

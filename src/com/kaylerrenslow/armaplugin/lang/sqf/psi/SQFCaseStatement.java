@@ -23,12 +23,19 @@ public class SQFCaseStatement extends ASTWrapperPsiElement implements SQFStateme
 		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
 	}
 
-
 	/**
 	 * @return the code block, or null if doesn't exist. Can return null because case 0; is valid
 	 */
 	@Nullable
 	public SQFCodeBlock getBlock() {
 		return PsiTreeUtil.getChildOfType(this, SQFCodeBlock.class);
+	}
+
+	/**
+	 * @return the expression or null if doesn't exist. Will return null because of pin in grammar.
+	 */
+	@Nullable
+	public SQFPsiExpression getExpression() {
+		return PsiTreeUtil.getChildOfType(this, SQFPsiExpression.class);
 	}
 }

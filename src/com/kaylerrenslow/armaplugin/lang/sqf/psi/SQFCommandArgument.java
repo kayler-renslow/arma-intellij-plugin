@@ -16,7 +16,7 @@ public class SQFCommandArgument extends ASTWrapperPsiElement {
 	}
 
 	@Nullable
-	public SQFCodeBlock getCodeBlock() {
+	public SQFCodeBlock getBlock() {
 		SQFCodeBlockExpression codeBlockExpression = PsiTreeUtil.getChildOfType(this, SQFCodeBlockExpression.class);
 		if (codeBlockExpression != null) {
 			return codeBlockExpression.getBlock();
