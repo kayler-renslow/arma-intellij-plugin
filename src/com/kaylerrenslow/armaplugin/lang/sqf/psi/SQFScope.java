@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
+import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -41,9 +42,7 @@ public interface SQFScope extends PsiElement {
 	@NotNull
 	default List<SQFPrivateVar> getPrivateVarInstances() {
 		List<SQFPrivateVar> vars = new ArrayList<>();
-		PsiFile file = getContainingFile();
-		SQFScope fileScope = getContainingScope(file);
-		for (PsiElement element : fileScope.getChildren()) {
+		for (PsiElement element : getChildren()) {
 			if (!(element instanceof SQFStatement)) {
 				continue;
 			}
@@ -52,22 +51,79 @@ public interface SQFScope extends PsiElement {
 			if (declaredPrivateVars == null) {
 				continue;
 			}
-			//todo traverse each private var and check if its scope subsumes this scope
-			//todo we should let any child scopes know about private vars of their parents (except in spawn statements)
+			for (SQFPrivateVar privateVar : declaredPrivateVars) {
+				if (privateVar.getMaxScope() == this) {
+					vars.add(privateVar);
+				}
+				/* Logic of this loop:
+				*  If the variable is declared private in a statement, it may be declared private in another scope that isn't this scope.
+				*  However, that doesn't mean that the variable is guaranteed to be private in that scope.
+				*  Example would be "for[{private _i=0;},{},{}]do {}"; the _i variable is declared private in the first scope
+				*  of the array, but it's max scope is actually the scope/code block after the "do".
+				*
+				*  Also, for any descendant code blocks that have their own scopes, we want to exclude the variables declared private
+				*  in them, unless their max scope is this scope.
+				*/
+			}
+		}
+		SQFScope containingScope = getContainingScope(this);
+		if (containingScope instanceof SQFFileScope && this instanceof SQFFileScope) {
+			//file scope is outermost scope, so if current scope is file scope, then we are at outermost scope
+			return vars;
+		}
+		for (SQFPrivateVar parentDeclaredPrivateVar : containingScope.getPrivateVarInstances()) {
+			//copy over private vars
+			for (SQFPrivateVar myPrivateVar : vars) {
+				if (parentDeclaredPrivateVar.getVariableName().equals(myPrivateVar.getVariableName())) {
+					//if declared private in this scope, we don't want the containing scope's private vars that match
+					continue;
+				}
+				vars.add(parentDeclaredPrivateVar);
+			}
 		}
 		return vars;
 	}
 
 	@NotNull
-	static List<SQFVariable> getVariableReferencesFor(@NotNull SQFVariable variable) {
-		List<SQFVariable> vars = new ArrayList<>();
+	static List<SQFVariableReference> getVariableReferencesFor(@NotNull SQFVariable variable) {
+		List<SQFVariableReference> vars = new ArrayList<>();
 		PsiFile file = variable.getContainingFile();
 		if (file == null) {
 			throw new IllegalArgumentException("variable doesn't have a containing file");
 		}
-		SQFScope containingScope = getContainingScope(variable);
+		SQFVariableName variableName = variable.getVarNameObj();
+		SQFScope variableMaxScope = null;
+		for (SQFPrivateVar privateVar : getContainingScope(variable).getPrivateVarInstances()) {
+			if (!privateVar.getVariableName().equals(variableName)) {
+				continue;
+			}
+			variableMaxScope = privateVar.getMaxScope(); //this is the scope that the variable exists in
+			break;
+		}
+		if (variableMaxScope == null /*not declared private*/) {
+			variableMaxScope = SQFScope.getContainingScope(variable.getContainingFile());
+		}
 
-		//todo get all variables that exist in this scope and return them
+		maxScope:
+		for (PsiElement element : variableMaxScope.getChildren()) {
+			if (!(element instanceof SQFStatement)) {
+				continue;
+			}
+			SQFStatement statement = (SQFStatement) element;
+			List<SQFPrivateVar> declaredPrivateVars = statement.getDeclaredPrivateVars();
+			if (declaredPrivateVars != null) {
+				for (SQFPrivateVar maxScopePrivateVar : declaredPrivateVars) {
+					if (maxScopePrivateVar.getVariableName().equals(variableName)
+							&& maxScopePrivateVar.getMaxScope() != variableMaxScope) {
+						//if the variable is made private in any descendant scopes, we don't want to reference those
+						//because the max scopes don't match
+						continue maxScope;
+					}
+				}
+			}
+			//todo get variable references from statement
+
+		}
 		return vars;
 	}
 

@@ -13,14 +13,18 @@ public class SQFPrivateVar {
 	private final SQFVariableName variableName;
 	@NotNull
 	private final PsiElement element;
+	@NotNull
+	private final SQFScope maxScope;
 
 	/**
 	 * @param variableName the variable name
 	 * @param element      the PsiElement that contains the variable name. This is either a {@link SQFString} or {@link SQFVariable}
+	 * @param maxScope     the {@link SQFScope} object that this private var exists in, as well as any children scopes in maxScope
 	 */
-	public SQFPrivateVar(@NotNull SQFVariableName variableName, @NotNull PsiElement element) {
+	public SQFPrivateVar(@NotNull SQFVariableName variableName, @NotNull PsiElement element, @NotNull SQFScope maxScope) {
 		this.variableName = variableName;
 		this.element = element;
+		this.maxScope = maxScope;
 	}
 
 	@NotNull
@@ -39,6 +43,14 @@ public class SQFPrivateVar {
 	@Override
 	public int hashCode() {
 		return variableName.text().hashCode() + 31 * element.hashCode();
+	}
+
+	/**
+	 * @return the {@link SQFScope} object that this private var exists in, as well as any children scopes in maxScope
+	 */
+	@NotNull
+	public SQFScope getMaxScope() {
+		return maxScope;
 	}
 
 	@Override

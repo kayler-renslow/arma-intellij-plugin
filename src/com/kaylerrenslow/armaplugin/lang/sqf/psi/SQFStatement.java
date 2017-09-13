@@ -25,7 +25,7 @@ public interface SQFStatement extends PsiElement {
 		if (this instanceof SQFAssignmentStatement) {
 			SQFAssignmentStatement assignment = (SQFAssignmentStatement) this;
 			if (assignment.isPrivate()) {
-				return Collections.singletonList(new SQFPrivateVar(assignment.getVar().getVarNameObj(), assignment.getVar()));
+				return Collections.singletonList(new SQFPrivateVar(assignment.getVar().getVarNameObj(), assignment.getVar(), SQFScope.getContainingScope(this)));
 			}
 		}
 		if (this instanceof SQFCommandExpression) {
@@ -36,7 +36,7 @@ public interface SQFStatement extends PsiElement {
 				return vars;
 			}
 		}
-		//todo we need to check inside code blocks and control structures (https://community.bistudio.com/wiki/Variables#Scope)
+		//todo we need to check inside code blocks, spawn, and control structures (https://community.bistudio.com/wiki/Variables#Scope)
 		return null;
 	}
 }
