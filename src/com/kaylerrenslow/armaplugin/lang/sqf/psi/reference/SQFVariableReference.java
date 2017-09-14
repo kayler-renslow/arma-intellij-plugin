@@ -1,10 +1,7 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi.reference;
 
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementResolveResult;
-import com.intellij.psi.PsiPolyVariantReference;
-import com.intellij.psi.ResolveResult;
+import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFString;
@@ -18,11 +15,11 @@ import java.util.List;
  * @author Kayler
  * @since 09/13/2017
  */
-public abstract class SQFVariableReference implements PsiPolyVariantReference {
+public abstract class SQFVariableReference implements PsiReference {
 	@NotNull
 	public abstract SQFVariableName getVariableNameObj();
 
-	public static class IdentifierReference extends SQFVariableReference {
+	public static class IdentifierReference extends SQFVariableReference implements PsiPolyVariantReference {
 		@NotNull
 		private final SQFVariable variable;
 		@NotNull
@@ -98,25 +95,25 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 		}
 	}
 
-	public static class StringReference extends SQFVariableReference {
+	public static class StringReference extends SQFVariableReference implements PsiPolyVariantReference {
+
+		@NotNull
+		private final ResolveResult[] resolveResults;
 		@NotNull
 		private final SQFString string;
 		@NotNull
-		private final List<SQFVariable> targets;
-		@NotNull
-		private final ResolveResult[] resolveResults;
+		private final List<SQFVariable> resolvedVars;
 
-		public StringReference(@NotNull SQFString string, @NotNull List<SQFVariable> targets) {
+		public StringReference(@NotNull SQFString string, @NotNull List<SQFVariable> resolvedVars) {
 			this.string = string;
-			this.targets = targets;
-
-			resolveResults = PsiElementResolveResult.createResults(targets);
+			this.resolvedVars = resolvedVars;
+			resolveResults = PsiElementResolveResult.createResults();
 		}
 
 		@NotNull
 		@Override
 		public SQFVariableName getVariableNameObj() {
-			return targets.get(0).getVarNameObj();
+			return resolvedVars.get(0).getVarNameObj();
 		}
 
 		@NotNull
@@ -138,13 +135,13 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 		@Nullable
 		@Override
 		public PsiElement resolve() {
-			return targets.get(0);
+			return resolvedVars.get(0);
 		}
 
 		@NotNull
 		@Override
 		public String getCanonicalText() {
-			return targets.get(0).getVarName();
+			return string.getNonQuoteText();
 		}
 
 		@Override
@@ -159,7 +156,7 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 
 		@Override
 		public boolean isReferenceTo(PsiElement element) {
-			return element == string || targets.contains(element);
+			return element == string || resolvedVars.contains(element);
 		}
 
 		@NotNull
@@ -172,5 +169,6 @@ public abstract class SQFVariableReference implements PsiPolyVariantReference {
 		public boolean isSoft() {
 			return false;
 		}
+
 	}
 }

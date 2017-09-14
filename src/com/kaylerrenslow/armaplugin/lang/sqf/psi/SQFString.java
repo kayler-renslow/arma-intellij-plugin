@@ -39,4 +39,12 @@ public class SQFString extends ASTWrapperPsiElement {
 	public String getNonQuoteText() {
 		return getText().substring(1, getTextLength() - 1);
 	}
+
+	/**
+	 * @return true if the String contains a local variable (_var for instance), or false if it doesn't
+	 */
+	public boolean containsLocalVariable() {
+		String nonq = getNonQuoteText();
+		return nonq.startsWith("_") && !nonq.contains(" ");
+	}
 }

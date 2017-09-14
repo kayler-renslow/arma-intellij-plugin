@@ -55,7 +55,7 @@ public interface SQFStatement extends PsiElement {
 									SQFLiteralExpression arrExpLiteral = (SQFLiteralExpression) arrExp;
 									if (arrExpLiteral.getStr() != null) {
 										SQFString str = arrExpLiteral.getStr();
-										if (str.getNonQuoteText().startsWith("_")) {
+										if (str.containsLocalVariable()) {
 											vars.add(
 													new SQFPrivateVar(
 															new SQFVariableName(str.getNonQuoteText()),
@@ -68,7 +68,7 @@ public interface SQFStatement extends PsiElement {
 							}
 						} else if (literal.getStr() != null) {
 							//private "_var"
-							if (literal.getStr().getNonQuoteText().startsWith("_")) {
+							if (literal.getStr().containsLocalVariable()) {
 								vars.add(
 										new SQFPrivateVar(
 												new SQFVariableName(literal.getStr().getNonQuoteText()),
