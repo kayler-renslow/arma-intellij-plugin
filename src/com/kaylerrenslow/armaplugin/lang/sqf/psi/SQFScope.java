@@ -54,10 +54,7 @@ public interface SQFScope extends PsiElement {
 			}
 			for (SQFPrivateVar privateVar : declaredPrivateVars) {
 				if (privateVar.getMaxScope() == this) {
-					if (privateVar.getElement().getTextOffset() < this.getTextOffset()) {
-						//only private vars coming before the scope should be available in the scope
-						vars.add(privateVar);
-					}
+					vars.add(privateVar);
 				}
 				/* Logic of this loop:
 				*  If the variable is declared private in a statement, it may be declared private in another scope that isn't this scope.
@@ -77,11 +74,20 @@ public interface SQFScope extends PsiElement {
 		}
 		for (SQFPrivateVar parentDeclaredPrivateVar : containingScope.getPrivateVarInstances()) {
 			//copy over private vars
+			boolean add = true;
 			for (SQFPrivateVar myPrivateVar : vars) {
 				if (parentDeclaredPrivateVar.getVariableNameObj().equals(myPrivateVar.getVariableNameObj())) {
 					//if declared private in this scope, we don't want the containing scope's private vars that match
-					continue;
+					add = false;
+					break;
 				}
+				if (parentDeclaredPrivateVar.getElement().getTextOffset() > this.getTextOffset()) {
+					//only private vars coming before this scope in the parent scope should be available in this scope
+					add = false;
+					break;
+				}
+			}
+			if (add) {
 				vars.add(parentDeclaredPrivateVar);
 			}
 		}
@@ -95,12 +101,11 @@ public interface SQFScope extends PsiElement {
 		if (file == null) {
 			throw new IllegalArgumentException("variable doesn't have a containing file");
 		}
-		SQFVariableName variableName = variable.getVarNameObj();
+		SQFVariableName variableNameObj = variable.getVarNameObj();
 		SQFScope variableMaxScope = null;
 		if (variable.isLocal() && !variable.isMagicVar()) {
-
 			for (SQFPrivateVar privateVar : getContainingScope(variable).getPrivateVarInstances()) {
-				if (!privateVar.getVariableNameObj().equals(variableName)) {
+				if (!privateVar.getVariableNameObj().equals(variableNameObj)) {
 					continue;
 				}
 				variableMaxScope = privateVar.getMaxScope(); //this is the scope that the variable exists in
@@ -115,25 +120,30 @@ public interface SQFScope extends PsiElement {
 			//global var
 			variableMaxScope = SQFScope.getContainingScope(file);
 		}
-		maxScope:
 		for (PsiElement element : variableMaxScope.getChildren()) {
 			if (!(element instanceof SQFStatement)) {
 				continue;
 			}
+			boolean ignore = false;
 			SQFStatement statement = (SQFStatement) element;
 			if (variable.isLocal()) {
 				//no need to do the following code if the variable is global
-				List<SQFPrivateVar> declaredPrivateVars = statement.getDeclaredPrivateVars();
-				if (declaredPrivateVars != null) {
-					for (SQFPrivateVar maxScopePrivateVar : declaredPrivateVars) {
-						if (maxScopePrivateVar.getVariableNameObj().equals(variableName)
-								&& maxScopePrivateVar.getMaxScope() != variableMaxScope) {
-							//if the variable is made private in any descendant scopes, we don't want to reference those
-							//because the max scopes don't match
-							continue maxScope;
+				List<SQFPrivateVar> statementDeclaredPrivateVars = statement.getDeclaredPrivateVars();
+				if (statementDeclaredPrivateVars != null) {
+					for (SQFPrivateVar statementDeclaredPrivateVar : statementDeclaredPrivateVars) {
+						if (statementDeclaredPrivateVar.getVariableNameObj().equals(variableNameObj)) {
+							if (statementDeclaredPrivateVar.getMaxScope() != variableMaxScope) {
+								//if the variable is made private in any descendant scopes, we don't want to reference those
+								//because the max scopes don't match
+								ignore = true;
+							}
+							break;
 						}
 					}
 				}
+			}
+			if (ignore) {
+				continue;
 			}
 			List<SQFVariable> varTargets = new ArrayList<>();
 			List<SQFString> stringTargets = new ArrayList<>();
@@ -156,7 +166,6 @@ public interface SQFScope extends PsiElement {
 				vars.add(new SQFVariableReference.IdentifierReference(variable, varTargets));
 			}
 			if (!stringTargets.isEmpty()) {
-				System.out.println("SQFScope.getVariableReferencesFor stringTargets=" + stringTargets);
 				vars.add(new SQFVariableReference.StringReference(variable, stringTargets));
 			}
 
@@ -205,5 +214,10 @@ public interface SQFScope extends PsiElement {
 			throw new IllegalStateException("no SQFFileScope for file " + file);
 		}
 		return fileScope;
+	}
+
+	@NotNull
+	default String getTextNoNewlines() {
+		return getText().replaceAll("\n", " ");
 	}
 }

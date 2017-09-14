@@ -38,6 +38,15 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 		return references.toArray(new PsiReference[references.size()]);
 	}
 
+	@Override
+	public PsiReference getReference() {
+		PsiReference[] refs = getReferences();
+		if (refs.length == 0) {
+			return null;
+		}
+		return refs[0];
+	}
+
 	/**
 	 * @return true if the variable starts with _, false otherwise
 	 */
@@ -61,4 +70,6 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 	public String getName() {
 		return getVarName();
 	}
+
+
 }

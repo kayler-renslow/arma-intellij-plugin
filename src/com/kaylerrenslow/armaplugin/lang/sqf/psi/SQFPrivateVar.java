@@ -64,4 +64,9 @@ public class SQFPrivateVar {
 		}
 		return false;
 	}
+
+	@Override
+	public String toString() {
+		return "SQFPrivateVar{name=" + variableName + "}";
+	}
 }
