@@ -98,6 +98,7 @@ public interface SQFScope extends PsiElement {
 		SQFVariableName variableName = variable.getVarNameObj();
 		SQFScope variableMaxScope = null;
 		if (variable.isLocal() && !variable.isMagicVar()) {
+
 			for (SQFPrivateVar privateVar : getContainingScope(variable).getPrivateVarInstances()) {
 				if (!privateVar.getVariableNameObj().equals(variableName)) {
 					continue;
@@ -114,7 +115,6 @@ public interface SQFScope extends PsiElement {
 			//global var
 			variableMaxScope = SQFScope.getContainingScope(file);
 		}
-
 		maxScope:
 		for (PsiElement element : variableMaxScope.getChildren()) {
 			if (!(element instanceof SQFStatement)) {
@@ -154,9 +154,10 @@ public interface SQFScope extends PsiElement {
 			});
 			if (!varTargets.isEmpty()) {
 				vars.add(new SQFVariableReference.IdentifierReference(variable, varTargets));
-				for (SQFString string : stringTargets) {
-					vars.add(new SQFVariableReference.StringReference(string, varTargets));
-				}
+			}
+			if (!stringTargets.isEmpty()) {
+				System.out.println("SQFScope.getVariableReferencesFor stringTargets=" + stringTargets);
+				vars.add(new SQFVariableReference.StringReference(variable, stringTargets));
 			}
 
 			//todo will intellij like how we are creating references to variables that have case insensitive names?

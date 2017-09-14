@@ -50,6 +50,9 @@ public class SQFParser implements PsiParser, LightPsiParser {
     else if (t == EXPRESSION) {
       r = expression(b, 0, -1);
     }
+    else if (t == EXPRESSION_STATEMENT) {
+      r = expression_statement(b, 0);
+    }
     else if (t == FILE_SCOPE) {
       r = file_scope(b, 0);
     }
@@ -83,7 +86,8 @@ public class SQFParser implements PsiParser, LightPsiParser {
 
   public static final TokenSet[] EXTENDS_SETS_ = new TokenSet[] {
     create_token_set_(CASE_COMMAND, COMMAND, PRIVATE_COMMAND),
-    create_token_set_(ASSIGNMENT_STATEMENT, CASE_STATEMENT, QUEST_STATEMENT, STATEMENT),
+    create_token_set_(ASSIGNMENT_STATEMENT, CASE_STATEMENT, EXPRESSION_STATEMENT, QUEST_STATEMENT,
+      STATEMENT),
     create_token_set_(ADD_EXPRESSION, BOOL_AND_EXPRESSION, BOOL_NOT_EXPRESSION, BOOL_OR_EXPRESSION,
       CODE_BLOCK_EXPRESSION, COMMAND_EXPRESSION, COMP_EXPRESSION, CONFIG_FETCH_EXPRESSION,
       DIV_EXPRESSION, EXPONENT_EXPRESSION, EXPRESSION, LITERAL_EXPRESSION,
@@ -314,6 +318,17 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // expression
+  public static boolean expression_statement(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "expression_statement")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, EXPRESSION_STATEMENT, "<expression statement>");
+    r = expression(b, l + 1, -1);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // items_
   public static boolean file_scope(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "file_scope")) return false;
@@ -411,14 +426,14 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // assignment_statement | case_statement | expression | quest_statement
+  // assignment_statement | case_statement | expression_statement | quest_statement
   public static boolean statement(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "statement")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, STATEMENT, "<statement>");
     r = assignment_statement(b, l + 1);
     if (!r) r = case_statement(b, l + 1);
-    if (!r) r = expression(b, l + 1, -1);
+    if (!r) r = expression_statement(b, l + 1);
     if (!r) r = quest_statement(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;

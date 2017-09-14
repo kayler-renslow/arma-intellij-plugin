@@ -27,6 +27,7 @@ public interface SQFTypes {
   IElementType DIV_EXPRESSION = new SQFElementType("DIV_EXPRESSION");
   IElementType EXPONENT_EXPRESSION = new SQFElementType("EXPONENT_EXPRESSION");
   IElementType EXPRESSION = new SQFElementType("EXPRESSION");
+  IElementType EXPRESSION_STATEMENT = new SQFElementType("EXPRESSION_STATEMENT");
   IElementType FILE_SCOPE = new SQFElementType("FILE_SCOPE");
   IElementType LITERAL_EXPRESSION = new SQFElementType("LITERAL_EXPRESSION");
   IElementType LOCAL_SCOPE = new SQFElementType("LOCAL_SCOPE");
@@ -133,6 +134,9 @@ public interface SQFTypes {
       else if (type == EXPONENT_EXPRESSION) {
         return new SQFPsiExponentExpressionImpl(node);
       }
+      else if (type == EXPRESSION_STATEMENT) {
+        return new SQFPsiExpressionStatementImpl(node);
+      }
       else if (type == FILE_SCOPE) {
         return new SQFPsiFileScopeImpl(node);
       }
@@ -156,9 +160,6 @@ public interface SQFTypes {
       }
       else if (type == QUEST_STATEMENT) {
         return new SQFPsiQuestStatementImpl(node);
-      }
-      else if (type == STATEMENT) {
-        return new SQFPsiStatementImpl(node);
       }
       else if (type == STRING) {
         return new SQFPsiStringImpl(node);
