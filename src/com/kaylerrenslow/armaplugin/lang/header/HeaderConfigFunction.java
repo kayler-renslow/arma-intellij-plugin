@@ -1,7 +1,7 @@
 package com.kaylerrenslow.armaplugin.lang.header;
 
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderClass;
-import com.kaylerrenslow.armaplugin.PluginIcons;
+import com.kaylerrenslow.armaplugin.ArmaPluginIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -128,7 +128,7 @@ public class HeaderConfigFunction {
 
 	@NotNull
 	public static Icon getIcon() {
-		return PluginIcons.ICON_SQF_FUNCTION;
+		return ArmaPluginIcons.ICON_SQF_FUNCTION;
 	}
 
 	@NotNull

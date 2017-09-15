@@ -8,7 +8,7 @@ import javax.swing.*;
  * @author Kayler
  * @since 01/01/2016
  */
-public class PluginIcons {
+public class ArmaPluginIcons {
 
 	public static final Icon ICON_ARMA3_FILE = IconLoader.getIcon("icons/plugin.png");
 

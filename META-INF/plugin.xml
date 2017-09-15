@@ -20,6 +20,9 @@
 		<documentationProvider implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFDocumentationProvider"/>
 		<completion.contributor language="Arma.SQF"
 								implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.SQFCompletionContributor"/>
+		<lang.findUsagesProvider language="Arma.SQF"
+								 implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.SQFFindUsagesProvider"/>
+		<psi.referenceContributor implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFReferenceContributor"/>
 
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.armaplugin.lang.header.HeaderFileTypeFactory"/>

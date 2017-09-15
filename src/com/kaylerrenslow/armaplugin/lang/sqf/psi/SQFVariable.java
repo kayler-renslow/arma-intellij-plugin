@@ -2,10 +2,14 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
+import com.kaylerrenslow.armaplugin.lang.presentation.SQFFunctionItemPresentation;
+import com.kaylerrenslow.armaplugin.lang.presentation.SQFVariableItemPresentation;
+import com.kaylerrenslow.armaplugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import org.jetbrains.annotations.NotNull;
@@ -35,6 +39,7 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 	@Override
 	public PsiReference[] getReferences() {
 		List<SQFVariableReference> references = SQFScope.getVariableReferencesFor(this);
+		
 		return references.toArray(new PsiReference[references.size()]);
 	}
 
@@ -71,5 +76,26 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 		return getVarName();
 	}
 
+	@Override
+	public String toString() {
+		return "SQFVariable{name=" + getVarName() + "}";
+	}
 
+	/**
+	 * @return true if matches, false if it doesn't
+	 * @see SQFStatic#followsSQFFunctionNameRules(String)
+	 */
+	public boolean followsSQFFunctionNameRules() {
+		return SQFStatic.followsSQFFunctionNameRules(getVarName());
+	}
+
+	@Override
+	public ItemPresentation getPresentation() {
+		if (!this.isLocal()) {
+			if (SQFStatic.followsSQFFunctionNameRules(this.getVarName())) {
+				return new SQFFunctionItemPresentation(this.getVarName(), this.getContainingFile());
+			}
+		}
+		return new SQFVariableItemPresentation(this);
+	}
 }

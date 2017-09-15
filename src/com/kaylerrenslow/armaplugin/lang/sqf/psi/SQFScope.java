@@ -158,10 +158,12 @@ public interface SQFScope extends PsiElement {
 					SQFString string = (SQFString) nodeAsPsi;
 					if (SQFVariableName.nameEquals(string.getNonQuoteText(), variable.getVarName())) {
 						stringTargets.add((SQFString) nodeAsPsi);
+						System.out.println("SQFScope.getVariableReferencesFor string.getNonQuoteText()=" + string.getNonQuoteText() + "-");
 					}
 				}
 				return false;
 			});
+			System.out.println("SQFScope.getVariableReferencesFor -----------------------");
 			if (!varTargets.isEmpty()) {
 				vars.add(new SQFVariableReference.IdentifierReference(variable, varTargets));
 			}
@@ -169,7 +171,6 @@ public interface SQFScope extends PsiElement {
 				vars.add(new SQFVariableReference.StringReference(variable, stringTargets));
 			}
 
-			//todo will intellij like how we are creating references to variables that have case insensitive names?
 		}
 		return vars;
 	}

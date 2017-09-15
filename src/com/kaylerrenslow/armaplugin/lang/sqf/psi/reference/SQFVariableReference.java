@@ -70,7 +70,7 @@ public abstract class SQFVariableReference implements PsiReference {
 
 		@Override
 		public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-			return null;
+			return variable.setName(newElementName);
 		}
 
 		@Override
@@ -102,12 +102,12 @@ public abstract class SQFVariableReference implements PsiReference {
 		@NotNull
 		private final SQFVariable variable;
 		@NotNull
-		private final List<SQFString> resolvedStrings;
+		private final List<SQFString> stringTargets;
 
-		public StringReference(@NotNull SQFVariable variable, @NotNull List<SQFString> resolvedStrings) {
+		public StringReference(@NotNull SQFVariable variable, @NotNull List<SQFString> stringTargets) {
 			this.variable = variable;
-			this.resolvedStrings = resolvedStrings;
-			resolveResults = PsiElementResolveResult.createResults();
+			this.stringTargets = stringTargets;
+			resolveResults = PsiElementResolveResult.createResults(stringTargets);
 		}
 
 		@NotNull
@@ -129,13 +129,13 @@ public abstract class SQFVariableReference implements PsiReference {
 
 		@Override
 		public TextRange getRangeInElement() {
-			return TextRange.allOf(variable.getVarName());
+			return TextRange.from(0, variable.getTextLength());
 		}
 
 		@Nullable
 		@Override
 		public PsiElement resolve() {
-			return resolvedStrings.get(0);
+			return stringTargets.get(0);
 		}
 
 		@NotNull
@@ -156,7 +156,84 @@ public abstract class SQFVariableReference implements PsiReference {
 
 		@Override
 		public boolean isReferenceTo(PsiElement element) {
-			return element == variable || resolvedStrings.contains(element);
+			return element == variable || stringTargets.contains(element);
+		}
+
+		@NotNull
+		@Override
+		public Object[] getVariants() {
+			return new Object[0];
+		}
+
+		@Override
+		public boolean isSoft() {
+			return false;
+		}
+
+	}
+
+	public static class StringReference2 extends SQFVariableReference implements PsiPolyVariantReference {
+
+		@NotNull
+		private final ResolveResult[] resolveResults;
+		@NotNull
+		private final SQFString string;
+		@NotNull
+		private final List<SQFVariable> varTargets;
+
+		public StringReference2(@NotNull SQFString string, @NotNull List<SQFVariable> varTargets) {
+			this.string = string;
+			this.varTargets = varTargets;
+			resolveResults = PsiElementResolveResult.createResults(varTargets);
+		}
+
+		@NotNull
+		@Override
+		public SQFVariableName getVariableNameObj() {
+			return varTargets.get(0).getVarNameObj();
+		}
+
+		@NotNull
+		@Override
+		public ResolveResult[] multiResolve(boolean incompleteCode) {
+			return resolveResults;
+		}
+
+		@Override
+		public PsiElement getElement() {
+			return string;
+		}
+
+		@Override
+		public TextRange getRangeInElement() {
+			return string.getNonQuoteRangeRelativeToElement();
+		}
+
+		@Nullable
+		@Override
+		public PsiElement resolve() {
+			return varTargets.get(0);
+		}
+
+		@NotNull
+		@Override
+		public String getCanonicalText() {
+			return string.getNonQuoteText();
+		}
+
+		@Override
+		public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+			return null;
+		}
+
+		@Override
+		public PsiElement bindToElement(@NotNull PsiElement element) throws IncorrectOperationException {
+			return null;
+		}
+
+		@Override
+		public boolean isReferenceTo(PsiElement element) {
+			return element == string || varTargets.contains(element);
 		}
 
 		@NotNull

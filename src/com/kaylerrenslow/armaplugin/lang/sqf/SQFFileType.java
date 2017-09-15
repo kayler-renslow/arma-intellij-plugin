@@ -2,7 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf;
 
 import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.kaylerrenslow.armaplugin.ArmaPlugin;
-import com.kaylerrenslow.armaplugin.PluginIcons;
+import com.kaylerrenslow.armaplugin.ArmaPluginIcons;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -43,7 +43,7 @@ public class SQFFileType extends LanguageFileType {
 	@Nullable
 	@Override
 	public Icon getIcon() {
-		return PluginIcons.ICON_SQF;
+		return ArmaPluginIcons.ICON_SQF;
 	}
 
 
