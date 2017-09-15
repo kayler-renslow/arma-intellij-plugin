@@ -31,7 +31,7 @@ public class SQFVariableName {
 	public static boolean isMagicVar(@NotNull String varName) {
 		String[] vars = {"_x", "_this", "this", "_exception", "_forEachIndex"};
 		for (String magicVar : vars) {
-			if (magicVar.equalsIgnoreCase(varName)) {
+			if (nameEquals(magicVar, varName)) {
 				return true;
 			}
 		}
@@ -39,7 +39,7 @@ public class SQFVariableName {
 	}
 
 	public boolean isMagicVar() {
-		return isMagicVar(this.text());
+		return isMagicVar(this.original);
 	}
 
 	/**

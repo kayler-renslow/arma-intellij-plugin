@@ -158,12 +158,10 @@ public interface SQFScope extends PsiElement {
 					SQFString string = (SQFString) nodeAsPsi;
 					if (SQFVariableName.nameEquals(string.getNonQuoteText(), variable.getVarName())) {
 						stringTargets.add((SQFString) nodeAsPsi);
-						System.out.println("SQFScope.getVariableReferencesFor string.getNonQuoteText()=" + string.getNonQuoteText() + "-");
 					}
 				}
 				return false;
 			});
-			System.out.println("SQFScope.getVariableReferencesFor -----------------------");
 			if (!varTargets.isEmpty()) {
 				vars.add(new SQFVariableReference.IdentifierReference(variable, varTargets));
 			}

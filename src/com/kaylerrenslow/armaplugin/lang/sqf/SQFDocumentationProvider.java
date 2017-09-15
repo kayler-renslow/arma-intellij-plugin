@@ -55,6 +55,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	@Nullable
 	@Override
 	public List<String> getUrlFor(PsiElement element, PsiElement originalElement) {
+		if (element == null) {
+			return null;
+		}
 		List<String> lst = new ArrayList<>();
 		if (SQFParserDefinition.isCommand(element.getNode().getElementType()) || SQFStatic.isBisFunction(element.getText())) {
 			lst.add(SQFStatic.BIS_WIKI_URL_PREFIX + element.getText());

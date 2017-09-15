@@ -43,14 +43,36 @@ public class PsiUtil {
 	}
 
 	/**
-	 * Traverses the entire ast tree with BFS, starting from start. Each node that is found will be sent to finder.
-	 * It is also possible to stop the traversal at any time with finder by returning true in it
+	 * Will traverse up the AST tree and send each discovered node into the callback, including the starting node.
+	 * The function can return true, which will then terminate the traversal, or return false or null to continue the traversal.
 	 *
-	 * @param start  starting ASTNode
-	 * @param finder TraversalObjectFinder
+	 * @param start    where to start
+	 * @param callback function invoked for each discovered node
 	 */
-	public static void traverseBreadthFirstSearch(@NotNull ASTNode start, @NotNull Function<ASTNode, Boolean> finder) {
-		Boolean stop = finder.apply(start);
+	public static void traverseUp(@NotNull ASTNode start, @NotNull Function<ASTNode, Boolean> callback) {
+		Boolean stop = callback.apply(start);
+		if (stop != null && stop) {
+			return;
+		}
+		ASTNode parent = start;
+		while (parent != null) {
+			parent = parent.getTreeParent();
+			stop = callback.apply(parent);
+			if (stop != null && stop) {
+				return;
+			}
+		}
+	}
+
+	/**
+	 * Traverses the entire ast tree with BFS, starting from start. Each node that is found will be sent to callback.
+	 * It is also possible to stop the traversal at any time with callback by returning true in it
+	 *
+	 * @param start    starting ASTNode
+	 * @param callback TraversalObjectFinder
+	 */
+	public static void traverseBreadthFirstSearch(@NotNull ASTNode start, @NotNull Function<ASTNode, Boolean> callback) {
+		Boolean stop = callback.apply(start);
 		if (stop != null && stop) {
 			return;
 		}
@@ -63,7 +85,7 @@ public class PsiUtil {
 		ASTNode node;
 		while (nodes.size() > 0) {
 			node = nodes.removeFirst();
-			stop = finder.apply(node);
+			stop = callback.apply(node);
 			if (stop != null && stop) {
 				return;
 			}
@@ -239,8 +261,6 @@ public class PsiUtil {
 			child = child.getNextSibling();
 		}
 	}
-
-
 
 
 	/**

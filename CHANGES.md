@@ -1,8 +1,6 @@
 **Added**  
-* FindUsagesProvider for SQF
-* presentations for variables and commands
-* references support for commands
-* sqf global var reference contributor
+* UsageTypeProvider
+* make magic variables a different color
 
 **Changed**  
 * 
