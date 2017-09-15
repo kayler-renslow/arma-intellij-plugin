@@ -1,6 +1,5 @@
 **Added**  
-* UsageTypeProvider
-* make magic variables a different color
+* 
 
 **Changed**  
 * 

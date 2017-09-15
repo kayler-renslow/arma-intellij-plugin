@@ -22,11 +22,11 @@ public interface SQFScope extends PsiElement {
 	 * This doesn't guarantee that all of them were declared private in this scope!
 	 *
 	 * @return a set containing all private variables for the scope
-	 * @see #getPrivateVarInstances()
+	 * @see #getPrivateVarInstances(boolean)
 	 */
 	@NotNull
 	default Set<SQFVariableName> getPrivateVars() {
-		List<SQFPrivateVar> varInstances = getPrivateVarInstances();
+		List<SQFPrivateVar> varInstances = getPrivateVarInstances(true);
 		Set<SQFVariableName> vars = new HashSet<>(varInstances.size());
 		for (SQFPrivateVar var : varInstances) {
 			vars.add(var.getVariableNameObj());
@@ -38,10 +38,12 @@ public interface SQFScope extends PsiElement {
 	 * This will return all variables that are private in this scope.
 	 * This doesn't guarantee that all of them were declared private in this scope!
 	 *
+	 * @param checkContainingScope if true, the results will include private vars that are passed in from this scope's
+	 *                             containing scope
 	 * @return a set containing all private variables for the scope and places them in {@link SQFPrivateVar} instances
 	 */
 	@NotNull
-	default List<SQFPrivateVar> getPrivateVarInstances() {
+	default List<SQFPrivateVar> getPrivateVarInstances(boolean checkContainingScope) {
 		List<SQFPrivateVar> vars = new ArrayList<>();
 		for (PsiElement element : getChildren()) {
 			if (!(element instanceof SQFStatement)) {
@@ -67,28 +69,30 @@ public interface SQFScope extends PsiElement {
 				*/
 			}
 		}
-		SQFScope containingScope = getContainingScope(this);
-		if (containingScope instanceof SQFFileScope && this instanceof SQFFileScope) {
-			//file scope is outermost scope, so if current scope is file scope, then we are at outermost scope
-			return vars;
-		}
-		for (SQFPrivateVar parentDeclaredPrivateVar : containingScope.getPrivateVarInstances()) {
-			//copy over private vars
-			boolean add = true;
-			for (SQFPrivateVar myPrivateVar : vars) {
-				if (parentDeclaredPrivateVar.getVariableNameObj().equals(myPrivateVar.getVariableNameObj())) {
-					//if declared private in this scope, we don't want the containing scope's private vars that match
-					add = false;
-					break;
-				}
-				if (parentDeclaredPrivateVar.getElement().getTextOffset() > this.getTextOffset()) {
-					//only private vars coming before this scope in the parent scope should be available in this scope
-					add = false;
-					break;
-				}
+		if (checkContainingScope) {
+			SQFScope containingScope = getContainingScope(this);
+			if (containingScope instanceof SQFFileScope && this instanceof SQFFileScope) {
+				//file scope is outermost scope, so if current scope is file scope, then we are at outermost scope
+				return vars;
 			}
-			if (add) {
-				vars.add(parentDeclaredPrivateVar);
+			for (SQFPrivateVar parentDeclaredPrivateVar : containingScope.getPrivateVarInstances(true)) {
+				//copy over private vars
+				boolean add = true;
+				for (SQFPrivateVar myPrivateVar : vars) {
+					if (parentDeclaredPrivateVar.getVariableNameObj().equals(myPrivateVar.getVariableNameObj())) {
+						//if declared private in this scope, we don't want the containing scope's private vars that match
+						add = false;
+						break;
+					}
+					if (parentDeclaredPrivateVar.getElement().getTextOffset() > this.getTextOffset()) {
+						//only private vars coming before this scope in the parent scope should be available in this scope
+						add = false;
+						break;
+					}
+				}
+				if (add) {
+					vars.add(parentDeclaredPrivateVar);
+				}
 			}
 		}
 		return vars;
@@ -104,7 +108,7 @@ public interface SQFScope extends PsiElement {
 		SQFVariableName variableNameObj = variable.getVarNameObj();
 		SQFScope variableMaxScope = null;
 		if (variable.isLocal() && !variable.isMagicVar()) {
-			for (SQFPrivateVar privateVar : getContainingScope(variable).getPrivateVarInstances()) {
+			for (SQFPrivateVar privateVar : getContainingScope(variable).getPrivateVarInstances(true)) {
 				if (!privateVar.getVariableNameObj().equals(variableNameObj)) {
 					continue;
 				}
@@ -120,6 +124,8 @@ public interface SQFScope extends PsiElement {
 			//global var
 			variableMaxScope = SQFScope.getContainingScope(file);
 		}
+		List<SQFVariable> varTargets = new ArrayList<>();
+		List<SQFString> stringTargets = new ArrayList<>();
 		for (PsiElement element : variableMaxScope.getChildren()) {
 			if (!(element instanceof SQFStatement)) {
 				continue;
@@ -136,6 +142,7 @@ public interface SQFScope extends PsiElement {
 								//if the variable is made private in any descendant scopes, we don't want to reference those
 								//because the max scopes don't match
 								ignore = true;
+								System.out.println("SQFScope.getVariableReferencesFor ");
 							}
 							break;
 						}
@@ -145,8 +152,6 @@ public interface SQFScope extends PsiElement {
 			if (ignore) {
 				continue;
 			}
-			List<SQFVariable> varTargets = new ArrayList<>();
-			List<SQFString> stringTargets = new ArrayList<>();
 			PsiUtil.traverseBreadthFirstSearch(statement.getNode(), astNode -> {
 				PsiElement nodeAsPsi = astNode.getPsi();
 				if (nodeAsPsi instanceof SQFVariable) {
@@ -162,13 +167,13 @@ public interface SQFScope extends PsiElement {
 				}
 				return false;
 			});
-			if (!varTargets.isEmpty()) {
-				vars.add(new SQFVariableReference.IdentifierReference(variable, varTargets));
-			}
-			if (!stringTargets.isEmpty()) {
-				vars.add(new SQFVariableReference.StringReference(variable, stringTargets));
-			}
 
+		}
+		if (!varTargets.isEmpty()) {
+			vars.add(new SQFVariableReference.IdentifierReference(variable, varTargets));
+		}
+		if (!stringTargets.isEmpty()) {
+			vars.add(new SQFVariableReference.StringReference(variable, stringTargets));
 		}
 		return vars;
 	}
@@ -193,6 +198,9 @@ public interface SQFScope extends PsiElement {
 				throw new IllegalStateException("no SQFFileScope for file " + element);
 			}
 			return fileScope;
+		}
+		if (element instanceof PsiFile) {
+			throw new IllegalArgumentException("element is a PsiFile, but not an SQFFile");
 		}
 		if (element instanceof SQFFileScope) {
 			return (SQFScope) element;

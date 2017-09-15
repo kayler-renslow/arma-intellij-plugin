@@ -5,8 +5,8 @@ import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * @author Kayler
@@ -24,17 +24,50 @@ public interface SQFStatement extends PsiElement {
 	@Nullable
 	default List<SQFPrivateVar> getDeclaredPrivateVars() {
 		SQFScope containingScope = SQFScope.getContainingScope(this);
+		List<SQFPrivateVar> vars = new ArrayList<>();
+
+		Function<SQFCodeBlockExpression, Void> checkCodeBlock = sqfCodeBlockExpression -> {
+			SQFCodeBlock codeBlock = sqfCodeBlockExpression.getBlock();
+			SQFLocalScope codeBlockScope = codeBlock.getScope();
+			if (codeBlockScope != null) {
+				List<SQFPrivateVar> blockPrivateVars = codeBlockScope.getPrivateVarInstances(false);
+				for (SQFPrivateVar blockPrivateVar : blockPrivateVars) {
+					boolean matched = false;
+					for (SQFPrivateVar statementPrivateVar : vars) {
+						if (blockPrivateVar.getVariableNameObj().nameEquals(statementPrivateVar.getVariableNameObj())) {
+							matched = true;
+							break;
+						}
+					}
+					if (!matched) {
+						vars.add(blockPrivateVar);
+					}
+				}
+			}
+			return null;
+		};
+
 		if (this instanceof SQFAssignmentStatement) {
 			SQFAssignmentStatement assignment = (SQFAssignmentStatement) this;
 			if (assignment.isPrivate()) {
-				return Collections.singletonList(new SQFPrivateVar(assignment.getVar().getVarNameObj(), assignment.getVar(), containingScope));
+				vars.add(new SQFPrivateVar(assignment.getVar().getVarNameObj(), assignment.getVar(), containingScope));
 			}
+			if (assignment.getExpr() != null) {
+				SQFExpression assignmentExpr = assignment.getExpr().withoutParenthesis();
+				if (assignmentExpr instanceof SQFCodeBlockExpression) {
+					checkCodeBlock.apply(((SQFCodeBlockExpression) assignmentExpr));
+				}
+			}
+			return vars;
 		}
 		if (this instanceof SQFExpressionStatement) {
 			SQFExpression expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
+			if (expr instanceof SQFCodeBlockExpression) {
+				checkCodeBlock.apply((SQFCodeBlockExpression) expr);
+				return vars;
+			}
 			if (expr instanceof SQFCommandExpression) {
 				SQFCommandExpression cmdExpr = (SQFCommandExpression) expr;
-				List<SQFPrivateVar> vars = new ArrayList<>();
 				switch (cmdExpr.getSQFCommand().getCommandName().toLowerCase()) {
 					case "private": {
 						SQFCommandArgument postfixArgument = cmdExpr.getPostfixArgument();

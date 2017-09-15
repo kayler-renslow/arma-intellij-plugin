@@ -50,6 +50,13 @@ public class SQFVariableName {
 	}
 
 	/**
+	 * invokes {@link #nameEquals(String, String)} with {@link #text()} and name
+	 */
+	public boolean nameEquals(@NotNull SQFVariableName other) {
+		return nameEquals(this.original, other.original);
+	}
+
+	/**
 	 * Return true if {@link #text()}.startsWith(s.toLowerCase())
 	 */
 	public boolean startsWith(@NotNull String s) {
