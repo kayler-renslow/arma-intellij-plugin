@@ -36,7 +36,7 @@ public class SQFPrivateVar {
 	 * @return the PsiElement that contains the variable name. This is either a {@link SQFString} or {@link SQFVariable}
 	 */
 	@NotNull
-	public PsiElement getElement() {
+	public PsiElement getVarNameElement() {
 		return element;
 	}
 

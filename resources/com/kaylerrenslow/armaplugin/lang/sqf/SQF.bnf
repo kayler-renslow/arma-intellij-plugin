@@ -42,8 +42,9 @@ code_block ::= L_CURLY_BRACE local_scope? R_CURLY_BRACE {pin=1 mixin="com.kayler
 //a variable is a global variable or local variable
 variable ::= GLOBAL_VAR | LOCAL_VAR {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFVariable"}
 
-//a statement is a line of code that has a semicolon after it, however, if there is 1 statement, then semicolon is optional
-statement ::= ( assignment_statement | case_statement | expression_statement | quest_statement ) //case statement must come before expression or it will think that case is a command
+//* a statement is a line of code that has a semicolon after it, however, if there is 1 statement, then semicolon is optional
+//* case statement must come before expression or case statement will never be discovered because of command expression
+statement ::= ( assignment_statement | case_statement | expression_statement | quest_statement )
 //a return statement is a statement that has NO semicolon and is the last statement in a scope
 //return_statement ::= variable | ( assignment_statement | case_statement | expression | quest_statement )
 

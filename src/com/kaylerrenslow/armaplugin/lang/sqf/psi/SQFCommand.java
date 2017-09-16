@@ -9,6 +9,7 @@ import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.presentation.SQFCommandItemPresentation;
+import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFCommandReference;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,7 +27,7 @@ public class SQFCommand extends ASTWrapperPsiElement implements PsiNamedElement 
 
 	@NotNull
 	public String getCommandName() {
-		return getNode().getText();
+		return getText();
 	}
 
 	@Override
@@ -75,4 +76,14 @@ public class SQFCommand extends ASTWrapperPsiElement implements PsiNamedElement 
 		return refs[0];
 	}
 
+	/**
+	 * Check if the given name is equal to the command's name ({@link #getCommandName()}), ignoring the case of the names.
+	 *
+	 * @param name name to check if equal to this command's name
+	 * @return true if equal, false otherwise
+	 * @see SQFVariableName#nameEquals(String, String)
+	 */
+	public boolean commandNameEquals(@NotNull String name) {
+		return SQFVariableName.nameEquals(getCommandName(), name);
+	}
 }

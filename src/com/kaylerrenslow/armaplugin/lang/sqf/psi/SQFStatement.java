@@ -1,6 +1,7 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.psi.PsiElement;
+import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +16,9 @@ import java.util.function.Function;
 public interface SQFStatement extends PsiElement {
 
 	/**
-	 * Gets all private vars declared private in this statement.
+	 * Gets all private vars declared private in this statement. Note that private variables may be declared private in the
+	 * statement, but not in the same scope as the statement!
+	 * <p>
 	 * This method will return null if the statement is incapable of making variables private. This method will return an empty list
 	 * if the statement can create private variables but none were made private.
 	 *
@@ -26,20 +29,25 @@ public interface SQFStatement extends PsiElement {
 		SQFScope containingScope = SQFScope.getContainingScope(this);
 		List<SQFPrivateVar> vars = new ArrayList<>();
 
-		Function<SQFCodeBlockExpression, Void> checkCodeBlock = sqfCodeBlockExpression -> {
+		Function<SQFCodeBlockExpression, Void> checkCodeBlockExp = sqfCodeBlockExpression -> {
 			SQFCodeBlock codeBlock = sqfCodeBlockExpression.getBlock();
 			SQFLocalScope codeBlockScope = codeBlock.getScope();
 			if (codeBlockScope != null) {
+				//don't check containing scope because we already checked the assignment's scope, which is containing scope
 				List<SQFPrivateVar> blockPrivateVars = codeBlockScope.getPrivateVarInstances(false);
+
 				for (SQFPrivateVar blockPrivateVar : blockPrivateVars) {
-					boolean matched = false;
+					boolean alreadyPrivate = false;
 					for (SQFPrivateVar statementPrivateVar : vars) {
-						if (blockPrivateVar.getVariableNameObj().nameEquals(statementPrivateVar.getVariableNameObj())) {
-							matched = true;
+						if (blockPrivateVar.getVariableNameObj().nameEquals(statementPrivateVar.getVariableNameObj())
+								&& blockPrivateVar.getMaxScope() == statementPrivateVar.getMaxScope()) {
+							//we need to check scopes as well because a variable may be declared private in a scope
+							//but that may not be it's max scope
+							alreadyPrivate = true;
 							break;
 						}
 					}
-					if (!matched) {
+					if (!alreadyPrivate) {
 						vars.add(blockPrivateVar);
 					}
 				}
@@ -53,17 +61,27 @@ public interface SQFStatement extends PsiElement {
 				vars.add(new SQFPrivateVar(assignment.getVar().getVarNameObj(), assignment.getVar(), containingScope));
 			}
 			if (assignment.getExpr() != null) {
-				SQFExpression assignmentExpr = assignment.getExpr().withoutParenthesis();
-				if (assignmentExpr instanceof SQFCodeBlockExpression) {
-					checkCodeBlock.apply(((SQFCodeBlockExpression) assignmentExpr));
-				}
+				SQFExpression assignmentExpr = assignment.getExpr();
+				PsiUtil.traverseBreadthFirstSearch(assignmentExpr.getNode(), astNode -> {
+					PsiElement nodeAsPsi = astNode.getPsi();
+					if (nodeAsPsi instanceof SQFCodeBlockExpression) {
+						SQFCodeBlockExpression codeBlockExpression = ((SQFCodeBlockExpression) nodeAsPsi);
+						checkCodeBlockExp.apply(codeBlockExpression);
+						return false; //nothing left to do
+					}
+					if (nodeAsPsi instanceof SQFScope) {
+						//do not traverse further because it was already traversed in SQFCodeBlockExpression
+						return false;
+					}
+					return false;
+				});
 			}
 			return vars;
 		}
 		if (this instanceof SQFExpressionStatement) {
 			SQFExpression expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
 			if (expr instanceof SQFCodeBlockExpression) {
-				checkCodeBlock.apply((SQFCodeBlockExpression) expr);
+				checkCodeBlockExp.apply((SQFCodeBlockExpression) expr);
 				return vars;
 			}
 			if (expr instanceof SQFCommandExpression) {

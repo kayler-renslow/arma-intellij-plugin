@@ -4,11 +4,15 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
+import com.kaylerrenslow.armaDialogCreator.util.Reference;
+import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.presentation.SQFFunctionItemPresentation;
 import com.kaylerrenslow.armaplugin.lang.presentation.SQFVariableItemPresentation;
+import com.kaylerrenslow.armaplugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
@@ -68,7 +72,18 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 
 	@Override
 	public PsiElement setName(@NotNull String name) throws IncorrectOperationException {
-		return null;
+		PsiFile file = PsiUtil.createFile(getProject(), name, SQFFileType.INSTANCE);
+		Reference<SQFVariable> var = new Reference<>();
+		PsiUtil.traverseBreadthFirstSearch(file.getNode(), astNode -> {
+			PsiElement nodeAsPsi = astNode.getPsi();
+			if (nodeAsPsi instanceof SQFVariable) {
+				var.setValue((SQFVariable) nodeAsPsi);
+				return true;
+			}
+			return false;
+		});
+		//todo fix this method
+		return var.getValue();
 	}
 
 	@Override
