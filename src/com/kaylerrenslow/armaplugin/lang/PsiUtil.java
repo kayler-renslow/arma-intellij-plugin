@@ -97,6 +97,42 @@ public class PsiUtil {
 	}
 
 	/**
+	 * Traverses the entire ast tree with BFS, starting from start. Each node that is found will be sent to callback.
+	 * It is also possible to stop the traversal at any time with callback by returning true in it. When returning true,
+	 * the traversal will prevent the current node's children from being traversed.
+	 * <p>
+	 * This method will not terminate until all discovered nodes are traversed. If the callback returns true, there may
+	 * still be nodes left to traverse because of the current node's parent had multiple children.
+	 *
+	 * @param start    starting ASTNode
+	 * @param callback TraversalObjectFinder
+	 */
+	public static void traverseInLayers(@NotNull ASTNode start, @NotNull Function<ASTNode, Boolean> callback) {
+		Boolean stop = callback.apply(start);
+		if (stop != null && stop) {
+			return;
+		}
+		ASTNode[] children = start.getChildren(null);
+		LinkedList<ASTNode> nodes = new LinkedList<>();
+
+		for (ASTNode child : children) {
+			nodes.addLast(child);
+		}
+		ASTNode node;
+		while (nodes.size() > 0) {
+			node = nodes.removeFirst();
+			stop = callback.apply(node);
+			if (stop != null && stop) {
+				continue;
+			}
+			children = node.getChildren(null);
+			for (ASTNode child : children) {
+				nodes.addLast(child);
+			}
+		}
+	}
+
+	/**
 	 * Gets the closest next sibling, that is non-whitespace, relative to node
 	 *
 	 * @param node node to find sibling of
