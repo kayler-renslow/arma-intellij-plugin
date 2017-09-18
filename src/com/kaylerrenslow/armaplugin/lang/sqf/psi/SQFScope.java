@@ -8,7 +8,10 @@ import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -105,15 +108,11 @@ public interface SQFScope extends PsiElement {
 		SQFScope variableMaxScope = null; //this is the scope that the variable exists in
 		SQFScope containingScope = getContainingScope(variable);
 		TextRange containingScopeRange = containingScope.getTextRange();
-		List<SQFScope> ignoreScopes = new LinkedList<>(); //scopes to not get references from
 
-		if (variable.isLocal() && !variable.isMagicVar()) {
-			List<SQFPrivateVar> privateVarInstances = containingScope.getPrivateVarInstances(true);
-			for (SQFPrivateVar privateVar : privateVarInstances) {
-				ignoreScopes.add(privateVar.getMaxScope());
-			}
-
-			for (SQFPrivateVar privateVar : privateVarInstances) {
+		if (containingScope instanceof SQFFileScope) {
+			variableMaxScope = containingScope;
+		} else if (variable.isLocal() && !variable.isMagicVar()) {
+			for (SQFPrivateVar privateVar : containingScope.getPrivateVarInstances(true)) {
 				if (!privateVar.getVariableNameObj().equals(variableNameObj)) {
 					continue;
 				}
@@ -139,7 +138,6 @@ public interface SQFScope extends PsiElement {
 
 				if (variableMaxScope == null) {
 					variableMaxScope = possibleMaxScope;
-					ignoreScopes.remove(possibleMaxScope);
 				} else {
 					//if we already have a variableMaxScope defined, we want to make sure that the possibleMaxScope is
 					//deeper than the current variableMaxScope in order to update variableMaxScope to possibleMaxScope
@@ -148,8 +146,10 @@ public interface SQFScope extends PsiElement {
 					if (variableMaxScope.getTextRange().contains(possibleMaxScopeRange)
 							|| possibleMaxScope == containingScope) {
 						variableMaxScope = possibleMaxScope;
-						ignoreScopes.remove(possibleMaxScope);
 					}
+				}
+				if (variableMaxScope == containingScope) {
+					break;
 				}
 			}
 
@@ -163,7 +163,6 @@ public interface SQFScope extends PsiElement {
 			variableMaxScope = SQFScope.getContainingScope(file);
 		}
 
-		ignoreScopes.remove(variableMaxScope);
 
 		List<SQFVariable> varTargets = new ArrayList<>();
 		List<SQFString> stringTargets = new ArrayList<>();
@@ -175,15 +174,8 @@ public interface SQFScope extends PsiElement {
 			List<SQFPrivateVar> statementDeclaredPrivateVars = statement.getDeclaredPrivateVars();
 
 			SQFScope finalVariableMaxScope = variableMaxScope;
-			PsiUtil.traverseInLayers(statement.getNode(), astNode -> {
+			PsiUtil.traverseBreadthFirstSearch(statement.getNode(), astNode -> {
 				PsiElement nodeAsPsi = astNode.getPsi();
-				if (nodeAsPsi instanceof SQFScope) {
-					SQFScope scope = (SQFScope) nodeAsPsi;
-					if (ignoreScopes.contains(scope)) {
-						return true;
-					}
-				}
-
 				if (!(nodeAsPsi instanceof SQFVariable || nodeAsPsi instanceof SQFString)) {
 					return false;
 				}
@@ -225,7 +217,9 @@ public interface SQFScope extends PsiElement {
 					if (nameEqualVar != null) {
 						varTargets.add(nameEqualVar);
 					} else {
-						stringTargets.add(nameEqualStr);
+						if (variable.isLocal()) {
+							stringTargets.add(nameEqualStr);
+						}
 					}
 				}
 

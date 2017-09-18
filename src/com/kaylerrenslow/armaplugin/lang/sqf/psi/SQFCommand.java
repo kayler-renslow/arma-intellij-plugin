@@ -6,14 +6,14 @@ import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.presentation.SQFCommandItemPresentation;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
-import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFCommandReference;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,23 +48,13 @@ public class SQFCommand extends ASTWrapperPsiElement implements PsiNamedElement 
 	@NotNull
 	@Override
 	public PsiReference[] getReferences() {
-		List<SQFCommand> commands = new ArrayList<>();
-		String myCommandName = getCommandName();
-		PsiUtil.traverseBreadthFirstSearch(getContainingFile().getNode(), astNode -> {
-			PsiElement nodeAsPsi = astNode.getPsi();
-			if (nodeAsPsi instanceof SQFCommand) {
-				SQFCommand command = (SQFCommand) nodeAsPsi;
-				if (command.getCommandName().equalsIgnoreCase(myCommandName)) {
-					commands.add((SQFCommand) nodeAsPsi);
-				}
-			}
-			return false;
-		});
-		if (commands.isEmpty()) {
+		List<PsiReference> allRefs = new ArrayList<>();
+		PsiReference[] refsFromProviders = ReferenceProvidersRegistry.getReferencesFromProviders(this);
+		Collections.addAll(allRefs, refsFromProviders);
+		if (allRefs.isEmpty()) {
 			return PsiReference.EMPTY_ARRAY;
 		}
-
-		return new PsiReference[]{new SQFCommandReference(this, commands)};
+		return allRefs.toArray(new PsiReference[allRefs.size()]);
 	}
 
 	@Override

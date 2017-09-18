@@ -7,6 +7,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.armaDialogCreator.util.Reference;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
@@ -42,9 +43,17 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 	@NotNull
 	@Override
 	public PsiReference[] getReferences() {
-		List<SQFVariableReference> references = SQFScope.getVariableReferencesFor(this);
-		
-		return references.toArray(new PsiReference[references.size()]);
+		List<SQFVariableReference> currentFileRefs = SQFScope.getVariableReferencesFor(this);
+		PsiReference[] refsFromProviders = ReferenceProvidersRegistry.getReferencesFromProviders(this);
+		PsiReference[] refsAsArray = new PsiReference[currentFileRefs.size() + refsFromProviders.length];
+		int i = 0;
+		for (; i < currentFileRefs.size(); i++) {
+			refsAsArray[i] = currentFileRefs.get(i);
+		}
+		for (int j = 0; j < refsFromProviders.length; i++, j++) {
+			refsAsArray[i] = refsFromProviders[j];
+		}
+		return refsAsArray;
 	}
 
 	@Override
