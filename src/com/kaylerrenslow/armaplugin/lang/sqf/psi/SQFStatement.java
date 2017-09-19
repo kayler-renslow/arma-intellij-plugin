@@ -5,6 +5,7 @@ import com.intellij.psi.PsiElement;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -136,41 +137,179 @@ public interface SQFStatement extends PsiElement {
 					case "param": { //todo
 						break;
 					}
+					case "spawn": { //todo
+						break;
+					}
 				}
 				return vars;
 			} else {
 				findAllCodeExpr.apply(expr);
 			}
 		}
-
-		//todo we need to check inside code blocks, spawn, and control structures (https://community.bistudio.com/wiki/Variables#Scope)
+		/*todo
+		//(https://community.bistudio.com/wiki/Variables#Scope)
+		SQFControlStructure controlStructure = getControlStructure();
+		if (controlStructure == null) {
+			return vars;
+		}
+		*/
 		return vars;
 	}
 
-	default boolean isIfStatement() {
-		//todo
-		return false;
+	/**
+	 * @return the {@link SQFIfStatement} instance if the statement contains an if statement,
+	 * or null if the statement isn't a valid if statement
+	 */
+	@Nullable
+	default SQFIfStatement getIfStatement() {
+		if (!(this instanceof SQFExpressionStatement)) {
+			return null;
+		}
+		SQFExpression expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
+		if (!(expr instanceof SQFCommandExpression)) {
+			return null;
+		}
+		SQFCommandExpression cmdExpr = (SQFCommandExpression) expr;
+		if (!cmdExpr.getSQFCommand().commandNameEquals("if")) {
+			return null;
+		}
+		SQFExpression condition = null;
+		SQFCodeBlock thenBlock = null;
+		SQFCodeBlock elseBlock = null;
+
+		//get condition, then block, and else block
+		{
+			SQFCommandArgument postArg = cmdExpr.getPostfixArgument();
+			if (postArg == null) {
+				return null;
+			}
+			if (postArg.getExpr() == null) {
+				return null;
+			}
+			SQFCommandExpression thenExp = (SQFCommandExpression) postArg.getExpr().withoutParenthesis();
+			if (!thenExp.getSQFCommand().commandNameEquals("then")
+					&& !thenExp.getSQFCommand().commandNameEquals("exitWith")) {
+				return null;
+			}
+			{ //get condition
+				SQFCommandArgument thenExpPrefix = thenExp.getPrefixArgument();
+				if (thenExpPrefix == null) {
+					return null;
+				}
+				condition = thenExpPrefix.getExpr();
+				if (condition != null) {
+					condition = condition.withoutParenthesis();
+				}
+			}
+			{ //get then block and else block
+				SQFCommandArgument thenExpPostfix = thenExp.getPostfixArgument();
+				if (thenExpPostfix == null) {
+					return null;
+				}
+				SQFExpression afterThenExp = thenExpPostfix.getExpr();
+				if (afterThenExp instanceof SQFArray) {
+					//if condition then [{/*true cond*/}, {/*false cond*/}]
+
+					SQFArray array = (SQFArray) afterThenExp;
+					List<SQFExpression> arrExps = array.getExpressions();
+					if (arrExps.size() < 1) {
+						return null;
+					}
+					SQFExpression first = arrExps.get(0).withoutParenthesis();
+					if (!(first instanceof SQFCodeBlockExpression)) {
+						return null;
+					}
+					thenBlock = ((SQFCodeBlockExpression) first).getBlock();
+					if (arrExps.size() > 1) {
+						SQFExpression second = arrExps.get(1).withoutParenthesis();
+						if (second instanceof SQFCodeBlockExpression) {
+							elseBlock = ((SQFCodeBlockExpression) second).getBlock();
+						}
+					}
+				} else {//if condition then {};
+					thenBlock = thenExpPostfix.getBlock();
+
+					Function<Void, SQFCodeBlock> getElseBlock = aVoid -> {
+						if (afterThenExp == null) {
+							return null;
+						}
+						if (!(afterThenExp.withoutParenthesis() instanceof SQFCommandExpression)) {
+							return null;
+						}
+						SQFCommandExpression afterThenCmdExpr = (SQFCommandExpression) afterThenExp.withoutParenthesis();
+						if (!afterThenCmdExpr.getSQFCommand().commandNameEquals("else")) {
+							return null;
+						}
+						SQFCommandArgument postfixArg = afterThenCmdExpr.getPostfixArgument();
+						if (postfixArg == null) {
+							return null;
+						}
+						return postfixArg.getBlock();
+					};
+					elseBlock = getElseBlock.apply(null);
+				}
+			}
+		}
+		if (thenBlock == null || condition == null) {
+			return null;
+		}
+		return new SQFIfStatement(condition, thenBlock, elseBlock);
 	}
 
-	default boolean isSpawnStatement() {
+	/**
+	 * @return the {@link SQFSpawnStatement} instance if the statement contains a "args <b>spawn</b> code" statement,
+	 * or null if the statement isn't a valid spawn statement
+	 */
+	@Nullable
+	default SQFSpawnStatement getSpawnStatement() {
 		//todo
-		return false;
+		return null;
 	}
 
-	default boolean isSwitchStatement() {
+	/**
+	 * @return the {@link SQFSwitchStatement} instance if the statement contains a switch statement,
+	 * or null if the statement isn't a valid switch statement
+	 */
+	@Nullable
+	default SQFSwitchStatement getSwitchStatement() {
 		//todo
-		return false;
+		return null;
 	}
 
-	default boolean isControlStructure() {
+	/**
+	 * @return the {@link SQFForLoopStatement} instance if the statement contains a for loop statement,
+	 * or null if the statement isn't a valid for loop statement
+	 */
+	@Nullable
+	default SQFForLoopStatement getForLoopStatement() {
 		//todo
-		return false;
+		return null;
+	}
+
+	/**
+	 * @return the {@link SQFControlStructure} instance if the statement contains a control structure,
+	 * or null if the statement isn't a valid control structure
+	 */
+	@Nullable
+	default SQFControlStructure getControlStructure() {
+		SQFControlStructure cs = getIfStatement();
+		if (cs != null) {
+			return cs;
+		}
+		cs = getForLoopStatement();
+		if (cs != null) {
+			return cs;
+		}
+		cs = getSwitchStatement();
+		return cs;
 	}
 
 	/**
 	 * Used for debugging. Will return the statement the given element is contained in.
 	 * If the element is a PsiComment, &lt;PsiComment&gt; will be returned. Otherwise, the element's ancestor statement
 	 * text will be returned with all newlines replaced with spaces.
+	 * <p>
+	 * If the element has no parent or no {@link SQFStatement} parent, &lt;No Statement Parent&gt; will be returned
 	 *
 	 * @return the text, or &lt;PsiComment&gt; if element is a PsiComment
 	 */
@@ -184,6 +323,9 @@ public interface SQFStatement extends PsiElement {
 		}
 		while (!(element instanceof SQFStatement)) {
 			element = element.getParent();
+			if (element == null) {
+				return "<No Statement Parent>";
+			}
 		}
 		return element.getText().replaceAll("\n", " ");
 	}

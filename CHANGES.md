@@ -1,5 +1,5 @@
 **Added**  
-* find references for global vars and commands across all files
+* untested method for getting an if statement from an SQFStatement
 
 **Changed**  
 * 
