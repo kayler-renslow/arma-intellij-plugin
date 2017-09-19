@@ -91,8 +91,12 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 			}
 			return false;
 		});
-		//todo fix this method
-		return var.getValue();
+		SQFVariable newVar = var.getValue();
+		if (newVar == null) {
+			return null;
+		}
+		replace(newVar);
+		return newVar;
 	}
 
 	@Override
