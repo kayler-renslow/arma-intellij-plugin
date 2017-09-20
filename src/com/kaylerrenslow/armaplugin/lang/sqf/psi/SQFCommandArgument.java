@@ -10,11 +10,12 @@ import org.jetbrains.annotations.Nullable;
  * @author Kayler
  * @since 09/13/2017
  */
-public class SQFCommandArgument extends ASTWrapperPsiElement {
+public class SQFCommandArgument extends ASTWrapperPsiElement implements SQFBlockOrExpression {
 	public SQFCommandArgument(@NotNull ASTNode node) {
 		super(node);
 	}
 
+	@Override
 	@Nullable
 	public SQFCodeBlock getBlock() {
 		SQFCodeBlockExpression codeBlockExpression = PsiTreeUtil.getChildOfType(this, SQFCodeBlockExpression.class);
@@ -24,6 +25,7 @@ public class SQFCommandArgument extends ASTWrapperPsiElement {
 		return PsiTreeUtil.getChildOfType(this, SQFCodeBlock.class);
 	}
 
+	@Override
 	@Nullable
 	public SQFExpression getExpr() {
 		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);

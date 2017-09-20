@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
+import com.kaylerrenslow.armaDialogCreator.util.Reference;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import org.jetbrains.annotations.NotNull;
@@ -162,20 +163,29 @@ public interface SQFStatement extends PsiElement {
 	 */
 	@Nullable
 	default SQFIfStatement getIfStatement() {
-		if (!(this instanceof SQFExpressionStatement)) {
+		SQFExpression expr;
+		if (this instanceof SQFExpressionStatement) {
+			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
+		} else if (this instanceof SQFAssignmentStatement) {
+			expr = ((SQFAssignmentStatement) this).getExpr();
+			if (expr == null) {
+				return null;
+			}
+			expr = expr.withoutParenthesis();
+		} else {
 			return null;
 		}
-		SQFExpression expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
+
 		if (!(expr instanceof SQFCommandExpression)) {
 			return null;
 		}
 		SQFCommandExpression cmdExpr = (SQFCommandExpression) expr;
-		if (!cmdExpr.getSQFCommand().commandNameEquals("if")) {
+		if (!cmdExpr.commandNameEquals("if")) {
 			return null;
 		}
 		SQFExpression condition = null;
-		SQFCodeBlock thenBlock = null;
-		SQFCodeBlock elseBlock = null;
+		SQFBlockOrExpression thenBlock = null;
+		SQFBlockOrExpression elseBlock = null;
 
 		//get condition, then block, and else block
 		{
@@ -187,8 +197,8 @@ public interface SQFStatement extends PsiElement {
 				return null;
 			}
 			SQFCommandExpression thenExp = (SQFCommandExpression) postArg.getExpr().withoutParenthesis();
-			if (!thenExp.getSQFCommand().commandNameEquals("then")
-					&& !thenExp.getSQFCommand().commandNameEquals("exitWith")) {
+			if (!thenExp.commandNameEquals("then")
+					&& !thenExp.commandNameEquals("exitWith")) {
 				return null;
 			}
 			{ //get condition
@@ -216,20 +226,15 @@ public interface SQFStatement extends PsiElement {
 						return null;
 					}
 					SQFExpression first = arrExps.get(0).withoutParenthesis();
-					if (!(first instanceof SQFCodeBlockExpression)) {
-						return null;
-					}
-					thenBlock = ((SQFCodeBlockExpression) first).getBlock();
+					thenBlock = new SQFBlockOrExpression.Impl(null, first);
 					if (arrExps.size() > 1) {
 						SQFExpression second = arrExps.get(1).withoutParenthesis();
-						if (second instanceof SQFCodeBlockExpression) {
-							elseBlock = ((SQFCodeBlockExpression) second).getBlock();
-						}
+						elseBlock = new SQFBlockOrExpression.Impl(null, second);
 					}
 				} else {//if condition then {};
-					thenBlock = thenExpPostfix.getBlock();
+					thenBlock = thenExpPostfix;
 
-					Function<Void, SQFCodeBlock> getElseBlock = aVoid -> {
+					Function<Void, SQFCommandArgument> getElseBlock = aVoid -> {
 						if (afterThenExp == null) {
 							return null;
 						}
@@ -237,14 +242,14 @@ public interface SQFStatement extends PsiElement {
 							return null;
 						}
 						SQFCommandExpression afterThenCmdExpr = (SQFCommandExpression) afterThenExp.withoutParenthesis();
-						if (!afterThenCmdExpr.getSQFCommand().commandNameEquals("else")) {
+						if (!afterThenCmdExpr.commandNameEquals("else")) {
 							return null;
 						}
 						SQFCommandArgument postfixArg = afterThenCmdExpr.getPostfixArgument();
 						if (postfixArg == null) {
 							return null;
 						}
-						return postfixArg.getBlock();
+						return postfixArg;
 					};
 					elseBlock = getElseBlock.apply(null);
 				}
@@ -257,13 +262,41 @@ public interface SQFStatement extends PsiElement {
 	}
 
 	/**
-	 * @return the {@link SQFSpawnStatement} instance if the statement contains a "args <b>spawn</b> code" statement,
+	 * This will return a {@link SQFSpawnStatement} only if the statement takes the form: "args <b>spawn</b> {}".
+	 * It can also take the form var=args spawn {} (notice its in an assignment this time)
+	 * <p>
+	 * "args" is optional, but the argument after the spawn command must exist.
+	 *
+	 * @return the {@link SQFSpawnStatement} instance if the statement contains a "args <b>spawn</b> {}" statement,
 	 * or null if the statement isn't a valid spawn statement
 	 */
 	@Nullable
 	default SQFSpawnStatement getSpawnStatement() {
-		//todo
-		return null;
+		SQFExpression expr;
+		if (this instanceof SQFExpressionStatement) {
+			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
+		} else if (this instanceof SQFAssignmentStatement) {
+			expr = ((SQFAssignmentStatement) this).getExpr();
+			if (expr == null) {
+				return null;
+			}
+			expr = expr.withoutParenthesis();
+		} else {
+			return null;
+		}
+		if (!(expr instanceof SQFCommandExpression)) {
+			return null;
+		}
+		SQFCommandExpression cmdExpr = (SQFCommandExpression) expr;
+		if (!cmdExpr.commandNameEquals("spawn")) {
+			return null;
+		}
+		SQFCommandArgument spawnPostArg = cmdExpr.getPostfixArgument();
+		if (spawnPostArg == null) {
+			return null;
+		}
+		SQFCommandArgument spawnPreArg = cmdExpr.getPrefixArgument();
+		return new SQFSpawnStatement(spawnPreArg, spawnPostArg);
 	}
 
 	/**
@@ -272,8 +305,55 @@ public interface SQFStatement extends PsiElement {
 	 */
 	@Nullable
 	default SQFSwitchStatement getSwitchStatement() {
-		//todo
-		return null;
+		SQFExpression expr;
+		if (this instanceof SQFExpressionStatement) {
+			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
+		} else if (this instanceof SQFAssignmentStatement) {
+			expr = ((SQFAssignmentStatement) this).getExpr();
+			if (expr == null) {
+				return null;
+			}
+			expr = expr.withoutParenthesis();
+		} else {
+			return null;
+		}
+		if (!(expr instanceof SQFCommandExpression)) {
+			return null;
+		}
+		SQFCommandExpression cmdExpr = (SQFCommandExpression) expr;
+		if (!cmdExpr.commandNameEquals("switch")) {
+			return null;
+		}
+		SQFCommandArgument postArg = cmdExpr.getPostfixArgument();
+		if (postArg == null) {
+			return null;
+		}
+		SQFScope switchBlockScope = null;
+		List<SQFCaseStatement> caseStatements = new ArrayList<>();
+		Reference<SQFBlockOrExpression> blockOrExprRef = new Reference<>(null);
+		{
+			SQFCodeBlock block = postArg.getBlock();
+			if (block == null) {
+				return null;
+			}
+			switchBlockScope = block.getScope();
+			if (switchBlockScope != null) {
+				PsiUtil.traverseInLayers(switchBlockScope.getNode(), astNode -> {
+					PsiElement nodeAsElement = astNode.getPsi();
+					if (nodeAsElement instanceof SQFCaseStatement) {
+						caseStatements.add((SQFCaseStatement) nodeAsElement);
+					} else if (nodeAsElement instanceof SQFCommandExpression) {
+						SQFCommandExpression cmdExprInSwitch = (SQFCommandExpression) nodeAsElement;
+						if (cmdExprInSwitch.commandNameEquals("default")) {
+							blockOrExprRef.setValue(cmdExprInSwitch.getPostfixArgument());
+						}
+					}
+					return true; //don't traverse past children
+				});
+			}
+		}
+
+		return new SQFSwitchStatement(caseStatements, blockOrExprRef.getValue());
 	}
 
 	/**

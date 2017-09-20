@@ -12,28 +12,28 @@ public class SQFIfStatement implements SQFControlStructure {
 	@NotNull
 	private final SQFExpression conditionExpr;
 	@NotNull
-	private final SQFCodeBlock thenBlock;
+	private final SQFBlockOrExpression thenBlock;
 	@Nullable
-	private final SQFCodeBlock elseBlock;
+	private final SQFBlockOrExpression elseBlock;
 
-	public SQFIfStatement(@NotNull SQFExpression conditionExpr, @NotNull SQFCodeBlock thenBlock, @Nullable SQFCodeBlock elseBlock) {
+	public SQFIfStatement(@NotNull SQFExpression conditionExpr, @NotNull SQFBlockOrExpression thenBlock, @Nullable SQFBlockOrExpression elseBlock) {
 		this.conditionExpr = conditionExpr;
 		this.thenBlock = thenBlock;
 		this.elseBlock = elseBlock;
 	}
 
 	@NotNull
-	public SQFExpression getConditionExpr() {
+	public SQFExpression getCondition() {
 		return conditionExpr;
 	}
 
 	@NotNull
-	public SQFCodeBlock getThenBlock() {
+	public SQFBlockOrExpression getThen() {
 		return thenBlock;
 	}
 
 	@Nullable
-	public SQFCodeBlock getElseBlock() {
+	public SQFBlockOrExpression getElse() {
 		return elseBlock;
 	}
 }

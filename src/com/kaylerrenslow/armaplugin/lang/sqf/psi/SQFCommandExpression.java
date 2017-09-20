@@ -25,6 +25,15 @@ public class SQFCommandExpression extends ASTWrapperPsiElement implements SQFExp
 	}
 
 	/**
+	 * Shortcut for {@link SQFCommand#commandNameEquals(String)} on {@link #getSQFCommand()}
+	 *
+	 * @return true if command name equals (case insensitive), or false if it doesn't equal
+	 */
+	public boolean commandNameEquals(@NotNull String commandName) {
+		return getSQFCommand().commandNameEquals(commandName);
+	}
+
+	/**
 	 * @return the {@link SQFCommandArgument} instance that comes before {@link #getSQFCommand()},
 	 * or null if doesn't exist (prefixArg? COMMAND postfixArg?)
 	 */
