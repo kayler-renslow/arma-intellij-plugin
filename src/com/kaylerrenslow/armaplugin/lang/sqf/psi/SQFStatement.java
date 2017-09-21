@@ -232,9 +232,10 @@ public interface SQFStatement extends PsiElement {
 						elseBlock = new SQFBlockOrExpression.Impl(null, second);
 					}
 				} else {//if condition then {};
-					thenBlock = thenExpPostfix;
+					Reference<SQFBlockOrExpression> thenBlockRef = new Reference<>(null);
+					Reference<SQFBlockOrExpression> elseBlockRef = new Reference<>(null);
 
-					Function<Void, SQFCommandArgument> getElseBlock = aVoid -> {
+					Function<Void, Void> getElseBlock = aVoid -> {
 						if (afterThenExp == null) {
 							return null;
 						}
@@ -245,13 +246,17 @@ public interface SQFStatement extends PsiElement {
 						if (!afterThenCmdExpr.commandNameEquals("else")) {
 							return null;
 						}
-						SQFCommandArgument postfixArg = afterThenCmdExpr.getPostfixArgument();
-						if (postfixArg == null) {
-							return null;
-						}
-						return postfixArg;
+						thenBlockRef.setValue(afterThenCmdExpr.getPrefixArgument());
+						elseBlockRef.setValue(afterThenCmdExpr.getPostfixArgument());
+						return null;
 					};
-					elseBlock = getElseBlock.apply(null);
+					getElseBlock.apply(null);
+					if (thenBlockRef.getValue() == null) {
+						thenBlock = new SQFBlockOrExpression.Impl(null, afterThenExp);
+					} else {
+						thenBlock = thenBlockRef.getValue();
+					}
+					elseBlock = elseBlockRef.getValue();
 				}
 			}
 		}
@@ -331,7 +336,7 @@ public interface SQFStatement extends PsiElement {
 		SQFScope switchBlockScope = null;
 		List<SQFCaseStatement> caseStatements = new ArrayList<>();
 		Reference<SQFBlockOrExpression> blockOrExprRef = new Reference<>(null);
-		{
+		{ //get case statements as well as default statement
 			SQFCodeBlock block = postArg.getBlock();
 			if (block == null) {
 				return null;
@@ -342,10 +347,14 @@ public interface SQFStatement extends PsiElement {
 					PsiElement nodeAsElement = astNode.getPsi();
 					if (nodeAsElement instanceof SQFCaseStatement) {
 						caseStatements.add((SQFCaseStatement) nodeAsElement);
-					} else if (nodeAsElement instanceof SQFCommandExpression) {
-						SQFCommandExpression cmdExprInSwitch = (SQFCommandExpression) nodeAsElement;
-						if (cmdExprInSwitch.commandNameEquals("default")) {
-							blockOrExprRef.setValue(cmdExprInSwitch.getPostfixArgument());
+					} else if (nodeAsElement instanceof SQFExpressionStatement) {
+						SQFExpressionStatement exprStatement = (SQFExpressionStatement) nodeAsElement;
+						SQFExpression exprInExprStatement = exprStatement.getExpr();
+						if (exprInExprStatement instanceof SQFCommandExpression) {
+							SQFCommandExpression cmdExprInSwitch = (SQFCommandExpression) exprInExprStatement;
+							if (cmdExprInSwitch.commandNameEquals("default")) {
+								blockOrExprRef.setValue(cmdExprInSwitch.getPostfixArgument());
+							}
 						}
 					}
 					return true; //don't traverse past children
@@ -367,6 +376,37 @@ public interface SQFStatement extends PsiElement {
 	}
 
 	/**
+	 * @return the {@link SQFWhileLoopStatement} instance if the statement contains a while loop statement,
+	 * or null if the statement isn't a valid for while statement
+	 */
+	@Nullable
+	default SQFWhileLoopStatement getWhileLoopStatement() {
+		SQFExpression expr;
+		if (this instanceof SQFExpressionStatement) {
+			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
+		} else {
+			return null;
+		}
+		if (!(expr instanceof SQFCommandExpression)) {
+			return null;
+		}
+		SQFCommandExpression cmdExpr = (SQFCommandExpression) expr;
+		if (!cmdExpr.commandNameEquals("while")) {
+			return null;
+		}
+		SQFCommandArgument whilePostArg = cmdExpr.getPostfixArgument();
+		if (whilePostArg == null) {
+			return null;
+		}
+		SQFExpression doCmdExpr = whilePostArg.getExpr();
+		if (doCmdExpr == null) {
+			return null;
+		}
+		//todo
+		return null;
+	}
+
+	/**
 	 * @return the {@link SQFControlStructure} instance if the statement contains a control structure,
 	 * or null if the statement isn't a valid control structure
 	 */
@@ -377,6 +417,10 @@ public interface SQFStatement extends PsiElement {
 			return cs;
 		}
 		cs = getForLoopStatement();
+		if (cs != null) {
+			return cs;
+		}
+		cs = getWhileLoopStatement();
 		if (cs != null) {
 			return cs;
 		}
