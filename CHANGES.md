@@ -2,7 +2,7 @@
 * 
 
 **Changed**  
-* finished SQFStatement.getWhileLoopStatement()
+* 
 
 **Fixed**  
 * 

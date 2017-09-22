@@ -4,7 +4,7 @@
       <root url="jar://$PROJECT_DIR$/lib/adc.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$PROJECT_DIR$/lib/adc-javadoc.zip!/javadoc" />
+      <root url="jar://$PROJECT_DIR$/lib/adc-javadoc.zip!/adc-javadoc" />
     </JAVADOC>
     <SOURCES />
   </library>
