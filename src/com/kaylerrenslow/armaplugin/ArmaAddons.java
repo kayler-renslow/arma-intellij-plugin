@@ -19,5 +19,5 @@ public class ArmaAddons {
 
 	// Question: Where would we store the file that lists all the dependency mods?
 
-	// For when we are extracting PBO files, we need a dialog to show progress and the like.
+	// For when we are extracting PBO files, we need a dialog to show progress on extraction and the like.
 }
