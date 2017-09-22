@@ -2,7 +2,7 @@
 * 
 
 **Changed**  
-* for Arma doc downloader: made the notes section look cleaner in the documentation window
+* finished SQFStatement.getWhileLoopStatement()
 
 **Fixed**  
 * 

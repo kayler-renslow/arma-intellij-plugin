@@ -398,12 +398,21 @@ public interface SQFStatement extends PsiElement {
 		if (whilePostArg == null) {
 			return null;
 		}
-		SQFExpression doCmdExpr = whilePostArg.getExpr();
-		if (doCmdExpr == null) {
+		SQFExpression whilePostArgExpr = whilePostArg.getExpr();
+		if (whilePostArgExpr == null) {
 			return null;
 		}
-		//todo
-		return null;
+		whilePostArgExpr = whilePostArgExpr.withoutParenthesis();
+		if (!(whilePostArgExpr instanceof SQFCommandExpression)) {
+			return null;
+		}
+		SQFCommandExpression cmdDoExpr = (SQFCommandExpression) whilePostArgExpr;
+		SQFCommandArgument whileCondition = cmdDoExpr.getPrefixArgument();
+		SQFCommandArgument whileBody = cmdDoExpr.getPostfixArgument();
+		if (whileCondition == null || whileBody == null) {
+			return null;
+		}
+		return new SQFWhileLoopStatement(whileCondition, whileBody);
 	}
 
 	/**
