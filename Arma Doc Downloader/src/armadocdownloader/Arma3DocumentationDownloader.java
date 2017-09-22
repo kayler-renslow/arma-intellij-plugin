@@ -82,7 +82,7 @@ public class Arma3DocumentationDownloader extends Application {
 				completedCommands = completedCommands || wikiDocumentationRetriever == commandsDocRetriever;
 				completedFunctions = completedFunctions || wikiDocumentationRetriever == functionsDocRetriever;
 				if (completedFunctions && completedCommands) {
-					//here, all of the commands and functions have been discovered, so we can run the finish commands
+					//here, all of the commands and functions have been discovered, so we can run the finish methods
 					//and make lookup lists
 					commandsDocRetriever.finish();
 					functionsDocRetriever.finish();
@@ -105,7 +105,6 @@ public class Arma3DocumentationDownloader extends Application {
 
 	@Override
 	public void stop() throws Exception {
-		System.out.println("Stopping Process");
 	}
 
 	public static void main(String[] args) {
@@ -114,9 +113,8 @@ public class Arma3DocumentationDownloader extends Application {
 
 
 	private void saveLookupLists() throws FileNotFoundException {
-
-		PrintWriter pwCommands = new PrintWriter(commandsDocRetriever.getUnformattedDocSaveFolder().getAbsolutePath() + "/lookup.list");
-		PrintWriter pwFunctions = new PrintWriter(functionsDocRetriever.getUnformattedDocSaveFolder().getAbsolutePath() + "/lookup.list");
+		PrintWriter pwCommands = new PrintWriter(commandDocPluginSaveFolder.getAbsolutePath() + "/lookup.list");
+		PrintWriter pwFunctions = new PrintWriter(functionDocPluginSaveFolder.getAbsolutePath() + "/lookup.list");
 		Hashtable<String, String> ignoredCommands = commandsDocRetriever.getIgnoredCommands();
 		for (PsiElementLinkType type : PsiElementLinkType.allTypes) {
 			if (type.type.equals(PSI_ELE_TYPE_COMMAND)) {

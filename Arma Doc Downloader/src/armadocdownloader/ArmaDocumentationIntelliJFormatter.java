@@ -37,10 +37,12 @@ public class ArmaDocumentationIntelliJFormatter {
 					Job take = jobs.take();
 					if (take == END_COMMANDS) {
 						endJobsCount.incrementAndGet();
+						System.out.println("No more commands to format.");
 						continue;
 					}
 					if (take == END_FUNCTIONS) {
 						endJobsCount.incrementAndGet();
+						System.out.println("No more BIS functions to format.");
 						continue;
 					}
 					doFormatAndSave(take.srcFile, take.destFile, take.linkType);
@@ -89,12 +91,71 @@ public class ArmaDocumentationIntelliJFormatter {
 
 		docName = document.select(getDocNameCSSCode).get(0).text().replaceAll("\\s", "_");
 
+		Elements codeEles = document.select("code, pre");
+		for (Element code : codeEles) {
+			for (Attribute attribute : code.attributes()) {
+				code.removeAttr(attribute.getKey());
+			}
+		}
 
-		StringBuilder notesBuilder = new StringBuilder();
+		//make non-function and non-command links green
+		Elements aEles = document.select("a");
+		for (Element aEle : aEles) {
+			boolean setColorToGreen = true;
+			for (PsiElementLinkType type : PsiElementLinkType.allTypes) {
+				if (type.linkNames.contains(aEle.text())) {
+					aEle.attr("href", "psi_element://" + type.type + ":" + aEle.text());
+					setColorToGreen = false;
+					break;
+				}
+			}
+			if (setColorToGreen) {
+				aEle.attr("style", "color:008800;");
+			}
+		}
+
+		StringBuilder allNotesBuilder = new StringBuilder();
 		{ //this needs to come before we trim down the description, otherwise it will get deleted
-			//todo make the notes look cleaner in the documentation window
-			for (Element e : document.getElementsByClass("command_description")) {
-				notesBuilder.append(fixTags(e.html()));
+			/*As of September 21, 2017, the wiki's notes are formatted as follows:
+			* <dl class="command_description"> <!-- This dl element can repeat multiple times-->
+			*     <!-- START_NOTE-->
+			*     <dd class="notedate">note's date</dd>
+			*     <dt class="note">author</dd>
+			*     <dd class="note">the actual note body</dd>
+			*     <!-- END_NOTE-->
+			* </dl>
+			*
+			* Between HTML comment "START_NOTE" "END_NOTE" defines a note's date, author, and body.
+			* Each of those elements are repeated for every note.
+			* */
+			allNotesBuilder.append("<h3>Notes</h3>");
+			int noteCount = 0;
+			for (Element noteCluster : document.getElementsByClass("command_description")) {
+				int notePart = 0;//when reached 2, that defines a whole note's date, author, and body
+				StringBuilder singleNoteBuilder = new StringBuilder();
+				for (Element noteClusterChild : noteCluster.children()) {
+					if (noteClusterChild.hasClass("note") || noteClusterChild.hasClass("notedate")) {
+						String elementHtml = fixTags(noteClusterChild.html());
+						singleNoteBuilder.append("<div>");
+						singleNoteBuilder.append(notePart == 0 ? "<b>Date: </b>" : notePart == 1 ? "<b>Author: </b>" : "");
+						singleNoteBuilder.append(elementHtml);
+						singleNoteBuilder.append("</div>");
+
+						if (notePart < 2) {
+							notePart++;
+						} else {
+							allNotesBuilder.append("<div style=\"border:2px solid #cacaca;padding:4px;\"");
+							allNotesBuilder.append(singleNoteBuilder);
+							allNotesBuilder.append("</div><br/>");
+							singleNoteBuilder = new StringBuilder();
+							notePart = 0;
+							noteCount++;
+						}
+					}
+				}
+			}
+			if (noteCount == 0) {
+				allNotesBuilder.append("No notes.");
 			}
 		}
 
@@ -126,32 +187,6 @@ public class ArmaDocumentationIntelliJFormatter {
 			}
 		}
 
-
-		Elements codeEles = document.select("code, pre");
-		for (Element code : codeEles) {
-			for (Attribute attribute : code.attributes()) {
-				code.removeAttr(attribute.getKey());
-			}
-		}
-
-		Elements aEles = document.select("a");
-		Iterator<Element> aElesIter = aEles.iterator();
-		boolean setColorToGreen = true;
-		while (aElesIter.hasNext()) {
-			Element a = aElesIter.next();
-			for (PsiElementLinkType type : PsiElementLinkType.allTypes) {
-				if (type.linkNames.contains(a.text())) {
-					a.attr("href", "psi_element://" + type.type + ":" + a.text());
-					setColorToGreen = false;
-					break;
-				}
-			}
-			if (setColorToGreen) {
-				a.attr("style", "color:008800;");
-			}
-			setColorToGreen = true;
-		}
-
 		cleanAttributes(document);
 
 		description = fixTags(descriptionElements.html());
@@ -161,7 +196,7 @@ public class ArmaDocumentationIntelliJFormatter {
 			PrintWriter pw = new PrintWriter(destFile);
 			pw.println(description);
 			pw.flush();
-			pw.println(notesBuilder.toString());
+			pw.println(allNotesBuilder.toString());
 			pw.flush();
 			pw.close();
 		} catch (Exception e) {
