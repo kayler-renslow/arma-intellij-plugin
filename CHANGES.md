@@ -1,5 +1,5 @@
 **Added**  
-* 
+* untested implementation for parsing addons config
 
 **Changed**  
 * 
