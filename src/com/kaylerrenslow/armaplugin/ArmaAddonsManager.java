@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.kaylerrenslow.armaDialogCreator.util.ReadOnlyList;
 import com.kaylerrenslow.armaDialogCreator.util.XmlUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,7 +21,7 @@ import java.util.function.Function;
  * @author Kayler
  * @since 09/22/2017
  */
-public class ArmaAddons {
+public class ArmaAddonsManager {
 	// We want to be able to control what gets kept after the extraction (models, sqf files, etc).
 	// However, the config files should always be extracted. Reason is the user may not care about the implementation of the scripts.
 	// We definitely don't need to keep the models or sounds or any other non-script related resource.
@@ -44,7 +45,36 @@ public class ArmaAddons {
 
 	// For when we are extracting PBO files, we need a dialog to show progress on extraction and the like.
 
+	private ArmaAddonsManager() {
+	}
 
+	private final List<ArmaAddon> addons = new ArrayList<>();
+	private final ReadOnlyList<ArmaAddon> addonsReadOnly = new ReadOnlyList<>(addons);
+
+	@NotNull
+	public ReadOnlyList<ArmaAddon> getAddons() {
+		return addonsReadOnly;
+	}
+
+	private static ArmaAddonsManager instance;
+
+	@NotNull
+	public static ArmaAddonsManager getAddonsManagerInstance() {
+		if (instance == null) {
+			instance = new ArmaAddonsManager();
+		}
+		return instance;
+	}
+
+	/**
+	 * Used to parse addonscfg.xml file. This method will also parse any macros present in the xml. For instance, the macro
+	 * $PROJECT_DIR$ will resolve to the project's directory. If the project's directory can't be resolved,
+	 * "." will be the result of the macro.
+	 *
+	 * @param configFile the .xml config file
+	 * @param project    the project instance
+	 * @return the config, or null if couldn't be created
+	 */
 	@Nullable
 	public static ArmaAddonsProjectConfig parseAddonsConfig(@NotNull VirtualFile configFile, @NotNull Project project) {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -148,19 +178,6 @@ public class ArmaAddons {
 		return new ArmaAddonsProjectConfigImpl(blacklistedAddons, whitelistedAddons, addonsRoots, addonsReferenceDirectory);
 	}
 
-	public interface ArmaAddonsProjectConfig {
-		@NotNull
-		List<String> getBlacklistedAddons();
-
-		@NotNull
-		List<String> getWhitelistedAddons();
-
-		@NotNull
-		String getAddonsReferenceDirectory();
-
-		@NotNull
-		List<String> getAddonsRoots();
-	}
 
 	private static class ArmaAddonsProjectConfigImpl implements ArmaAddonsProjectConfig {
 
