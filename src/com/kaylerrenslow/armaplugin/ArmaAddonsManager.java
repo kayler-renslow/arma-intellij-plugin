@@ -2,8 +2,10 @@ package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
+import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.util.ReadOnlyList;
 import com.kaylerrenslow.armaDialogCreator.util.XmlUtil;
+import com.kaylerrenslow.armaplugin.lang.ArmaPluginUserData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
@@ -14,6 +16,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -55,6 +59,209 @@ public class ArmaAddonsManager {
 	public ReadOnlyList<ArmaAddon> getAddons() {
 		return addonsReadOnly;
 	}
+
+	public void loadAddons(@NotNull ArmaAddonsProjectConfig config) {
+		List<ArmaAddon> armaAddons;
+		try {
+			armaAddons = doLoadAddons(config);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return;
+		}
+		this.addons.clear();
+		this.addons.addAll(armaAddons);
+	}
+
+	@NotNull
+	private List<ArmaAddon> doLoadAddons(@NotNull ArmaAddonsProjectConfig config) throws Exception {
+		File refDir = new File(config.getAddonsReferenceDirectory());
+		if (refDir.exists() && !refDir.isDirectory()) {
+			throw new IllegalArgumentException("reference directory isn't a directory");
+		}
+		if (!refDir.exists()) {
+			boolean mkdirs = refDir.mkdirs();
+			if (!mkdirs) {
+				throw new IllegalStateException("couldn't make directories for the reference directory");
+			}
+		}
+		File armaTools = ArmaPluginUserData.getInstance().getArmaToolsDirectory();
+		if (armaTools == null) {
+			throw new IllegalStateException("arma tools directory isn't set");
+		}
+
+		List<ArmaAddonHelper> addonHelpers = new ArrayList<>();
+
+		{//Collect all @ prefixed folders that aren't blacklisted and is whitelisted (ignore whitelist when it's empty).
+
+			List<File> addonRoots = new ArrayList<>(config.getAddonsRoots().size());
+			for (String addonRootPath : config.getAddonsRoots()) {
+				File f = new File(addonRootPath);
+				if (!f.exists()) {
+					continue;
+				}
+				if (!f.isDirectory()) {
+					continue;
+				}
+				addonRoots.add(f);
+			}
+
+			boolean useWhitelist = !config.getWhitelistedAddons().isEmpty();
+
+			for (File addonRoot : addonRoots) {
+				File[] files = addonRoot.listFiles((dir, name) -> {
+					if (name.length() == 0) {
+						return false;
+					}
+					if (name.charAt(0) != '@') {
+						return false;
+					}
+					if (config.getBlacklistedAddons().contains(name)) {
+						return false;
+					}
+
+					return !useWhitelist || config.getWhitelistedAddons().contains(name);
+				});
+				if (files == null) {
+					continue;
+				}
+				for (File addonDir : files) {
+					addonHelpers.add(new ArmaAddonHelper(addonDir));
+				}
+			}
+		}
+
+		{ //find and extract all PBO's from each addon
+
+			// Create a temp folder to extract the pbo in.
+			// Make sure it doesn't exist to ensure we aren't overwriting/deleting existing data
+			File tempDir;
+			{
+				String tempDirName = "_armaPluginTemp";
+				while (true) {
+					boolean matched = false;
+					File[] files = refDir.listFiles();
+					if (files == null) {
+						throw new IllegalStateException("files is null despite refDir being a directory");
+					}
+					for (File f : files) {
+						if (f.getName().equals(tempDirName)) {
+							tempDirName = tempDirName + "_";
+							matched = true;
+							break;
+						}
+					}
+					if (!matched) {
+						break;
+					}
+				}
+				tempDir = new File(refDir.getAbsolutePath() + "/" + tempDirName);
+				boolean mkdirs = tempDir.mkdirs();
+				if (!mkdirs) {
+					throw new IllegalStateException("couldn't make the temp directory for extracting");
+				}
+			}
+
+			{//extract pbo's into temp directory
+				for (ArmaAddonHelper helper : addonHelpers) {
+					File addonsDir = null;
+					{ //locate the "addons" folder, which contains all the pbo files
+						File[] addonDirFiles = helper.getAddonDirectory().listFiles();
+						if (addonDirFiles == null) {
+							throw new IllegalStateException("addon directory isn't a directory: " + helper.getAddonDirectory());
+						}
+						for (File addonDirFile : addonDirFiles) {
+							if (!addonDirFile.getName().equalsIgnoreCase("addons")) {
+								continue;
+							}
+							addonsDir = addonDirFile;
+							break;
+						}
+						if (addonsDir == null) {
+							continue;
+						}
+					}
+					File[] pboFiles = addonsDir.listFiles((dir, name) -> name.endsWith(".pbo"));
+					if (pboFiles == null) {
+						continue;
+					}
+					//todo make this multithreaded
+					for (File pboFile : pboFiles) {
+						File extractDir = new File(
+								tempDir.getAbsolutePath() + "/" + helper.getAddonDirName()
+						);
+						boolean success = ArmaTools.extractPBO(
+								armaTools,
+								pboFile,
+								extractDir, 10 * 60 * 1000 /*10 minutes before suspend*/
+						);
+						if (!success) {
+							System.err.println("Couldn't extract pbo " + pboFile);
+							continue;
+						}
+						helper.setExtractDir(extractDir);
+					}
+				}
+			}
+			final String BINARIZED_CONFIG_NAME = "config.bin";
+			{//de-binarize the configs
+				for (ArmaAddonHelper helper : addonHelpers) {
+					List<File> configBinFiles = new ArrayList<>();
+					LinkedList<File> toVisit = new LinkedList<>();
+					//locate all config.bin files
+					if (helper.getExtractDir() != null) {
+						toVisit.add(helper.getExtractDir());
+					}
+					while (!toVisit.isEmpty()) {
+						File visit = toVisit.removeFirst();
+						File[] children = visit.listFiles();
+						if (children != null) {
+							Collections.addAll(toVisit, children);
+						}
+						if (visit.getName().equalsIgnoreCase(BINARIZED_CONFIG_NAME)) {
+							configBinFiles.add(visit);
+						}
+					}
+
+					//convert all config.bin files
+					//todo make multithreaded
+					for (File configBinFile : configBinFiles) {
+						String newPath = configBinFile.getAbsolutePath();
+						newPath = newPath.substring(0, newPath.length() - configBinFile.getName().length()) + "config.cpp";
+						File debinarizedFile = new File(newPath);
+						boolean success = ArmaTools.convertBinConfigToText(
+								armaTools,
+								configBinFile,
+								debinarizedFile,
+								10 * 1000 /*10 seconds*/
+						);
+						if (!success) {
+							System.err.println("Couldn't convert binarized config " + configBinFile);
+							continue;
+						}
+						helper.getDebinarizedConfigs().add(debinarizedFile);
+					}
+				}
+			}
+
+
+			//move the files out of temp directory that we want to keep
+			//todo
+
+			//delete temp directory (will also remove unnecessary files)
+			//todo
+
+			//parse the configs
+			//todo
+		}
+
+		List<ArmaAddon> addons = new ArrayList<>(addonHelpers.size());
+		for (ArmaAddonHelper helper : addonHelpers) {
+			//todo fill addons list
+		}
+
+		return addons;
+	}
+
 
 	private static ArmaAddonsManager instance;
 
@@ -178,6 +385,47 @@ public class ArmaAddonsManager {
 		return new ArmaAddonsProjectConfigImpl(blacklistedAddons, whitelistedAddons, addonsRoots, addonsReferenceDirectory);
 	}
 
+
+	private static class ArmaAddonHelper {
+		@NotNull
+		private final File addonDirectory;
+		private final List<HeaderFile> parsedConfigs = new ArrayList<>();
+		private final List<File> debinarizedConfigs = new ArrayList<>();
+		private File extractDir;
+
+		public ArmaAddonHelper(@NotNull File addonDirectory) {
+			this.addonDirectory = addonDirectory;
+		}
+
+		@NotNull
+		public List<HeaderFile> getParsedConfigs() {
+			return parsedConfigs;
+		}
+
+		@Nullable
+		public File getExtractDir() {
+			return extractDir;
+		}
+
+		public void setExtractDir(@Nullable File extractDir) {
+			this.extractDir = extractDir;
+		}
+
+		@NotNull
+		public File getAddonDirectory() {
+			return addonDirectory;
+		}
+
+		@NotNull
+		public String getAddonDirName() {
+			return addonDirectory.getName();
+		}
+
+		@NotNull
+		public List<File> getDebinarizedConfigs() {
+			return debinarizedConfigs;
+		}
+	}
 
 	private static class ArmaAddonsProjectConfigImpl implements ArmaAddonsProjectConfig {
 

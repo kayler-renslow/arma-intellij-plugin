@@ -150,4 +150,8 @@ public class ArmaPluginUserData {
 		}
 	}
 
+	@Nullable
+	public File getArmaToolsDirectory() {
+		throw new UnsupportedOperationException("todo");
+	}
 }
