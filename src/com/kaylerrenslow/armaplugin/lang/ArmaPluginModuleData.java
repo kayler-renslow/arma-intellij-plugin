@@ -2,11 +2,13 @@ package com.kaylerrenslow.armaplugin.lang;
 
 import com.intellij.openapi.module.Module;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
-import com.kaylerrenslow.armaDialogCreator.util.ReadOnlyList;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunctionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Kayler
@@ -16,7 +18,7 @@ public class ArmaPluginModuleData {
 	private HeaderFile rootConfigHeaderFile;
 	private boolean reparseRootConfigHeaderFile = true;
 	private final Module module;
-	private ReadOnlyList<HeaderConfigFunction> functions = null;
+	private List<HeaderConfigFunction> functions = null;
 
 	public ArmaPluginModuleData(@NotNull Module module) {
 		this.module = module;
@@ -37,7 +39,7 @@ public class ArmaPluginModuleData {
 		this.rootConfigHeaderFile = rootConfigHeaderFile;
 		if (rootConfigHeaderFile != null) {
 			try {
-				functions = new ReadOnlyList<>(
+				functions = Collections.unmodifiableList(
 						HeaderConfigFunctionUtil.getAllConfigFunctionsFromRootConfig(HeaderConfigFunctionUtil.getCfgFunctions(rootConfigHeaderFile))
 				);
 			} catch (Exception ignore) {
@@ -56,8 +58,11 @@ public class ArmaPluginModuleData {
 		return module;
 	}
 
+	/**
+	 * @return a read-only list of all config functions
+	 */
 	@Nullable
-	public ReadOnlyList<HeaderConfigFunction> getAllConfigFunctions() {
+	public List<HeaderConfigFunction> getAllConfigFunctions() {
 		return functions;
 	}
 }

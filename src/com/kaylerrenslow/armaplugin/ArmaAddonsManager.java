@@ -3,7 +3,7 @@ package com.kaylerrenslow.armaplugin;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
-import com.kaylerrenslow.armaDialogCreator.util.ReadOnlyList;
+import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
 import com.kaylerrenslow.armaDialogCreator.util.XmlUtil;
 import com.kaylerrenslow.armaplugin.lang.ArmaPluginUserData;
 import org.jetbrains.annotations.NotNull;
@@ -15,10 +15,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 import java.util.function.Function;
 
 /**
@@ -26,40 +26,18 @@ import java.util.function.Function;
  * @since 09/22/2017
  */
 public class ArmaAddonsManager {
-	// We want to be able to control what gets kept after the extraction (models, sqf files, etc).
-	// However, the config files should always be extracted. Reason is the user may not care about the implementation of the scripts.
-	// We definitely don't need to keep the models or sounds or any other non-script related resource.
-
-	// CAREFUL: when we delete files that are extracted and don't need, we need to make sure we aren't deleting files that were originally in the folder.
-	// A user may accidentally select the wrong folder or misunderstand instructions and we don't want them to pay for it!
-	// Idea: create a folder inside the extract folder in which we can extract everything. The folder we create shouldn't exist!
-	// Once the extract is done, we move out everything we want to keep and then delete what remains, including the temp extract folder.
-	// The temp extract folder is also where we would do binarized config conversion
-
-
-	// We want a central location that lists where the mods are stored. We also want a central location of where the extracted contents go.
-	// It would be ideal to have the option for many different extract locations, but also be able to detect when extraction isn't necessary.
-
-	// We will want to make sure that we collect ALL config.cpp files. Some mods can have multiple. Thus, we will want a way
-	// to programmatically merge the HeaderFiles or at least index them as if they were 1 file.
-
-	// For the file that lists all the mods, we should allow blacklisting, whitelisting, and option to use everything in a directory.
-
-	// Question: Where would we store the file that lists all the dependency mods?
-
-	// For when we are extracting PBO files, we need a dialog to show progress on extraction and the like.
-
 	private ArmaAddonsManager() {
 	}
 
 	private final List<ArmaAddon> addons = new ArrayList<>();
-	private final ReadOnlyList<ArmaAddon> addonsReadOnly = new ReadOnlyList<>(addons);
+	private final List<ArmaAddon> addonsReadOnly = Collections.unmodifiableList(addons);
 
 	@NotNull
-	public ReadOnlyList<ArmaAddon> getAddons() {
+	public List<ArmaAddon> getAddons() {
 		return addonsReadOnly;
 	}
 
+	//todo: document this method
 	public void loadAddons(@NotNull ArmaAddonsProjectConfig config) {
 		List<ArmaAddon> armaAddons;
 		try {
@@ -184,22 +162,61 @@ public class ArmaAddonsManager {
 					if (pboFiles == null) {
 						continue;
 					}
-					//todo make this multithreaded
-					for (File pboFile : pboFiles) {
-						File extractDir = new File(
-								tempDir.getAbsolutePath() + "/" + helper.getAddonDirName()
-						);
-						boolean success = ArmaTools.extractPBO(
-								armaTools,
-								pboFile,
-								extractDir, 10 * 60 * 1000 /*10 minutes before suspend*/
-						);
-						if (!success) {
-							System.err.println("Couldn't extract pbo " + pboFile);
-							continue;
+
+					//make it so each partition of the files won't place more work than the other for threads
+					Arrays.sort(pboFiles, Comparator.comparingLong(File::length));
+					List<File> left = new ArrayList<>(pboFiles.length);
+					List<File> right = new ArrayList<>(pboFiles.length);
+					int leftCapacity = 0;
+					int rightCapacity = 0;
+					for (int i = pboFiles.length - 1; i >= 0; i--) {//iterate backwards since array is sorted A-Z
+						File file = pboFiles[i];
+						if (leftCapacity < rightCapacity) {
+							left.add(file);
+							leftCapacity += file.length();
+						} else {
+							right.add(file);
+							rightCapacity += file.length();
 						}
-						helper.setExtractDir(extractDir);
 					}
+
+					Function<List<File>, Void> extractPbos = pboFilesToExtract -> {
+						for (File pboFile : pboFilesToExtract) {
+							File extractDir = new File(
+									tempDir.getAbsolutePath() + "/" + helper.getAddonDirName() +
+											"/" +
+											pboFile.getName().substring(0, pboFile.getName().length() - ".pbo".length())
+							);
+							boolean success = false;
+							try {
+								success = ArmaTools.extractPBO(
+										armaTools,
+										pboFile,
+										extractDir, 10 * 60 * 1000 /*10 minutes before suspend*/
+								);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							if (!success) {
+								System.err.println("ArmaAddonsManager.java: Couldn't extract pbo " + pboFile);
+								continue;
+							}
+							helper.getExtractDirs().add(extractDir);
+						}
+						return null;
+					};
+					ArmaToolsWorkerThread t1 = new ArmaToolsWorkerThread(() -> {
+						extractPbos.apply(left);
+					}, 1
+					);
+					ArmaToolsWorkerThread t2 = new ArmaToolsWorkerThread(() -> {
+						extractPbos.apply(right);
+					}, 2
+					);
+					t1.start();
+					t2.start();
+					t1.join();
+					t2.join();
 				}
 			}
 			final String BINARIZED_CONFIG_NAME = "config.bin";
@@ -208,9 +225,7 @@ public class ArmaAddonsManager {
 					List<File> configBinFiles = new ArrayList<>();
 					LinkedList<File> toVisit = new LinkedList<>();
 					//locate all config.bin files
-					if (helper.getExtractDir() != null) {
-						toVisit.add(helper.getExtractDir());
-					}
+					toVisit.addAll(helper.getExtractDirs());
 					while (!toVisit.isEmpty()) {
 						File visit = toVisit.removeFirst();
 						File[] children = visit.listFiles();
@@ -219,44 +234,135 @@ public class ArmaAddonsManager {
 						}
 						if (visit.getName().equalsIgnoreCase(BINARIZED_CONFIG_NAME)) {
 							configBinFiles.add(visit);
+						} else if (visit.getName().endsWith(".sqf")) {
+							helper.getSqfFiles().add(visit);
+						}
+					}
+
+					//make it so each partition of the files won't place more work than the other for threads
+					configBinFiles.sort(Comparator.comparingLong(File::length));
+					List<File> left = new ArrayList<>(configBinFiles.size());
+					List<File> right = new ArrayList<>(configBinFiles.size());
+					int leftCapacity = 0;
+					int rightCapacity = 0;
+					for (int i = configBinFiles.size() - 1; i >= 0; i--) {//iterate backwards since array is sorted A-Z
+						File file = configBinFiles.get(i);
+						if (leftCapacity < rightCapacity) {
+							left.add(file);
+							leftCapacity += file.length();
+						} else {
+							right.add(file);
+							rightCapacity += file.length();
 						}
 					}
 
 					//convert all config.bin files
-					//todo make multithreaded
-					for (File configBinFile : configBinFiles) {
-						String newPath = configBinFile.getAbsolutePath();
-						newPath = newPath.substring(0, newPath.length() - configBinFile.getName().length()) + "config.cpp";
-						File debinarizedFile = new File(newPath);
-						boolean success = ArmaTools.convertBinConfigToText(
-								armaTools,
-								configBinFile,
-								debinarizedFile,
-								10 * 1000 /*10 seconds*/
-						);
-						if (!success) {
-							System.err.println("Couldn't convert binarized config " + configBinFile);
-							continue;
+					Function<List<File>, Void> convertConfigBinFiles = configBinFilesToConvert -> {
+						for (File configBinFile : configBinFilesToConvert) {
+							String newPath = configBinFile.getParentFile().getAbsolutePath() + "/config.cpp";
+							File debinarizedFile = new File(newPath);
+							boolean success = false;
+							try {
+								success = ArmaTools.convertBinConfigToText(
+										armaTools,
+										configBinFile,
+										debinarizedFile,
+										10 * 1000 /*10 seconds*/
+								);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							if (!success) {
+								System.err.println("ArmaAddonsManager.java: Couldn't convert binarized config " + configBinFile);
+								continue;
+							}
+							helper.getDebinarizedConfigFiles().add(debinarizedFile);
 						}
-						helper.getDebinarizedConfigs().add(debinarizedFile);
+						return null;
+					};
+					ArmaToolsWorkerThread t1 = new ArmaToolsWorkerThread(() -> {
+						convertConfigBinFiles.apply(left);
+					}, 1
+					);
+					ArmaToolsWorkerThread t2 = new ArmaToolsWorkerThread(() -> {
+						convertConfigBinFiles.apply(right);
+					}, 2
+					);
+					t1.start();
+					t2.start();
+					t1.join();
+					t2.join();
+				}
+			}
+
+			{//parse the configs
+				for (ArmaAddonHelper helper : addonHelpers) {
+					for (File configFile : helper.getDebinarizedConfigFiles()) {
+						HeaderFile headerFile = HeaderParser.parse(configFile, configFile.getParentFile());
+						helper.getParsedConfigs().add(headerFile);
 					}
 				}
 			}
 
+			{//copy the files out of temp directory that we want to keep
+				for (ArmaAddonHelper helper : addonHelpers) {
+					//create folder in reference directory
+					File destDir = new File(refDir.getAbsolutePath() + "/" + helper.getAddonDirName());
+					boolean mkdirs = destDir.mkdirs();
+					if (!mkdirs) {
+						System.err.println("ArmaAddonsManager.java: Couldn't create reference directory for " + helper.getAddonDirName());
+						continue;
+					}
 
-			//move the files out of temp directory that we want to keep
-			//todo
+					//copy over sqf files into destDir and replicate folder structure in destDir
+					LinkedList<File> toVisit = new LinkedList<>();
+					LinkedList<File> traverseCopy = new LinkedList<>();
+					toVisit.addAll(helper.getExtractDirs());
+					traverseCopy.add(destDir);
+					while (!toVisit.isEmpty()) {
+						File visit = toVisit.pop();
+						File folderCopy = traverseCopy.pop();
 
-			//delete temp directory (will also remove unnecessary files)
-			//todo
+						if (visit.isDirectory() && !helper.getExtractDirs().contains(visit)) {
+							File newFolder = new File(folderCopy.getAbsolutePath() + "/" + visit.getName());
+							boolean mkdirs1 = newFolder.mkdirs();
+							if (!mkdirs1) {
+								System.err.println("ArmaAddonsManager.java: Couldn't create directories for " + newFolder);
+								continue;
+							}
+						}
 
-			//parse the configs
-			//todo
+						File[] children = visit.listFiles();
+						if (children != null) {
+							for (File child : children) {
+								if (helper.getSqfFiles().contains(child)) {
+									try {
+										Files.copy(
+												child.toPath(),
+												new File(destDir.getAbsolutePath() + "/" + child.getName()).toPath(),
+												StandardCopyOption.REPLACE_EXISTING
+										);
+									} catch (IOException e) {
+										e.printStackTrace();
+										continue;
+									}
+								} else if (child.isDirectory()) {
+									toVisit.push(child);
+								}
+							}
+						}
+					}
+				}
+			}
+
+			{//delete temp directory (will also remove unnecessary files)
+				deleteDirectory(tempDir);
+			}
 		}
 
 		List<ArmaAddon> addons = new ArrayList<>(addonHelpers.size());
 		for (ArmaAddonHelper helper : addonHelpers) {
-			//todo fill addons list
+			addons.add(new ArmaAddonImpl(helper));
 		}
 
 		return addons;
@@ -272,6 +378,23 @@ public class ArmaAddonsManager {
 		}
 		return instance;
 	}
+
+	private static void deleteDirectory(@NotNull File directory) {
+		if (directory.exists()) {
+			File[] files = directory.listFiles();
+			if (null != files) {
+				for (File file : files) {
+					if (file.isDirectory()) {
+						deleteDirectory(file);
+					} else {
+						file.delete();
+					}
+				}
+			}
+		}
+		directory.delete();
+	}
+
 
 	/**
 	 * Used to parse addonscfg.xml file. This method will also parse any macros present in the xml. For instance, the macro
@@ -385,13 +508,37 @@ public class ArmaAddonsManager {
 		return new ArmaAddonsProjectConfigImpl(blacklistedAddons, whitelistedAddons, addonsRoots, addonsReferenceDirectory);
 	}
 
+	private static class ArmaAddonImpl implements ArmaAddon {
+
+		private final List<HeaderFile> configFiles;
+		private final File addonDirectory;
+
+		public ArmaAddonImpl(@NotNull ArmaAddonHelper helper) {
+			this.configFiles = Collections.unmodifiableList(helper.getParsedConfigs());
+			this.addonDirectory = helper.getAddonDirectory();
+		}
+
+		@NotNull
+		@Override
+		public List<HeaderFile> getConfigFiles() {
+			return configFiles;
+		}
+
+		@NotNull
+		@Override
+		public File getAddonDirectory() {
+			return addonDirectory;
+		}
+
+	}
 
 	private static class ArmaAddonHelper {
 		@NotNull
 		private final File addonDirectory;
-		private final List<HeaderFile> parsedConfigs = new ArrayList<>();
-		private final List<File> debinarizedConfigs = new ArrayList<>();
-		private File extractDir;
+		private final List<HeaderFile> parsedConfigs = Collections.synchronizedList(new ArrayList<>());
+		private final List<File> debinarizedConfigs = Collections.synchronizedList(new ArrayList<>());
+		private final List<File> sqfFiles = Collections.synchronizedList(new ArrayList<>());
+		private final List<File> extractDirs = Collections.synchronizedList(new ArrayList<>());
 
 		public ArmaAddonHelper(@NotNull File addonDirectory) {
 			this.addonDirectory = addonDirectory;
@@ -400,15 +547,6 @@ public class ArmaAddonsManager {
 		@NotNull
 		public List<HeaderFile> getParsedConfigs() {
 			return parsedConfigs;
-		}
-
-		@Nullable
-		public File getExtractDir() {
-			return extractDir;
-		}
-
-		public void setExtractDir(@Nullable File extractDir) {
-			this.extractDir = extractDir;
 		}
 
 		@NotNull
@@ -422,8 +560,18 @@ public class ArmaAddonsManager {
 		}
 
 		@NotNull
-		public List<File> getDebinarizedConfigs() {
+		public List<File> getDebinarizedConfigFiles() {
 			return debinarizedConfigs;
+		}
+
+		@NotNull
+		public List<File> getSqfFiles() {
+			return sqfFiles;
+		}
+
+		@NotNull
+		public List<File> getExtractDirs() {
+			return extractDirs;
 		}
 	}
 
@@ -470,6 +618,13 @@ public class ArmaAddonsManager {
 		@Override
 		public List<String> getAddonsRoots() {
 			return addonsRoots;
+		}
+	}
+
+	private static class ArmaToolsWorkerThread extends Thread {
+		public ArmaToolsWorkerThread(@NotNull Runnable target, int workerId) {
+			super(target);
+			setName("ArmaAddonsManager.ArmaToolsWorkerThread " + workerId);
 		}
 	}
 }

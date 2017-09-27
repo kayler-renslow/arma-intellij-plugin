@@ -1,10 +1,10 @@
 package com.kaylerrenslow.armaplugin;
 
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
-import com.kaylerrenslow.armaDialogCreator.util.ReadOnlyList;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @author Kayler
@@ -13,10 +13,10 @@ import java.io.File;
 public interface ArmaAddon {
 
 	/**
-	 * @return a list of {@link HeaderFile} instances that each represent a parsed config.cpp
+	 * @return a read-only list of {@link HeaderFile} instances that each represent a parsed config.cpp
 	 */
 	@NotNull
-	ReadOnlyList<HeaderFile> getConfigFiles();
+	List<HeaderFile> getConfigFiles();
 
 	/**
 	 * @return the folder with the "@" symbol prefixed
@@ -28,6 +28,8 @@ public interface ArmaAddon {
 	 * @return the name of the addon with the "@" symbol prefixed
 	 */
 	@NotNull
-	String getAddonDirectoryName();
+	default String getAddonDirectoryName() {
+		return getAddonDirectory().getName();
+	}
 
 }

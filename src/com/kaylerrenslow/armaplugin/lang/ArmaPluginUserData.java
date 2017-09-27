@@ -11,7 +11,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtil;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
-import com.kaylerrenslow.armaDialogCreator.util.ReadOnlyList;
 import com.kaylerrenslow.armaplugin.ArmaPlugin;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderPsiFile;
@@ -20,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -108,7 +108,7 @@ public class ArmaPluginUserData {
 	}
 
 	@Nullable
-	public ReadOnlyList<HeaderConfigFunction> getAllConfigFunctions(@NotNull PsiElement elementFromModule) {
+	public List<HeaderConfigFunction> getAllConfigFunctions(@NotNull PsiElement elementFromModule) {
 		synchronized (this) {
 			ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
 			if (moduleData == null) {
