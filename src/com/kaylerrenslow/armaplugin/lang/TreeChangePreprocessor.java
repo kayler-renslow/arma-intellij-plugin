@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang;
 
 import com.intellij.psi.impl.PsiTreeChangeEventImpl;
 import com.intellij.psi.impl.PsiTreeChangePreprocessor;
+import com.kaylerrenslow.armaplugin.ArmaPluginUserData;
 import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderPsiFile;
 import org.jetbrains.annotations.NotNull;
 

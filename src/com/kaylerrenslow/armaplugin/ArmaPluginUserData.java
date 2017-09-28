@@ -1,4 +1,4 @@
-package com.kaylerrenslow.armaplugin.lang;
+package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.application.TransactionGuard;
 import com.intellij.openapi.editor.Document;
@@ -11,7 +11,6 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.util.PsiUtil;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
-import com.kaylerrenslow.armaplugin.ArmaPlugin;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderPsiFile;
 import org.jetbrains.annotations.NotNull;
@@ -137,7 +136,7 @@ public class ArmaPluginUserData {
 	 * Note that this doesn't do any reparsing and instead tells {@link #parseAndGetRootConfigHeaderFile(PsiElement)} that it's cached
 	 * {@link HeaderFile} is no longer valid and it should reparse.
 	 */
-	void reparseRootConfig(@NotNull PsiFile fileFromModule) {
+	public void reparseRootConfig(@NotNull PsiFile fileFromModule) {
 		synchronized (this) {
 			Module module = ModuleUtil.findModuleForPsiElement(fileFromModule);
 			if (module == null) {

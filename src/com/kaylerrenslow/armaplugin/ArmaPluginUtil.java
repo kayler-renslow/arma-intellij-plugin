@@ -1,4 +1,4 @@
-package com.kaylerrenslow.armaplugin.lang;
+package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;

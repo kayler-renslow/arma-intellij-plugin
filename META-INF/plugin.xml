@@ -9,7 +9,7 @@
 	<description>
 
 	</description>
-	<idea-version since-build="131"/>
+	<idea-version since-build="171"/>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- SQF Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFFileTypeFactory"/>
@@ -49,6 +49,19 @@
 
 	</extensions>
 
+	<actions>
+		<group id="ArmaPluginGroup" text="Arma Plugin">
+			<add-to-group group-id="MainMenu"/>
+		</group>
+		<action class="com.kaylerrenslow.armaplugin.actions.SetArmaToolsDirAction"
+				id="com.kaylerrenslow.armaplugin.actions.SetArmaToolsDirAction" text="Set Arma Tools Directory">
+			<add-to-group group-id="ArmaPluginGroup"/>
+		</action>
+		<action class="com.kaylerrenslow.armaplugin.actions.TestAction"
+				id="com.kaylerrenslow.armaplugin.actions.TestAction" text="Test">
+			<add-to-group group-id="ArmaPluginGroup"/>
+		</action>
+	</actions>
 
 	<change-notes></change-notes>
 

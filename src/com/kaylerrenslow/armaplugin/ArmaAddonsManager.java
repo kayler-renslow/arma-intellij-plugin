@@ -1,11 +1,9 @@
 package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.project.Project;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
 import com.kaylerrenslow.armaDialogCreator.util.XmlUtil;
-import com.kaylerrenslow.armaplugin.lang.ArmaPluginUserData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
@@ -40,7 +38,13 @@ public class ArmaAddonsManager {
 		return addonsReadOnly;
 	}
 
+	/**
+	 * Will load addons into {@link #getAddons()}.
+	 *
+	 * @param config the config to use
+	 */
 	//todo: document this method
+	//todo: we should check to see if we need to re-extract each addon. If we don't need to extract it, load it from reference directory
 	public void loadAddons(@NotNull ArmaAddonsProjectConfig config) {
 		List<ArmaAddon> armaAddons;
 		try {
@@ -157,7 +161,6 @@ public class ArmaAddonsManager {
 									  @NotNull File refDir, @NotNull File armaTools, @NotNull File tempDir) throws Exception {
 		final List<File> extractDirs = Collections.synchronizedList(new ArrayList<>());
 		final List<File> debinarizedConfigs = Collections.synchronizedList(new ArrayList<>());
-		final List<File> sqfFiles = Collections.synchronizedList(new ArrayList<>());
 
 		{//extract pbo's into temp directory
 			File addonsDir = null;
@@ -182,7 +185,7 @@ public class ArmaAddonsManager {
 				return;
 			}
 
-			//make it so each partition of the files won't place more work than the other for threads
+			//make it so each thread doesn't do more work than the other. Also, partition the data.
 			Arrays.sort(pboFiles, Comparator.comparingLong(File::length));
 			List<File> left = new ArrayList<>(pboFiles.length);
 			List<File> right = new ArrayList<>(pboFiles.length);
@@ -206,6 +209,7 @@ public class ArmaAddonsManager {
 									"/" +
 									pboFile.getName().substring(0, pboFile.getName().length() - ".pbo".length())
 					);
+					extractDir.mkdirs();
 					boolean success = false;
 					try {
 						success = ArmaTools.extractPBO(
@@ -252,12 +256,10 @@ public class ArmaAddonsManager {
 				}
 				if (visit.getName().equalsIgnoreCase(BINARIZED_CONFIG_NAME)) {
 					configBinFiles.add(visit);
-				} else if (visit.getName().endsWith(".sqf")) {
-					sqfFiles.add(visit);
 				}
 			}
 
-			//make it so each partition of the files won't place more work than the other for threads
+			//make it so each thread doesn't do more work than the other. Also, partition the data.
 			configBinFiles.sort(Comparator.comparingLong(File::length));
 			List<File> left = new ArrayList<>(configBinFiles.size());
 			List<File> right = new ArrayList<>(configBinFiles.size());
@@ -328,32 +330,34 @@ public class ArmaAddonsManager {
 				return;
 			}
 
-			//copy over sqf files into destDir and replicate folder structure in destDir
+			//copy over sqf and header files into destDir and replicate folder structure in destDir
 			LinkedList<File> toVisit = new LinkedList<>();
 			LinkedList<File> traverseCopy = new LinkedList<>();
-			toVisit.addAll(extractDirs);
-			traverseCopy.add(destDir);
+			for (File extractDir : extractDirs) {
+				toVisit.add(extractDir);
+				File folderCopy = new File(destDir.getAbsolutePath() + "/" + extractDir.getName());
+				traverseCopy.add(folderCopy);
+				boolean mkdirs1 = folderCopy.mkdirs();
+				if (!mkdirs1) {
+					System.err.println("ArmaAddonsManager.java: Couldn't create reference directory for " + folderCopy);
+				}
+			}
 			while (!toVisit.isEmpty()) {
 				File visit = toVisit.pop();
 				File folderCopy = traverseCopy.pop();
 
-				if (visit.isDirectory() && !extractDirs.contains(visit)) {
-					File newFolder = new File(folderCopy.getAbsolutePath() + "/" + visit.getName());
-					boolean mkdirs1 = newFolder.mkdirs();
-					if (!mkdirs1) {
-						System.err.println("ArmaAddonsManager.java: Couldn't create directories for " + newFolder);
-						continue;
-					}
-				}
-
 				File[] children = visit.listFiles();
 				if (children != null) {
 					for (File child : children) {
-						if (sqfFiles.contains(child)) {
+						if (child.isFile() && child.getName().endsWith(".sqf")
+								|| child.getName().endsWith(".cpp")
+								|| child.getName().endsWith(".h")
+								|| child.getName().endsWith(".hh")
+								|| child.getName().endsWith(".hpp")) {
 							try {
 								Files.copy(
 										child.toPath(),
-										new File(destDir.getAbsolutePath() + "/" + child.getName()).toPath(),
+										new File(folderCopy.getAbsolutePath() + "/" + child.getName()).toPath(),
 										StandardCopyOption.REPLACE_EXISTING
 								);
 							} catch (IOException e) {
@@ -362,6 +366,14 @@ public class ArmaAddonsManager {
 							}
 						} else if (child.isDirectory()) {
 							toVisit.push(child);
+
+							File newFolder = new File(folderCopy.getAbsolutePath() + "/" + visit.getName());
+							boolean mkdirs1 = newFolder.mkdirs();
+							if (!mkdirs1) {
+								System.err.println("ArmaAddonsManager.java: Couldn't create directories for " + newFolder);
+								continue;
+							}
+							traverseCopy.push(newFolder);
 						}
 					}
 				}
@@ -411,7 +423,7 @@ public class ArmaAddonsManager {
 	 * @return the config, or null if couldn't be created
 	 */
 	@Nullable
-	public static ArmaAddonsProjectConfig parseAddonsConfig(@NotNull VirtualFile configFile, @NotNull Project project) {
+	public static ArmaAddonsProjectConfig parseAddonsConfig(@NotNull File configFile, @NotNull Project project) {
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder builder = null;
 		try {
@@ -421,7 +433,7 @@ public class ArmaAddonsManager {
 		}
 		Document doc;
 		try {
-			doc = builder.parse(new File(configFile.getPath()));
+			doc = builder.parse(configFile);
 		} catch (Exception e) {
 			return null;
 		}
@@ -535,12 +547,19 @@ public class ArmaAddonsManager {
 			return addonDirectory;
 		}
 
+		@Override
+		public String toString() {
+			return "ArmaAddonImpl{" +
+					"configFiles=" + configFiles +
+					", addonDirectory=" + addonDirectory +
+					'}';
+		}
 	}
 
 	private static class ArmaAddonHelper {
 		@NotNull
 		private final File addonDirectory;
-		private final List<HeaderFile> parsedConfigs = Collections.synchronizedList(new ArrayList<>());
+		private final List<HeaderFile> parsedConfigs = new ArrayList<>();
 
 		public ArmaAddonHelper(@NotNull File addonDirectory) {
 			this.addonDirectory = addonDirectory;
@@ -605,6 +624,20 @@ public class ArmaAddonsManager {
 		@Override
 		public List<String> getAddonsRoots() {
 			return addonsRoots;
+		}
+
+		@Override
+		public String toString() {
+			return "ArmaAddonsProjectConfigImpl{" +
+					"blacklist=" +
+					blacklistedAddons +
+					";whitelist=" +
+					whitelistedAddons +
+					";addonRoots=" +
+					addonsRoots +
+					";referenceDirectory=" +
+					addonsReferenceDirectory +
+					'}';
 		}
 	}
 
