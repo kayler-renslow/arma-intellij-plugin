@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.kaylerrenslow.armaplugin.dialog.ArmaPluginSettingsForm;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 

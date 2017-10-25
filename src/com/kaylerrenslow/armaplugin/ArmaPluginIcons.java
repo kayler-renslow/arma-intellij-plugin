@@ -20,6 +20,9 @@ public class ArmaPluginIcons {
 
 	public static final Icon ICON_HEADER = IconLoader.getIcon(path("icons/header.png"));
 
+	public static final Icon ICON_DIALOG_ERROR = IconLoader.getIcon("icons/dialogError.png");
+	public static final Icon ICON_DIALOG_GOOD = IconLoader.getIcon("icons/dialogGood.png");
+
 	private static String path(String p) {
 		return "/com/kaylerrenslow/armaplugin/" + p;
 	}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.kaylerrenslow.armaplugin.ArmaPluginSettingsForm">
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="com.kaylerrenslow.armaplugin.dialog.ArmaPluginSettingsForm">
   <grid id="8b673" binding="panelRoot" layout-manager="BorderLayout" hgap="0" vgap="0">
     <constraints>
       <xy x="20" y="20" width="740" height="400"/>
