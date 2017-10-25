@@ -35,6 +35,7 @@ public class ArmaPluginUserData {
 	}
 
 	private final Map<Module, ArmaPluginModuleData> moduleMap = new IdentityHashMap<>();
+	private File armaToolsDir = null;
 
 	/**
 	 * Get the {@link HeaderFile} instance. It will be either description.ext (for missions) or config.cpp (for addons/mods).
@@ -151,6 +152,10 @@ public class ArmaPluginUserData {
 
 	@Nullable
 	public File getArmaToolsDirectory() {
-		throw new UnsupportedOperationException("todo");
+		return armaToolsDir;
+	}
+
+	public void setArmaToolsDir(@Nullable File armaToolsDir) {
+		this.armaToolsDir = armaToolsDir;
 	}
 }
