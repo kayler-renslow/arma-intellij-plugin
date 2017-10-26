@@ -24,7 +24,6 @@ public class ArmaPluginApplicationSettings implements PersistentStateComponent<A
 
 	@Override
 	public void loadState(State state) {
-		System.out.println("ArmaPluginPersistentStateComponent.loadState ");
 		this.myState = state;
 	}
 
