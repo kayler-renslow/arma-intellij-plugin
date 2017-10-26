@@ -23,6 +23,9 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
+ * Used for storing data collected from the current IntelliJ process's lifetime.
+ * This data will not be persisted after IntelliJ restarts.
+ *
  * @author Kayler
  * @since 09/08/2017
  */
@@ -35,7 +38,6 @@ public class ArmaPluginUserData {
 	}
 
 	private final Map<Module, ArmaPluginModuleData> moduleMap = new IdentityHashMap<>();
-	private File armaToolsDir = null;
 
 	/**
 	 * Get the {@link HeaderFile} instance. It will be either description.ext (for missions) or config.cpp (for addons/mods).
@@ -150,16 +152,29 @@ public class ArmaPluginUserData {
 		}
 	}
 
+	/**
+	 * This method is just a shortcut that utilizes {@link ArmaPluginApplicationSettings#getState()}
+	 *
+	 * @return the Arma Tools directory
+	 * @see #setArmaToolsDirectory(File)
+	 */
 	@Nullable
 	public File getArmaToolsDirectory() {
-		synchronized (this) {
-			return armaToolsDir;
+		String path = ArmaPluginApplicationSettings.getInstance().getState().armaToolsDirectory;
+		if (path == null) {
+			return null;
 		}
+		return new File(path);
 	}
 
-	public void setArmaToolsDir(@Nullable File armaToolsDir) {
-		synchronized (this) {
-			this.armaToolsDir = armaToolsDir;
-		}
+	/**
+	 * Sets the current Arma Tools directory.
+	 * This method is just a shortcut that utilizes {@link ArmaPluginApplicationSettings#getState()}
+	 *
+	 * @see #getArmaToolsDirectory()
+	 */
+	public void setArmaToolsDirectory(@Nullable File armaToolsDir) {
+		String path = armaToolsDir == null ? null : armaToolsDir.getAbsolutePath();
+		ArmaPluginApplicationSettings.getInstance().getState().armaToolsDirectory = path;
 	}
 }

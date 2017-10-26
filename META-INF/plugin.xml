@@ -25,7 +25,8 @@
 		<psi.referenceContributor implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFReferenceContributor"/>
 		<annotator language="Arma.SQF"
 				   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.codestyle.SQFMagicVarColorizerAnnotator"/>
-
+	</extensions>
+	<extensions defaultExtensionNs="com.intellij">
 		<!-- Header Language -->
 		<fileTypeFactory implementation="com.kaylerrenslow.armaplugin.lang.header.HeaderFileTypeFactory"/>
 		<lang.parserDefinition language="Arma.Header"
@@ -35,26 +36,24 @@
 									   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderSyntaxHighlighterFactory"/>
 		<annotator language="Arma.Header"
 				   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderIncludeColorizerAnnotator"/>
-
+	</extensions>
+	<extensions defaultExtensionNs="com.intellij">
 		<!-- Shared -->
 		<annotator language="Arma.Header"
 				   implementationClass="com.kaylerrenslow.armaplugin.lang.DocumentationTagsAnnotator"/>
 		<annotator language="Arma.SQF"
 				   implementationClass="com.kaylerrenslow.armaplugin.lang.DocumentationTagsAnnotator"/>
 		<usageTypeProvider implementation="com.kaylerrenslow.armaplugin.lang.ArmaUsageTypeProvider"/>
-
+	</extensions>
+	<extensions defaultExtensionNs="com.intellij">
 		<!-- Misc -->
 		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/armaplugin/armaPluginColorSchemes.xml"/>
 		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/armaplugin/armaPluginColorSchemes.xml"/>
 
 		<applicationConfigurable instance="com.kaylerrenslow.armaplugin.ArmaPluginProjectConfigurable"/>
+		<applicationService serviceImplementation="com.kaylerrenslow.armaplugin.ArmaPluginApplicationSettings"
+							serviceInterface="com.kaylerrenslow.armaplugin.ArmaPluginApplicationSettings"/>
 	</extensions>
-	<application-components>
-		<component>
-			<implementation-class>com.kaylerrenslow.armaplugin.ArmaPluginUserSettingsApplicationComponent
-			</implementation-class>
-		</component>
-	</application-components>
 	<change-notes></change-notes>
 
 </idea-plugin>

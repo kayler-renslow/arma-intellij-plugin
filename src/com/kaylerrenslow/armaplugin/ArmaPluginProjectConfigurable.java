@@ -1,6 +1,5 @@
 package com.kaylerrenslow.armaplugin;
 
-import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.io.FileUtil;
@@ -49,11 +48,6 @@ public class ArmaPluginProjectConfigurable implements Configurable {
 
 	@Override
 	public void apply() throws ConfigurationException {
-		ArmaPluginUserData.getInstance().setArmaToolsDir(new File(form.getArmaToolsDirectoryPath()));
-		PropertiesComponent.getInstance().setValue(Keys.ArmaToolsDir, form.getArmaToolsDirectoryPath());
-	}
-
-	private interface Keys {
-		String ArmaToolsDir = "ArmaIntellijPlugin.armaToolsDirectory";
+		ArmaPluginApplicationSettings.getInstance().getState().armaToolsDirectory = form.getArmaToolsDirectoryPath();
 	}
 }
