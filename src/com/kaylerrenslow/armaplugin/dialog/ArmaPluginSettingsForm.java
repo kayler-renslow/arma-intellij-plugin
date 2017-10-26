@@ -2,7 +2,6 @@ package com.kaylerrenslow.armaplugin.dialog;
 
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.kaylerrenslow.armaDialogCreator.util.Reference;
 import com.kaylerrenslow.armaplugin.ArmaPlugin;
 import com.kaylerrenslow.armaplugin.ArmaPluginIcons;
 import com.kaylerrenslow.armaplugin.ArmaTools;
@@ -21,15 +20,15 @@ public class ArmaPluginSettingsForm {
 	private JPanel panelRoot;
 	private JButton btnTestDir;
 	private JPanel panelForTfArmaToolsDir;
-	private final Reference<String> armaToolsDirectoryRef = new Reference<>();
+	private JTextField tfArmaToolsDir;
 
 	public ArmaPluginSettingsForm() {
 		btnTestDir.addActionListener(e -> {
-			boolean validA3ToolsDirectory = false;
-			if (armaToolsDirectoryRef.getValue() != null) {
-				validA3ToolsDirectory = ArmaTools.isValidA3ToolsDirectory(new File(armaToolsDirectoryRef.getValue()));
+			boolean validAToolsDirectory = false;
+			if (tfArmaToolsDir.getText() != null) {
+				validAToolsDirectory = ArmaTools.isValidA3ToolsDirectory(new File(tfArmaToolsDir.getText()));
 			}
-			new ArmaToolsDirOkDialog(validA3ToolsDirectory).show();
+			new ArmaToolsDirOkDialog(validAToolsDirectory).show();
 
 		});
 	}
@@ -40,7 +39,7 @@ public class ArmaPluginSettingsForm {
 	}
 
 	private void createUIComponents() {
-		final JTextField tfArmaToolsDir = new JTextField(40);
+		tfArmaToolsDir = new JTextField(40);
 		{
 			panelForTfArmaToolsDir = new TextFieldWithBrowseButton(tfArmaToolsDir, e -> {
 				JFileChooser fc = new JFileChooser();
@@ -52,19 +51,27 @@ public class ArmaPluginSettingsForm {
 					return;
 				}
 				tfArmaToolsDir.setText(file.getAbsolutePath());
-				armaToolsDirectoryRef.setValue(tfArmaToolsDir.getText());
 			});
 		}
 	}
 
+	@NotNull
+	public String getArmaToolsDirectoryPath() {
+		return tfArmaToolsDir.getText() == null ? "" : tfArmaToolsDir.getText();
+	}
+
+	public void initArma3ToolsDirectory(@NotNull String path) {
+		tfArmaToolsDir.setText(path);
+	}
+
 	private class ArmaToolsDirOkDialog extends DialogWrapper {
 
-		private final boolean validA3ToolsDirectory;
+		private final boolean validArmaToolsDirectory;
 		private final ResourceBundle b = ArmaPlugin.getPluginBundle();
 
-		public ArmaToolsDirOkDialog(boolean validA3ToolsDirectory) {
+		public ArmaToolsDirOkDialog(boolean validArmaToolsDirectory) {
 			super(false);
-			this.validA3ToolsDirectory = validA3ToolsDirectory;
+			this.validArmaToolsDirectory = validArmaToolsDirectory;
 
 			init();
 			setTitle(b.getString("Misc.aip-notification"));
@@ -75,14 +82,14 @@ public class ArmaPluginSettingsForm {
 		protected JComponent createCenterPanel() {
 			JPanel root = new JPanel();
 			root.add(new JLabel(
-							validA3ToolsDirectory ?
+					validArmaToolsDirectory ?
 									ArmaPluginIcons.ICON_DIALOG_GOOD :
 									ArmaPluginIcons.ICON_DIALOG_ERROR
 					)
 			);
 			root.add(
 					new JLabel(
-							validA3ToolsDirectory ? b.getString("Dialog.ArmaToolsConfig.directory-is-valid")
+							validArmaToolsDirectory ? b.getString("Dialog.ArmaToolsConfig.directory-is-valid")
 									: b.getString("Dialog.ArmaToolsConfig.directory-is-not-valid")
 					)
 

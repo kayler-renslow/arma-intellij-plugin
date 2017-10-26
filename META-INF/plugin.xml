@@ -49,7 +49,12 @@
 
 		<applicationConfigurable instance="com.kaylerrenslow.armaplugin.ArmaPluginProjectConfigurable"/>
 	</extensions>
-
+	<application-components>
+		<component>
+			<implementation-class>com.kaylerrenslow.armaplugin.ArmaPluginUserSettingsApplicationComponent
+			</implementation-class>
+		</component>
+	</application-components>
 	<change-notes></change-notes>
 
 </idea-plugin>

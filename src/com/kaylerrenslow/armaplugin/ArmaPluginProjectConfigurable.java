@@ -1,12 +1,15 @@
 package com.kaylerrenslow.armaplugin;
 
+import com.intellij.ide.util.PropertiesComponent;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.util.io.FileUtil;
 import com.kaylerrenslow.armaplugin.dialog.ArmaPluginSettingsForm;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
 import javax.swing.*;
+import java.io.File;
 
 /**
  * @author Kayler
@@ -14,7 +17,6 @@ import javax.swing.*;
  */
 public class ArmaPluginProjectConfigurable implements Configurable {
 
-	private final JLabel lblCurrentDirPath = new JLabel();
 	private final ArmaPluginSettingsForm form = new ArmaPluginSettingsForm();
 
 	@Nls
@@ -26,16 +28,32 @@ public class ArmaPluginProjectConfigurable implements Configurable {
 	@Nullable
 	@Override
 	public JComponent createComponent() {
+		File a3ToolsDir = ArmaPluginUserData.getInstance().getArmaToolsDirectory();
+		form.initArma3ToolsDirectory(a3ToolsDir == null ? "" : a3ToolsDir.getAbsolutePath());
 		return form.getPanelRoot();
 	}
 
 	@Override
 	public boolean isModified() {
-		return false;
+		String enteredDir = form.getArmaToolsDirectoryPath();
+		boolean modified = false;
+		File currentArmaToolsDir = ArmaPluginUserData.getInstance().getArmaToolsDirectory();
+		if (currentArmaToolsDir == null && enteredDir.length() == 0) {
+			modified = false;
+		} else {
+			//if modified, that means the files aren't equal
+			modified = !FileUtil.filesEqual(new File(enteredDir), ArmaPluginUserData.getInstance().getArmaToolsDirectory());
+		}
+		return modified;
 	}
 
 	@Override
 	public void apply() throws ConfigurationException {
+		ArmaPluginUserData.getInstance().setArmaToolsDir(new File(form.getArmaToolsDirectoryPath()));
+		PropertiesComponent.getInstance().setValue(Keys.ArmaToolsDir, form.getArmaToolsDirectoryPath());
+	}
 
+	private interface Keys {
+		String ArmaToolsDir = "ArmaIntellijPlugin.armaToolsDirectory";
 	}
 }

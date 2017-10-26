@@ -152,10 +152,14 @@ public class ArmaPluginUserData {
 
 	@Nullable
 	public File getArmaToolsDirectory() {
-		return armaToolsDir;
+		synchronized (this) {
+			return armaToolsDir;
+		}
 	}
 
 	public void setArmaToolsDir(@Nullable File armaToolsDir) {
-		this.armaToolsDir = armaToolsDir;
+		synchronized (this) {
+			this.armaToolsDir = armaToolsDir;
+		}
 	}
 }
