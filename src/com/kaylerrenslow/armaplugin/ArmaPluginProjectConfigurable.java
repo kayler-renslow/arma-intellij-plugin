@@ -36,7 +36,7 @@ public class ArmaPluginProjectConfigurable implements Configurable {
 		JButton btnTest = new JButton("Test");
 		form.getPanelRoot().add(btnTest);
 		btnTest.addActionListener(e -> {
-			new IndexArmaAddonsStatusDialog(null).show();
+			new IndexArmaAddonsStatusDialog().setVisible(true);
 		});
 
 		//end testing code
