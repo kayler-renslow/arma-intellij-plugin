@@ -55,5 +55,4 @@
 							serviceInterface="com.kaylerrenslow.armaplugin.ArmaPluginApplicationSettings"/>
 	</extensions>
 	<change-notes></change-notes>
-
 </idea-plugin>

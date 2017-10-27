@@ -4,10 +4,12 @@ import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
 import com.intellij.openapi.util.io.FileUtil;
 import com.kaylerrenslow.armaplugin.dialog.ArmaPluginSettingsForm;
+import com.kaylerrenslow.armaplugin.dialog.IndexArmaAddonsStatusDialog;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JComponent;
 import java.io.File;
 
 /**
@@ -29,6 +31,15 @@ public class ArmaPluginProjectConfigurable implements Configurable {
 	public JComponent createComponent() {
 		File a3ToolsDir = ArmaPluginUserData.getInstance().getArmaToolsDirectory();
 		form.initArma3ToolsDirectory(a3ToolsDir == null ? "" : a3ToolsDir.getAbsolutePath());
+
+		//testing code
+		JButton btnTest = new JButton("Test");
+		form.getPanelRoot().add(btnTest);
+		btnTest.addActionListener(e -> {
+			new IndexArmaAddonsStatusDialog(null).show();
+		});
+
+		//end testing code
 		return form.getPanelRoot();
 	}
 
