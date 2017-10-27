@@ -1,6 +1,7 @@
 package com.kaylerrenslow.armaplugin.dialog;
 
 import com.intellij.util.ui.UIUtil;
+import com.kaylerrenslow.armaplugin.ArmaAddonsIndexingCallback.Step;
 import com.kaylerrenslow.armaplugin.ArmaPlugin;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
@@ -36,6 +37,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 	public IndexArmaAddonsStatusDialog() {
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setContentPane(createCenterPanel());
+		setSize(800, 570);
 	}
 
 	@NotNull
@@ -148,14 +150,12 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 		private final CheckBox checkBoxCleanup = new CheckBox();
 		private final TableView<Message> tableViewMessage = new TableView<>();
 
-		public enum Step {
-			ExtractPBOs, DeBinarizeConfigs, ParseConfigs, SaveReferences, Cleanup
-		}
 
 		public CenterPanel() {
 			super(5);
 			SplitPane centerSplitPane = new SplitPane(taConsole, tableViewMessage);
 			centerSplitPane.setOrientation(Orientation.HORIZONTAL);
+			VBox.setVgrow(centerSplitPane, Priority.ALWAYS);
 			GridPane gridPaneProgress = new GridPane();
 
 			getChildren().addAll(
@@ -341,7 +341,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 		private final Font BOLD_FONT = Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize());
 
 		public StatusBar() {
-			getChildren().addAll(
+			getItems().addAll(
 					getBoldLabel(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mod-name")),
 					lblModName,
 					new Separator(Orientation.VERTICAL),
