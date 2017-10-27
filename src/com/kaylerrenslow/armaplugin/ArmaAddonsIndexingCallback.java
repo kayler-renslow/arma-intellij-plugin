@@ -6,7 +6,8 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 
 /**
- * Contains a set of methods to track the progress of Arma Addon/Mod indexing progress from {@link ArmaAddonsManager#loadAddonsAsync(ArmaAddonsProjectConfig, File, ArmaAddonsIndexingCallback)}.
+ * Contains a set of methods to track the progress of Arma Addon/Mod indexing progress from
+ * {@link ArmaAddonsManager#loadAddonsAsync(ArmaAddonsProjectConfig, File, ArmaAddonsIndexingCallback)}.
  * Each method is invoked for one particular addon.
  * <p>
  * All methods will <b>not</b> run on the JavaFX Thread of Java Swing Thread.

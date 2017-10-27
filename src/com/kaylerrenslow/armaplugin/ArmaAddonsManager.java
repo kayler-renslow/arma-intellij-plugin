@@ -19,6 +19,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
@@ -57,6 +58,7 @@ public class ArmaAddonsManager {
 			List<ArmaAddon> armaAddons;
 			ArmaToolsCallbackForwardingThread forwardingThread = new ArmaToolsCallbackForwardingThread(callback, logFile);
 			forwardingThread.start();
+			forwardingThread.log("[BEGIN LOAD ADDONS]\n");
 			try {
 				armaAddons = doLoadAddons(config, logFile, callback, forwardingThread);
 			} catch (Exception e) {
@@ -925,6 +927,7 @@ public class ArmaAddonsManager {
 		};
 		@NotNull
 		private final ArmaAddonsIndexingCallback callback;
+		private final SimpleDateFormat dateFormat;
 		private PrintWriter logger;
 		private int loggerBufferSize = 0;
 		private final Object loggerLock = new Object();
@@ -939,6 +942,8 @@ public class ArmaAddonsManager {
 					logger = null;
 				}
 			}
+
+			dateFormat = new SimpleDateFormat("hh:mm aaa");
 		}
 
 		@Override
@@ -1041,8 +1046,10 @@ public class ArmaAddonsManager {
 			}
 
 			synchronized (loggerLock) {
+				logger.append(dateFormat.format(new Date(System.currentTimeMillis())));
+				logger.append(" - ");
 				logger.append(message);
-				logger.append("\n");
+				logger.append('\n');
 				loggerBufferSize += message.length() + 1;//+1 for \n
 				if (loggerBufferSize >= 1000) {
 					logger.flush();

@@ -36,8 +36,8 @@ public class ArmaPluginProjectConfigurable implements Configurable {
 //		btnTest.addActionListener(e -> {
 //			new IndexArmaAddonsStatusDialog().setVisible(true);
 //		});
-
 		//end testing code
+
 		return form.getPanelRoot();
 	}
 

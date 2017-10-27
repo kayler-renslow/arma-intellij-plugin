@@ -2,7 +2,7 @@
 * 
 
 **Changed**  
-* made ArmaAddonsManager utilize ArmaAddonsIndexingCallback.java and ArmaAddonIndexingHandle
+* 
 
 **Fixed**  
 * 
