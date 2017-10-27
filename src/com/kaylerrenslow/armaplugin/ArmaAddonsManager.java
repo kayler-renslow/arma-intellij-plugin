@@ -2,8 +2,10 @@ package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.project.Project;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
+import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParseException;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
 import com.kaylerrenslow.armaDialogCreator.util.XmlUtil;
+import com.kaylerrenslow.armaplugin.ArmaAddonsIndexingCallback.Step;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.w3c.dom.Document;
@@ -14,9 +16,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 
 /**
@@ -35,30 +39,48 @@ public class ArmaAddonsManager {
 	 */
 	@NotNull
 	public List<ArmaAddon> getAddons() {
-		return addonsReadOnly;
+		synchronized (instance) {
+			return addonsReadOnly;
+		}
 	}
 
 	/**
 	 * Will load addons into {@link #getAddons()}.
 	 *
-	 * @param config the config to use
+	 * @param config   the config to use
+	 * @param callback
 	 */
 	//todo: document this method
 	//todo: we should check to see if we need to re-extract each addon. If we don't need to extract it, load it from reference directory
-	public void loadAddons(@NotNull ArmaAddonsProjectConfig config) {
-		List<ArmaAddon> armaAddons;
-		try {
-			armaAddons = doLoadAddons(config);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return;
-		}
-		this.addons.clear();
-		this.addons.addAll(armaAddons);
+	public void loadAddonsAsync(@NotNull ArmaAddonsProjectConfig config, @Nullable File logFile, @NotNull ArmaAddonsIndexingCallback callback) {
+		Thread t = new Thread(() -> {
+			List<ArmaAddon> armaAddons;
+			ArmaToolsCallbackForwardingThread forwardingThread = new ArmaToolsCallbackForwardingThread(callback, logFile);
+			forwardingThread.start();
+			try {
+				armaAddons = doLoadAddons(config, logFile, callback, forwardingThread);
+			} catch (Exception e) {
+				e.printStackTrace();
+				forwardingThread.logError("Couldn't complete indexing addons", e);
+				return;
+			} finally {
+				forwardingThread.log("[EXIT]\n\n");
+				forwardingThread.closeThread();
+			}
+			synchronized (instance) {
+				this.addons.clear();
+				this.addons.addAll(armaAddons);
+			}
+		}, "ArmaAddonsManager - Load Addons");
+		t.start();
 	}
 
 	@NotNull
-	private List<ArmaAddon> doLoadAddons(@NotNull ArmaAddonsProjectConfig config) throws Exception {
+	private List<ArmaAddon> doLoadAddons(@NotNull ArmaAddonsProjectConfig config,
+										 @Nullable File logFile, @NotNull ArmaAddonsIndexingCallback callback,
+										 @NotNull ArmaToolsCallbackForwardingThread forwardingThread) throws Exception {
+		ResourceBundle bundle = getBundle();
+
 		File refDir = new File(config.getAddonsReferenceDirectory());
 		if (refDir.exists() && !refDir.isDirectory()) {
 			throw new IllegalArgumentException("reference directory isn't a directory");
@@ -86,6 +108,7 @@ public class ArmaAddonsManager {
 				if (!f.isDirectory()) {
 					continue;
 				}
+				forwardingThread.log("Found addon root " + f.getAbsolutePath());
 				addonRoots.add(f);
 			}
 
@@ -100,6 +123,7 @@ public class ArmaAddonsManager {
 						return false;
 					}
 					if (config.getBlacklistedAddons().contains(name)) {
+						forwardingThread.log("Addon excluded (blacklisted):" + name);
 						return false;
 					}
 
@@ -110,6 +134,7 @@ public class ArmaAddonsManager {
 				}
 				for (File addonDir : files) {
 					addonHelpers.add(new ArmaAddonHelper(addonDir));
+					forwardingThread.log("Addon directory marked for indexing: " + addonDir.getAbsolutePath());
 				}
 			}
 		}
@@ -141,16 +166,60 @@ public class ArmaAddonsManager {
 			if (!mkdirs) {
 				throw new IllegalStateException("couldn't make the temp directory for extracting");
 			}
+			forwardingThread.log("Temp directory for addons extraction:" + tempDir.getAbsolutePath());
 		}
 
 		for (ArmaAddonHelper helper : addonHelpers) {
-			doWorkForAddonHelper(helper, refDir, armaTools, tempDir);
+			if (helper.isCancelled()) {
+				continue;
+			}
+
+			//reason for passing extractDirs instead of placing it in doWorkForAddonHelper
+			//is because the addon could be cancelled half way through pbo extraction and we want to make sure
+			//the data is cleaned up
+			final List<File> extractDirs = Collections.synchronizedList(new ArrayList<>());
+			forwardingThread.workBegin(helper);
+			doWorkForAddonHelper(helper, refDir, armaTools, tempDir, forwardingThread, extractDirs);
+
+			//delete extract directories to free up disk space for next addon extraction
+			forwardingThread.stepStart(helper, Step.Cleanup);
+			for (File extractDir : extractDirs) {
+				boolean success = deleteDirectory(extractDir);
+				if (success) {
+					forwardingThread.log(
+							String.format(bundle.getString("deleted-temp-directory-f"), extractDir)
+					);
+				} else {
+					forwardingThread.warningMessage(
+							helper,
+							String.format(bundle.getString("failed-to-delete-temp-directory-f"), extractDir),
+							null
+					);
+				}
+			}
+			forwardingThread.stepFinish(helper, Step.Cleanup);
+			forwardingThread.finishedAddonIndex(helper);
 		}
 
-		deleteDirectory(tempDir);
+		boolean success = deleteDirectory(tempDir);
+		if (success) {
+			forwardingThread.log(
+					String.format(bundle.getString("deleted-temp-directory-f"), tempDir)
+			);
+		} else {
+			forwardingThread.logWarning(
+					String.format(bundle.getString("failed-to-delete-temp-directory-f"), tempDir),
+					null
+			);
+		}
 
 		List<ArmaAddon> addons = new ArrayList<>(addonHelpers.size());
 		for (ArmaAddonHelper helper : addonHelpers) {
+			if (helper.isCancelled()) {
+				forwardingThread.log("Addon cancelled: " + helper.getAddonDirName());
+				continue;
+			}
+			forwardingThread.log("Addon finished: " + helper.getAddonDirName());
 			addons.add(new ArmaAddonImpl(helper));
 		}
 
@@ -158,11 +227,15 @@ public class ArmaAddonsManager {
 	}
 
 	private void doWorkForAddonHelper(@NotNull ArmaAddonHelper helper,
-									  @NotNull File refDir, @NotNull File armaTools, @NotNull File tempDir) throws Exception {
-		final List<File> extractDirs = Collections.synchronizedList(new ArrayList<>());
+									  @NotNull File refDir, @NotNull File armaTools, @NotNull File tempDir,
+									  @NotNull ArmaToolsCallbackForwardingThread forwardingThread,
+									  @NotNull List<File> extractDirs) throws Exception {
+		ResourceBundle bundle = getBundle();
+
 		final List<File> debinarizedConfigs = Collections.synchronizedList(new ArrayList<>());
 
 		{//extract pbo's into temp directory
+
 			File addonsDir = null;
 			{ //locate the "addons" folder, which contains all the pbo files
 				File[] addonDirFiles = helper.getAddonDirectory().listFiles();
@@ -177,11 +250,23 @@ public class ArmaAddonsManager {
 					break;
 				}
 				if (addonsDir == null) {
+					forwardingThread.warningMessage(helper,
+							String.format(
+									bundle.getString("couldnt-find-addons-dir-f"),
+									helper.getAddonDirectory().getAbsolutePath()
+							), null
+					);
 					return;
 				}
 			}
 			File[] pboFiles = addonsDir.listFiles((dir, name) -> name.endsWith(".pbo"));
 			if (pboFiles == null) {
+				forwardingThread.warningMessage(helper,
+						String.format(
+								bundle.getString("no-pbos-were-in-addons-dir-f"),
+								helper.getAddonDirectory().getAbsolutePath()
+						), null
+				);
 				return;
 			}
 
@@ -202,29 +287,72 @@ public class ArmaAddonsManager {
 				}
 			}
 
+
+			forwardingThread.stepStart(helper, Step.ExtractPBOs);
+
 			Function<List<File>, Void> extractPbos = pboFilesToExtract -> {
+				StringBuilder sb = new StringBuilder();
+				sb.append("Extracting PBO's on thread ").append(Thread.currentThread().getName()).append(": [");
+				int i = 0;
 				for (File pboFile : pboFilesToExtract) {
+					sb.append(pboFile.getName());
+					i++;
+					if (i < pboFilesToExtract.size()) {
+						sb.append(", ");
+					}
+				}
+				sb.append(']');
+				forwardingThread.log(sb.toString());
+
+				for (File pboFile : pboFilesToExtract) {
+					if (helper.isCancelled()) {
+						return null;
+					}
 					File extractDir = new File(
 							tempDir.getAbsolutePath() + "/" + helper.getAddonDirName() +
 									"/" +
 									pboFile.getName().substring(0, pboFile.getName().length() - ".pbo".length())
 					);
-					extractDir.mkdirs();
+					boolean mkdirs = extractDir.mkdirs();
+					if (!mkdirs) {
+						forwardingThread.errorMessage(
+								helper, String.format(
+										bundle.getString("failed-to-create-temp-directory-f"),
+										extractDir.getAbsolutePath(),
+										helper.getAddonDirName()
+								), null
+						);
+						return null;
+					}
+
+					extractDirs.add(extractDir);
+					forwardingThread.log("Created extract directory: " + extractDir.getAbsolutePath());
 					boolean success = false;
+					Exception e = null;
 					try {
 						success = ArmaTools.extractPBO(
 								armaTools,
 								pboFile,
 								extractDir, 10 * 60 * 1000 /*10 minutes before suspend*/
 						);
-					} catch (IOException e) {
-						e.printStackTrace();
+						forwardingThread.message(helper,
+								String.format(
+										bundle.getString("extracted-pbo-f"),
+										pboFile.getName(),
+										helper.getAddonDirName()
+								)
+						);
+					} catch (IOException e1) {
+						e = e1;
 					}
 					if (!success) {
-						System.err.println("ArmaAddonsManager.java: Couldn't extract pbo " + pboFile);
-						continue;
+						forwardingThread.errorMessage(helper,
+								String.format(
+										bundle.getString("couldnt-extract-pbo-f"),
+										pboFile.getName(), helper.getAddonDirName()
+								), e
+						);
 					}
-					extractDirs.add(extractDir);
 				}
 				return null;
 			};
@@ -240,7 +368,13 @@ public class ArmaAddonsManager {
 			t2.start();
 			t1.join();
 			t2.join();
-
+			forwardingThread.message(helper,
+					String.format(
+							bundle.getString("extracted-all-pbo-f"),
+							helper.getAddonDirName()
+					)
+			);
+			forwardingThread.stepFinish(helper, Step.ExtractPBOs);
 		}
 		{//de-binarize the configs and locate all sqf files
 			final String BINARIZED_CONFIG_NAME = "config.bin";
@@ -276,10 +410,32 @@ public class ArmaAddonsManager {
 				}
 			}
 
+			forwardingThread.stepStart(helper, Step.DeBinarizeConfigs);
+
 			Function<List<File>, Void> convertConfigBinFiles = configBinFilesToConvert -> {
+				StringBuilder sb = new StringBuilder();
+				sb.append("DeBinarizing config.bin files on thread ").append(Thread.currentThread().getName()).append(": [\n");
+				int i = 0;
+				for (File configBinFile : configBinFiles) {
+					sb.append('\t');
+					sb.append(configBinFile.getAbsolutePath());
+					sb.append('\n');
+					i++;
+					if (i < configBinFiles.size()) {
+						sb.append(", ");
+					}
+				}
+				sb.append('\n');
+				sb.append(']');
+				forwardingThread.log(sb.toString());
+
 				for (File configBinFile : configBinFilesToConvert) {
+					if (helper.isCancelled()) {
+						return null;
+					}
 					String newPath = configBinFile.getParentFile().getAbsolutePath() + "/config.cpp";
 					File debinarizedFile = new File(newPath);
+					Exception e = null;
 					boolean success = false;
 					try {
 						success = ArmaTools.convertBinConfigToText(
@@ -288,14 +444,25 @@ public class ArmaAddonsManager {
 								debinarizedFile,
 								10 * 1000 /*10 seconds*/
 						);
-					} catch (IOException e) {
-						e.printStackTrace();
+					} catch (IOException e1) {
+						e = e1;
 					}
 					if (!success) {
-						System.err.println("ArmaAddonsManager.java: Couldn't convert binarized config " + configBinFile);
+						forwardingThread.errorMessage(helper,
+								String.format(
+										bundle.getString("couldnt-debinarize-config-f"),
+										configBinFile.getAbsolutePath(), helper.getAddonDirName()
+								), e
+						);
 						continue;
 					}
 					debinarizedConfigs.add(debinarizedFile);
+					forwardingThread.message(helper,
+							String.format(
+									bundle.getString("debinarized-config-f"),
+									helper.getAddonDirName(), configBinFile.getAbsolutePath()
+							)
+					);
 				}
 				return null;
 			};
@@ -311,14 +478,47 @@ public class ArmaAddonsManager {
 			t2.start();
 			t1.join();
 			t2.join();
-
+			forwardingThread.message(
+					helper,
+					String.format(
+							bundle.getString("debinarized-all-config-f"),
+							helper.getAddonDirName()
+					)
+			);
+			forwardingThread.stepFinish(helper, Step.DeBinarizeConfigs);
 		}
 
 		{//parse the configs
+			forwardingThread.stepStart(helper, Step.ParseConfigs);
 			for (File configFile : debinarizedConfigs) {
-				HeaderFile headerFile = HeaderParser.parse(configFile, configFile.getParentFile());
-				helper.getParsedConfigs().add(headerFile);
+				if (helper.isCancelled()) {
+					return;
+				}
+				try {
+					HeaderFile headerFile = HeaderParser.parse(configFile, configFile.getParentFile());
+					helper.getParsedConfigs().add(headerFile);
+					forwardingThread.message(helper,
+							String.format(
+									bundle.getString("parsed-config-f"),
+									configFile.getAbsolutePath()
+							)
+					);
+				} catch (HeaderParseException e) {
+					forwardingThread.errorMessage(helper,
+							String.format(
+									bundle.getString("couldnt-parse-config-f"),
+									configFile.getAbsolutePath()
+							), e
+					);
+				}
 			}
+			forwardingThread.message(helper,
+					String.format(
+							bundle.getString("parsed-all-config-f"),
+							helper.getAddonDirName()
+					)
+			);
+			forwardingThread.stepFinish(helper, Step.ParseConfigs);
 		}
 
 		{//copy the files out of temp directory that we want to keep
@@ -326,9 +526,18 @@ public class ArmaAddonsManager {
 			File destDir = new File(refDir.getAbsolutePath() + "/" + helper.getAddonDirName());
 			boolean mkdirs = destDir.mkdirs();
 			if (!mkdirs) {
-				System.err.println("ArmaAddonsManager.java: Couldn't create reference directory for " + helper.getAddonDirName());
+				forwardingThread.errorMessage(
+						helper,
+						String.format(
+								bundle.getString("failed-to-create-reference-directory-f"),
+								destDir.getAbsolutePath(),
+								helper.getAddonDirName()
+						), null
+				);
 				return;
 			}
+
+			forwardingThread.stepStart(helper, Step.SaveReferences);
 
 			//copy over sqf and header files into destDir and replicate folder structure in destDir
 			LinkedList<File> toVisit = new LinkedList<>();
@@ -339,7 +548,14 @@ public class ArmaAddonsManager {
 				traverseCopy.add(folderCopy);
 				boolean mkdirs1 = folderCopy.mkdirs();
 				if (!mkdirs1) {
-					System.err.println("ArmaAddonsManager.java: Couldn't create reference directory for " + folderCopy);
+					forwardingThread.errorMessage(
+							helper,
+							String.format(
+									bundle.getString("failed-to-create-reference-directory-f"),
+									folderCopy.getAbsolutePath(),
+									helper.getAddonDirName()
+							), null
+					);
 				}
 			}
 			while (!toVisit.isEmpty()) {
@@ -354,14 +570,30 @@ public class ArmaAddonsManager {
 								|| child.getName().endsWith(".h")
 								|| child.getName().endsWith(".hh")
 								|| child.getName().endsWith(".hpp")) {
+							File target = new File(folderCopy.getAbsolutePath() + "/" + child.getName());
 							try {
 								Files.copy(
 										child.toPath(),
-										new File(folderCopy.getAbsolutePath() + "/" + child.getName()).toPath(),
+										target.toPath(),
 										StandardCopyOption.REPLACE_EXISTING
 								);
+								forwardingThread.message(
+										helper,
+										String.format(
+												bundle.getString("copied-file-to-f"),
+												child.getAbsolutePath(),
+												target.getAbsolutePath()
+										)
+								);
 							} catch (IOException e) {
-								e.printStackTrace();
+								forwardingThread.errorMessage(
+										helper,
+										String.format(
+												bundle.getString("couldnt-copy-file-to-f"),
+												child.getAbsolutePath(),
+												target.getAbsolutePath()
+										), e
+								);
 								continue;
 							}
 						} else if (child.isDirectory()) {
@@ -370,7 +602,13 @@ public class ArmaAddonsManager {
 							File newFolder = new File(folderCopy.getAbsolutePath() + "/" + visit.getName());
 							boolean mkdirs1 = newFolder.mkdirs();
 							if (!mkdirs1) {
-								System.err.println("ArmaAddonsManager.java: Couldn't create directories for " + newFolder);
+								forwardingThread.errorMessage(
+										helper,
+										String.format(
+												bundle.getString("failed-to-create-directory-f"),
+												newFolder.getAbsolutePath()
+										), null
+								);
 								continue;
 							}
 							traverseCopy.push(newFolder);
@@ -378,25 +616,22 @@ public class ArmaAddonsManager {
 					}
 				}
 			}
-		}
-
-		//delete extract directories to free up disk space for next addon extraction
-		for (File extractDir : extractDirs) {
-			deleteDirectory(extractDir);
+			forwardingThread.stepFinish(helper, Step.SaveReferences);
 		}
 	}
 
-	private static ArmaAddonsManager instance;
+	private ResourceBundle getBundle() {
+		return ResourceBundle.getBundle("com.kaylerrenslow.armaplugin.ArmaAddonsManagerBundle");
+	}
+
+	private static final ArmaAddonsManager instance = new ArmaAddonsManager();
 
 	@NotNull
 	public static ArmaAddonsManager getAddonsManagerInstance() {
-		if (instance == null) {
-			instance = new ArmaAddonsManager();
-		}
 		return instance;
 	}
 
-	private static void deleteDirectory(@NotNull File directory) {
+	private static boolean deleteDirectory(@NotNull File directory) {
 		if (directory.exists()) {
 			File[] files = directory.listFiles();
 			if (null != files) {
@@ -409,7 +644,7 @@ public class ArmaAddonsManager {
 				}
 			}
 		}
-		directory.delete();
+		return directory.delete();
 	}
 
 
@@ -556,10 +791,12 @@ public class ArmaAddonsManager {
 		}
 	}
 
-	private static class ArmaAddonHelper {
-		@NotNull
+	private static class ArmaAddonHelper implements ArmaAddonIndexingHandle {
 		private final File addonDirectory;
 		private final List<HeaderFile> parsedConfigs = new ArrayList<>();
+		private volatile double currentWorkProgress = 0;
+		private volatile double totalWorkProgress = 0;
+		private volatile boolean cancelled = false;
 
 		public ArmaAddonHelper(@NotNull File addonDirectory) {
 			this.addonDirectory = addonDirectory;
@@ -578,6 +815,40 @@ public class ArmaAddonsManager {
 		@NotNull
 		public String getAddonDirName() {
 			return addonDirectory.getName();
+		}
+
+		@Override
+		public void cancel() {
+			cancelled = true;
+		}
+
+		@Override
+		public boolean isCancelled() {
+			return cancelled;
+		}
+
+		@Override
+		public double getCurrentWorkProgress() {
+			return currentWorkProgress;
+		}
+
+		@Override
+		public double getTotalWorkProgress() {
+			return totalWorkProgress;
+		}
+
+		public void setCurrentWorkProgress(double d) {
+			currentWorkProgress = d;
+		}
+
+		public void setTotalWorkProgress(double d) {
+			totalWorkProgress = d;
+		}
+
+		@NotNull
+		@Override
+		public String getAddonName() {
+			return getAddonDirName();
 		}
 	}
 
@@ -645,6 +916,157 @@ public class ArmaAddonsManager {
 		public ArmaToolsWorkerThread(@NotNull Runnable target, int workerId) {
 			super(target);
 			setName("ArmaAddonsManager.ArmaToolsWorkerThread " + workerId);
+		}
+	}
+
+	private static class ArmaToolsCallbackForwardingThread extends Thread implements ArmaAddonsIndexingCallback {
+		private final LinkedBlockingQueue<Runnable> forwardingQ = new LinkedBlockingQueue<>();
+		private final Runnable EXIT_THREAD = () -> {
+		};
+		@NotNull
+		private final ArmaAddonsIndexingCallback callback;
+		private PrintWriter logger;
+		private int loggerBufferSize = 0;
+		private final Object loggerLock = new Object();
+
+		public ArmaToolsCallbackForwardingThread(@NotNull ArmaAddonsIndexingCallback callback, @Nullable File logFile) {
+			this.callback = callback;
+			setName("ArmaAddonsManager - Callback Thread");
+			if (logFile != null) {
+				try {
+					logger = new PrintWriter(logFile);
+				} catch (IOException e) {
+					logger = null;
+				}
+			}
+		}
+
+		@Override
+		public void run() {
+			while (true) {
+				try {
+					Runnable take = forwardingQ.take();
+					if (take == EXIT_THREAD) {
+						return;
+					}
+				} catch (InterruptedException ignore) {
+				}
+			}
+		}
+
+		@Override
+		public void workBegin(@NotNull ArmaAddonIndexingHandle handle) {
+			forwardingQ.add(() -> {
+				callback.workBegin(handle);
+			});
+		}
+
+		@Override
+		public void totalWorkProgressUpdate(@NotNull ArmaAddonIndexingHandle handle, double progress) {
+			forwardingQ.add(() -> {
+				callback.totalWorkProgressUpdate(handle, progress);
+			});
+		}
+
+		@Override
+		public void currentWorkProgressUpdate(@NotNull ArmaAddonIndexingHandle handle, double progress) {
+			forwardingQ.add(() -> {
+				callback.currentWorkProgressUpdate(handle, progress);
+			});
+		}
+
+		@Override
+		public void message(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message) {
+			log(message);
+			forwardingQ.add(() -> {
+				callback.message(handle, message);
+			});
+		}
+
+		@Override
+		public void errorMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+			logError(message, e);
+			forwardingQ.add(() -> {
+				callback.errorMessage(handle, message, e);
+			});
+		}
+
+		@Override
+		public void warningMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+			logWarning(message, e);
+			forwardingQ.add(() -> {
+				callback.warningMessage(handle, message, e);
+			});
+		}
+
+		@Override
+		public void stepStart(@NotNull ArmaAddonIndexingHandle handle, @NotNull Step newStep) {
+			forwardingQ.add(() -> {
+				callback.stepStart(handle, newStep);
+			});
+		}
+
+		@Override
+		public void stepFinish(@NotNull ArmaAddonIndexingHandle handle, @NotNull Step stepFinished) {
+			forwardingQ.add(() -> {
+				callback.stepFinish(handle, stepFinished);
+			});
+		}
+
+		@Override
+		public void finishedAddonIndex(@NotNull ArmaAddonIndexingHandle handle) {
+			forwardingQ.add(() -> {
+				callback.finishedAddonIndex(handle);
+			});
+		}
+
+		public void closeThread() {
+			forwardingQ.add(EXIT_THREAD);
+			if (logger != null) {
+				synchronized (loggerLock) {
+					try {
+						logger.flush();
+						logger.close();
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+
+		public void log(@NotNull String message) {
+			if (logger == null) {
+				//don't need to synchronize this check since logger is immutable after constructor
+				return;
+			}
+
+			synchronized (loggerLock) {
+				logger.append(message);
+				logger.append("\n");
+				loggerBufferSize += message.length() + 1;//+1 for \n
+				if (loggerBufferSize >= 1000) {
+					logger.flush();
+					loggerBufferSize = 0;
+				}
+			}
+		}
+
+		public void logError(@NotNull String message, @Nullable Exception e) {
+			synchronized (loggerLock) {
+				log("[ERROR] " + message);
+				if (e != null) {
+					log(ArmaPluginUtil.getExceptionString(e));
+				}
+			}
+		}
+
+		public void logWarning(@NotNull String message, @Nullable Exception e) {
+			synchronized (loggerLock) {
+				log("[WARNING] " + message);
+				if (e != null) {
+					log(ArmaPluginUtil.getExceptionString(e));
+				}
+			}
 		}
 	}
 }

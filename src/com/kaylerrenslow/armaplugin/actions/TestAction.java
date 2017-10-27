@@ -5,7 +5,7 @@ import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.kaylerrenslow.armaplugin.ArmaAddonsManager;
 import com.kaylerrenslow.armaplugin.ArmaAddonsProjectConfig;
 
-import javax.swing.*;
+import javax.swing.JFileChooser;
 import java.io.File;
 
 /**
@@ -24,7 +24,7 @@ public class TestAction extends AnAction {
 		File selectedFile = chooser.getSelectedFile();
 		if (selectedFile != null) {
 			ArmaAddonsProjectConfig config = ArmaAddonsManager.parseAddonsConfig(selectedFile, anActionEvent.getProject());
-			ArmaAddonsManager.getAddonsManagerInstance().loadAddons(config);
+			ArmaAddonsManager.getAddonsManagerInstance().loadAddonsAsync(config);
 			System.out.println(ArmaAddonsManager.getAddonsManagerInstance().getAddons());
 		}
 	}

@@ -9,6 +9,8 @@ import com.kaylerrenslow.armaplugin.lang.header.HeaderFileType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Collection;
 
 /**
@@ -39,5 +41,14 @@ public class ArmaPluginUtil {
 
 		}
 		return null;
+	}
+
+	@NotNull
+	public static String getExceptionString(@NotNull Throwable t) {
+		StringWriter sw = new StringWriter();
+		PrintWriter pw = new PrintWriter(sw);
+		t.printStackTrace(pw);
+		pw.close();
+		return sw.toString();
 	}
 }
