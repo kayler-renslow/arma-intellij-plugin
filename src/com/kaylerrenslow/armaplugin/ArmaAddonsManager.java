@@ -195,7 +195,10 @@ public class ArmaAddonsManager {
 			//is because the addon could be cancelled half way through pbo extraction and we want to make sure
 			//the data is cleaned up
 			final List<File> extractDirs = Collections.synchronizedList(new ArrayList<>());
+
 			forwardingThread.indexStartedForAddon(helper);
+			forwardingThread.log("INDEX STARTED for addon " + helper.getAddonDirName());
+
 			doWorkForAddonHelper(helper, refDir, armaTools, tempDir, forwardingThread, extractDirs);
 
 			//delete extract directories to free up disk space for next addon extraction
@@ -216,6 +219,7 @@ public class ArmaAddonsManager {
 			}
 			forwardingThread.stepFinish(helper, Step.Cleanup);
 			forwardingThread.indexFinishedForAddon(helper);
+			forwardingThread.log("INDEX FINISHED for addon " + helper.getAddonDirName());
 		}
 
 		boolean success = deleteDirectory(tempDir);
@@ -960,7 +964,7 @@ public class ArmaAddonsManager {
 				}
 			}
 
-			dateFormat = new SimpleDateFormat("hh:mm aaa");
+			dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm aaa");
 		}
 
 		@Override
