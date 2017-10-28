@@ -1,5 +1,5 @@
 **Added**  
-* ArmaAddonsManger forwarding thread logger now writes the year, month, and day
+* 
 
 **Changed**  
 * 

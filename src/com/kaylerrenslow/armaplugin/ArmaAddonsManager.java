@@ -291,6 +291,24 @@ public class ArmaAddonsManager {
 				return;
 			}
 
+			{ //print to log all pbo files marked for extraction
+				StringBuilder sb = new StringBuilder();
+				sb.append("All PBO's marked to extract:[\n");
+				int i = 0;
+				for (File pboFile : pboFiles) {
+					sb.append('\t');
+					sb.append(pboFile.getAbsolutePath());
+					sb.append('\n');
+					i++;
+					if (i < pboFiles.length) {
+						sb.append(", ");
+					}
+				}
+				sb.append('\n');
+				sb.append(']');
+				forwardingThread.log(sb.toString());
+			}
+
 			//make it so each thread doesn't do more work than the other. Also, partition the data.
 			Arrays.sort(pboFiles, Comparator.comparingLong(File::length));
 			List<File> left = new ArrayList<>(pboFiles.length);
@@ -400,18 +418,37 @@ public class ArmaAddonsManager {
 		{//de-binarize the configs and locate all sqf files
 			final String BINARIZED_CONFIG_NAME = "config.bin";
 			List<File> configBinFiles = new ArrayList<>();
-			LinkedList<File> toVisit = new LinkedList<>();
-			//locate all config.bin files
-			toVisit.addAll(extractDirs);
-			while (!toVisit.isEmpty()) {
-				File visit = toVisit.removeFirst();
-				File[] children = visit.listFiles();
-				if (children != null) {
-					Collections.addAll(toVisit, children);
+			{//locate all config.bin files
+				LinkedList<File> toVisit = new LinkedList<>();
+				toVisit.addAll(extractDirs);
+				while (!toVisit.isEmpty()) {
+					File visit = toVisit.removeFirst();
+					File[] children = visit.listFiles();
+					if (children != null) {
+						Collections.addAll(toVisit, children);
+					}
+					if (visit.getName().equalsIgnoreCase(BINARIZED_CONFIG_NAME)) {
+						configBinFiles.add(visit);
+					}
 				}
-				if (visit.getName().equalsIgnoreCase(BINARIZED_CONFIG_NAME)) {
-					configBinFiles.add(visit);
+			}
+
+			{ //print to log all config.bin files marked for debinarize
+				StringBuilder sb = new StringBuilder();
+				sb.append("All config.bin marked to debinarize:[\n");
+				int i = 0;
+				for (File configBinFile : configBinFiles) {
+					sb.append('\t');
+					sb.append(configBinFile.getAbsolutePath());
+					sb.append('\n');
+					i++;
+					if (i < configBinFiles.size()) {
+						sb.append(", ");
+					}
 				}
+				sb.append('\n');
+				sb.append(']');
+				forwardingThread.log(sb.toString());
 			}
 
 			//make it so each thread doesn't do more work than the other. Also, partition the data.
