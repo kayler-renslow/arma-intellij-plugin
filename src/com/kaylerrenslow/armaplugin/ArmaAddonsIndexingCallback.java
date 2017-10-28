@@ -8,7 +8,7 @@ import java.io.File;
 /**
  * Contains a set of methods to track the progress of Arma Addon/Mod indexing progress from
  * {@link ArmaAddonsManager#loadAddonsAsync(ArmaAddonsProjectConfig, File, ArmaAddonsIndexingCallback)}.
- * Each method is invoked for one particular addon.
+ * Each method is invoked for one particular addon, except for {@link ArmaAddonsIndexingCallback#finishedIndex() and {@link ArmaAddonsIndexingCallback#startedIndex(ArmaAddonsIndexingData) }}.
  * <p>
  * All methods will <b>not</b> run on the JavaFX Thread of Java Swing Thread.
  * Instead, the methods are invoked from a temporary thread.
@@ -47,12 +47,12 @@ public interface ArmaAddonsIndexingCallback {
 	 *
 	 * @param handle a handle for the addon
 	 */
-	void workBegin(@NotNull ArmaAddonIndexingHandle handle);
+	void indexStartedForAddon(@NotNull ArmaAddonIndexingHandle handle);
 
 	/**
 	 * Invoked when the total overall work for an addon has been updated.
 	 * The total work for the addon will reach 100% when all of its parts are complete.
-	 * When the total work for the addon reaches 100%, {@link #finishedAddonIndex(ArmaAddonIndexingHandle)} will be invoked.
+	 * When the total work for the addon reaches 100%, {@link #indexFinishedForAddon(ArmaAddonIndexingHandle)} will be invoked.
 	 *
 	 * @param handle   the addon's handle
 	 * @param progress new progress value for the addon (ranged 0.0-1.0)
@@ -120,5 +120,17 @@ public interface ArmaAddonsIndexingCallback {
 	 *
 	 * @param handle the addon's handle
 	 */
-	void finishedAddonIndex(@NotNull ArmaAddonIndexingHandle handle);
+	void indexFinishedForAddon(@NotNull ArmaAddonIndexingHandle handle);
+
+	/**
+	 * Invoked when all addons have been indexed. This method is invoked only once.
+	 */
+	void finishedIndex();
+
+	/**
+	 * Invoked when addons indexing has been started. This method is invoked only once.
+	 *
+	 * @param data the data used at the start of the index
+	 */
+	void startedIndex(@NotNull ArmaAddonsIndexingData data);
 }

@@ -24,7 +24,7 @@ public class TestAction extends AnAction {
 		File selectedFile = chooser.getSelectedFile();
 		if (selectedFile != null) {
 			ArmaAddonsProjectConfig config = ArmaAddonsManager.parseAddonsConfig(selectedFile, anActionEvent.getProject());
-			ArmaAddonsManager.getAddonsManagerInstance().loadAddonsAsync(config);
+//			ArmaAddonsManager.getAddonsManagerInstance().loadAddonsAsync(config);
 			System.out.println(ArmaAddonsManager.getAddonsManagerInstance().getAddons());
 		}
 	}

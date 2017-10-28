@@ -1,12 +1,18 @@
 package com.kaylerrenslow.armaplugin;
 
+import com.intellij.ide.DataManager;
+import com.intellij.openapi.actionSystem.DataContext;
+import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.options.Configurable;
 import com.intellij.openapi.options.ConfigurationException;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.io.FileUtil;
 import com.kaylerrenslow.armaplugin.dialog.ArmaPluginSettingsForm;
+import com.kaylerrenslow.armaplugin.dialog.IndexArmaAddonsStatusDialog;
 import org.jetbrains.annotations.Nls;
 import org.jetbrains.annotations.Nullable;
 
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import java.io.File;
 
@@ -31,11 +37,17 @@ public class ArmaPluginProjectConfigurable implements Configurable {
 		form.initArma3ToolsDirectory(a3ToolsDir == null ? "" : a3ToolsDir.getAbsolutePath());
 
 		//testing code
-//		JButton btnTest = new JButton("Test");
-//		form.getPanelRoot().add(btnTest);
-//		btnTest.addActionListener(e -> {
-//			new IndexArmaAddonsStatusDialog().setVisible(true);
-//		});
+		JButton btnTest = new JButton("Test");
+		form.getPanelRoot().add(btnTest);
+		btnTest.addActionListener(e -> {
+			DataContext dc = DataManager.getInstance().getDataContextFromFocus().getResult();
+			Project project = dc.getData(DataKeys.PROJECT);
+			if (project == null) {
+				throw new IllegalStateException("project is null");
+			}
+
+			new IndexArmaAddonsStatusDialog(project).setVisible(true);
+		});
 		//end testing code
 
 		return form.getPanelRoot();

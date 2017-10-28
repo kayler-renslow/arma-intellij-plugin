@@ -23,6 +23,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Kayler
@@ -53,7 +54,12 @@ public class ArmaAddonsManager {
 	 */
 	//todo: document this method
 	//todo: we should check to see if we need to re-extract each addon. If we don't need to extract it, load it from reference directory
-	public void loadAddonsAsync(@NotNull ArmaAddonsProjectConfig config, @Nullable File logFile, @NotNull ArmaAddonsIndexingCallback callback) {
+	public static void loadAddonsAsync(@NotNull ArmaAddonsProjectConfig config, @Nullable File logFile, @NotNull ArmaAddonsIndexingCallback callback) {
+		instance._loadAddonsAsync(config, logFile, callback);
+	}
+
+
+	private void _loadAddonsAsync(@NotNull ArmaAddonsProjectConfig config, @Nullable File logFile, @NotNull ArmaAddonsIndexingCallback callback) {
 		Thread t = new Thread(() -> {
 			List<ArmaAddon> armaAddons;
 			ArmaToolsCallbackForwardingThread forwardingThread = new ArmaToolsCallbackForwardingThread(callback, logFile);
@@ -66,6 +72,7 @@ public class ArmaAddonsManager {
 				forwardingThread.logError("Couldn't complete indexing addons", e);
 				return;
 			} finally {
+				forwardingThread.finishedIndex();
 				forwardingThread.log("[EXIT]\n\n");
 				forwardingThread.closeThread();
 			}
@@ -141,6 +148,14 @@ public class ArmaAddonsManager {
 			}
 		}
 
+		{ //tell forwarding thread that the index is about to begin
+			List<String> addonsMarkedForIndex = addonHelpers.stream().map(helper -> {
+				return helper.getAddonDirName();
+			}).collect(Collectors.toList());
+
+			forwardingThread.startedIndex(new ArmaAddonsIndexingData(config, addonsMarkedForIndex));
+		}
+
 		File tempDir;
 		{// Create a temp folder to extract the pbo in.
 			String tempDirName = "_armaPluginTemp";
@@ -180,7 +195,7 @@ public class ArmaAddonsManager {
 			//is because the addon could be cancelled half way through pbo extraction and we want to make sure
 			//the data is cleaned up
 			final List<File> extractDirs = Collections.synchronizedList(new ArrayList<>());
-			forwardingThread.workBegin(helper);
+			forwardingThread.indexStartedForAddon(helper);
 			doWorkForAddonHelper(helper, refDir, armaTools, tempDir, forwardingThread, extractDirs);
 
 			//delete extract directories to free up disk space for next addon extraction
@@ -200,7 +215,7 @@ public class ArmaAddonsManager {
 				}
 			}
 			forwardingThread.stepFinish(helper, Step.Cleanup);
-			forwardingThread.finishedAddonIndex(helper);
+			forwardingThread.indexFinishedForAddon(helper);
 		}
 
 		boolean success = deleteDirectory(tempDir);
@@ -666,12 +681,14 @@ public class ArmaAddonsManager {
 		try {
 			builder = factory.newDocumentBuilder();
 		} catch (ParserConfigurationException e) {
+			e.printStackTrace();
 			return null;
 		}
 		Document doc;
 		try {
 			doc = builder.parse(configFile);
 		} catch (Exception e) {
+			e.printStackTrace();
 			return null;
 		}
 		//https://stackoverflow.com/questions/13786607/normalization-in-dom-parsing-with-java-how-does-it-work
@@ -960,9 +977,9 @@ public class ArmaAddonsManager {
 		}
 
 		@Override
-		public void workBegin(@NotNull ArmaAddonIndexingHandle handle) {
+		public void indexStartedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
 			forwardingQ.add(() -> {
-				callback.workBegin(handle);
+				callback.indexStartedForAddon(handle);
 			});
 		}
 
@@ -1019,9 +1036,23 @@ public class ArmaAddonsManager {
 		}
 
 		@Override
-		public void finishedAddonIndex(@NotNull ArmaAddonIndexingHandle handle) {
+		public void indexFinishedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
 			forwardingQ.add(() -> {
-				callback.finishedAddonIndex(handle);
+				callback.indexFinishedForAddon(handle);
+			});
+		}
+
+		@Override
+		public void finishedIndex() {
+			forwardingQ.add(() -> {
+				callback.finishedIndex();
+			});
+		}
+
+		@Override
+		public void startedIndex(@NotNull ArmaAddonsIndexingData data) {
+			forwardingQ.add(() -> {
+				callback.startedIndex(data);
 			});
 		}
 

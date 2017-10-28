@@ -1,8 +1,8 @@
 package com.kaylerrenslow.armaplugin.dialog;
 
+import com.intellij.openapi.project.Project;
 import com.intellij.util.ui.UIUtil;
-import com.kaylerrenslow.armaplugin.ArmaAddonsIndexingCallback.Step;
-import com.kaylerrenslow.armaplugin.ArmaPlugin;
+import com.kaylerrenslow.armaplugin.*;
 import javafx.animation.AnimationTimer;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -21,20 +21,27 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import java.io.File;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 
 public class IndexArmaAddonsStatusDialog extends JDialog {
 
 	private static final ResourceBundle bundle = ArmaPlugin.getPluginBundle();
+	@NotNull
+	private final Project project;
 
 	private StatusBar statusBar;
 	private CenterPanel centerPanel;
 	private Footer footer;
 
-	public IndexArmaAddonsStatusDialog() {
+	public IndexArmaAddonsStatusDialog(@NotNull Project project) {
+		this.project = project;
 		setModalityType(ModalityType.APPLICATION_MODAL);
 		setContentPane(createCenterPanel());
 		setSize(800, 570);
@@ -66,12 +73,21 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			rootNode.setBottom(footer);
 			footer.setPadding(padding);
 
+			JFileChooser chooser = new JFileChooser();
+			chooser.showDialog(null, "");
+			File selectedAddonsCfgFile = chooser.getSelectedFile();
+			if (selectedAddonsCfgFile != null) {
+				ArmaAddonsProjectConfig config = ArmaAddonsManager.parseAddonsConfig(selectedAddonsCfgFile, project);
+				ArmaAddonsManager.loadAddonsAsync(config, new File(selectedAddonsCfgFile.getParentFile().getAbsolutePath() + "/addonsIndexLog.txt"), new IndexingCallbackCluster(
+						statusBar, centerPanel, footer
+				));
+			}
 		});
 		return root;
 	}
 
-	private static class Footer extends HBox {
-		private boolean running = false;
+	private static class Footer extends HBox implements IndexingCallback {
+
 		private final RunningIndicator indicator = new RunningIndicator();
 
 		public Footer() {
@@ -80,8 +96,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			setRunning(false);
 		}
 
-		public void setRunning(boolean running) {
-			this.running = running;
+		private void setRunning(boolean running) {
 			indicator.color1 = running ? Color.color(0, 1, 0) : Color.color(1, 0, 0);
 			indicator.color2 = indicator.color1.deriveColor(0, 1, 0.5, 1);
 			if (!running) {
@@ -90,6 +105,16 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			} else {
 				indicator.timer.start();
 			}
+		}
+
+		@Override
+		public void finishedIndex() {
+			setRunning(false);
+		}
+
+		@Override
+		public void startedIndex(@NotNull ArmaAddonsIndexingData data) {
+			setRunning(true);
 		}
 
 		private class RunningIndicator extends Canvas {
@@ -138,7 +163,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 		}
 	}
 
-	private static class CenterPanel extends VBox {
+	private static class CenterPanel extends VBox implements IndexingCallback {
 		private final Label lblStatusMessage = new Label();
 		private final ProgressBar pbTotalWork = new ProgressBar();
 		private final ProgressBar pbCurrentWork = new ProgressBar();
@@ -149,7 +174,6 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 		private final CheckBox checkBoxSaveReferences = new CheckBox();
 		private final CheckBox checkBoxCleanup = new CheckBox();
 		private final TableView<Message> tableViewMessage = new TableView<>();
-
 
 		public CenterPanel() {
 			super(5);
@@ -242,32 +266,56 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			taConsole.setDisable(true);
 		}
 
-		public void finishStep(@NotNull Step step) {
-			CheckBox checkBox = getCheckBoxForStep(step);
-			checkBox.setSelected(true);
-			checkBox.setIndeterminate(false);
-		}
-
-		public void startStep(@NotNull Step step) {
-			CheckBox checkBox = getCheckBoxForStep(step);
+		@Override
+		public void stepStart(@NotNull ArmaAddonIndexingHandle handle, @NotNull Step newStep) {
+			CheckBox checkBox = getCheckBoxForStep(newStep);
+			checkBox.setSelected(false);
 			checkBox.setIndeterminate(true);
 
 			lblStatusMessage.setText(checkBox.getUserData().toString());
 		}
 
-		public void addError(@NotNull String modName, @NotNull String message) {
-			addMessageRow(modName, message, bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.message-type-error"));
+		@Override
+		public void stepFinish(@NotNull ArmaAddonIndexingHandle handle, @NotNull Step stepFinished) {
+			CheckBox checkBox = getCheckBoxForStep(stepFinished);
+			checkBox.setSelected(true);
+			checkBox.setIndeterminate(false);
 		}
 
-		public void addWarning(@NotNull String modName, @NotNull String message) {
-			addMessageRow(modName, message, bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.message-type-warning"));
+		@Override
+		public void message(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message) {
+			writeToConsole(handle, message);
 		}
 
-		public void writeToConsole(@NotNull String message) {
+		@Override
+		public void errorMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+			String errorType = bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.message-type-error");
+			String cmessage = errorType + " - " + message;
+			writeToConsole(handle, cmessage);
+			addMessageRow(handle.getAddonName(), message, errorType);
+		}
+
+		@Override
+		public void warningMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+			String warningType = bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.message-type-warning");
+			String cmessage = warningType + " - " + message;
+			writeToConsole(handle, cmessage);
+			addMessageRow(handle.getAddonName(), message, warningType);
+		}
+
+		@Override
+		public void indexStartedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
+			resetSteps();
+		}
+
+		private void writeToConsole(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message) {
+			taConsole.appendText(handle.getAddonName());
+			taConsole.appendText(" - ");
 			taConsole.appendText(message);
+			taConsole.appendText("\n");
 		}
 
-		public void clearConsole() {
+		private void clearConsole() {
 			taConsole.setText("");
 		}
 
@@ -298,7 +346,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			}
 		}
 
-		public void resetSteps() {
+		private void resetSteps() {
 			checkBoxExtractPbo.setSelected(false);
 			checkBoxExtractPbo.setIndeterminate(false);
 
@@ -331,7 +379,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 		}
 	}
 
-	private static class StatusBar extends ToolBar {
+	private static class StatusBar extends ToolBar implements IndexingCallback {
 		private final Label lblModName = new Label();
 		private final Label lblModsLeft = new Label();
 		private final Label lblModsFinished = new Label();
@@ -340,57 +388,262 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 		private final Label lblTimeElapsed = new Label();
 		private final Font BOLD_FONT = Font.font(Font.getDefault().getFamily(), FontWeight.BOLD, Font.getDefault().getSize());
 
+		private int modsFinishedCount = 0;
+		private int totalAddonsToIndex = 0;
+		private int errorCount = 0;
+		private int warningCount = 0;
+		private long timeIndexStarted = 0;
+		private long millisSinceLastLabelUpdate = 0;
+		private final AnimationTimer timerTimeElapsed = new AnimationTimer() {
+			private final String formatString = bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.time-elapsed-minutes-f");
+
+			@Override
+			public void start() {
+				super.start();
+				lblTimeElapsed.setText(String.format(formatString, 0));
+			}
+
+			@Override
+			public void handle(long now) {
+				long curTime = System.currentTimeMillis();
+				long timeElapsed = curTime - timeIndexStarted;
+				millisSinceLastLabelUpdate += timeElapsed;
+				if (millisSinceLastLabelUpdate >= 60 * 1000) {
+					//update the label every minute
+					lblTimeElapsed.setText(String.format(formatString, millisSinceLastLabelUpdate / (60 * 1000)));
+					millisSinceLastLabelUpdate = 0;
+				}
+			}
+		};
+
 		public StatusBar() {
+			Function<String, Label> getBoldLabel = text -> {
+				Label lbl = new Label(text);
+				lbl.setFont(BOLD_FONT);
+				return lbl;
+			};
+
 			getItems().addAll(
-					getBoldLabel(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mod-name")),
+					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mod-name")),
 					lblModName,
 					new Separator(Orientation.VERTICAL),
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mods-left")),
+					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mods-left")),
 					lblModsLeft,
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mods-finished")),
+					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mods-finished")),
 					lblModsFinished,
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.errors")),
+					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.errors")),
 					lblErrorCount,
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.warnings")),
+					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.warnings")),
 					lblWarningCount,
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.time-elapsed")),
+					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.time-elapsed")),
 					lblTimeElapsed
 			);
 		}
 
-		private Label getBoldLabel(@NotNull String text) {
-			Label lbl = new Label(text);
-			lbl.setFont(BOLD_FONT);
-			return lbl;
+		@Override
+		public void indexStartedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
+			lblModName.setText(handle.getAddonName());
 		}
 
-		public void setModName(@NotNull String name) {
-			lblModName.setText(name);
+		@Override
+		public void startedIndex(@NotNull ArmaAddonsIndexingData data) {
+			totalAddonsToIndex = data.getAddonsMarkedToIndex().size();
+			timeIndexStarted = System.currentTimeMillis();
+			timerTimeElapsed.start();
+			updateModsLeftLabel();
 		}
 
-		public void setModsLeft(int modsLeft) {
-			lblModsLeft.setText(modsLeft + "");
+		@Override
+		public void finishedIndex() {
+			timerTimeElapsed.stop();
 		}
 
-		public void setModsFinished(int modsFinished) {
-			lblModsFinished.setText(modsFinished + "");
+		@Override
+		public void indexFinishedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
+			modsFinishedCount++;
+			lblModsFinished.setText(modsFinishedCount + "");
+			updateModsLeftLabel();
 		}
 
-		public void setErrorCount(int errorCount) {
+		@Override
+		public void errorMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+			errorCount++;
 			lblErrorCount.setText(errorCount + "");
 		}
 
-		public void setWarningCount(int warningCount) {
+		@Override
+		public void warningMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+			warningCount++;
 			lblWarningCount.setText(warningCount + "");
 		}
 
-		public void setTimeElapsed(int minutes) {
-			lblTimeElapsed.setText(String.format(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.time-elapsed-minutes-f"), minutes));
+		private void updateModsLeftLabel() {
+			lblModsLeft.setText((totalAddonsToIndex - modsFinishedCount) + "");
+		}
+	}
+
+	/**
+	 * Creates a wrapper around a series of {@link ArmaAddonsIndexingCallback} instances and then forwards method invocations
+	 * in the JavaFX UI Thread
+	 */
+	private static class IndexingCallbackCluster implements ArmaAddonsIndexingCallback {
+
+		@NotNull
+		private final ArmaAddonsIndexingCallback[] callbacks;
+
+		public IndexingCallbackCluster(@NotNull ArmaAddonsIndexingCallback... callbacks) {
+			this.callbacks = callbacks;
+		}
+
+		@Override
+		public void indexStartedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.indexStartedForAddon(handle);
+				}
+			});
+		}
+
+		@Override
+		public void totalWorkProgressUpdate(@NotNull ArmaAddonIndexingHandle handle, double progress) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.totalWorkProgressUpdate(handle, progress);
+				}
+			});
+		}
+
+		@Override
+		public void currentWorkProgressUpdate(@NotNull ArmaAddonIndexingHandle handle, double progress) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.currentWorkProgressUpdate(handle, progress);
+				}
+			});
+		}
+
+		@Override
+		public void message(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.message(handle, message);
+				}
+			});
+		}
+
+		@Override
+		public void errorMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.errorMessage(handle, message, e);
+				}
+			});
+		}
+
+		@Override
+		public void warningMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.warningMessage(handle, message, e);
+				}
+			});
+		}
+
+		@Override
+		public void stepStart(@NotNull ArmaAddonIndexingHandle handle, @NotNull Step newStep) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.stepStart(handle, newStep);
+				}
+			});
+		}
+
+		@Override
+		public void stepFinish(@NotNull ArmaAddonIndexingHandle handle, @NotNull Step stepFinished) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.stepFinish(handle, stepFinished);
+				}
+			});
+		}
+
+		@Override
+		public void indexFinishedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.indexFinishedForAddon(handle);
+				}
+			});
+		}
+
+		@Override
+		public void finishedIndex() {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.finishedIndex();
+				}
+			});
+		}
+
+		@Override
+		public void startedIndex(@NotNull ArmaAddonsIndexingData data) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.startedIndex(data);
+				}
+			});
+		}
+	}
+
+	private interface IndexingCallback extends ArmaAddonsIndexingCallback {
+
+		@Override
+		default void indexStartedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
+		}
+
+		@Override
+		default void totalWorkProgressUpdate(@NotNull ArmaAddonIndexingHandle handle, double progress) {
+		}
+
+		@Override
+		default void currentWorkProgressUpdate(@NotNull ArmaAddonIndexingHandle handle, double progress) {
+		}
+
+		@Override
+		default void message(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message) {
+		}
+
+		@Override
+		default void errorMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+		}
+
+		@Override
+		default void warningMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
+		}
+
+		@Override
+		default void stepStart(@NotNull ArmaAddonIndexingHandle handle, @NotNull Step newStep) {
+		}
+
+		@Override
+		default void stepFinish(@NotNull ArmaAddonIndexingHandle handle, @NotNull Step stepFinished) {
+		}
+
+		@Override
+		default void indexFinishedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
+		}
+
+		@Override
+		default void finishedIndex() {
+		}
+
+		@Override
+		default void startedIndex(@NotNull ArmaAddonsIndexingData data) {
 		}
 	}
 }
