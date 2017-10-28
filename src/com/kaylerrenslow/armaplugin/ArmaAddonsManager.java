@@ -304,7 +304,6 @@ public class ArmaAddonsManager {
 						sb.append(", ");
 					}
 				}
-				sb.append('\n');
 				sb.append(']');
 				forwardingThread.log(sb.toString());
 			}
@@ -446,7 +445,6 @@ public class ArmaAddonsManager {
 						sb.append(", ");
 					}
 				}
-				sb.append('\n');
 				sb.append(']');
 				forwardingThread.log(sb.toString());
 			}
@@ -483,7 +481,6 @@ public class ArmaAddonsManager {
 						sb.append(", ");
 					}
 				}
-				sb.append('\n');
 				sb.append(']');
 				forwardingThread.log(sb.toString());
 
