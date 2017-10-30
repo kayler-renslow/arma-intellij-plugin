@@ -66,14 +66,14 @@ public class ArmaAddonsManager {
 			forwardingThread.start();
 			forwardingThread.log("[BEGIN LOAD ADDONS]\n");
 			try {
-				armaAddons = doLoadAddons(config, logFile, callback, forwardingThread);
+				armaAddons = doLoadAddons(config, forwardingThread);
 			} catch (Exception e) {
 				e.printStackTrace();
 				forwardingThread.logError("Couldn't complete indexing addons", e);
 				return;
 			} finally {
 				forwardingThread.finishedIndex();
-				forwardingThread.log("[EXIT]\n\n");
+				forwardingThread.log("[EXIT LOAD ADDONS]\n\n");
 				forwardingThread.closeThread();
 			}
 			synchronized (instance) {
@@ -86,7 +86,6 @@ public class ArmaAddonsManager {
 
 	@NotNull
 	private List<ArmaAddon> doLoadAddons(@NotNull ArmaAddonsProjectConfig config,
-										 @Nullable File logFile, @NotNull ArmaAddonsIndexingCallback callback,
 										 @NotNull ArmaToolsCallbackForwardingThread forwardingThread) throws Exception {
 		ResourceBundle bundle = getBundle();
 
