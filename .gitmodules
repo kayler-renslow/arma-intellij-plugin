@@ -1,0 +1,4 @@
+[submodule "lib/arma-dialog-creator"]
+	path = lib/arma-dialog-creator
+	url = https://github.com/kayler-renslow/arma-dialog-creator.git
+	branch = master

@@ -1,10 +1,12 @@
 package com.kaylerrenslow.armaplugin;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,9 +37,12 @@ public class ArmaTools {
 	 *
 	 * @param commandLineText text to run
 	 * @param timeout         how many milliseconds the operation is allowed to run
+	 * @param errStm          stream to write the process's error output to, or null to only print to standard out
+	 * @param outStm          stream to write the process's non-error output to, or null to only print to standard out
 	 * @return true if the operation succeeded, false if it didn't
 	 */
-	private static boolean execCommandLineOperation(@NotNull String commandLineText, long timeout) {
+	private static boolean execCommandLineOperation(@NotNull String commandLineText, long timeout,
+													@Nullable PrintStream errStm, @Nullable PrintStream outStm) {
 		ProcessBuilder pb = new ProcessBuilder(commandLineText);
 		Process p;
 		try {
@@ -52,6 +57,25 @@ public class ArmaTools {
 			}
 		} catch (InterruptedException e) {
 			return false;
+		} finally {
+			try {
+				byte[] berr = new byte[p.getErrorStream().available()];
+				p.getErrorStream().read(berr);
+				if (errStm == null) {
+					System.err.println(new String(berr));
+				} else {
+					errStm.println(berr);
+				}
+				byte[] bnorm = new byte[p.getInputStream().available()];
+				p.getInputStream().read(bnorm);
+				if (outStm == null) {
+					System.out.println(new String(bnorm));
+				} else {
+					outStm.println(bnorm);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		return true;
 	}
@@ -65,10 +89,13 @@ public class ArmaTools {
 	 * @param pboToExtract        the .pbo file to extract
 	 * @param saveToDirectory     the directory to save the extracted contents to
 	 * @param timeout             how many milliseconds the operation is allowed to take before it is suspended.
+	 * @param errStm              stream to write the process's error output to, or null to only print to standard out
+	 * @param outStm              stream to write the process's non-error output to, or null to only print to standard out
 	 * @return true if the operation succeeded. Returns false if the operation failed and for an unknown reason (something bad happened with the conversion).
 	 * @throws IOException when any of the given file parameters are invalid
 	 */
-	public static boolean extractPBO(@NotNull File arma3ToolsDirectory, @NotNull File pboToExtract, @NotNull File saveToDirectory, long timeout) throws IOException {
+	public static boolean extractPBO(@NotNull File arma3ToolsDirectory, @NotNull File pboToExtract, @NotNull File saveToDirectory,
+									 long timeout, @Nullable PrintStream errStm, @Nullable PrintStream outStm) throws IOException {
 		checkA3ToolsDir(arma3ToolsDirectory);
 
 		if (!pboToExtract.exists()) {
@@ -82,7 +109,7 @@ public class ArmaTools {
 				saveToDirectory.getPath(),
 				pboToExtract.getPath()
 		);
-		return execCommandLineOperation(commandLine, timeout);
+		return execCommandLineOperation(commandLine, timeout, errStm, outStm);
 	}
 
 	/**
@@ -93,10 +120,13 @@ public class ArmaTools {
 	 * @param binarizedCfgFile    the binarized config
 	 * @param destFile            where to save the plain text converted config to
 	 * @param timeout             how many milliseconds the operation is allowed to take before it is suspended.
+	 * @param errStm              stream to write the process's error output to, or null to only print to standard out
+	 * @param outStm              stream to write the process's non-error output to, or null to only print to standard out
 	 * @return true if the operation succeeded. Returns false if the operation failed and for an unknown reason (something bad happened with the conversion).
 	 * @throws IOException when any of the given file parameters are invalid
 	 */
-	public static boolean convertBinConfigToText(@NotNull File arma3ToolsDirectory, @NotNull File binarizedCfgFile, @NotNull File destFile, long timeout) throws IOException {
+	public static boolean convertBinConfigToText(@NotNull File arma3ToolsDirectory, @NotNull File binarizedCfgFile, @NotNull File destFile,
+												 long timeout, @Nullable PrintStream errStm, @Nullable PrintStream outStm) throws IOException {
 		checkA3ToolsDir(arma3ToolsDirectory);
 		if (!binarizedCfgFile.exists()) {
 			throw new FileNotFoundException("Arma Tools: The binary cfg file doesn't exist. File=" + binarizedCfgFile.getPath());
@@ -108,7 +138,7 @@ public class ArmaTools {
 				binarizedCfgFile.getPath(),
 				destFile.getPath()
 		);
-		return execCommandLineOperation(commandLine, timeout);
+		return execCommandLineOperation(commandLine, timeout, errStm, outStm);
 	}
 
 	private static void checkA3ToolsDir(@NotNull File arma3ToolsDirectory) throws FileNotFoundException {

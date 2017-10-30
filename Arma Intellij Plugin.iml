@@ -8,10 +8,10 @@
       <sourceFolder url="file://$MODULE_DIR$/gen" isTestSource="false" generated="true" />
       <sourceFolder url="file://$MODULE_DIR$/resources" type="java-resource" />
       <sourceFolder url="file://$MODULE_DIR$/raw_doc" type="java-resource" relativeOutputPath="com.kaylerrenslow.armaplugin.lang.sqf.raw_doc" />
+      <sourceFolder url="file://$MODULE_DIR$/lib/arma-dialog-creator/src" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="IntelliJ IDEA Community Edition IC-172.4155.36" jdkType="IDEA JDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="jflex-1.7.0-SNAPSHOT" level="project" />
-    <orderEntry type="library" name="Arma Dialog Creator" level="project" />
   </component>
 </module>

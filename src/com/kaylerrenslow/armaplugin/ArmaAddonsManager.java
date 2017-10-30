@@ -298,11 +298,11 @@ public class ArmaAddonsManager {
 				for (File pboFile : pboFiles) {
 					sb.append('\t');
 					sb.append(pboFile.getAbsolutePath());
-					sb.append('\n');
 					i++;
 					if (i < pboFiles.length) {
 						sb.append(", ");
 					}
+					sb.append('\n');
 				}
 				sb.append(']');
 				forwardingThread.log(sb.toString());
@@ -371,7 +371,8 @@ public class ArmaAddonsManager {
 						success = ArmaTools.extractPBO(
 								armaTools,
 								pboFile,
-								extractDir, 10 * 60 * 1000 /*10 minutes before suspend*/
+								extractDir, 10 * 60 * 1000 /*10 minutes before suspend*/,
+								null, null
 						);
 						forwardingThread.message(helper,
 								String.format(
@@ -428,6 +429,8 @@ public class ArmaAddonsManager {
 					}
 					if (visit.getName().equalsIgnoreCase(BINARIZED_CONFIG_NAME)) {
 						configBinFiles.add(visit);
+					} else if (visit.getName().equalsIgnoreCase("config.cpp")) {
+						debinarizedConfigs.add(visit);
 					}
 				}
 			}
@@ -435,15 +438,10 @@ public class ArmaAddonsManager {
 			{ //print to log all config.bin files marked for debinarize
 				StringBuilder sb = new StringBuilder();
 				sb.append("All config.bin marked to debinarize:[\n");
-				int i = 0;
 				for (File configBinFile : configBinFiles) {
 					sb.append('\t');
 					sb.append(configBinFile.getAbsolutePath());
 					sb.append('\n');
-					i++;
-					if (i < configBinFiles.size()) {
-						sb.append(", ");
-					}
 				}
 				sb.append(']');
 				forwardingThread.log(sb.toString());
@@ -471,15 +469,10 @@ public class ArmaAddonsManager {
 			Function<List<File>, Void> convertConfigBinFiles = configBinFilesToConvert -> {
 				StringBuilder sb = new StringBuilder();
 				sb.append("DeBinarizing config.bin files on thread ").append(Thread.currentThread().getName()).append(": [\n");
-				int i = 0;
 				for (File configBinFile : configBinFiles) {
 					sb.append('\t');
 					sb.append(configBinFile.getAbsolutePath());
 					sb.append('\n');
-					i++;
-					if (i < configBinFiles.size()) {
-						sb.append(", ");
-					}
 				}
 				sb.append(']');
 				forwardingThread.log(sb.toString());
@@ -497,7 +490,7 @@ public class ArmaAddonsManager {
 								armaTools,
 								configBinFile,
 								debinarizedFile,
-								10 * 1000 /*10 seconds*/
+								10 * 1000 /*10 seconds*/, null, null
 						);
 					} catch (IOException e1) {
 						e = e1;
