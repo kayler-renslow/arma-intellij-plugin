@@ -1001,6 +1001,7 @@ public class ArmaAddonsManager {
 					if (take == EXIT_THREAD) {
 						return;
 					}
+					take.run();
 				} catch (InterruptedException ignore) {
 				}
 			}
