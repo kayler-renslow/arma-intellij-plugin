@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.swing.JComponent;
 import javax.swing.JDialog;
-import javax.swing.JFileChooser;
 import java.io.File;
 import java.util.ResourceBundle;
 import java.util.function.Function;
@@ -76,15 +75,11 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			rootNode.setBottom(footer);
 			footer.setPadding(padding);
 
-			JFileChooser chooser = new JFileChooser();
-			chooser.showDialog(null, "");
-			File selectedAddonsCfgFile = chooser.getSelectedFile();
-			if (selectedAddonsCfgFile != null) {
-				ArmaAddonsProjectConfig config = ArmaAddonsManager.parseAddonsConfig(selectedAddonsCfgFile, project);
-				ArmaAddonsManager.loadAddonsAsync(config, new File(selectedAddonsCfgFile.getParentFile().getAbsolutePath() + "/addonsIndexLog.txt"), new IndexingCallbackCluster(
-						statusBar, centerPanel, footer
-				));
-			}
+			File selectedAddonsCfgFile = new File("D:\\Archive\\Intellij Files\\Arma Tools\\Arma Intellij Plugin\\addonsCfgTest.xml");
+			ArmaAddonsProjectConfig config = ArmaAddonsManager.parseAddonsConfig(selectedAddonsCfgFile, project);
+			ArmaAddonsManager.loadAddonsAsync(config, new File(selectedAddonsCfgFile.getParentFile().getAbsolutePath() + "/addonsIndexLog.txt"), new IndexingCallbackCluster(
+					statusBar, centerPanel, footer
+			));
 		});
 		return root;
 	}
@@ -276,6 +271,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			}
 
 			taConsole.setEditable(false);
+
 		}
 
 		@Override

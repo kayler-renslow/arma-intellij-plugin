@@ -340,7 +340,7 @@ public class ArmaAddonsManager {
 
 			Function<List<File>, Void> extractPbos = pboFilesToExtract -> {
 				StringBuilder sb = new StringBuilder();
-				sb.append("Extracting PBO's on thread ").append(Thread.currentThread().getName()).append(": [");
+				sb.append("Extracting PBO's on thread ").append(Thread.currentThread().getName()).append(": [\n");
 				for (File pboFile : pboFilesToExtract) {
 					sb.append('\t');
 					sb.append(pboFile.getName());
@@ -693,15 +693,16 @@ public class ArmaAddonsManager {
 	}
 
 	private static boolean deleteDirectory(@NotNull File directory) {
-		if (directory.exists()) {
-			File[] files = directory.listFiles();
-			if (null != files) {
-				for (File file : files) {
-					if (file.isDirectory()) {
-						deleteDirectory(file);
-					} else {
-						file.delete();
-					}
+		if (!directory.exists()) {
+			return true;
+		}
+		File[] files = directory.listFiles();
+		if (null != files) {
+			for (File file : files) {
+				if (file.isDirectory()) {
+					deleteDirectory(file);
+				} else {
+					file.delete();
 				}
 			}
 		}
