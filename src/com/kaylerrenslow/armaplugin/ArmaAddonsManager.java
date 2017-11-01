@@ -62,7 +62,7 @@ public class ArmaAddonsManager {
 	private void _loadAddonsAsync(@NotNull ArmaAddonsProjectConfig config, @Nullable File logFile, @NotNull ArmaAddonsIndexingCallback callback) {
 		Thread t = new Thread(() -> {
 			List<ArmaAddon> armaAddons;
-			ArmaToolsCallbackForwardingThread forwardingThread = new ArmaToolsCallbackForwardingThread(callback, logFile);
+			ForwardingThread forwardingThread = new ForwardingThread(callback, logFile);
 			forwardingThread.start();
 			forwardingThread.log("[BEGIN LOAD ADDONS]\n");
 			try {
@@ -72,7 +72,22 @@ public class ArmaAddonsManager {
 				forwardingThread.logError("Couldn't complete indexing addons", e);
 				return;
 			} finally {
+
 				forwardingThread.finishedIndex();
+
+				if (forwardingThread.getRootTempDirectory() != null) {
+					//this is in case the the try-catch block resulted in exception and cleanup couldn't be performed normally
+					boolean deleted = deleteDirectory(forwardingThread.getRootTempDirectory());
+					if (!deleted) {
+						forwardingThread.errorMessage(
+								String.format(
+										getBundle().getString("failed-to-delete-root-temp-directory-f"),
+										forwardingThread.getRootTempDirectory().getAbsolutePath()
+								), null
+						);
+					}
+				}
+
 				forwardingThread.log("[EXIT LOAD ADDONS]\n\n");
 				forwardingThread.closeThread();
 			}
@@ -86,7 +101,7 @@ public class ArmaAddonsManager {
 
 	@NotNull
 	private List<ArmaAddon> doLoadAddons(@NotNull ArmaAddonsProjectConfig config,
-										 @NotNull ArmaToolsCallbackForwardingThread forwardingThread) throws Exception {
+										 @NotNull ForwardingThread forwardingThread) throws Exception {
 		ResourceBundle bundle = getBundle();
 
 		File refDir = new File(config.getAddonsReferenceDirectory());
@@ -182,6 +197,7 @@ public class ArmaAddonsManager {
 			if (!mkdirs) {
 				throw new IllegalStateException("couldn't make the temp directory for extracting");
 			}
+			forwardingThread.setRootTempDirectory(tempDir);
 			forwardingThread.log("Temp directory for addons extraction:" + tempDir.getAbsolutePath());
 		}
 
@@ -248,7 +264,7 @@ public class ArmaAddonsManager {
 
 	private void doWorkForAddonHelper(@NotNull ArmaAddonHelper helper,
 									  @NotNull File refDir, @NotNull File armaTools, @NotNull File tempDir,
-									  @NotNull ArmaToolsCallbackForwardingThread forwardingThread,
+									  @NotNull ForwardingThread forwardingThread,
 									  @NotNull List<File> extractDirs) throws Exception {
 		ResourceBundle bundle = getBundle();
 
@@ -293,14 +309,9 @@ public class ArmaAddonsManager {
 			{ //print to log all pbo files marked for extraction
 				StringBuilder sb = new StringBuilder();
 				sb.append("All PBO's marked to extract:[\n");
-				int i = 0;
 				for (File pboFile : pboFiles) {
 					sb.append('\t');
 					sb.append(pboFile.getAbsolutePath());
-					i++;
-					if (i < pboFiles.length) {
-						sb.append(", ");
-					}
 					sb.append('\n');
 				}
 				sb.append(']');
@@ -330,13 +341,10 @@ public class ArmaAddonsManager {
 			Function<List<File>, Void> extractPbos = pboFilesToExtract -> {
 				StringBuilder sb = new StringBuilder();
 				sb.append("Extracting PBO's on thread ").append(Thread.currentThread().getName()).append(": [");
-				int i = 0;
 				for (File pboFile : pboFilesToExtract) {
+					sb.append('\t');
 					sb.append(pboFile.getName());
-					i++;
-					if (i < pboFilesToExtract.size()) {
-						sb.append(", ");
-					}
+					sb.append('\n');
 				}
 				sb.append(']');
 				forwardingThread.log(sb.toString());
@@ -429,6 +437,10 @@ public class ArmaAddonsManager {
 					if (visit.getName().equalsIgnoreCase(BINARIZED_CONFIG_NAME)) {
 						configBinFiles.add(visit);
 					} else if (visit.getName().equalsIgnoreCase("config.cpp")) {
+						forwardingThread.log("Found pre-debinarized config for addon '"
+								+ helper.getAddonDirName() + "'. Added to parsed configs:"
+								+ visit.getAbsolutePath()
+						);
 						debinarizedConfigs.add(visit);
 					}
 				}
@@ -468,7 +480,7 @@ public class ArmaAddonsManager {
 			Function<List<File>, Void> convertConfigBinFiles = configBinFilesToConvert -> {
 				StringBuilder sb = new StringBuilder();
 				sb.append("DeBinarizing config.bin files on thread ").append(Thread.currentThread().getName()).append(": [\n");
-				for (File configBinFile : configBinFiles) {
+				for (File configBinFile : configBinFilesToConvert) {
 					sb.append('\t');
 					sb.append(configBinFile.getAbsolutePath());
 					sb.append('\n');
@@ -644,20 +656,22 @@ public class ArmaAddonsManager {
 								continue;
 							}
 						} else if (child.isDirectory()) {
-							toVisit.push(child);
-
 							File newFolder = new File(folderCopy.getAbsolutePath() + "/" + visit.getName());
-							boolean mkdirs1 = newFolder.mkdirs();
-							if (!mkdirs1) {
-								forwardingThread.errorMessage(
-										helper,
-										String.format(
-												bundle.getString("failed-to-create-directory-f"),
-												newFolder.getAbsolutePath()
-										), null
-								);
-								continue;
+							if (!newFolder.exists()) {
+								boolean mkdirs1 = newFolder.mkdirs();
+								if (!mkdirs1) {
+									forwardingThread.errorMessage(
+											helper,
+											String.format(
+													bundle.getString("failed-to-create-directory-f"),
+													newFolder.getAbsolutePath()
+											), null
+									);
+									continue;
+								}
 							}
+							//keep toVisit.push() down here in case the new folder can't be created
+							toVisit.push(child);
 							traverseCopy.push(newFolder);
 						}
 					}
@@ -968,7 +982,7 @@ public class ArmaAddonsManager {
 		}
 	}
 
-	private static class ArmaToolsCallbackForwardingThread extends Thread implements ArmaAddonsIndexingCallback {
+	private static class ForwardingThread extends Thread implements ArmaAddonsIndexingCallback {
 		private final LinkedBlockingQueue<Runnable> forwardingQ = new LinkedBlockingQueue<>();
 		private final Runnable EXIT_THREAD = () -> {
 		};
@@ -978,8 +992,10 @@ public class ArmaAddonsManager {
 		private PrintWriter logger;
 		private int loggerBufferSize = 0;
 		private final Object loggerLock = new Object();
+		private @Nullable
+		File rootTempDirectory;
 
-		public ArmaToolsCallbackForwardingThread(@NotNull ArmaAddonsIndexingCallback callback, @Nullable File logFile) {
+		public ForwardingThread(@NotNull ArmaAddonsIndexingCallback callback, @Nullable File logFile) {
 			this.callback = callback;
 			setName("ArmaAddonsManager - Callback Thread");
 			if (logFile != null) {
@@ -1041,6 +1057,14 @@ public class ArmaAddonsManager {
 			logError(message, e);
 			forwardingQ.add(() -> {
 				callback.errorMessage(handle, message, e);
+			});
+		}
+
+		@Override
+		public void errorMessage(@NotNull String message, @Nullable Exception e) {
+			logError(message, e);
+			forwardingQ.add(() -> {
+				callback.errorMessage(message, e);
 			});
 		}
 
@@ -1136,6 +1160,15 @@ public class ArmaAddonsManager {
 					log(ArmaPluginUtil.getExceptionString(e));
 				}
 			}
+		}
+
+		public void setRootTempDirectory(@NotNull File rootTempDirectory) {
+			this.rootTempDirectory = rootTempDirectory;
+		}
+
+		@Nullable
+		public File getRootTempDirectory() {
+			return rootTempDirectory;
 		}
 	}
 }

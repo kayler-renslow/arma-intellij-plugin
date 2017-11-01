@@ -103,7 +103,7 @@ public class ArmaTools {
 		}
 
 		String commandLine = String.format(
-				"\"%s\\\\%s\" -f \"%s\" \"%s\"",
+				"\"%s\\%s\" -f \"%s\" \"%s\"",
 				arma3ToolsDirectory.getPath(),
 				BANK_REV,
 				saveToDirectory.getPath(),
@@ -132,7 +132,7 @@ public class ArmaTools {
 			throw new FileNotFoundException("Arma Tools: The binary cfg file doesn't exist. File=" + binarizedCfgFile.getPath());
 		}
 		String commandLine = String.format(
-				"\"%s\\\\%s\" -bin -dst \"%s\" \"%s\"",
+				"\"%s\\%s\" -txt \"%s\" \"%s\"",
 				arma3ToolsDirectory.getPath(),
 				CFG_CONVERT,
 				binarizedCfgFile.getPath(),

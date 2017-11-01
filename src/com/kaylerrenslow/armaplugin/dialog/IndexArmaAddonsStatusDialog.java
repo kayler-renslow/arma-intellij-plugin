@@ -16,10 +16,13 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.*;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.scene.text.Text;
+import javafx.util.converter.DefaultStringConverter;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -214,10 +217,13 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			}
 
 			{//table view stuff
-				TableColumn<Message, String> columnModName = new TableColumn<>(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.ColumnName.mod"));
+				TableColumn<Message, String> columnModName = new TableColumn<>(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.ColumnName.addon"));
 				tableViewMessage.getColumns().add(columnModName);
 				columnModName.setCellValueFactory(param -> {
-					return param.getValue().modName;
+					return param.getValue().addonName;
+				});
+				columnModName.setCellFactory(param -> {
+					return new WrappingTextFieldTableCell<>();
 				});
 
 				TableColumn<Message, String> columnMessageTxt = new TableColumn<>(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.ColumnName.message"));
@@ -225,11 +231,17 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 				columnMessageTxt.setCellValueFactory(param -> {
 					return param.getValue().message;
 				});
+				columnMessageTxt.setCellFactory(param -> {
+					return new WrappingTextFieldTableCell<>();
+				});
 
 				TableColumn<Message, String> columnType = new TableColumn<>(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.ColumnName.type"));
 				tableViewMessage.getColumns().add(columnType);
 				columnType.setCellValueFactory(param -> {
 					return param.getValue().type;
+				});
+				columnType.setCellFactory(param -> {
+					return new WrappingTextFieldTableCell<>();
 				});
 			}
 
@@ -263,7 +275,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 				checkBoxCleanup.setUserData(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Active.cleanup"));
 			}
 
-			taConsole.setDisable(true);
+			taConsole.setEditable(false);
 		}
 
 		@Override
@@ -296,6 +308,15 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 		}
 
 		@Override
+		public void errorMessage(@NotNull String message, @Nullable Exception e) {
+			String errorType = bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.message-type-error");
+			String cmessage = errorType + " - " + message;
+			taConsole.appendText(cmessage);
+			taConsole.appendText("\n");
+			addMessageRow("?", message, errorType);
+		}
+
+		@Override
 		public void warningMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
 			String warningType = bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.message-type-warning");
 			String cmessage = warningType + " - " + message;
@@ -319,8 +340,8 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			taConsole.setText("");
 		}
 
-		private void addMessageRow(@NotNull String modeName, @NotNull String message, @NotNull String type) {
-			tableViewMessage.getItems().add(new Message(modeName, message, type));
+		private void addMessageRow(@NotNull String addonName, @NotNull String message, @NotNull String type) {
+			tableViewMessage.getItems().add(new Message(addonName, message, type));
 		}
 
 		private CheckBox getCheckBoxForStep(@NotNull Step step) {
@@ -365,16 +386,47 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 
 		private class Message {
 			@NotNull
-			private final ObservableValue<String> modName;
+			private final ObservableValue<String> addonName;
 			@NotNull
 			private final ObservableValue<String> message;
 			@NotNull
 			private final ObservableValue<String> type;
 
-			public Message(@NotNull String modName, @NotNull String message, @NotNull String type) {
-				this.modName = new SimpleStringProperty(modName);
+			public Message(@NotNull String addonName, @NotNull String message, @NotNull String type) {
+				this.addonName = new SimpleStringProperty(addonName);
 				this.message = new SimpleStringProperty(message);
 				this.type = new SimpleStringProperty(type);
+			}
+		}
+
+		private class WrappingTextFieldTableCell<S> extends TextFieldTableCell<S, String> {
+
+			private final Text cellText;
+
+			public WrappingTextFieldTableCell() {
+				super(new DefaultStringConverter());
+				this.cellText = createText();
+			}
+
+			@Override
+			public void cancelEdit() {
+				super.cancelEdit();
+				setGraphic(cellText);
+			}
+
+			@Override
+			public void updateItem(String item, boolean empty) {
+				super.updateItem(item, empty);
+				if (!isEmpty() && !isEditing()) {
+					setGraphic(cellText);
+				}
+			}
+
+			private Text createText() {
+				Text text = new Text();
+				text.wrappingWidthProperty().bind(widthProperty());
+				text.textProperty().bind(itemProperty());
+				return text;
 			}
 		}
 	}
@@ -456,6 +508,9 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			timeIndexStarted = System.currentTimeMillis();
 			timerTimeElapsed.start();
 			updateModsLeftLabel();
+			updateModsFinishedLabel();
+			updateErrorCountLabel();
+			updateWarningCountLabel();
 		}
 
 		@Override
@@ -466,20 +521,38 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 		@Override
 		public void indexFinishedForAddon(@NotNull ArmaAddonIndexingHandle handle) {
 			modsFinishedCount++;
-			lblModsFinished.setText(modsFinishedCount + "");
+			updateModsFinishedLabel();
 			updateModsLeftLabel();
 		}
 
 		@Override
 		public void errorMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
 			errorCount++;
-			lblErrorCount.setText(errorCount + "");
+			updateErrorCountLabel();
+		}
+
+		@Override
+		public void errorMessage(@NotNull String message, @Nullable Exception e) {
+			errorCount++;
+			updateErrorCountLabel();
 		}
 
 		@Override
 		public void warningMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
 			warningCount++;
+			updateWarningCountLabel();
+		}
+
+		private void updateWarningCountLabel() {
 			lblWarningCount.setText(warningCount + "");
+		}
+
+		private void updateErrorCountLabel() {
+			lblErrorCount.setText(errorCount + "");
+		}
+
+		private void updateModsFinishedLabel() {
+			lblModsFinished.setText(modsFinishedCount + "");
 		}
 
 		private void updateModsLeftLabel() {
@@ -541,6 +614,15 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			Platform.runLater(() -> {
 				for (ArmaAddonsIndexingCallback callback : callbacks) {
 					callback.errorMessage(handle, message, e);
+				}
+			});
+		}
+
+		@Override
+		public void errorMessage(@NotNull String message, @Nullable Exception e) {
+			Platform.runLater(() -> {
+				for (ArmaAddonsIndexingCallback callback : callbacks) {
+					callback.errorMessage(message, e);
 				}
 			});
 		}
@@ -644,6 +726,10 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 
 		@Override
 		default void startedIndex(@NotNull ArmaAddonsIndexingData data) {
+		}
+
+		@Override
+		default void errorMessage(@NotNull String message, @Nullable Exception e) {
 		}
 	}
 }

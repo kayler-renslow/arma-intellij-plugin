@@ -85,8 +85,18 @@ public interface ArmaAddonsIndexingCallback {
 	 *
 	 * @param handle  the addon's handle
 	 * @param message the message
+	 * @param e       the exception that resulted in the error, or null if no exception ha
 	 */
 	void errorMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e);
+
+	/**
+	 * Invoked when only an error message is being passed, but the error wasn't for a specific addon.
+	 * This is invoked while the addon is being indexed.
+	 *
+	 * @param message the message
+	 * @param e       the exception that resulted in the error, or null if no exception happened
+	 */
+	void errorMessage(@NotNull String message, @Nullable Exception e);
 
 	/**
 	 * Invoked when only a warning message is being passed for an addon.
