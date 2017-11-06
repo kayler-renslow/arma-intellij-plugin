@@ -34,7 +34,7 @@ import java.util.function.Function;
 
 public class IndexArmaAddonsStatusDialog extends JDialog {
 
-	private static final ResourceBundle bundle = ArmaPlugin.getPluginBundle();
+	private static final ResourceBundle bundle = ResourceBundle.getBundle("com.kaylerrenslow.armaplugin.IndexArmaAddonsBundle");
 	@NotNull
 	private final Project project;
 
@@ -181,7 +181,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			GridPane gridPaneProgress = new GridPane();
 
 			getChildren().addAll(
-					new HBox(5, new Label(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.status")), lblStatusMessage),
+					new HBox(5, new Label(bundle.getString("CenterPanel.status")), lblStatusMessage),
 					gridPaneProgress,
 					new FlowPane(Orientation.HORIZONTAL, 5, 10,
 							checkBoxExtractPbo,
@@ -199,11 +199,11 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 
 			{//grid pane progress stuff
 				gridPaneProgress.addRow(0,
-						new Label(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.total-work-for-mod")),
+						new Label(bundle.getString("CenterPanel.total-work-for-mod")),
 						pbTotalWork
 				);
 				gridPaneProgress.addRow(1,
-						new Label(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.current-work")),
+						new Label(bundle.getString("CenterPanel.current-work")),
 						pbCurrentWork
 				);
 				gridPaneProgress.getColumnConstraints().add(new ColumnConstraints(0, -1, -1, Priority.NEVER, HPos.CENTER, false));
@@ -212,7 +212,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			}
 
 			{//table view stuff
-				TableColumn<Message, String> columnModName = new TableColumn<>(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.ColumnName.addon"));
+				TableColumn<Message, String> columnModName = new TableColumn<>(bundle.getString("CenterPanel.Table.ColumnName.addon"));
 				tableViewMessage.getColumns().add(columnModName);
 				columnModName.setCellValueFactory(param -> {
 					return param.getValue().addonName;
@@ -221,7 +221,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 					return new WrappingTextFieldTableCell<>();
 				});
 
-				TableColumn<Message, String> columnMessageTxt = new TableColumn<>(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.ColumnName.message"));
+				TableColumn<Message, String> columnMessageTxt = new TableColumn<>(bundle.getString("CenterPanel.Table.ColumnName.message"));
 				tableViewMessage.getColumns().add(columnMessageTxt);
 				columnMessageTxt.setCellValueFactory(param -> {
 					return param.getValue().message;
@@ -230,7 +230,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 					return new WrappingTextFieldTableCell<>();
 				});
 
-				TableColumn<Message, String> columnType = new TableColumn<>(bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.ColumnName.type"));
+				TableColumn<Message, String> columnType = new TableColumn<>(bundle.getString("CenterPanel.Table.ColumnName.type"));
 				tableViewMessage.getColumns().add(columnType);
 				columnType.setCellValueFactory(param -> {
 					return param.getValue().type;
@@ -254,20 +254,20 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 				checkBoxSaveReferences.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
 				checkBoxCleanup.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
 
-				checkBoxExtractPbo.setText(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Preview.extracting-pbos"));
-				checkBoxExtractPbo.setUserData(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Active.extracting-pbos"));
+				checkBoxExtractPbo.setText(bundle.getString("Status.Preview.extracting-pbos"));
+				checkBoxExtractPbo.setUserData(bundle.getString("Status.Active.extracting-pbos"));
 
-				checkBoxDebinarizeConfigs.setText(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Preview.debinarize-configs"));
-				checkBoxDebinarizeConfigs.setUserData(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Active.debinarize-configs"));
+				checkBoxDebinarizeConfigs.setText(bundle.getString("Status.Preview.debinarize-configs"));
+				checkBoxDebinarizeConfigs.setUserData(bundle.getString("Status.Active.debinarize-configs"));
 
-				checkBoxParseConfigs.setText(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Preview.parse-configs"));
-				checkBoxParseConfigs.setUserData(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Active.parse-configs"));
+				checkBoxParseConfigs.setText(bundle.getString("Status.Preview.parse-configs"));
+				checkBoxParseConfigs.setUserData(bundle.getString("Status.Active.parse-configs"));
 
-				checkBoxSaveReferences.setText(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Preview.save-references"));
-				checkBoxSaveReferences.setUserData(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Active.save-references"));
+				checkBoxSaveReferences.setText(bundle.getString("Status.Preview.save-references"));
+				checkBoxSaveReferences.setUserData(bundle.getString("Status.Active.save-references"));
 
-				checkBoxCleanup.setText(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Preview.cleanup"));
-				checkBoxCleanup.setUserData(bundle.getString("Dialog.IndexArmaAddonsStatus.Status.Active.cleanup"));
+				checkBoxCleanup.setText(bundle.getString("Status.Preview.cleanup"));
+				checkBoxCleanup.setUserData(bundle.getString("Status.Active.cleanup"));
 			}
 
 			taConsole.setEditable(false);
@@ -297,7 +297,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 
 		@Override
 		public void errorMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
-			String errorType = bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.message-type-error");
+			String errorType = bundle.getString("CenterPanel.Table.message-type-error");
 			String cmessage = errorType + " - " + message;
 			writeToConsole(handle, cmessage);
 			addMessageRow(handle.getAddonName(), message, errorType);
@@ -305,7 +305,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 
 		@Override
 		public void errorMessage(@NotNull String message, @Nullable Exception e) {
-			String errorType = bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.message-type-error");
+			String errorType = bundle.getString("CenterPanel.Table.message-type-error");
 			String cmessage = errorType + " - " + message;
 			taConsole.appendText(cmessage);
 			taConsole.appendText("\n");
@@ -314,7 +314,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 
 		@Override
 		public void warningMessage(@NotNull ArmaAddonIndexingHandle handle, @NotNull String message, @Nullable Exception e) {
-			String warningType = bundle.getString("Dialog.IndexArmaAddonsStatus.CenterPanel.Table.message-type-warning");
+			String warningType = bundle.getString("CenterPanel.Table.message-type-warning");
 			String cmessage = warningType + " - " + message;
 			writeToConsole(handle, cmessage);
 			addMessageRow(handle.getAddonName(), message, warningType);
@@ -443,7 +443,7 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 		private long timeIndexStarted = 0;
 		private long millisSinceLastLabelUpdate = 0;
 		private final AnimationTimer timerTimeElapsed = new AnimationTimer() {
-			private final String formatString = bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.time-elapsed-minutes-f");
+			private final String formatString = bundle.getString("StatusBar.time-elapsed-minutes-f");
 
 			@Override
 			public void start() {
@@ -472,23 +472,23 @@ public class IndexArmaAddonsStatusDialog extends JDialog {
 			};
 
 			getItems().addAll(
-					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mod-name")),
+					getBoldLabel.apply(bundle.getString("StatusBar.mod-name")),
 					lblModName,
 					new Separator(Orientation.VERTICAL),
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mods-left")),
+					getBoldLabel.apply(bundle.getString("StatusBar.mods-left")),
 					lblModsLeft,
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.mods-finished")),
+					getBoldLabel.apply(bundle.getString("StatusBar.mods-finished")),
 					lblModsFinished,
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.errors")),
+					getBoldLabel.apply(bundle.getString("StatusBar.errors")),
 					lblErrorCount,
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.warnings")),
+					getBoldLabel.apply(bundle.getString("StatusBar.warnings")),
 					lblWarningCount,
 					new Separator(Orientation.VERTICAL),
-					getBoldLabel.apply(bundle.getString("Dialog.IndexArmaAddonsStatus.StatusBar.time-elapsed")),
+					getBoldLabel.apply(bundle.getString("StatusBar.time-elapsed")),
 					lblTimeElapsed
 			);
 		}

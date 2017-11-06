@@ -1,4 +1,4 @@
-package com.kaylerrenslow.armaplugin;
+package com.kaylerrenslow.armaplugin.settings;
 
 import com.intellij.openapi.components.PersistentStateComponent;
 import com.intellij.openapi.components.ServiceManager;

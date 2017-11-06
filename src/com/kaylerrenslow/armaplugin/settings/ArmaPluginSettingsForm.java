@@ -1,8 +1,7 @@
-package com.kaylerrenslow.armaplugin.dialog;
+package com.kaylerrenslow.armaplugin.settings;
 
 import com.intellij.openapi.ui.DialogWrapper;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
-import com.kaylerrenslow.armaplugin.ArmaPlugin;
 import com.kaylerrenslow.armaplugin.ArmaPluginIcons;
 import com.kaylerrenslow.armaplugin.ArmaTools;
 import org.jetbrains.annotations.NotNull;
@@ -44,7 +43,7 @@ public class ArmaPluginSettingsForm {
 			panelForTfArmaToolsDir = new TextFieldWithBrowseButton(tfArmaToolsDir, e -> {
 				JFileChooser fc = new JFileChooser();
 				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-				fc.showDialog(panelRoot, ArmaPlugin.getPluginBundle().getString("Dialog.ArmaToolsConfig.select"));
+				fc.showDialog(panelRoot, getBundle().getString("ApplicationSettings.ArmaToolsConfig.select"));
 				File file = fc.getSelectedFile();
 
 				if (file == null) {
@@ -64,10 +63,14 @@ public class ArmaPluginSettingsForm {
 		tfArmaToolsDir.setText(path);
 	}
 
+	private ResourceBundle getBundle() {
+		return ResourceBundle.getBundle("com.kaylerrenslow.armaplugin.ApplicationSettingsBundle");
+	}
+
 	private class ArmaToolsDirOkDialog extends DialogWrapper {
 
 		private final boolean validArmaToolsDirectory;
-		private final ResourceBundle b = ArmaPlugin.getPluginBundle();
+		private final ResourceBundle b = getBundle();
 
 		public ArmaToolsDirOkDialog(boolean validArmaToolsDirectory) {
 			super(false);
@@ -89,8 +92,8 @@ public class ArmaPluginSettingsForm {
 			);
 			root.add(
 					new JLabel(
-							validArmaToolsDirectory ? b.getString("Dialog.ArmaToolsConfig.directory-is-valid")
-									: b.getString("Dialog.ArmaToolsConfig.directory-is-not-valid")
+							validArmaToolsDirectory ? b.getString("ApplicationSettings.ArmaToolsConfig.directory-is-valid")
+									: b.getString("ApplicationSettings.ArmaToolsConfig.directory-is-not-valid")
 					)
 
 			);
