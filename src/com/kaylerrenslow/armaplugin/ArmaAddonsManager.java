@@ -692,6 +692,10 @@ public class ArmaAddonsManager {
 		return instance;
 	}
 
+	/**
+	 * @param directory the directory to delete
+	 * @return true if the directory doesn't exist or was deleted. Returns false if the directory couldn't be deleted
+	 */
 	private static boolean deleteDirectory(@NotNull File directory) {
 		if (!directory.exists()) {
 			return true;

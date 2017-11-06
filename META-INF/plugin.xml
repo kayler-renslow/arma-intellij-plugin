@@ -50,9 +50,14 @@
 		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/armaplugin/armaPluginColorSchemes.xml"/>
 		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/armaplugin/armaPluginColorSchemes.xml"/>
 
-		<applicationConfigurable instance="com.kaylerrenslow.armaplugin.ArmaPluginProjectConfigurable"/>
+		<applicationConfigurable instance="com.kaylerrenslow.armaplugin.ArmaPluginApplicationConfigurable"/>
 		<applicationService serviceImplementation="com.kaylerrenslow.armaplugin.ArmaPluginApplicationSettings"
 							serviceInterface="com.kaylerrenslow.armaplugin.ArmaPluginApplicationSettings"/>
+
+		<projectConfigurable instance="com.kaylerrenslow.armaplugin.ArmaPluginProjectConfigurable"/>
+		<projectService serviceImplementation="com.kaylerrenslow.armaplugin.ArmaPluginProjectSettings"
+						serviceInterface="com.kaylerrenslow.armaplugin.ArmaPluginProjectSettings"/>
+
 	</extensions>
 	<change-notes></change-notes>
 </idea-plugin>
