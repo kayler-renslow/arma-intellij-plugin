@@ -14,7 +14,7 @@ import javax.swing.JComponent;
  */
 public class ArmaPluginProjectConfigurable implements SearchableConfigurable {
 
-	private final ArmaPluginSettingsForm form = new ArmaPluginSettingsForm();
+	private final ArmaAddonsSettingsForm form = new ArmaAddonsSettingsForm();
 
 	@Nls
 	@Override
@@ -25,7 +25,7 @@ public class ArmaPluginProjectConfigurable implements SearchableConfigurable {
 	@Nullable
 	@Override
 	public JComponent createComponent() {
-		return null;
+		return form.getPanelRoot();
 	}
 
 	@Override
