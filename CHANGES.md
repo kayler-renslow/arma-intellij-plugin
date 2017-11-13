@@ -1,5 +1,5 @@
 **Added**  
-* syntax xml files directory
+* 
 
 **Changed**  
 * 
