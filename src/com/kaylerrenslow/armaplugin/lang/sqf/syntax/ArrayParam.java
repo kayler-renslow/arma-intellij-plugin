@@ -8,7 +8,7 @@ import java.util.List;
  * @author Kayler
  * @since 02/18/2017
  */
-public class ArrayParam extends Param implements ArrayValue {
+public class ArrayParam extends Param implements ArrayValueHolder {
 
 	private boolean unboundedParams;
 	private List<Param> params;
@@ -25,8 +25,6 @@ public class ArrayParam extends Param implements ArrayValue {
 		super("ARRAY", ValueHolderType.ARRAY, description, optional);
 		this.unboundedParams = unboundedParams;
 		this.params = params;
-
-		nameProperty().setValue(ArrayValue.getArrayDataValueDisplayText(this, new StringBuilder(params.size() * 10)));
 	}
 
 	public boolean hasUnboundedParams() {

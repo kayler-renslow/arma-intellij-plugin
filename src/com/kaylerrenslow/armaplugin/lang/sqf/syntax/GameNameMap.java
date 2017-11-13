@@ -2,7 +2,6 @@ package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,7 +24,6 @@ public class GameNameMap {
 		return INSTANCE;
 	}
 
-	private final File nameCacheFile = new File("gameNames.txt");
 	private final HashMap<LookupType, MapBucketHashMap> hashMap = new HashMap<>();
 
 	private GameNameMap() {
