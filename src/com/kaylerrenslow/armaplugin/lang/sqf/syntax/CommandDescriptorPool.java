@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.*;
 
 /**
  * Used for caching and loading SQF command syntax's ({@link CommandSyntax}) from their xml files
@@ -24,6 +25,7 @@ public class CommandDescriptorPool {
 	private final Map<String, CommandDescriptor> frequentCache = new HashMap<>();
 	private final DescriptorWrapper PLACEHOLDER = new DescriptorWrapper(new CommandDescriptor(""));
 	private final Random random = new Random();
+	private final LinkedBlockingQueue<ProcessingCommand> processing = new LinkedBlockingQueue<>();
 
 	public CommandDescriptorPool() {
 		Arrays.fill(tallyCache, PLACEHOLDER);
@@ -92,7 +94,7 @@ public class CommandDescriptorPool {
 	/**
 	 * A thread-safe way of retrieving a {@link CommandDescriptor} instance from file.
 	 * This method will check a map full of frequently used commands. If the command exists in the frequently used commands,
-	 * the frequently used command will only be parsed once to speed-up access times.
+	 * the frequently used command will only be parsed once in it's lifetime to speed-up access times.
 	 * <p>
 	 * If the command is not frequently used, it will check an independent tallied cache. If it exists there, it will keep tally
 	 * of how many times it gets used. In theory, commands with a low tally count will not last as long in the cache as high-tallied
@@ -121,44 +123,63 @@ public class CommandDescriptorPool {
 			}
 		}
 		synchronized (tallyCache) {
-			DescriptorWrapper ret = null;
-			boolean replace = false;
 			for (DescriptorWrapper w : tallyCache) {
 				if (w == null) {
 					continue;
 				}
 				if (w.descriptor.getCommandName().equalsIgnoreCase(commandName)) {
 					w.requestCount++;
-					ret = w;
+					return w.descriptor;
+				}
+			}
+		}
+
+		ProcessingCommand processingCommand;
+
+		synchronized (processing) {
+			ProcessingCommand waitFor = null;
+			for (ProcessingCommand processing : processing) {
+				if (processing.commandName.equalsIgnoreCase(commandName)) {
+					waitFor = processing;
 					break;
 				}
 			}
-
-			if (ret == null) {
-				CommandDescriptor d = getDescriptorFromFile(commandName);
-				if (d == null) {
-					return null;
+			if (waitFor != null) {
+				try {
+					return waitFor.result.get();
+				} catch (Exception e) {
+					throw new RuntimeException(e);
 				}
-				ret = new DescriptorWrapper(d);
-				replace = true;
+			} else {
+				processingCommand = new ProcessingCommand(commandName);
+				processing.add(processingCommand);
 			}
+		}
 
+		CommandDescriptor d = getDescriptorFromFile(commandName);
+
+		if (d == null) {
+			return null;
+		}
+		DescriptorWrapper ret = new DescriptorWrapper(d);
+		processingCommand.result.put(ret.descriptor);
+
+		synchronized (tallyCache) {
 			Arrays.sort(tallyCache);
 
-			if (replace) {
-				/*
-				* Instead of replacing the least recently used command in the cache, we are replacing a randomly
-				* selected command in the lower third of the cache. The reason we are doing this is because
-				* if we only replaced the least recently used, the least recently used command
-				* would constantly be swapped out; also, it would be hard for the rest of the commands to get
-				* replaced in the cache.
-				*/
-				int replaceInd = random.nextInt(tallyCache.length / 3);
-				tallyCache[replaceInd] = ret;
-			}
-
-			return ret.descriptor;
+			/*
+			* Instead of replacing the least recently used command in the cache, we are replacing a randomly
+			* selected command in the lower third of the cache. The reason we are doing this is because
+			* if we only replaced the least recently used, the least recently used command
+			* would constantly be swapped out; also, it would be hard for the rest of the commands to get
+			* replaced in the cache.
+			*/
+			int replaceInd = random.nextInt(tallyCache.length / 3);
+			tallyCache[replaceInd] = ret;
 		}
+
+
+		return ret.descriptor;
 	}
 
 	@Nullable
@@ -191,6 +212,68 @@ public class CommandDescriptorPool {
 		public int compareTo(@NotNull DescriptorWrapper o) {
 			//sort from -infinity to +infinity (A to Z)
 			return this.requestCount - o.requestCount;
+		}
+	}
+
+	private class ProcessingCommand {
+		@NotNull
+		private final String commandName;
+		private FutureImpl<CommandDescriptor> result = new FutureImpl<>();
+
+		public ProcessingCommand(@NotNull String commandName) {
+			this.commandName = commandName;
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if (o == this) {
+				return true;
+			}
+			if (o instanceof ProcessingCommand) {
+				return this.commandName.equalsIgnoreCase(((ProcessingCommand) o).commandName);
+			}
+			return false;
+		}
+	}
+
+	private class FutureImpl<T> implements Future<T> {
+		private final CountDownLatch latch = new CountDownLatch(1);
+		private T value;
+
+		@Override
+		public boolean cancel(boolean mayInterruptIfRunning) {
+			return false;
+		}
+
+		@Override
+		public boolean isCancelled() {
+			return false;
+		}
+
+		@Override
+		public boolean isDone() {
+			return latch.getCount() == 0;
+		}
+
+		@Override
+		public T get() throws InterruptedException {
+			latch.await();
+			return value;
+		}
+
+		@Override
+		public T get(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+			if (latch.await(timeout, unit)) {
+				return value;
+			} else {
+				throw new TimeoutException();
+			}
+		}
+
+		// calling this more than once doesn't make sense, and won't work properly in this implementation. so: don't.
+		public void put(T result) {
+			value = result;
+			latch.countDown();
 		}
 	}
 }

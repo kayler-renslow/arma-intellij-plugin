@@ -41,8 +41,11 @@ public class SQFCommandSyntaxHelper {
 		//todo finish
 	}
 
+	/**
+	 * @return an array of all {@link CommandDescriptor} instances for the given {@link SQFFile}
+	 */
 	@NotNull
-	private CommandDescriptor[] getCommandDescriptors(@NotNull SQFFile file) {
+	public CommandDescriptor[] getCommandDescriptors(@NotNull SQFFile file) {
 		CommandDescriptor[] descriptors;
 
 		HashSet<String> commands = new HashSet<>();
@@ -81,8 +84,7 @@ public class SQFCommandSyntaxHelper {
 			}
 		}
 
-		//get syntax's concurrently
-		{
+		{//get syntax's concurrently
 			List<CommandDescriptor> finished = Collections.synchronizedList(new ArrayList<>());
 
 			Thread t1 = new Thread(() -> {
