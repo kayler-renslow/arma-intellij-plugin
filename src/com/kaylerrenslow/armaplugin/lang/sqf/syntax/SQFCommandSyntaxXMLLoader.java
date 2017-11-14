@@ -7,7 +7,6 @@ import org.w3c.dom.Element;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,14 +14,14 @@ import java.util.List;
  * @author Kayler
  * @since 11/12/2017
  */
-public class SQFCommandSyntaxXMLLoader {
+class SQFCommandSyntaxXMLLoader {
 	@NotNull
-	public static Command importFromFile(@NotNull File xmlFile) {
+	public static CommandDescriptor importFromStream(@NotNull CommandXMLInputStream is) {
 		Document document;
 		try {
 			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
-			document = documentBuilder.parse(xmlFile);
+			document = documentBuilder.parse(is);
 			document.getDocumentElement().normalize();
 		} catch (Exception e) {
 			throw new RuntimeException(e);
@@ -32,7 +31,7 @@ public class SQFCommandSyntaxXMLLoader {
 
 		boolean deprecated, uncertain;
 
-		List<Syntax> syntaxList;
+		List<CommandSyntax> syntaxList;
 
 		Element rootElement = document.getDocumentElement();
 		commandName = rootElement.getAttribute("name");
@@ -53,7 +52,7 @@ public class SQFCommandSyntaxXMLLoader {
 			for (Element arrayElement : arrayElements) {
 				int order = Integer.parseInt(arrayElement.getAttribute("order"));
 				if (params[order] != null) {
-					throw new RuntimeException("duplicate order for command " + xmlFile.getName() + ". order=" + order);
+					throw new RuntimeException("duplicate order for command " + is.getCommandName() + ". order=" + order);
 				}
 				params[order] = getArrayParam(arrayElement);
 			}
@@ -61,7 +60,7 @@ public class SQFCommandSyntaxXMLLoader {
 			for (Element paramElement : paramElements) {
 				int order = Integer.parseInt(paramElement.getAttribute("order"));
 				if (params[order] != null) {
-					throw new RuntimeException("duplicate order for command " + xmlFile.getName() + ". order=" + order);
+					throw new RuntimeException("duplicate order for command " + is.getCommandName() + ". order=" + order);
 				}
 				params[order] = getParam(paramElement);
 			}
@@ -75,10 +74,10 @@ public class SQFCommandSyntaxXMLLoader {
 			returnValue = getReturnValue(returnElements.get(0));
 
 
-			syntaxList.add(new Syntax(params[PREFIX], params[POSTFIX], returnValue));
+			syntaxList.add(new CommandSyntax(params[PREFIX], params[POSTFIX], returnValue));
 		}
 
-		Command c = new Command(commandName, syntaxList, gameVersion, GameNameMap.getInstance().getGame(GameNameMap.LookupType.LINK_PREFIX, gameName));
+		CommandDescriptor c = new CommandDescriptor(commandName, syntaxList, gameVersion, GameNameMap.getInstance().getGame(GameNameMap.LookupType.LINK_PREFIX, gameName));
 		c.setDeprecated(deprecated);
 		c.setUncertain(uncertain);
 

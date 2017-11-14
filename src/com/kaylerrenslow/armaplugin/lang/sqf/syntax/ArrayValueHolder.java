@@ -13,13 +13,13 @@ public interface ArrayValueHolder extends ValueHolder {
 	static String getArrayDataValueDisplayText(@NotNull ArrayValueHolder arrayDataValue, @NotNull StringBuilder sb) {
 		sb.append("[");
 		int i = 0;
-		for (ValueHolder valueHolder : arrayDataValue.getValues()) {
+		for (ValueHolder valueHolder : arrayDataValue.getValueHolders()) {
 			if (valueHolder instanceof ArrayValueHolder) {
 				getArrayDataValueDisplayText((ArrayValueHolder) valueHolder, sb);
 			} else {
 				sb.append(valueHolder.getType().getDisplayName());
 			}
-			if (i != arrayDataValue.getValues().size() - 1) {
+			if (i != arrayDataValue.getValueHolders().size() - 1) {
 				sb.append(", ");
 			}
 			i++;
@@ -34,5 +34,5 @@ public interface ArrayValueHolder extends ValueHolder {
 	boolean hasUnboundedParams();
 
 	@NotNull
-	List<? extends ValueHolder> getValues();
+	List<? extends ValueHolder> getValueHolders();
 }

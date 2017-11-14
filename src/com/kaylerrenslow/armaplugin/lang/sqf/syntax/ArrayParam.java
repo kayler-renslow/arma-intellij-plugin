@@ -33,20 +33,12 @@ public class ArrayParam extends Param implements ArrayValueHolder {
 
 	@Override
 	@NotNull
-	public List<? extends ValueHolder> getValues() {
+	public List<? extends ValueHolder> getValueHolders() {
 		return getParams();
 	}
 
 	@NotNull
 	public List<Param> getParams() {
 		return params;
-	}
-
-	@Override
-	public String toString() {
-		return "ArrayParam{" +
-				"unboundedParams=" + unboundedParams +
-				", params=" + params +
-				'}';
 	}
 }

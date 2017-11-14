@@ -7,6 +7,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 11/12/2017
  */
 public class BIGame implements Comparable<BIGame> {
+	public static final BIGame UNKNOWN = new BIGame("?", "?", "?");
 	private final String fullName;
 	private final String shortName;
 	private final String linkPrefix;

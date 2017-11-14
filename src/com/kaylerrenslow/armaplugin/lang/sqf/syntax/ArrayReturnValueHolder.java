@@ -23,7 +23,7 @@ public class ArrayReturnValueHolder extends ReturnValueHolder implements ArrayVa
 	}
 
 	@NotNull
-	public List<ReturnValueHolder> getValues() {
+	public List<ReturnValueHolder> getValueHolders() {
 		return values;
 	}
 }

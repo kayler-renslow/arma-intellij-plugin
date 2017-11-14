@@ -12,12 +12,12 @@ import java.util.List;
  * @author Kayler
  * @since 06/11/2016
  */
-public class Syntax {
+public class CommandSyntax {
 	private ReturnValueHolder returnValue;
 	private Param prefixParam;
 	private Param postfixParam;
 
-	public Syntax(@Nullable Param prefixParam, @Nullable Param postfixParam, @NotNull ReturnValueHolder returnValue) {
+	public CommandSyntax(@Nullable Param prefixParam, @Nullable Param postfixParam, @NotNull ReturnValueHolder returnValue) {
 		this.prefixParam = prefixParam;
 		this.postfixParam = postfixParam;
 		this.returnValue = returnValue;
