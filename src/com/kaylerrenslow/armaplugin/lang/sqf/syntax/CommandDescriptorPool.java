@@ -163,6 +163,9 @@ public class CommandDescriptorPool {
 		}
 		DescriptorWrapper ret = new DescriptorWrapper(d);
 		processingCommand.result.put(ret.descriptor);
+		synchronized (processing) {
+			processing.remove(processingCommand);
+		}
 
 		synchronized (tallyCache) {
 			Arrays.sort(tallyCache);
