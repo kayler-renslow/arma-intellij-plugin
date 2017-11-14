@@ -88,4 +88,8 @@ public class CommandDescriptor {
 		this.uncertain = uncertain;
 	}
 
+	@Override
+	public int hashCode() {
+		return commandName.hashCode();
+	}
 }

@@ -37,6 +37,22 @@ public interface SQFScope extends PsiElement {
 	}
 
 	/**
+	 * @return a list of {@link SQFStatement} instances that are direct children of this scope
+	 */
+	@NotNull
+	default List<SQFStatement> getChildStatements() {
+		List<SQFStatement> statements = new ArrayList<>();
+		for (PsiElement element : getChildren()) {
+			if (!(element instanceof SQFStatement)) {
+				continue;
+			}
+			SQFStatement statement = (SQFStatement) element;
+			statements.add(statement);
+		}
+		return statements;
+	}
+
+	/**
 	 * This will return all variables that are private in this scope.
 	 * This doesn't guarantee that all of them were declared private in this scope!
 	 * <p>

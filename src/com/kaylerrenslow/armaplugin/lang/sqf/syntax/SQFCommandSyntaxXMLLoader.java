@@ -16,16 +16,14 @@ import java.util.List;
  */
 class SQFCommandSyntaxXMLLoader {
 	@NotNull
-	public static CommandDescriptor importFromStream(@NotNull CommandXMLInputStream is) {
+	public static CommandDescriptor importFromStream(@NotNull CommandXMLInputStream is) throws Exception {
 		Document document;
-		try {
-			DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
-			DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
-			document = documentBuilder.parse(is);
-			document.getDocumentElement().normalize();
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
+
+		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
+		DocumentBuilder documentBuilder = builderFactory.newDocumentBuilder();
+		document = documentBuilder.parse(is);
+		document.getDocumentElement().normalize();
+
 
 		String commandName, gameVersion, gameName, format;
 
