@@ -159,6 +159,7 @@ public class CommandDescriptorPool {
 		CommandDescriptor d = getDescriptorFromFile(commandName);
 
 		if (d == null) {
+			processingCommand.result.put(null);
 			return null;
 		}
 		DescriptorWrapper ret = new DescriptorWrapper(d);
