@@ -160,6 +160,9 @@ public class CommandDescriptorPool {
 
 		if (d == null) {
 			processingCommand.result.put(null);
+			synchronized (processing) {
+				processing.remove(processingCommand);
+			}
 			return null;
 		}
 		DescriptorWrapper ret = new DescriptorWrapper(d);
