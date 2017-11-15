@@ -16,7 +16,7 @@ import java.util.function.Function;
  * @author Kayler
  * @since 05/23/2017
  */
-public interface SQFStatement extends PsiElement {
+public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 
 	/**
 	 * Gets all private vars declared private in this statement. Note that private variables may be declared private in the
@@ -158,11 +158,11 @@ public interface SQFStatement extends PsiElement {
 	}
 
 	/**
-	 * @return the {@link SQFIfStatement} instance if the statement contains an if statement,
+	 * @return the {@link SQFIfHelperStatement} instance if the statement contains an if statement,
 	 * or null if the statement isn't a valid if statement
 	 */
 	@Nullable
-	default SQFIfStatement getIfStatement() {
+	default SQFIfHelperStatement getIfStatement() {
 		SQFExpression expr;
 		if (this instanceof SQFExpressionStatement) {
 			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
@@ -226,10 +226,10 @@ public interface SQFStatement extends PsiElement {
 						return null;
 					}
 					SQFExpression first = arrExps.get(0).withoutParenthesis();
-					thenBlock = new SQFBlockOrExpression.Impl(null, first);
+					thenBlock = new SQFBlockOrExpression.Impl(first);
 					if (arrExps.size() > 1) {
 						SQFExpression second = arrExps.get(1).withoutParenthesis();
-						elseBlock = new SQFBlockOrExpression.Impl(null, second);
+						elseBlock = new SQFBlockOrExpression.Impl(second);
 					}
 				} else {//if condition then {};
 					Reference<SQFBlockOrExpression> thenBlockRef = new Reference<>(null);
@@ -252,7 +252,7 @@ public interface SQFStatement extends PsiElement {
 					};
 					getElseBlock.apply(null);
 					if (thenBlockRef.getValue() == null) {
-						thenBlock = new SQFBlockOrExpression.Impl(null, afterThenExp);
+						thenBlock = new SQFBlockOrExpression.Impl(afterThenExp);
 					} else {
 						thenBlock = thenBlockRef.getValue();
 					}
@@ -263,20 +263,20 @@ public interface SQFStatement extends PsiElement {
 		if (thenBlock == null || condition == null) {
 			return null;
 		}
-		return new SQFIfStatement(condition, thenBlock, elseBlock);
+		return new SQFIfHelperStatement(condition, thenBlock, elseBlock);
 	}
 
 	/**
-	 * This will return a {@link SQFSpawnStatement} only if the statement takes the form: "args <b>spawn</b> {}".
+	 * This will return a {@link SQFSpawnHelperStatement} only if the statement takes the form: "args <b>spawn</b> {}".
 	 * It can also take the form var=args spawn {} (notice its in an assignment this time)
 	 * <p>
 	 * "args" is optional, but the argument after the spawn command must exist.
 	 *
-	 * @return the {@link SQFSpawnStatement} instance if the statement contains a "args <b>spawn</b> {}" statement,
+	 * @return the {@link SQFSpawnHelperStatement} instance if the statement contains a "args <b>spawn</b> {}" statement,
 	 * or null if the statement isn't a valid spawn statement
 	 */
 	@Nullable
-	default SQFSpawnStatement getSpawnStatement() {
+	default SQFSpawnHelperStatement getSpawnStatement() {
 		SQFExpression expr;
 		if (this instanceof SQFExpressionStatement) {
 			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
@@ -301,15 +301,15 @@ public interface SQFStatement extends PsiElement {
 			return null;
 		}
 		SQFCommandArgument spawnPreArg = cmdExpr.getPrefixArgument();
-		return new SQFSpawnStatement(spawnPreArg, spawnPostArg);
+		return new SQFSpawnHelperStatement(spawnPreArg, spawnPostArg);
 	}
 
 	/**
-	 * @return the {@link SQFSwitchStatement} instance if the statement contains a switch statement,
+	 * @return the {@link SQFSwitchHelperStatement} instance if the statement contains a switch statement,
 	 * or null if the statement isn't a valid switch statement
 	 */
 	@Nullable
-	default SQFSwitchStatement getSwitchStatement() {
+	default SQFSwitchHelperStatement getSwitchStatement() {
 		SQFExpression expr;
 		if (this instanceof SQFExpressionStatement) {
 			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
@@ -362,25 +362,25 @@ public interface SQFStatement extends PsiElement {
 			}
 		}
 
-		return new SQFSwitchStatement(caseStatements, blockOrExprRef.getValue());
+		return new SQFSwitchHelperStatement(caseStatements, blockOrExprRef.getValue());
 	}
 
 	/**
-	 * @return the {@link SQFForLoopStatement} instance if the statement contains a for loop statement,
+	 * @return the {@link SQFForLoopHelperStatement} instance if the statement contains a for loop statement,
 	 * or null if the statement isn't a valid for loop statement
 	 */
 	@Nullable
-	default SQFForLoopStatement getForLoopStatement() {
+	default SQFForLoopHelperStatement getForLoopStatement() {
 		//todo
 		return null;
 	}
 
 	/**
-	 * @return the {@link SQFWhileLoopStatement} instance if the statement contains a while loop statement,
+	 * @return the {@link SQFWhileLoopHelperStatement} instance if the statement contains a while loop statement,
 	 * or null if the statement isn't a valid for while statement
 	 */
 	@Nullable
-	default SQFWhileLoopStatement getWhileLoopStatement() {
+	default SQFWhileLoopHelperStatement getWhileLoopStatement() {
 		SQFExpression expr;
 		if (this instanceof SQFExpressionStatement) {
 			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
@@ -412,7 +412,7 @@ public interface SQFStatement extends PsiElement {
 		if (whileCondition == null || whileBody == null) {
 			return null;
 		}
-		return new SQFWhileLoopStatement(whileCondition, whileBody);
+		return new SQFWhileLoopHelperStatement(whileCondition, whileBody);
 	}
 
 	/**

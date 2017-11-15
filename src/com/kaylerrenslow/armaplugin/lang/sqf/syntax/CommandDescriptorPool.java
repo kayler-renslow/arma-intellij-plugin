@@ -148,7 +148,8 @@ public class CommandDescriptorPool {
 				try {
 					return waitFor.result.get();
 				} catch (Exception e) {
-					throw new RuntimeException(e);
+					e.printStackTrace();
+					return null;
 				}
 			} else {
 				processingCommand = new ProcessingCommand(commandName);
@@ -159,17 +160,13 @@ public class CommandDescriptorPool {
 		CommandDescriptor d = getDescriptorFromFile(commandName);
 
 		if (d == null) {
-			processingCommand.result.put(null);
 			synchronized (processing) {
+				processingCommand.result.put(null);
 				processing.remove(processingCommand);
 			}
 			return null;
 		}
 		DescriptorWrapper ret = new DescriptorWrapper(d);
-		processingCommand.result.put(ret.descriptor);
-		synchronized (processing) {
-			processing.remove(processingCommand);
-		}
 
 		synchronized (tallyCache) {
 			Arrays.sort(tallyCache);
@@ -183,6 +180,11 @@ public class CommandDescriptorPool {
 			*/
 			int replaceInd = random.nextInt(tallyCache.length / 3);
 			tallyCache[replaceInd] = ret;
+
+			synchronized (processing) {
+				processingCommand.result.put(ret.descriptor);
+				processing.remove(processingCommand);
+			}
 		}
 
 

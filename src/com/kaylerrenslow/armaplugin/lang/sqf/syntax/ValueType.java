@@ -1,14 +1,12 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
 
 /**
- * Created by Kayler on 06/12/2016.
+ * @author Kayler
+ * @since 06/12/2016
  */
-public enum ValueHolderType {
+public enum ValueType {
 	ANYTHING("Anything"),
 	ARRAY("Array"),
 	ARRAY_OF_EDEN_ENTITIES("Array of Eden Entities"),
@@ -65,47 +63,15 @@ public enum ValueHolderType {
 	WHILE("While Type"),
 	WITH("With Type"),;
 
-	public final String displayName;
+	private final String displayName;
 
-	ValueHolderType(String displayName) {
+	ValueType(String displayName) {
 		this.displayName = displayName;
 	}
 
 	@Override
 	public String toString() {
 		return displayName;
-	}
-
-	private static final HashMap<String, ValueHolderType> remap = new HashMap<>();
-
-	static {
-		remap.put("Editor Object", STRING);
-		remap.put("Strings", STRING);
-		remap.put("Objects", OBJECT);
-		remap.put("Numbers", NUMBER);
-		remap.put("Bool", BOOLEAN);
-		remap.put("bool", BOOLEAN);
-		remap.put("Eden Entities", ARRAY_OF_EDEN_ENTITIES);
-		remap.put("Nil", NIL);
-		remap.put("Code String", STRING);
-		remap.put("Integer", NUMBER);
-		remap.put("Any", ANYTHING);
-		remap.put("Any Value", ANYTHING);
-		remap.put("Script", SCRIPT_HANDLE);
-		remap.put("Script_(Handle)", SCRIPT_HANDLE);
-		remap.put("Scalar", NUMBER);
-		remap.put("PositionASL", POSITION_ASL);
-		remap.put("PositionWorld", POSITION_WORLD);
-	}
-
-	@Nullable
-	public static ValueHolderType getFromDisplayName(String displayName) {
-		for (ValueHolderType valueType : values()) {
-			if (valueType.displayName.equals(displayName)) {
-				return valueType;
-			}
-		}
-		return remap.get(displayName);
 	}
 
 	@NotNull

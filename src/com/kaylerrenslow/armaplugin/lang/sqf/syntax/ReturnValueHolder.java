@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  * @since 02/24/2017
  */
 public class ReturnValueHolder extends BasicValueHolder {
-	public ReturnValueHolder(@NotNull ValueHolderType type, @NotNull String description) {
+	public ReturnValueHolder(@NotNull ValueType type, @NotNull String description) {
 		super(type, description, false);
 	}
 

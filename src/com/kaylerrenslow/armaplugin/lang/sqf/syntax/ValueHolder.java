@@ -10,10 +10,10 @@ import java.util.List;
  */
 public interface ValueHolder {
 	/**
-	 * @return the {@link ValueHolderType} of the value
+	 * @return the {@link ValueType} of the value
 	 */
 	@NotNull
-	ValueHolderType getType();
+	ValueType getType();
 
 	/**
 	 * @return a description of the value
@@ -33,8 +33,8 @@ public interface ValueHolder {
 	List<String> getLiterals();
 
 	/**
-	 * @return a list of {@link ValueHolderType} that this holder can have, or empty list if {@link #getType()} is only one
+	 * @return a list of {@link ValueType} that this holder can have, or empty list if {@link #getType()} is only one
 	 */
 	@NotNull
-	List<ValueHolderType> getAlternateValueTypes();
+	List<ValueType> getAlternateValueTypes();
 }

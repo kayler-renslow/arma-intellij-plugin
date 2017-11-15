@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -38,5 +39,11 @@ public class SQFAssignmentStatement extends ASTWrapperPsiElement implements SQFS
 	public boolean isPrivate() {
 		SQFCommand command = PsiTreeUtil.getChildOfType(this, SQFCommand.class);
 		return command != null && command.commandNameEquals("private");
+	}
+
+	@Nullable
+	@Override
+	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
+		return visitor.visit(this, cluster);
 	}
 }

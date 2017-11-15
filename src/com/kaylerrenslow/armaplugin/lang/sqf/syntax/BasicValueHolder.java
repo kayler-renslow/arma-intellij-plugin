@@ -14,16 +14,16 @@ public class BasicValueHolder implements ValueHolder {
 
 	private boolean optional;
 
-	private final ValueHolderType type;
+	private final ValueType type;
 	private final String description;
-	private final List<ValueHolderType> alternateValueTypes = new LinkedList<>();
+	private final List<ValueType> alternateValueTypes = new LinkedList<>();
 	private final List<String> literals;
 
-	public BasicValueHolder(@NotNull ValueHolderType type, @NotNull String description, boolean optional) {
+	public BasicValueHolder(@NotNull ValueType type, @NotNull String description, boolean optional) {
 		this(type, description, optional, new ArrayList<>());
 	}
 
-	public BasicValueHolder(@NotNull ValueHolderType type, @NotNull String description, boolean optional, @NotNull List<String> literals) {
+	public BasicValueHolder(@NotNull ValueType type, @NotNull String description, boolean optional, @NotNull List<String> literals) {
 		this.type = type;
 		this.description = description.trim();
 		this.optional = optional;
@@ -33,7 +33,7 @@ public class BasicValueHolder implements ValueHolder {
 
 	@Override
 	@NotNull
-	public ValueHolderType getType() {
+	public ValueType getType() {
 		return type;
 	}
 
@@ -50,7 +50,7 @@ public class BasicValueHolder implements ValueHolder {
 
 	@Override
 	@NotNull
-	public List<ValueHolderType> getAlternateValueTypes() {
+	public List<ValueType> getAlternateValueTypes() {
 		return alternateValueTypes;
 	}
 

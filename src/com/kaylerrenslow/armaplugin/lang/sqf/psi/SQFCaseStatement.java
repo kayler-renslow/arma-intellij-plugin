@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,5 +30,11 @@ public class SQFCaseStatement extends ASTWrapperPsiElement implements SQFStateme
 	@Nullable
 	public SQFCodeBlock getBlock() {
 		return PsiTreeUtil.getChildOfType(this, SQFCodeBlock.class);
+	}
+
+	@Nullable
+	@Override
+	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
+		return visitor.visit(this, cluster);
 	}
 }

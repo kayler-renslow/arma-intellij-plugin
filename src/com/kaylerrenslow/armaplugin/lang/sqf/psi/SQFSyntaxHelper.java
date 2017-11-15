@@ -1,33 +1,32 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptor;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorPool;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * @author Kayler
  * @since 11/13/2017
  */
-public class SQFCommandSyntaxHelper {
-	private static final SQFCommandSyntaxHelper instance = new SQFCommandSyntaxHelper();
+public class SQFSyntaxHelper {
+	private static final SQFSyntaxHelper instance = new SQFSyntaxHelper();
 
 	@NotNull
-	public static SQFCommandSyntaxHelper getInstance() {
+	public static SQFSyntaxHelper getInstance() {
 		return instance;
 	}
 
 	private final CommandDescriptorPool pool = new CommandDescriptorPool();
 
-	private SQFCommandSyntaxHelper() {
+	private SQFSyntaxHelper() {
 	}
 
 	@Nullable
@@ -36,21 +35,27 @@ public class SQFCommandSyntaxHelper {
 	}
 
 	public void checkSyntax(@NotNull SQFFile file, @NotNull ProblemsHolder problemsHolder) {
-		CommandDescriptor[] descriptors = getCommandDescriptors(file);
+		CommandDescriptorCluster cluster = getCommandDescriptors(file.getNode());
+
 		List<SQFStatement> statements = file.getFileScope().getChildStatements();
-		//todo finish
+		new SQFSyntaxChecker(statements, cluster, problemsHolder).begin();
 	}
 
+	public void checkSyntax(@NotNull SQFStatement statement, @NotNull ProblemsHolder holder,
+							@Nullable CommandDescriptorCluster cluster) {
+		cluster = cluster == null ? getCommandDescriptors(statement.getNode()) : cluster;
+		new SQFSyntaxChecker(Collections.singletonList(statement), cluster, holder).begin();
+	}
+
+
 	/**
-	 * @return an array of all {@link CommandDescriptor} instances for the given {@link SQFFile}
+	 * @return an array of all {@link CommandDescriptor} instances for every {@link SQFCommand} contained in the given {@link ASTNode}
 	 */
 	@NotNull
-	public CommandDescriptor[] getCommandDescriptors(@NotNull SQFFile file) {
-		CommandDescriptor[] descriptors;
-
+	public CommandDescriptorCluster getCommandDescriptors(@NotNull ASTNode node) {
 		HashSet<String> commands = new HashSet<>();
 		{ //collect all commands needed to get syntax for
-			PsiUtil.traverseBreadthFirstSearch(file.getNode(), astNode -> {
+			PsiUtil.traverseBreadthFirstSearch(node, astNode -> {
 				PsiElement psiElement = astNode.getPsi();
 				if (!(psiElement instanceof SQFCommand)) {
 					return false;
@@ -63,9 +68,19 @@ public class SQFCommandSyntaxHelper {
 			});
 		}
 
+		return getCommandDescriptors(commands);
+	}
+
+	/**
+	 * @return an array of all {@link CommandDescriptor} instances for the given set of command names
+	 */
+	@NotNull
+	public CommandDescriptorCluster getCommandDescriptors(@NotNull Set<String> commands) {
+		CommandDescriptor[] descriptors;
+
 		if (commands.size() == 0) {
 			descriptors = new CommandDescriptor[0];
-			return descriptors;
+			return new CommandDescriptorCluster(descriptors);
 		}
 
 		final String[] first = new String[commands.size() >= 2 ? (commands.size() / 2) : 1];
@@ -126,7 +141,7 @@ public class SQFCommandSyntaxHelper {
 				descriptors[i++] = d;
 			}
 		}
-		return descriptors;
+		return new CommandDescriptorCluster(descriptors);
 	}
 
 }

@@ -8,7 +8,7 @@ import javax.annotation.Nullable;
  * @author Kayler
  * @since 09/18/2017
  */
-public class SQFIfStatement implements SQFControlStructure {
+public class SQFIfHelperStatement implements SQFControlStructure {
 	@NotNull
 	private final SQFExpression conditionExpr;
 	@NotNull
@@ -16,7 +16,7 @@ public class SQFIfStatement implements SQFControlStructure {
 	@Nullable
 	private final SQFBlockOrExpression elseBlock;
 
-	public SQFIfStatement(@NotNull SQFExpression conditionExpr, @NotNull SQFBlockOrExpression thenBlock, @Nullable SQFBlockOrExpression elseBlock) {
+	public SQFIfHelperStatement(@NotNull SQFExpression conditionExpr, @NotNull SQFBlockOrExpression thenBlock, @Nullable SQFBlockOrExpression elseBlock) {
 		this.conditionExpr = conditionExpr;
 		this.thenBlock = thenBlock;
 		this.elseBlock = elseBlock;

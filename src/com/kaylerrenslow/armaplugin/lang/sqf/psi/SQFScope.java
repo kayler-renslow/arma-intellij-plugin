@@ -6,7 +6,9 @@ import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -18,7 +20,9 @@ import java.util.function.Function;
  * @author Kayler
  * @since 05/23/2017
  */
-public interface SQFScope extends PsiElement {
+public interface SQFScope extends PsiElement, SQFSyntaxNode {
+	Object NULL_CHILD_STATEMENT_VISIT = new Object();
+
 	/**
 	 * This will return all variables that are private in this scope.
 	 * This doesn't guarantee that all of them were declared private in this scope!
@@ -299,5 +303,16 @@ public interface SQFScope extends PsiElement {
 	@NotNull
 	default String getTextNoNewlines() {
 		return getText().replaceAll("\n", " ");
+	}
+
+	@Nullable
+	@Override
+	default Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptor[] descriptors) {
+		List<SQFStatement> statements = getChildStatements();
+		Object ret = null;
+		for (SQFStatement statement : statements) {
+			ret = visitor.visit(statement, descriptors);
+		}
+		return ret;
 	}
 }

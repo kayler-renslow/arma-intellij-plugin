@@ -9,13 +9,13 @@ import java.util.List;
  * @author Kayler
  * @since 09/18/2017
  */
-public class SQFSwitchStatement implements SQFControlStructure {
+public class SQFSwitchHelperStatement implements SQFControlStructure {
 	@NotNull
 	private final List<SQFCaseStatement> caseStatements;
 	@Nullable
 	private final SQFBlockOrExpression defaultStatementBlock;
 
-	public SQFSwitchStatement(@NotNull List<SQFCaseStatement> caseStatements, @Nullable SQFBlockOrExpression defaultStatementBlock) {
+	public SQFSwitchHelperStatement(@NotNull List<SQFCaseStatement> caseStatements, @Nullable SQFBlockOrExpression defaultStatementBlock) {
 		this.caseStatements = caseStatements;
 		this.defaultStatementBlock = defaultStatementBlock;
 	}

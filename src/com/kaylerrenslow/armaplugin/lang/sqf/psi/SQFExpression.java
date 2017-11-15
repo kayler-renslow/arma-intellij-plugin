@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
  * @author Kayler
  * @since 05/23/2017
  */
-public interface SQFExpression extends PsiElement {
+public interface SQFExpression extends PsiElement, SQFSyntaxNode {
 	/**
 	 * If this {@link SQFExpression} happens to be a {@link SQFParenExpression},
 	 * this method will traverse down through {@link SQFParenExpression#getExpresssion()} until the first

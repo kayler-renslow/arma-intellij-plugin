@@ -6,14 +6,14 @@ import org.jetbrains.annotations.NotNull;
  * @author Kayler
  * @since 09/19/2017
  */
-public class SQFWhileLoopStatement implements SQFControlStructure, SQFLoopStatement {
+public class SQFWhileLoopHelperStatement implements SQFControlStructure, SQFLoopStatement {
 
 	@NotNull
 	private final SQFBlockOrExpression whileCondition;
 	@NotNull
 	private final SQFBlockOrExpression whileBody;
 
-	public SQFWhileLoopStatement(@NotNull SQFBlockOrExpression whileCondition, @NotNull SQFBlockOrExpression whileBody) {
+	public SQFWhileLoopHelperStatement(@NotNull SQFBlockOrExpression whileCondition, @NotNull SQFBlockOrExpression whileBody) {
 		this.whileCondition = whileCondition;
 		this.whileBody = whileBody;
 	}

@@ -19,7 +19,7 @@ public class Param extends BasicValueHolder {
 	 * @param description description for the parameter
 	 * @param optional    true if the parameter is not required, false if it is required
 	 */
-	public Param(@NotNull String name, @NotNull ValueHolderType type, @NotNull String description, boolean optional) {
+	public Param(@NotNull String name, @NotNull ValueType type, @NotNull String description, boolean optional) {
 		this(name, type, description, optional, Collections.emptyList());
 	}
 
@@ -30,7 +30,7 @@ public class Param extends BasicValueHolder {
 	 * @param optional    true if the parameter is not required, false if it is required
 	 * @param literals    a list of all literals, or an empty list if there are not literals
 	 */
-	public Param(@NotNull String name, @NotNull ValueHolderType type, @NotNull String description, boolean optional, @NotNull List<String> literals) {
+	public Param(@NotNull String name, @NotNull ValueType type, @NotNull String description, boolean optional, @NotNull List<String> literals) {
 		super(type, description, optional, literals);
 		this.name = name;
 	}

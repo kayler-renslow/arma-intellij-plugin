@@ -13,7 +13,7 @@ public class ArrayReturnValueHolder extends ReturnValueHolder implements ArrayVa
 	private boolean unbounded;
 
 	public ArrayReturnValueHolder(@NotNull String description, @NotNull List<ReturnValueHolder> values, boolean unbounded) {
-		super(ValueHolderType.ARRAY, description);
+		super(ValueType.ARRAY, description);
 		this.values = values;
 		this.unbounded = unbounded;
 	}
