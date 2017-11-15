@@ -105,6 +105,12 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			return ValueType.ANYTHING;
 		}
 
+		ValueType[] allowedTypes = {
+				ValueType.NUMBER,
+				ValueType.STRING,
+				ValueType.ARRAY
+		};
+
 		switch (left) {
 			case NUMBER: //fall
 			case STRING: {
@@ -112,15 +118,15 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				break;
 			}
 			default: {
+				if (left == ValueType._VARIABLE) {
+					assertIsType(right, allowedTypes, rightExpr);
+					return ValueType._VARIABLE;
+				}
 				if (left.isArray() && !right.isArray()) {
 					problems.registerProblem(rightExpr, "Not an Array type.", ProblemHighlightType.ERROR);
 					return ValueType.ARRAY;
 				}
-				notOfType(new ValueType[]{
-								ValueType.NUMBER,
-								ValueType.STRING,
-								ValueType.ARRAY
-						}, right, rightExpr
+				notOfType(allowedTypes, right, rightExpr
 				);
 				return ValueType.ANYTHING;
 			}
@@ -148,21 +154,26 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			return ValueType.ANYTHING;
 		}
 
+		ValueType[] allowedTypes = {
+				ValueType.NUMBER,
+				ValueType.ARRAY
+		};
+
 		switch (left) {
 			case NUMBER: {
 				assertIsType(right, ValueType.NUMBER, rightExpr);
 				break;
 			}
 			default: {
+				if (left == ValueType._VARIABLE) {
+					assertIsType(right, allowedTypes, rightExpr);
+					return ValueType._VARIABLE;
+				}
 				if (left.isArray() && !right.isArray()) {
 					problems.registerProblem(rightExpr, "Not an Array type.", ProblemHighlightType.ERROR);
 					return ValueType.ARRAY;
 				}
-				notOfType(new ValueType[]{
-								ValueType.NUMBER,
-								ValueType.ARRAY
-						}, right, rightExpr
-				);
+				notOfType(allowedTypes, right, rightExpr);
 				return ValueType.ANYTHING;
 			}
 		}
@@ -195,6 +206,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			return ValueType.ANYTHING;
 		}
 
+		ValueType[] allowedTypes = {
+				ValueType.NUMBER,
+				ValueType.STRING
+		};
+
 		switch (left) {
 			case NUMBER: {
 				assertIsType(right, ValueType.NUMBER, rightExpr);
@@ -204,11 +220,12 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				assertIsType(right, ValueType.STRING, rightExpr);
 				return ValueType.CONFIG;
 			}
+			case _VARIABLE: {
+				assertIsType(right, allowedTypes, rightExpr);
+				return ValueType._VARIABLE;
+			}
 			default: {
-				notOfType(new ValueType[]{
-								ValueType.NUMBER,
-								ValueType.STRING
-						}, right, rightExpr
+				notOfType(allowedTypes, right, rightExpr
 				);
 				return ValueType.ANYTHING;
 			}
@@ -323,6 +340,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				ValueType.CONTROL,
 				ValueType.LOCATION
 		};
+		if (left == ValueType._VARIABLE) {
+			assertIsType(right, allowedTypes, rightExpr);
+			return ValueType.BOOLEAN;
+		}
+
 		for (ValueType type : allowedTypes) {
 			if (left == type) {
 				assertIsType(right, allowedTypes, rightExpr);
@@ -402,11 +424,31 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return expected;
 	}
 
+	/**
+	 * Reports a type error.
+	 *
+	 * @param expected    an array of expected {@link ValueType}. Be sure to exclude {@link ValueType#_VARIABLE}
+	 * @param got         the unexpected {@link ValueType}.
+	 * @param gotPsiOwner the PsiElement to which the <code>got</code> type is owner of
+	 */
 	private void notOfType(@NotNull ValueType[] expected, @NotNull ValueType got, @NotNull PsiElement gotPsiOwner) {
 		problems.registerProblem(gotPsiOwner, "Type(s) " + Arrays.toString(expected) + " expected. Got " + got + ".", ProblemHighlightType.ERROR);
 	}
 
+	/**
+	 * Checks if the given type matches one of the {@link ValueType} in expected. If they aren't equal, this method
+	 * will register a problem and return false. If they are equal, this method will return true.
+	 * <p>
+	 * This method will automatically return true and not report an error if <code>check</code> is {@link ValueType#_VARIABLE}
+	 *
+	 * @param check         the {@link ValueType} to look for in <code>expected</code>
+	 * @param expected      an array of expected {@link ValueType}. Be sure to exclude {@link ValueType#_VARIABLE}
+	 * @param checkPsiOwner the PsiElement to which the <code>check</code> type is owner of
+	 */
 	private boolean assertIsType(@NotNull ValueType check, @NotNull ValueType[] expected, @NotNull PsiElement checkPsiOwner) {
+		if (check == ValueType._VARIABLE) {
+			return true;
+		}
 		for (ValueType expect : expected) {
 			if (check == expect) {
 				return true;
@@ -416,7 +458,20 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return false;
 	}
 
+	/**
+	 * Checks if the given type matches the expected {@link ValueType}. If they aren't equal, this method
+	 * will register a problem and return false. If they are equal, this method will return true.
+	 * <p>
+	 * This method will automatically return true and not report an error if <code>check</code> is {@link ValueType#_VARIABLE}
+	 *
+	 * @param check         the {@link ValueType} to look for in <code>expected</code>
+	 * @param expected      the expected {@link ValueType}. Be sure to not use {@link ValueType#_VARIABLE}
+	 * @param checkPsiOwner the PsiElement to which the <code>check</code> type is owner of
+	 */
 	private boolean assertIsType(@NotNull ValueType check, @NotNull ValueType expected, @NotNull PsiElement checkPsiOwner) {
+		if (check == ValueType._VARIABLE) {
+			return true;
+		}
 		if (check != expected) {
 			problems.registerProblem(checkPsiOwner, "Type " + expected + " expected. Got " + check + ".", ProblemHighlightType.ERROR);
 			return false;

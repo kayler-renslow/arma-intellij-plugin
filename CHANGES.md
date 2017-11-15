@@ -1,8 +1,9 @@
 **Added**  
 * more implementation to SQFSyntaxChecker
+* added _VARIABLE ValueType to help with indeterminate types when using variables in static type checking
 
 **Changed**  
-* changed SQFUnaryExpression ([+-] expression) to SQFSignedExpression. Then, SQFUnaryExpression is now interface used for any unary expression
+* 
 
 **Fixed**  
 * 
