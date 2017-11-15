@@ -68,7 +68,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
 
                  // keep below command expression, otherwise the command may not be
                  // matched since a command can have a unary expression as an argument
-                | unary_expression
+                | signed_expression
 
                 | literal_expression
                 | code_block_expression
@@ -80,7 +80,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
     private mul_group_ ::= mul_expression | div_expression | mod_expression
     private conditional_group_::= bool_and_expression | bool_or_expression | bool_not_expression
 
-    unary_expression ::= (PLUS | MINUS) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFUnaryExpression"}
+    signed_expression ::= (PLUS | MINUS) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSignedExpression"}
 
     add_expression ::= expression PLUS expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFAddExpression"}
     sub_expression ::= expression MINUS expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSubExpression"}
@@ -115,7 +115,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
         //The prefix and postfix arguments of commands is inconsistent.
         //The type checker will have to handle if command_before or command_after is a prefix argument,
         //postfix argument, or is an argument of the child/parent command. (I know. It's weird.)
-        command_before ::= code_block_expression | unary_expression | paren_expression | literal_expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
+        command_before ::= code_block_expression | signed_expression | paren_expression | literal_expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
 
         //"code_block expression?" is for cases like if () then {} else{};
         command_after ::= expression /*| (code_block expression?)*/ {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}

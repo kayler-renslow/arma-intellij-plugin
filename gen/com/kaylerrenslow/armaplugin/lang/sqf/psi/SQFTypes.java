@@ -36,10 +36,10 @@ public interface SQFTypes {
   IElementType PAREN_EXPRESSION = new SQFElementType("PAREN_EXPRESSION");
   IElementType PRIVATE_COMMAND = new SQFElementType("PRIVATE_COMMAND");
   IElementType QUEST_STATEMENT = new SQFElementType("QUEST_STATEMENT");
+  IElementType SIGNED_EXPRESSION = new SQFElementType("SIGNED_EXPRESSION");
   IElementType STATEMENT = new SQFElementType("STATEMENT");
   IElementType STRING = new SQFElementType("STRING");
   IElementType SUB_EXPRESSION = new SQFElementType("SUB_EXPRESSION");
-  IElementType UNARY_EXPRESSION = new SQFElementType("UNARY_EXPRESSION");
   IElementType VARIABLE = new SQFElementType("VARIABLE");
 
   IElementType AMPAMP = new SQFTokenType("AMPAMP");
@@ -161,14 +161,14 @@ public interface SQFTypes {
       else if (type == QUEST_STATEMENT) {
         return new SQFPsiQuestStatementImpl(node);
       }
+      else if (type == SIGNED_EXPRESSION) {
+        return new SQFPsiSignedExpressionImpl(node);
+      }
       else if (type == STRING) {
         return new SQFPsiStringImpl(node);
       }
       else if (type == SUB_EXPRESSION) {
         return new SQFPsiSubExpressionImpl(node);
-      }
-      else if (type == UNARY_EXPRESSION) {
-        return new SQFPsiUnaryExpressionImpl(node);
       }
       else if (type == VARIABLE) {
         return new SQFPsiVariableImpl(node);

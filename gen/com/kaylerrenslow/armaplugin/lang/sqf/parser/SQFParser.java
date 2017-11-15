@@ -91,8 +91,8 @@ public class SQFParser implements PsiParser, LightPsiParser {
     create_token_set_(ADD_EXPRESSION, BOOL_AND_EXPRESSION, BOOL_NOT_EXPRESSION, BOOL_OR_EXPRESSION,
       CODE_BLOCK_EXPRESSION, COMMAND_EXPRESSION, COMP_EXPRESSION, CONFIG_FETCH_EXPRESSION,
       DIV_EXPRESSION, EXPONENT_EXPRESSION, EXPRESSION, LITERAL_EXPRESSION,
-      MOD_EXPRESSION, MUL_EXPRESSION, PAREN_EXPRESSION, SUB_EXPRESSION,
-      UNARY_EXPRESSION),
+      MOD_EXPRESSION, MUL_EXPRESSION, PAREN_EXPRESSION, SIGNED_EXPRESSION,
+      SUB_EXPRESSION),
   };
 
   /* ********************************************************** */
@@ -285,13 +285,13 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // code_block_expression | unary_expression | paren_expression | literal_expression
+  // code_block_expression | signed_expression | paren_expression | literal_expression
   public static boolean command_before(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "command_before")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, COMMAND_BEFORE, "<command before>");
     r = code_block_expression(b, l + 1);
-    if (!r) r = unary_expression(b, l + 1);
+    if (!r) r = signed_expression(b, l + 1);
     if (!r) r = paren_expression(b, l + 1);
     if (!r) r = literal_expression(b, l + 1);
     exit_section_(b, l, m, r, false, null);
@@ -455,7 +455,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   // 4: N_ARY(exponent_expression)
   // 5: BINARY(config_fetch_expression)
   // 6: ATOM(command_expression)
-  // 7: PREFIX(unary_expression)
+  // 7: PREFIX(signed_expression)
   // 8: ATOM(literal_expression)
   // 9: ATOM(code_block_expression)
   // 10: PREFIX(paren_expression)
@@ -466,7 +466,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
     Marker m = enter_section_(b, l, _NONE_, "<expression>");
     r = bool_not_expression(b, l + 1);
     if (!r) r = command_expression(b, l + 1);
-    if (!r) r = unary_expression(b, l + 1);
+    if (!r) r = signed_expression(b, l + 1);
     if (!r) r = literal_expression(b, l + 1);
     if (!r) r = code_block_expression(b, l + 1);
     if (!r) r = paren_expression(b, l + 1);
@@ -597,21 +597,21 @@ public class SQFParser implements PsiParser, LightPsiParser {
     return true;
   }
 
-  public static boolean unary_expression(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unary_expression")) return false;
+  public static boolean signed_expression(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "signed_expression")) return false;
     if (!nextTokenIsSmart(b, MINUS, PLUS)) return false;
     boolean r, p;
     Marker m = enter_section_(b, l, _NONE_, null);
-    r = unary_expression_0(b, l + 1);
+    r = signed_expression_0(b, l + 1);
     p = r;
     r = p && expression(b, l, 7);
-    exit_section_(b, l, m, UNARY_EXPRESSION, r, p, null);
+    exit_section_(b, l, m, SIGNED_EXPRESSION, r, p, null);
     return r || p;
   }
 
   // PLUS | MINUS
-  private static boolean unary_expression_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "unary_expression_0")) return false;
+  private static boolean signed_expression_0(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "signed_expression_0")) return false;
     boolean r;
     Marker m = enter_section_(b);
     r = consumeTokenSmart(b, PLUS);

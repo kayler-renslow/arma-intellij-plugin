@@ -5,9 +5,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
-import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserDefinition;
-import java.util.Collections;
 
 
 /**

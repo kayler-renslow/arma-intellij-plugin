@@ -67,5 +67,5 @@ interface SQFSyntaxVisitor<T> {
 	T visit(@NotNull SQFCodeBlockExpression expr, @NotNull CommandDescriptorCluster cluster);
 
 	@Nullable
-	T visit(@NotNull SQFUnaryExpression expr, @NotNull CommandDescriptorCluster cluster);
+	T visit(@NotNull SQFSignedExpression expr, @NotNull CommandDescriptorCluster cluster);
 }

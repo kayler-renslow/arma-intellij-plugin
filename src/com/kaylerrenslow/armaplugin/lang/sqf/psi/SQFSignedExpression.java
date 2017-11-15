@@ -10,8 +10,8 @@ import org.jetbrains.annotations.Nullable;
  * @author Kayler
  * @since 05/23/2017
  */
-public class SQFBoolNotExpression extends ASTWrapperPsiElement implements SQFBoolExpression, SQFUnaryExpression {
-	public SQFBoolNotExpression(@NotNull ASTNode node) {
+public class SQFSignedExpression extends ASTWrapperPsiElement implements SQFUnaryExpression {
+	public SQFSignedExpression(@NotNull ASTNode node) {
 		super(node);
 	}
 

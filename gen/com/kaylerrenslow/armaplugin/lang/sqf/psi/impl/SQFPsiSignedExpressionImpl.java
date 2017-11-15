@@ -8,17 +8,17 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes.*;
-import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFUnaryExpression;
+import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSignedExpression;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.*;
 
-public class SQFPsiUnaryExpressionImpl extends SQFUnaryExpression implements SQFPsiUnaryExpression {
+public class SQFPsiSignedExpressionImpl extends SQFSignedExpression implements SQFPsiSignedExpression {
 
-  public SQFPsiUnaryExpressionImpl(ASTNode node) {
+  public SQFPsiSignedExpressionImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SQFPsiVisitor visitor) {
-    visitor.visitUnaryExpression(this);
+    visitor.visitSignedExpression(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {

@@ -107,12 +107,15 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		switch (left) {
 			case NUMBER: //fall
-			case STRING: //fall
-			case ARRAY: {
+			case STRING: {
 				assertIsType(right, left, rightExpr);
 				break;
 			}
 			default: {
+				if (left.isArray() && !right.isArray()) {
+					problems.registerProblem(rightExpr, "Not an Array type.", ProblemHighlightType.ERROR);
+					return ValueType.ARRAY;
+				}
 				notOfType(new ValueType[]{
 								ValueType.NUMBER,
 								ValueType.STRING,
@@ -146,12 +149,15 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		switch (left) {
-			case NUMBER: //fall
-			case ARRAY: {
-				assertIsType(right, left, rightExpr);
+			case NUMBER: {
+				assertIsType(right, ValueType.NUMBER, rightExpr);
 				break;
 			}
 			default: {
+				if (left.isArray() && !right.isArray()) {
+					problems.registerProblem(rightExpr, "Not an Array type.", ProblemHighlightType.ERROR);
+					return ValueType.ARRAY;
+				}
 				notOfType(new ValueType[]{
 								ValueType.NUMBER,
 								ValueType.ARRAY
@@ -167,37 +173,119 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFMultExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		return binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
 	}
 
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFDivExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		SQFExpression leftExpr = expr.getLeft();
+		ValueType left = null, right = null;
+		if (leftExpr != null) {
+			left = (ValueType) leftExpr.accept(this, cluster);
+		}
+
+		SQFExpression rightExpr = expr.getRight();
+		if (rightExpr != null) {
+			right = (ValueType) rightExpr.accept(this, cluster);
+		}
+
+		if (left == null || right == null) {
+			//can't be determined
+			return ValueType.ANYTHING;
+		}
+
+		switch (left) {
+			case NUMBER: {
+				assertIsType(right, ValueType.NUMBER, rightExpr);
+				return ValueType.NUMBER;
+			}
+			case CONFIG: {
+				assertIsType(right, ValueType.STRING, rightExpr);
+				return ValueType.CONFIG;
+			}
+			default: {
+				notOfType(new ValueType[]{
+								ValueType.NUMBER,
+								ValueType.STRING
+						}, right, rightExpr
+				);
+				return ValueType.ANYTHING;
+			}
+		}
 	}
 
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFModExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		return binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
 	}
 
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFBoolAndExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		SQFExpression leftExpr = expr.getLeft();
+		ValueType left = null, right = null;
+		if (leftExpr != null) {
+			left = (ValueType) leftExpr.accept(this, cluster);
+		}
+
+		SQFExpression rightExpr = expr.getRight();
+		if (rightExpr != null) {
+			right = (ValueType) rightExpr.accept(this, cluster);
+		}
+
+		if (left == null || right == null) {
+			return ValueType.BOOLEAN;
+		}
+
+		assertIsType(left, ValueType.BOOLEAN, leftExpr);
+		assertIsType(right, new ValueType[]{
+						ValueType.BOOLEAN, ValueType.CODE
+				}, rightExpr
+		);
+
+		return ValueType.BOOLEAN;
 	}
 
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFBoolOrExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		SQFExpression leftExpr = expr.getLeft();
+		ValueType left = null, right = null;
+		if (leftExpr != null) {
+			left = (ValueType) leftExpr.accept(this, cluster);
+		}
+
+		SQFExpression rightExpr = expr.getRight();
+		if (rightExpr != null) {
+			right = (ValueType) rightExpr.accept(this, cluster);
+		}
+
+		if (left == null || right == null) {
+			return ValueType.BOOLEAN;
+		}
+
+		assertIsType(left, ValueType.BOOLEAN, leftExpr);
+		assertIsType(right, new ValueType[]{
+						ValueType.BOOLEAN, ValueType.CODE
+				}, rightExpr
+		);
+
+		return ValueType.BOOLEAN;
 	}
 
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFBoolNotExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		SQFExpression expr1 = expr.getExpr();
+		if (expr1 != null) {
+			ValueType type = (ValueType) expr1.accept(this, cluster);
+			if (type != null) {
+				assertIsType(type, ValueType.BOOLEAN, expr1);
+			}
+		}
+		return ValueType.BOOLEAN;
 	}
 
 	@Nullable
@@ -244,26 +332,54 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 	@Nullable
 	@Override
-	public ValueType visit(@NotNull SQFUnaryExpression expr, @NotNull CommandDescriptorCluster cluster) {
+	public ValueType visit(@NotNull SQFSignedExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		return null;
+	}
+
+	@NotNull
+	private ValueType binaryExprSameTypeHelper(@NotNull SQFBinaryExpression expr, @NotNull ValueType expected,
+											   @NotNull CommandDescriptorCluster cluster) {
+		SQFExpression leftExpr = expr.getLeft();
+		ValueType left = null, right = null;
+		if (leftExpr != null) {
+			left = (ValueType) leftExpr.accept(this, cluster);
+		}
+
+		SQFExpression rightExpr = expr.getRight();
+		if (rightExpr != null) {
+			right = (ValueType) rightExpr.accept(this, cluster);
+		}
+
+		if (left == null || right == null) {
+			//can't be determined
+			return ValueType.ANYTHING;
+		}
+
+		assertIsType(left, expected, leftExpr);
+		assertIsType(right, expected, rightExpr);
+
+		return expected;
 	}
 
 	private void notOfType(@NotNull ValueType[] expected, @NotNull ValueType got, @NotNull PsiElement gotPsiOwner) {
 		problems.registerProblem(gotPsiOwner, "Type(s) " + Arrays.toString(expected) + " expected. Got " + got + ".", ProblemHighlightType.ERROR);
 	}
 
-	private void assertIsType(@NotNull ValueType check, @NotNull ValueType[] expected, @NotNull PsiElement checkPsiOwner) {
+	private boolean assertIsType(@NotNull ValueType check, @NotNull ValueType[] expected, @NotNull PsiElement checkPsiOwner) {
 		for (ValueType expect : expected) {
 			if (check == expect) {
-				return;
+				return true;
 			}
 		}
 		problems.registerProblem(checkPsiOwner, "Type(s) " + Arrays.toString(expected) + " expected. Got " + check + ".", ProblemHighlightType.ERROR);
+		return false;
 	}
 
-	private void assertIsType(@NotNull ValueType check, @NotNull ValueType expected, @NotNull PsiElement checkPsiOwner) {
+	private boolean assertIsType(@NotNull ValueType check, @NotNull ValueType expected, @NotNull PsiElement checkPsiOwner) {
 		if (check != expected) {
 			problems.registerProblem(checkPsiOwner, "Type " + expected + " expected. Got " + check + ".", ProblemHighlightType.ERROR);
+			return false;
 		}
+		return true;
 	}
 }

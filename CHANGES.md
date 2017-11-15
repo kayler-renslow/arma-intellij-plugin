@@ -1,8 +1,8 @@
 **Added**  
-* 
+* more implementation to SQFSyntaxChecker
 
 **Changed**  
-* 
+* changed SQFUnaryExpression ([+-] expression) to SQFSignedExpression. Then, SQFUnaryExpression is now interface used for any unary expression
 
 **Fixed**  
 * 

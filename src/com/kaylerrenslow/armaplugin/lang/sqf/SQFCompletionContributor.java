@@ -6,7 +6,6 @@ import com.intellij.patterns.PlatformPatterns;
 import com.kaylerrenslow.armaplugin.lang.sqf.completion.SQFFunctionNameCompletionProvider;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommand;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFPsiCommandAfter;
-import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes;
 
 import static com.intellij.patterns.PlatformPatterns.*;
 

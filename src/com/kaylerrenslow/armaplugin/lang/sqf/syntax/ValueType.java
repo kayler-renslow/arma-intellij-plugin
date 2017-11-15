@@ -8,17 +8,17 @@ import org.jetbrains.annotations.NotNull;
  */
 public enum ValueType {
 	ANYTHING("Anything"),
-	ARRAY("Array"),
-	ARRAY_OF_EDEN_ENTITIES("Array of Eden Entities"),
+	ARRAY("Array", true),
+	ARRAY_OF_EDEN_ENTITIES("Array of Eden Entities", true),
 	BOOLEAN("Boolean"),
 	CODE("Code"),
-	COLOR("Color"),
-	COLOR_RGB("Color RGB"),
+	COLOR("Color", true),
+	COLOR_RGB("Color RGB", true),
 	CONFIG("Config"),
 	CONTROL("Control"),
 	DIARY_RECORD("Diary Record"),
 	DISPLAY("Display"),
-	EDEN_ENTITY("Eden Entity"),
+	EDEN_ENTITY("Eden Entity", true),
 	EXCEPTION_TYPE("Exception Type"),
 	GROUP("Group"),
 	LOCATION("Location"),
@@ -31,17 +31,17 @@ public enum ValueType {
 	OBJECT_RTD("ObjectRTD"),
 	ORIENT("Orient"),
 	ORIENTATION("Orientation"),
-	POSITION("Position"),
-	POSITION_2D("Position 2D"),
-	POSITION_3D("Position 3D"),
-	POSITION_ASL("Position ASL"),
-	POSITION_ASLW("Position ASLW"),
-	POSITION_ATL("Position ATL"),
-	POSITION_AGL("Position AGL"),
-	POSITION_AGLS("Position AGLS"),
-	POSITION_WORLD("Position World"),
-	POSITION_RELATIVE("Position Relative"),
-	POSITION_CONFIG("Position Config"),
+	POSITION("Position", true),
+	POSITION_2D("Position 2D", true),
+	POSITION_3D("Position 3D", true),
+	POSITION_ASL("Position ASL", true),
+	POSITION_ASLW("Position ASLW", true),
+	POSITION_ATL("Position ATL", true),
+	POSITION_AGL("Position AGL", true),
+	POSITION_AGLS("Position AGLS", true),
+	POSITION_WORLD("Position World", true),
+	POSITION_RELATIVE("Position Relative", true),
+	POSITION_CONFIG("Position Config", true),
 	SCRIPT_HANDLE("Script (Handle)"),
 	SIDE("Side"),
 	STRING("String"),
@@ -52,8 +52,8 @@ public enum ValueType {
 	TEAM_MEMBER("Team Member"),
 	TRANS("Trans"),
 	TRANSFORMATION("Transformation"),
-	WAYPOINT("Waypoint"),
-	VECTOR_3D("Vector 3D"),
+	WAYPOINT("Waypoint", true),
+	VECTOR_3D("Vector 3D", true),
 	VOID("Void"),
 
 	/*fake types*/
@@ -64,9 +64,16 @@ public enum ValueType {
 	WITH("With Type"),;
 
 	private final String displayName;
+	private final boolean isArray;
 
 	ValueType(String displayName) {
 		this.displayName = displayName;
+		isArray = false;
+	}
+
+	ValueType(String displayName, boolean isSimplifiedArray) {
+		this.displayName = displayName;
+		this.isArray = isSimplifiedArray;
 	}
 
 	@Override
@@ -77,5 +84,9 @@ public enum ValueType {
 	@NotNull
 	public String getDisplayName() {
 		return displayName;
+	}
+
+	public boolean isArray() {
+		return isArray;
 	}
 }

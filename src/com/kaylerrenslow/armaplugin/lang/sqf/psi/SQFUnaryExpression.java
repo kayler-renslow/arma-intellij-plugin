@@ -1,29 +1,17 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kayler
- * @since 05/23/2017
+ * @since 11/14/2017
  */
-public class SQFUnaryExpression extends ASTWrapperPsiElement implements SQFExpression {
-	public SQFUnaryExpression(@NotNull ASTNode node) {
-		super(node);
-	}
+public interface SQFUnaryExpression extends SQFExpression {
 
 	@Nullable
-	public SQFExpression getExpr() {
+	default SQFExpression getExpr() {
 		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
 	}
 
-	@Nullable
-	@Override
-	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
-		return visitor.visit(this, cluster);
-	}
 }

@@ -119,6 +119,10 @@ public class SQFPsiVisitor extends PsiElementVisitor {
     visitStatement(o);
   }
 
+  public void visitSignedExpression(@NotNull SQFPsiSignedExpression o) {
+    visitExpression(o);
+  }
+
   public void visitStatement(@NotNull SQFPsiStatement o) {
     visitPsiElement(o);
   }
@@ -128,10 +132,6 @@ public class SQFPsiVisitor extends PsiElementVisitor {
   }
 
   public void visitSubExpression(@NotNull SQFPsiSubExpression o) {
-    visitExpression(o);
-  }
-
-  public void visitUnaryExpression(@NotNull SQFPsiUnaryExpression o) {
     visitExpression(o);
   }
 
