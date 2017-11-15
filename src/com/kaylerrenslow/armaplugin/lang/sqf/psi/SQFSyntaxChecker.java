@@ -291,7 +291,48 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFCompExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		if (expr.getComparisonType() != SQFCompExpression.ComparisonType.Equals) {
+			binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
+			return ValueType.BOOLEAN;
+		}
+
+		SQFExpression leftExpr = expr.getLeft();
+		ValueType left = null, right = null;
+		if (leftExpr != null) {
+			left = (ValueType) leftExpr.accept(this, cluster);
+		}
+
+		SQFExpression rightExpr = expr.getRight();
+		if (rightExpr != null) {
+			right = (ValueType) rightExpr.accept(this, cluster);
+		}
+
+		if (left == null || right == null) {
+			//can't be determined
+			return ValueType.ANYTHING;
+		}
+		ValueType[] allowedTypes = {
+				ValueType.NUMBER,
+				ValueType.GROUP,
+				ValueType.SIDE,
+				ValueType.STRING,
+				ValueType.OBJECT,
+				ValueType.STRUCTURED_TEXT,
+				ValueType.CONFIG,
+				ValueType.DISPLAY,
+				ValueType.CONTROL,
+				ValueType.LOCATION
+		};
+		for (ValueType type : allowedTypes) {
+			if (left == type) {
+				assertIsType(right, allowedTypes, rightExpr);
+				return ValueType.BOOLEAN;
+			}
+		}
+		notOfType(allowedTypes, left, leftExpr);
+		assertIsType(right, allowedTypes, rightExpr);
+
+		return ValueType.BOOLEAN;
 	}
 
 	@Nullable

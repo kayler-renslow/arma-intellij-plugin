@@ -2,6 +2,8 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -11,6 +13,10 @@ import org.jetbrains.annotations.Nullable;
  * @since 05/23/2017
  */
 public class SQFCompExpression extends ASTWrapperPsiElement implements SQFBinaryExpression {
+	public enum ComparisonType {
+		Equals, NotEquals, LessThan, LessThanOrEqual, GreaterThan, GreaterThanOrEqual
+	}
+
 	public SQFCompExpression(@NotNull ASTNode node) {
 		super(node);
 	}
@@ -19,5 +25,31 @@ public class SQFCompExpression extends ASTWrapperPsiElement implements SQFBinary
 	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);
+	}
+
+	@NotNull
+	public ComparisonType getComparisonType() {
+		for (PsiElement child : getChildren()) {
+			IElementType type = child.getNode().getElementType();
+			if (type == SQFTypes.EQEQ) {
+				return ComparisonType.Equals;
+			}
+			if (type == SQFTypes.NE) {
+				return ComparisonType.NotEquals;
+			}
+			if (type == SQFTypes.LT) {
+				return ComparisonType.LessThan;
+			}
+			if (type == SQFTypes.LE) {
+				return ComparisonType.LessThanOrEqual;
+			}
+			if (type == SQFTypes.GT) {
+				return ComparisonType.GreaterThan;
+			}
+			if (type == SQFTypes.GE) {
+				return ComparisonType.GreaterThanOrEqual;
+			}
+		}
+		throw new IllegalStateException("couldn't determine comparison type");
 	}
 }
