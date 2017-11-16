@@ -4,6 +4,8 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.ex.InspectionManagerEx;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFFileType;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -12,8 +14,43 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 
+	public void testLiteralExpression_number() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1");
+		ProblemsHolder problems = getProblemsHolder(file);
+		ValueType ret = new SQFSyntaxChecker(
+				file.getFileScope().getChildStatements(),
+				new CommandDescriptorCluster(),
+				problems
+		).begin();
+
+		assertEquals(ret, ValueType.NUMBER);
+	}
+
+	public void testLiteralExpression_string() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "'hello'");
+		ProblemsHolder problems = getProblemsHolder(file);
+		ValueType ret = new SQFSyntaxChecker(
+				file.getFileScope().getChildStatements(),
+				new CommandDescriptorCluster(),
+				problems
+		).begin();
+
+		assertEquals(ret, ValueType.STRING);
+	}
+
+	public void testLiteralExpression_array() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "[1,2,3]");
+		ProblemsHolder problems = getProblemsHolder(file);
+		ValueType ret = new SQFSyntaxChecker(
+				file.getFileScope().getChildStatements(),
+				new CommandDescriptorCluster(),
+				problems
+		).begin();
+
+		assertEquals(ret, ValueType.ARRAY);
+	}
+
 	public void testAddExpression_valid_number() throws Exception {
-		//number plus number
 		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1+1");
 		ProblemsHolder problems = getProblemsHolder(file);
 		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
@@ -22,7 +59,6 @@ public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 	}
 
 	public void testAddExpression_valid_string() throws Exception {
-		//string plus string
 		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "''+''");
 		ProblemsHolder problems = getProblemsHolder(file);
 		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
@@ -31,12 +67,63 @@ public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 	}
 
 	public void testAddExpression_valid_array() throws Exception {
-		//array plus array
 		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "[]+[]");
 		ProblemsHolder problems = getProblemsHolder(file);
 		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
 
 		assertEquals(0, problems.getResultCount());
+	}
+
+	public void testAddExpression_valid_variable() throws Exception {
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var+_var");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1+_var");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "[]+_var");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "''+_var");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var+1");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var+[]");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var=''");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
 	}
 
 	public void testAddExpression_bad_numAndString() throws Exception {
@@ -95,7 +182,4 @@ public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 		return new ProblemsHolder(new InspectionManagerEx(myFixture.getProject()), file, false);
 	}
 
-	private String getTestsFile(String fileName) {
-		return "tests/com/kaylerrenslow/armaplugin/lang/sqf/psi/" + fileName;
-	}
 }

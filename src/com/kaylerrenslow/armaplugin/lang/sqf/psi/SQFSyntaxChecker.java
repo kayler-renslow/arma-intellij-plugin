@@ -30,10 +30,17 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		this.problems = holder;
 	}
 
-	public void begin() {
+	/**
+	 * @return the last statement's resulted {@link ValueType}.
+	 * If there was no statements to check, will return {@link ValueType#NOTHING}
+	 */
+	@Nullable
+	public ValueType begin() {
+		ValueType ret = ValueType.NOTHING;
 		for (SQFStatement statement : statements) {
-			statement.accept(this, cluster);
+			ret = (ValueType) statement.accept(this, cluster);
 		}
+		return ret;
 	}
 
 	@Nullable
@@ -129,17 +136,18 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				assertIsType(right, left, rightExpr);
 				break;
 			}
+			case _VARIABLE: {
+				assertIsType(right, allowedTypes, rightExpr);
+				return ValueType._VARIABLE;
+			}
 			default: {
-				if (left == ValueType._VARIABLE) {
-					assertIsType(right, allowedTypes, rightExpr);
-					return ValueType._VARIABLE;
-				}
-				if (left.isArray() && !right.isArray()) {
-					problems.registerProblem(rightExpr, "Not an Array type.", ProblemHighlightType.ERROR);
+				if (left.isArray() && right == ValueType._VARIABLE) {
 					return ValueType.ARRAY;
 				}
-				notOfType(allowedTypes, right, rightExpr
-				);
+				if (left.isArray() && right.isArray()) {
+					return ValueType.ARRAY;
+				}
+				notOfType(allowedTypes, right, rightExpr);
 				return ValueType.ANYTHING;
 			}
 		}
@@ -176,11 +184,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				assertIsType(right, ValueType.NUMBER, rightExpr);
 				break;
 			}
+			case _VARIABLE: {
+				assertIsType(right, allowedTypes, rightExpr);
+				return ValueType._VARIABLE;
+			}
 			default: {
-				if (left == ValueType._VARIABLE) {
-					assertIsType(right, allowedTypes, rightExpr);
-					return ValueType._VARIABLE;
-				}
 				if (left.isArray() && !right.isArray()) {
 					problems.registerProblem(rightExpr, "Not an Array type.", ProblemHighlightType.ERROR);
 					return ValueType.ARRAY;

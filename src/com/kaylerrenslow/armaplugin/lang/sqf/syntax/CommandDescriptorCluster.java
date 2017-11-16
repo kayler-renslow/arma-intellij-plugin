@@ -22,6 +22,10 @@ public class CommandDescriptorCluster {
 		}
 	}
 
+	public CommandDescriptorCluster() {
+
+	}
+
 	/**
 	 * @return the {@link CommandDescriptor} for the given command name (case-insensitive), or null if couldn't be found
 	 * or doesn't exist in cluster
