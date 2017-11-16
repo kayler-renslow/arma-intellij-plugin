@@ -38,6 +38,18 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 	@Nullable
 	@Override
+	public ValueType visit(@NotNull SQFScope scope, @NotNull CommandDescriptorCluster cluster) {
+		List<SQFStatement> statements = scope.getChildStatements();
+		ValueType ret = ValueType.NOTHING;
+		for (SQFStatement statement : statements) {
+			ret = (ValueType) statement.accept(this, cluster);
+		}
+		return ret;
+	}
+
+
+	@Nullable
+	@Override
 	public ValueType visit(@NotNull SQFAssignmentStatement statement, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression expr = statement.getExpr();
 		if (expr != null) {
@@ -372,7 +384,19 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFLiteralExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		if (expr.getVar() != null) {
+			return ValueType._VARIABLE;
+		}
+		if (expr.getArr() != null) {
+			return ValueType.ARRAY;
+		}
+		if (expr.getStr() != null) {
+			return ValueType.STRING;
+		}
+		if (expr.getNum() != null) {
+			return ValueType.NUMBER;
+		}
+		throw new IllegalStateException("literal expression '" + expr.getText() + "' couldn't determine type");
 	}
 
 	@Nullable

@@ -59,6 +59,9 @@ public class SQFParser implements PsiParser, LightPsiParser {
     else if (t == LOCAL_SCOPE) {
       r = local_scope(b, 0);
     }
+    else if (t == NUMBER) {
+      r = number(b, 0);
+    }
     else if (t == PRIVATE_COMMAND) {
       r = private_command(b, 0);
     }
@@ -374,6 +377,19 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // INTEGER_LITERAL | DEC_LITERAL | HEX_LITERAL
+  public static boolean number(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "number")) return false;
+    boolean r;
+    Marker m = enter_section_(b, l, _NONE_, NUMBER, "<number>");
+    r = consumeToken(b, INTEGER_LITERAL);
+    if (!r) r = consumeToken(b, DEC_LITERAL);
+    if (!r) r = consumeToken(b, HEX_LITERAL);
+    exit_section_(b, l, m, r, false, null);
+    return r;
+  }
+
+  /* ********************************************************** */
   // <<external_rule_private_command 0>>
   public static boolean private_command(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "private_command")) return false;
@@ -623,9 +639,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   // string
   //                         | variable
   //                         | array
-  //                         | INTEGER_LITERAL
-  //                         | DEC_LITERAL
-  //                         | HEX_LITERAL
+  //                         | number
   public static boolean literal_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literal_expression")) return false;
     boolean r;
@@ -633,9 +647,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
     r = string(b, l + 1);
     if (!r) r = variable(b, l + 1);
     if (!r) r = array(b, l + 1);
-    if (!r) r = consumeTokenSmart(b, INTEGER_LITERAL);
-    if (!r) r = consumeTokenSmart(b, DEC_LITERAL);
-    if (!r) r = consumeTokenSmart(b, HEX_LITERAL);
+    if (!r) r = number(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

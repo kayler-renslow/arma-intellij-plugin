@@ -10,6 +10,9 @@ import org.jetbrains.annotations.Nullable;
  */
 interface SQFSyntaxVisitor<T> {
 	@Nullable
+	T visit(@NotNull SQFScope scope, @NotNull CommandDescriptorCluster cluster);
+
+	@Nullable
 	T visit(@NotNull SQFAssignmentStatement statement, @NotNull CommandDescriptorCluster cluster);
 
 	@Nullable

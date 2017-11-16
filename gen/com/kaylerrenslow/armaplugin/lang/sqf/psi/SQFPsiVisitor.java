@@ -107,6 +107,10 @@ public class SQFPsiVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitNumber(@NotNull SQFPsiNumber o) {
+    visitPsiElement(o);
+  }
+
   public void visitParenExpression(@NotNull SQFPsiParenExpression o) {
     visitExpression(o);
   }

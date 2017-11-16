@@ -6,6 +6,7 @@ import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserDefinition;
+import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes;
 
 
 /**

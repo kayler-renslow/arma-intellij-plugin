@@ -12,6 +12,8 @@
     <option name="PASS_PARENT_ENVS" value="true" />
     <module name="Arma Doc Downloader" />
     <envs />
-    <method />
+    <method>
+      <option name="Make" enabled="false" />
+    </method>
   </configuration>
 </component>

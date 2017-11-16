@@ -1,6 +1,5 @@
 **Added**  
 * more implementation to SQFSyntaxChecker
-* added _VARIABLE ValueType to help with indeterminate types when using variables in static type checking
 
 **Changed**  
 * 

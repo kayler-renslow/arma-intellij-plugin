@@ -33,6 +33,7 @@ public interface SQFTypes {
   IElementType LOCAL_SCOPE = new SQFElementType("LOCAL_SCOPE");
   IElementType MOD_EXPRESSION = new SQFElementType("MOD_EXPRESSION");
   IElementType MUL_EXPRESSION = new SQFElementType("MUL_EXPRESSION");
+  IElementType NUMBER = new SQFElementType("NUMBER");
   IElementType PAREN_EXPRESSION = new SQFElementType("PAREN_EXPRESSION");
   IElementType PRIVATE_COMMAND = new SQFElementType("PRIVATE_COMMAND");
   IElementType QUEST_STATEMENT = new SQFElementType("QUEST_STATEMENT");
@@ -151,6 +152,9 @@ public interface SQFTypes {
       }
       else if (type == MUL_EXPRESSION) {
         return new SQFPsiMulExpressionImpl(node);
+      }
+      else if (type == NUMBER) {
+        return new SQFPsiNumberImpl(node);
       }
       else if (type == PAREN_EXPRESSION) {
         return new SQFPsiParenExpressionImpl(node);

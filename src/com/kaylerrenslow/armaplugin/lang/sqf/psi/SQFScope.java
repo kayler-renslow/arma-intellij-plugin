@@ -6,7 +6,7 @@ import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
-import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptor;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -307,12 +307,7 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 
 	@Nullable
 	@Override
-	default Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptor[] descriptors) {
-		List<SQFStatement> statements = getChildStatements();
-		Object ret = null;
-		for (SQFStatement statement : statements) {
-			ret = visitor.visit(statement, descriptors);
-		}
-		return ret;
+	default Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
+		return visitor.visit(this, cluster);
 	}
 }

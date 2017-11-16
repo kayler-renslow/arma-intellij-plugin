@@ -9,6 +9,7 @@ import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFLexerAdapter;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserDefinition;
+import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes;
 import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAttributesKey;

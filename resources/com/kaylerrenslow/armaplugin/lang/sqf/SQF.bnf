@@ -101,9 +101,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
     literal_expression ::= string
                         | variable
                         | array
-                        | INTEGER_LITERAL
-                        | DEC_LITERAL
-                        | HEX_LITERAL {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFLiteralExpression"}
+                        | number {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFLiteralExpression"}
 
     paren_expression ::= LPAREN expression RPAREN {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParenExpression"}
 
@@ -134,3 +132,4 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
 //values
 string ::= STRING_LITERAL {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFString"}
 array ::= L_SQ_BRACKET (expression (COMMA expression)*)? R_SQ_BRACKET {pin=1 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFArray"}
+number ::= INTEGER_LITERAL | DEC_LITERAL | HEX_LITERAL {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFNumber"}
