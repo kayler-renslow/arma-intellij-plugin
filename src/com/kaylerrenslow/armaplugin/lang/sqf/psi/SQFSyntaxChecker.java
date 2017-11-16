@@ -189,8 +189,10 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				return ValueType._VARIABLE;
 			}
 			default: {
-				if (left.isArray() && !right.isArray()) {
-					problems.registerProblem(rightExpr, "Not an Array type.", ProblemHighlightType.ERROR);
+				if (left.isArray() && right == ValueType._VARIABLE) {
+					return ValueType.ARRAY;
+				}
+				if (left.isArray() && right.isArray()) {
 					return ValueType.ARRAY;
 				}
 				notOfType(allowedTypes, right, rightExpr);

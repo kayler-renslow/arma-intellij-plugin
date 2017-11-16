@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
  */
 public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 
+	//----START Literal Expression----
 	public void testLiteralExpression_number() throws Exception {
 		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1");
 		ProblemsHolder problems = getProblemsHolder(file);
@@ -49,6 +50,10 @@ public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 
 		assertEquals(ret, ValueType.ARRAY);
 	}
+
+	//----END Literal Expression----
+
+	//----START Paren Expression----
 
 	public void testParenExpression1() throws Exception {
 		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "(1)");
@@ -97,6 +102,10 @@ public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 
 		assertEquals(ret, ValueType.NUMBER);
 	}
+
+	//----END Paren Expression----
+
+	//----START Add Expression----
 
 	public void testAddExpression_valid_number() throws Exception {
 		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1+1");
@@ -166,7 +175,7 @@ public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 			assertEquals(0, problems.getResultCount());
 		}
 		{
-			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var=''");
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var+''");
 			ProblemsHolder problems = getProblemsHolder(file);
 			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
 
@@ -224,6 +233,100 @@ public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 			assertEquals(1, problems.getResultCount());
 		}
 	}
+
+	//----END Add Expression----
+
+	//----START Sub Expression----
+
+	public void testSubExpression_valid_number() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1-1");
+		ProblemsHolder problems = getProblemsHolder(file);
+		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+		assertEquals(0, problems.getResultCount());
+	}
+
+	public void testSubExpression_valid_array() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "[]-[]");
+		ProblemsHolder problems = getProblemsHolder(file);
+		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+		assertEquals(0, problems.getResultCount());
+	}
+
+	public void testSubExpression_valid_variable() throws Exception {
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var-_var");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1-_var");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "[]-_var");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var-1");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var-[]");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+	}
+
+	public void testSubExpression_bad_numAndString() throws Exception {
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1e1-''");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(1, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "''-1e1");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(1, problems.getResultCount());
+		}
+	}
+
+	public void testSubExpression_bad_numAndArray() throws Exception {
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "0.5-[]");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(1, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "[]-0.5");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(1, problems.getResultCount());
+		}
+	}
+
+	//----END Sub Expression----
 
 	@NotNull
 	private ProblemsHolder getProblemsHolder(SQFFile file) {
