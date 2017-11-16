@@ -17,8 +17,20 @@ public class CommandXMLInputStream extends InputStream {
 	@NotNull
 	private final String commandName;
 
-	public CommandXMLInputStream(@NotNull InputStream is, @NotNull String commandName) {
-		this.is = is;
+	/**
+	 * Creates a stream for getting command syntax xml files.
+	 *
+	 * @param commandName the command name (case doesn't matter)
+	 * @throws UnsupportedOperationException if the command doesn't have a syntax xml file
+	 */
+	public CommandXMLInputStream(@NotNull String commandName) {
+		InputStream stm = getClass().getClassLoader().getResourceAsStream(
+				"/com/kaylerrenslow/armaplugin/lang/sqf/syntax/" + commandName.toLowerCase() + ".xml"
+		);
+		if (stm == null) {
+			throw new UnsupportedOperationException("command " + commandName + " doesn't have a syntax xml file");
+		}
+		this.is = stm;
 		this.commandName = commandName;
 	}
 

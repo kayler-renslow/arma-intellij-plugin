@@ -3,7 +3,6 @@ package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.InputStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -103,6 +102,8 @@ public class CommandDescriptorPool {
 	 * This method will return null when a syntax xml file doesn't exist or the XML had an error being parsed.
 	 * <p>
 	 * This method will not get any parameter descriptions, return descriptions, or any other type of descriptions.
+	 * If you wish to get these descriptions, you will need to invoke
+	 * {@link SQFCommandSyntaxXMLLoader#importFromStream(CommandXMLInputStream, boolean)} directly.
 	 *
 	 * @param commandName the name of command (case sensitivity doesn't matter).
 	 * @return the {@link CommandDescriptor} instance, or null if one couldn't be created
@@ -197,15 +198,14 @@ public class CommandDescriptorPool {
 
 	@Nullable
 	private CommandDescriptor getDescriptorFromFile(@NotNull String commandName) {
-		InputStream stm = getClass().getClassLoader().getResourceAsStream(
-				"/com/kaylerrenslow/armaplugin/lang/sqf/syntax/" + commandName.toLowerCase() + ".xml"
-		);
-		if (stm == null) {
-			return null;
-		}
 		try {
-			return SQFCommandSyntaxXMLLoader.importFromStream(new CommandXMLInputStream(stm, commandName), false);
+			return SQFCommandSyntaxXMLLoader.importFromStream(new CommandXMLInputStream(commandName), false);
 		} catch (Exception e) {
+			if (e instanceof UnsupportedOperationException) {
+				//command doesn't have a syntax xml file
+				System.out.println(e.getMessage());
+				return null;
+			}
 			e.printStackTrace();
 			return null;
 		}
