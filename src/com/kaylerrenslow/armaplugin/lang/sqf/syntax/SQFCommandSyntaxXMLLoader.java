@@ -16,7 +16,7 @@ import java.util.List;
  */
 class SQFCommandSyntaxXMLLoader {
 	@NotNull
-	public static CommandDescriptor importFromStream(@NotNull CommandXMLInputStream is) throws Exception {
+	public static CommandDescriptor importFromStream(@NotNull CommandXMLInputStream is, boolean getCommandDescriptions) throws Exception {
 		Document document;
 
 		DocumentBuilderFactory builderFactory = DocumentBuilderFactory.newInstance();
@@ -52,7 +52,7 @@ class SQFCommandSyntaxXMLLoader {
 				if (params[order] != null) {
 					throw new RuntimeException("duplicate order for command " + is.getCommandName() + ". order=" + order);
 				}
-				params[order] = getArrayParam(arrayElement);
+				params[order] = getArrayParam(arrayElement, getCommandDescriptions);
 			}
 			List<Element> paramElements = XmlUtil.getChildElementsWithTagName(syntaxElement, "param");
 			for (Element paramElement : paramElements) {
@@ -60,7 +60,7 @@ class SQFCommandSyntaxXMLLoader {
 				if (params[order] != null) {
 					throw new RuntimeException("duplicate order for command " + is.getCommandName() + ". order=" + order);
 				}
-				params[order] = getParam(paramElement);
+				params[order] = getParam(paramElement, getCommandDescriptions);
 			}
 
 			ReturnValueHolder returnValue;
@@ -69,7 +69,7 @@ class SQFCommandSyntaxXMLLoader {
 			if (returnElements.size() == 0) {
 				throw new RuntimeException("no return value");
 			}
-			returnValue = getReturnValue(returnElements.get(0));
+			returnValue = getReturnValue(returnElements.get(0), getCommandDescriptions);
 
 
 			syntaxList.add(new CommandSyntax(params[PREFIX], params[POSTFIX], returnValue));
@@ -82,24 +82,26 @@ class SQFCommandSyntaxXMLLoader {
 		return c;
 	}
 
-	private static ReturnValueHolder getReturnValue(@NotNull Element returnValueElement) {
+	private static ReturnValueHolder getReturnValue(@NotNull Element returnValueElement, boolean getCommandDescriptions) {
 		List<Element> arrayElements = XmlUtil.getChildElementsWithTagName(returnValueElement, "array");
 		List<Element> valueElements = XmlUtil.getChildElementsWithTagName(returnValueElement, "value");
 
 		ArrayList<ReturnValueHolder> list = new ArrayList<>(1);
 
 		if (arrayElements.size() > 0) {
-			getArrayReturnValueFromElement(arrayElements.get(0), list);
+			getArrayReturnValueFromElement(arrayElements.get(0), list, getCommandDescriptions);
 			return list.get(0);
 		} else if (valueElements.size() > 0) {
-			getReturnValueFromElement(valueElements.get(0), list);
+			getReturnValueFromElement(valueElements.get(0), list, getCommandDescriptions);
 			return list.get(0);
 		} else {
 			throw new RuntimeException("no return value saved");
 		}
 	}
 
-	private static void getReturnValueFromElement(@NotNull Element returnValueElement, @NotNull List<ReturnValueHolder> parentReturnValues) {
+	private static void getReturnValueFromElement(@NotNull Element returnValueElement,
+												  @NotNull List<ReturnValueHolder> parentReturnValues,
+												  boolean getCommandDescriptions) {
 		String orderStr = returnValueElement.getAttribute("order");
 		int order = orderStr.length() > 0 ? Integer.parseInt(orderStr) : 0;
 
@@ -108,7 +110,7 @@ class SQFCommandSyntaxXMLLoader {
 
 		String type = returnValueElement.getAttribute("type");
 		dataType = ValueType.valueOf(type);
-		desc = XmlUtil.getImmediateTextContent(returnValueElement);
+		desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(returnValueElement) : "";
 
 		ReturnValueHolder returnValue = new ReturnValueHolder(dataType, desc);
 
@@ -127,22 +129,25 @@ class SQFCommandSyntaxXMLLoader {
 		parentReturnValues.set(order, returnValue);
 	}
 
-	private static void getArrayReturnValueFromElement(@NotNull Element arrayElement, @NotNull List<ReturnValueHolder> parentReturnValues) {
+	private static void getArrayReturnValueFromElement(@NotNull Element arrayElement,
+													   @NotNull List<ReturnValueHolder> parentReturnValues,
+													   boolean getCommandDescriptions) {
 		String orderStr = arrayElement.getAttribute("order");
 		int order = orderStr.length() > 0 ? Integer.parseInt(orderStr) : 0;
 
 		boolean unbounded = valueOfTF(arrayElement.getAttribute("unbounded"));
 		List<ReturnValueHolder> myValues = new ArrayList<>();
 
-		ArrayReturnValueHolder value = new ArrayReturnValueHolder(XmlUtil.getImmediateTextContent(arrayElement), myValues, unbounded);
+		String desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(arrayElement) : "";
+		ArrayReturnValueHolder value = new ArrayReturnValueHolder(desc, myValues, unbounded);
 
 		List<Element> valueElements = XmlUtil.getChildElementsWithTagName(arrayElement, "value");
 		for (Element arrayChildElement : valueElements) {
-			getReturnValueFromElement(arrayChildElement, myValues);
+			getReturnValueFromElement(arrayChildElement, myValues, getCommandDescriptions);
 		}
 		List<Element> arrayElements = XmlUtil.getChildElementsWithTagName(arrayElement, "array");
 		for (Element arrayChildElement : arrayElements) {
-			getArrayReturnValueFromElement(arrayChildElement, myValues);
+			getArrayReturnValueFromElement(arrayChildElement, myValues, getCommandDescriptions);
 		}
 		while (order >= parentReturnValues.size()) { //guarantee that the order index exists
 			parentReturnValues.add(PLACEHOLDER_RETURN_VALUE);
@@ -151,7 +156,7 @@ class SQFCommandSyntaxXMLLoader {
 		parentReturnValues.set(order, value);
 	}
 
-	private static Param getParam(Element paramElement) {
+	private static Param getParam(@NotNull Element paramElement, boolean getCommandDescriptions) {
 		ValueType dataType;
 		String paramName, desc;
 		boolean optional;
@@ -160,7 +165,7 @@ class SQFCommandSyntaxXMLLoader {
 		dataType = ValueType.valueOf(type);
 		paramName = paramElement.getAttribute("name");
 		optional = valueOfTF(paramElement.getAttribute("optional"));
-		desc = XmlUtil.getImmediateTextContent(paramElement);
+		desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(paramElement) : "";
 
 		Param p = new Param(paramName, dataType, desc, optional);
 		addAltTypes(paramElement, p.getAlternateValueTypes());
@@ -174,7 +179,7 @@ class SQFCommandSyntaxXMLLoader {
 		return p;
 	}
 
-	private static void addAltTypes(Element hostElement, List<ValueType> alternateDataTypes) {
+	private static void addAltTypes(@NotNull Element hostElement, @NotNull List<ValueType> alternateDataTypes) {
 		List<Element> altTypesElements = XmlUtil.getChildElementsWithTagName(hostElement, "alt-types");
 		for (Element altTypeElement : altTypesElements) {
 			List<Element> tElements = XmlUtil.getChildElementsWithTagName(altTypeElement, "t");
@@ -185,7 +190,7 @@ class SQFCommandSyntaxXMLLoader {
 		}
 	}
 
-	private static ArrayParam getArrayParam(Element arrayParamElement) {
+	private static ArrayParam getArrayParam(@NotNull Element arrayParamElement, boolean getCommandDescriptions) {
 		List<Param> paramList = new ArrayList<>();
 		boolean unbounded, optional;
 
@@ -195,20 +200,20 @@ class SQFCommandSyntaxXMLLoader {
 		List<Element> arrayElements = XmlUtil.getChildElementsWithTagName(arrayParamElement, "array");
 		for (Element arrayElement : arrayElements) {
 			int order = getOrderForParam(paramList, arrayElement);
-			paramList.set(order, getArrayParam(arrayElement));
+			paramList.set(order, getArrayParam(arrayElement, getCommandDescriptions));
 		}
 
 		List<Element> paramElements = XmlUtil.getChildElementsWithTagName(arrayParamElement, "param");
 		for (Element paramElement : paramElements) {
 			int order = getOrderForParam(paramList, paramElement);
-			paramList.set(order, getParam(paramElement));
+			paramList.set(order, getParam(paramElement, getCommandDescriptions));
 		}
 
 		return new ArrayParam(unbounded, paramList, optional);
 
 	}
 
-	private static int getOrderForParam(List<Param> paramList, Element paramElement) {
+	private static int getOrderForParam(@NotNull List<Param> paramList, @NotNull Element paramElement) {
 		int order = Integer.parseInt(paramElement.getAttribute("order"));
 		while (order >= paramList.size()) {
 			paramList.add(PLACEHOLDER_PARAM);

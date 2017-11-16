@@ -87,7 +87,7 @@ public class CommandDescriptorPool {
 				"while",
 		};
 		for (String command : frequent) {
-			frequentCache.put(command, PLACEHOLDER.descriptor);
+			frequentCache.put(command.toLowerCase(), PLACEHOLDER.descriptor);
 		}
 	}
 
@@ -101,11 +101,15 @@ public class CommandDescriptorPool {
 	 * commands. However, the tallied cache can be completely replaced over time.
 	 * <p>
 	 * This method will return null when a syntax xml file doesn't exist or the XML had an error being parsed.
+	 * <p>
+	 * This method will not get any parameter descriptions, return descriptions, or any other type of descriptions.
 	 *
+	 * @param commandName the name of command (case sensitivity doesn't matter).
 	 * @return the {@link CommandDescriptor} instance, or null if one couldn't be created
 	 */
 	@Nullable
 	public CommandDescriptor get(@NotNull String commandName) {
+		commandName = commandName.toLowerCase();
 		synchronized (frequentCache) {
 			if (frequentCache.containsKey(commandName)) {
 				CommandDescriptor descriptor = frequentCache.get(commandName);
@@ -200,7 +204,7 @@ public class CommandDescriptorPool {
 			return null;
 		}
 		try {
-			return SQFCommandSyntaxXMLLoader.importFromStream(new CommandXMLInputStream(stm, commandName));
+			return SQFCommandSyntaxXMLLoader.importFromStream(new CommandXMLInputStream(stm, commandName), false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return null;
