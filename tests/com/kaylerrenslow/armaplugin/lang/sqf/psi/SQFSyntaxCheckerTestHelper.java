@@ -4,7 +4,10 @@ import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.ex.InspectionManagerEx;
 import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFFileType;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Contains helper methods for {@link SQFSyntaxChecker} related tests
@@ -47,6 +50,21 @@ public abstract class SQFSyntaxCheckerTestHelper extends LightCodeInsightFixture
 		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
 
 		assertEquals(0, problems.getResultCount());
+	}
+
+	/**
+	 * Parses the given text into a {@link SQFFile}. Then it creates a {@link SQFSyntaxChecker} and runs
+	 * it on the entire file and returns the last {@link ValueType} of all the statements.
+	 *
+	 * @param text SQF code to parse
+	 * @return the {@link SQFSyntaxChecker#begin()} exit value
+	 */
+	@Nullable
+	public ValueType getExitTypeForText(@NotNull String text) {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, text);
+		ProblemsHolder problems = getProblemsHolder(file);
+		CommandDescriptorCluster cluster = SQFSyntaxHelper.getInstance().getCommandDescriptors(file.getNode());
+		return new SQFSyntaxChecker(file.getFileScope().getChildStatements(), cluster, problems).begin();
 	}
 
 	/**

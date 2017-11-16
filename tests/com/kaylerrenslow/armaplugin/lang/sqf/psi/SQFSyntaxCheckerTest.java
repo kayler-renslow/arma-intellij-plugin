@@ -1,12 +1,6 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
-import com.intellij.codeInspection.ProblemsHolder;
-import com.kaylerrenslow.armaplugin.lang.sqf.SQFFileType;
-import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptor;
-import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * Tests for non-{@link SQFCommandExpression} syntax/type checking
@@ -193,16 +187,50 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----END Div Expression----
 
-	@Nullable
-	private ValueType getExitTypeForText(@NotNull String text, @NotNull CommandDescriptor... descriptors) {
-		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, text);
-		ProblemsHolder problems = getProblemsHolder(file);
-		return new SQFSyntaxChecker(
-				file.getFileScope().getChildStatements(),
-				new CommandDescriptorCluster(descriptors),
-				problems
-		).begin();
+	//----START Bool And Expression----
+	public void testBoolAndExpression_valid() throws Exception {
+		assertNoProblems("true && true");
+		assertNoProblems("true && false");
+		assertNoProblems("false && {true}");
 	}
+
+	public void testBoolAndExpression_bad() throws Exception {
+		assertProblemCount("true && 1", 1);
+		assertProblemCount("true && []", 1);
+		assertProblemCount("false && {5}", 1);
+	}
+
+	public void testBoolAndExpression_valid_variable() throws Exception {
+		assertNoProblems("_var && _var");
+		assertNoProblems("_var && {_var}");
+		assertNoProblems("true && _var");
+		assertNoProblems("true && {_var}");
+	}
+
+	//----END Bool And Expression----
+
+	//----START Bool Or Expression----
+	public void testBoolOrExpression_valid() throws Exception {
+		assertNoProblems("true || true");
+		assertNoProblems("true || false");
+		assertNoProblems("false || {true}");
+	}
+
+	public void testBoolOrExpression_bad() throws Exception {
+		assertProblemCount("true || 1", 1);
+		assertProblemCount("true || []", 1);
+		assertProblemCount("false || {5}", 1);
+	}
+
+	public void testBoolOrExpression_valid_variable() throws Exception {
+		assertNoProblems("_var || _var");
+		assertNoProblems("_var || {_var}");
+		assertNoProblems("true || _var");
+		assertNoProblems("true || {_var}");
+	}
+
+	//----END Bool Or Expression----
+
 
 
 }
