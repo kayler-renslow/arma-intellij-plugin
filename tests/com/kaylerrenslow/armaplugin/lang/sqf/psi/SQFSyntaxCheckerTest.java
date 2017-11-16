@@ -50,6 +50,54 @@ public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 		assertEquals(ret, ValueType.ARRAY);
 	}
 
+	public void testParenExpression1() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "(1)");
+		ProblemsHolder problems = getProblemsHolder(file);
+		ValueType ret = new SQFSyntaxChecker(
+				file.getFileScope().getChildStatements(),
+				new CommandDescriptorCluster(),
+				problems
+		).begin();
+
+		assertEquals(ret, ValueType.NUMBER);
+	}
+
+	public void testParenExpression2() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "('hello')");
+		ProblemsHolder problems = getProblemsHolder(file);
+		ValueType ret = new SQFSyntaxChecker(
+				file.getFileScope().getChildStatements(),
+				new CommandDescriptorCluster(),
+				problems
+		).begin();
+
+		assertEquals(ret, ValueType.STRING);
+	}
+
+	public void testParenExpression3() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "([1,2,3])");
+		ProblemsHolder problems = getProblemsHolder(file);
+		ValueType ret = new SQFSyntaxChecker(
+				file.getFileScope().getChildStatements(),
+				new CommandDescriptorCluster(),
+				problems
+		).begin();
+
+		assertEquals(ret, ValueType.ARRAY);
+	}
+
+	public void testParenExpression4() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "(1+1)");
+		ProblemsHolder problems = getProblemsHolder(file);
+		ValueType ret = new SQFSyntaxChecker(
+				file.getFileScope().getChildStatements(),
+				new CommandDescriptorCluster(),
+				problems
+		).begin();
+
+		assertEquals(ret, ValueType.NUMBER);
+	}
+
 	public void testAddExpression_valid_number() throws Exception {
 		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1+1");
 		ProblemsHolder problems = getProblemsHolder(file);
