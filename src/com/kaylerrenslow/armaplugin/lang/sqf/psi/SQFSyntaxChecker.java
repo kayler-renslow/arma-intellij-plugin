@@ -12,6 +12,9 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
+ * Checks syntax and type for validity. This will not report problems related to grammar errors.
+ * This will handle syntax errors where commands take too few or too many arguments.
+ *
  * @author Kayler
  * @since 11/14/2017
  */
