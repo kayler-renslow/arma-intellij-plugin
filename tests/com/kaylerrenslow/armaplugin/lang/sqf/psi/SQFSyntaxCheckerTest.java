@@ -328,6 +328,57 @@ public class SQFSyntaxCheckerTest extends LightCodeInsightFixtureTestCase {
 
 	//----END Sub Expression----
 
+	//----START Mult Expression----
+	public void testMultExpression_valid() throws Exception {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "0*1.5");
+		ProblemsHolder problems = getProblemsHolder(file);
+		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+		assertEquals(0, problems.getResultCount());
+	}
+
+	public void testMultExpression_bad() throws Exception {
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "0*[]");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(1, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "[]*0");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(1, problems.getResultCount());
+		}
+	}
+
+	public void testMultExpression_valid_variable() throws Exception {
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var*_var");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "1*_var");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+		{
+			SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, "_var*1");
+			ProblemsHolder problems = getProblemsHolder(file);
+			SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
+
+			assertEquals(0, problems.getResultCount());
+		}
+	}
+	//----END Mult Expression----
+
 	@NotNull
 	private ProblemsHolder getProblemsHolder(SQFFile file) {
 		return new ProblemsHolder(new InspectionManagerEx(myFixture.getProject()), file, false);
