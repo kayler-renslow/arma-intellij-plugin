@@ -318,32 +318,32 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	public void testCompExpression_bad() throws Exception {
 		assertProblemCount("1 < ''", 1);
 		assertProblemCount("1 < []", 1);
-		assertProblemCount("'' < []", 1);
+		assertProblemCount("'' < []", 2);
 		assertProblemCount("[] < 1", 1);
-		assertProblemCount("[] < []", 1);
+		assertProblemCount("[] < []", 2);
 
 		assertProblemCount("1 <= ''", 1);
 		assertProblemCount("1 <= []", 1);
-		assertProblemCount("'' <= []", 1);
+		assertProblemCount("'' <= []", 2);
 		assertProblemCount("[] <= 1", 1);
-		assertProblemCount("[] <= []", 1);
+		assertProblemCount("[] <= []", 2);
 
 		assertProblemCount("1 > ''", 1);
 		assertProblemCount("1 > []", 1);
-		assertProblemCount("'' > []", 1);
+		assertProblemCount("'' > []", 2);
 		assertProblemCount("[] > 1", 1);
-		assertProblemCount("[] > []", 1);
+		assertProblemCount("[] > []", 2);
 
 		assertProblemCount("1 >= ''", 1);
 		assertProblemCount("1 >= []", 1);
-		assertProblemCount("'' >= []", 1);
+		assertProblemCount("'' >= []", 2);
 		assertProblemCount("[] >= 1", 1);
-		assertProblemCount("[] >= []", 1);
+		assertProblemCount("[] >= []", 2);
 
 		assertProblemCount("1 == ''", 1);
-		assertProblemCount("[] == []", 1);
+		assertProblemCount("[] == []", 2);
 		assertProblemCount("1 == []", 1);
-		assertProblemCount("'' == []", 1);
+		assertProblemCount("'' == []", 2);
 		assertProblemCount("[] == 1", 1);
 		assertProblemCount("[] == false", 1);
 		assertProblemCount("groupNull==west", 1);
@@ -355,9 +355,9 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertProblemCount("locationNull==false", 1);
 		assertProblemCount("(parseText '')==0", 1);
 
-		assertProblemCount("[] != []", 1);
+		assertProblemCount("[] != []", 2);
 		assertProblemCount("1 != []", 1);
-		assertProblemCount("'' != []", 1);
+		assertProblemCount("'' != []", 2);
 		assertProblemCount("[] != 1", 1);
 		assertProblemCount("[] != false", 1);
 		assertProblemCount("configFile!=[]", 1);
@@ -405,5 +405,23 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("true != _var");
 	}
 	//----END Comp Expression----
+
+	//----START config fetch Expression----
+	public void testConfigFetchExpression_valid() throws Exception {
+		assertNoProblems("configFile >> ''");
+		assertNoProblems("configFile >> '' >> ''");
+		assertNoProblems("configFile >> '' >> '' >> ''");
+
+		assertNoProblems("configFile >> _var >> '' >> _var");
+		assertNoProblems("configFile >> _var");
+		assertNoProblems("configFile >> '' >> _var >> _var");
+	}
+
+	public void testConfigFetchExpression_bad() throws Exception {
+		assertProblemCount("configFile >> 1", 1);
+		assertProblemCount("configFile >> 1 >> 2", 2);
+		assertProblemCount("1 >> '' >> ''", 1);
+	}
+	//----END config fetch Expression----
 
 }

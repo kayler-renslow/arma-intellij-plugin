@@ -24,7 +24,7 @@ public class CommandXMLInputStream extends InputStream {
 	 * @throws UnsupportedOperationException if the command doesn't have a syntax xml file
 	 */
 	public CommandXMLInputStream(@NotNull String commandName) {
-		InputStream stm = getClass().getClassLoader().getResourceAsStream(
+		InputStream stm = getClass().getResourceAsStream(
 				"/com/kaylerrenslow/armaplugin/lang/sqf/syntax/" + commandName.toLowerCase() + ".xml"
 		);
 		if (stm == null) {
