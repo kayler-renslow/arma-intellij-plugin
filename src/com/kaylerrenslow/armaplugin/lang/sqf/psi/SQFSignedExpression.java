@@ -11,8 +11,27 @@ import org.jetbrains.annotations.Nullable;
  * @since 05/23/2017
  */
 public class SQFSignedExpression extends ASTWrapperPsiElement implements SQFUnaryExpression {
+	public enum Sign {
+		Plus, Minus
+	}
+
 	public SQFSignedExpression(@NotNull ASTNode node) {
 		super(node);
+	}
+
+	@NotNull
+	public Sign getSign() {
+		String t = getText();
+		if (t == null || t.length() == 0) {
+			throw new IllegalStateException("couldn't determine sign");
+		}
+		if (t.charAt(0) == '+') {
+			return Sign.Plus;
+		}
+		if (t.charAt(0) == '-') {
+			return Sign.Plus;
+		}
+		throw new IllegalStateException("couldn't determine sign");
 	}
 
 	@Nullable

@@ -452,4 +452,27 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 	//----END exponent Expression----
 
+	//----START signed Expression----
+	public void testSignExpression_valid() throws Exception {
+		assertNoProblems("+1");
+		assertNoProblems("+1.5");
+		assertNoProblems("+1e1");
+		assertNoProblems("+[]");
+		assertNoProblems("+_var");
+
+		assertNoProblems("-1");
+		assertNoProblems("-1.5");
+		assertNoProblems("-1e1");
+		assertNoProblems("-_var");
+	}
+
+	public void testSignExpression_bad() throws Exception {
+		assertProblemCount("+configFile", 1);
+		assertProblemCount("+''", 1);
+
+		assertProblemCount("-[]", 1);
+		assertProblemCount("-''", 1);
+	}
+	//----END signed Expression----
+
 }
