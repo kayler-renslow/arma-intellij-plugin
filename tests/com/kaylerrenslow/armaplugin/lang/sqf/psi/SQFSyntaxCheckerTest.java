@@ -268,50 +268,50 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		{ //group
 			assertEquals(getExitTypeForText("groupNull"), ValueType.GROUP);
 			assertNoProblems("groupNull==groupNull");
+			assertNoProblems("groupNull!=groupNull");
 		}
 
 		{ //side
 			assertEquals(getExitTypeForText("west"), ValueType.SIDE);
 			assertNoProblems("west==west");
+			assertNoProblems("west!=west");
 		}
 
 		{ //object
 			assertEquals(getExitTypeForText("objectNull"), ValueType.OBJECT);
 			assertNoProblems("objectNull==objectNull");
+			assertNoProblems("objectNull!=objectNull");
 		}
 
 		{ //config
 			assertEquals(getExitTypeForText("configFile"), ValueType.CONFIG);
 			assertNoProblems("configFile==configFile");
+			assertNoProblems("configFile!=configFile");
 		}
 
 		{ //display
 			assertEquals(getExitTypeForText("displayNull"), ValueType.DISPLAY);
 			assertNoProblems("displayNull==displayNull");
+			assertNoProblems("displayNull!=displayNull");
 		}
 
 		{ //control
 			assertEquals(getExitTypeForText("controlNull"), ValueType.CONTROL);
 			assertNoProblems("controlNull==controlNull");
+			assertNoProblems("controlNull!=controlNull");
 		}
 
 		{ //location
 			assertEquals(getExitTypeForText("locationNull"), ValueType.LOCATION);
 			assertNoProblems("locationNull==controlNull");
+			assertNoProblems("locationNull!=controlNull");
 		}
 
 		{ //structured text
 			assertEquals(getExitTypeForText("parseText ''"), ValueType.STRUCTURED_TEXT);
 			assertNoProblems("(parseText '')==(parseText '')");
+			assertNoProblems("(parseText '')!=(parseText '')");
 		}
-
-		assertNoProblems("1 != ''");
-		assertNoProblems("groupNull!=west");
-		assertNoProblems("west!=groupNull");
-		assertNoProblems("objectNull!=1");
-		assertNoProblems("displayNull!=''");
-		assertNoProblems("locationNull!=false");
-		assertNoProblems("(parseText '')!=0");
 
 	}
 
@@ -362,6 +362,13 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertProblemCount("[] != false", 1);
 		assertProblemCount("configFile!=[]", 1);
 		assertProblemCount("controlNull!=[]", 1);
+		assertProblemCount("1 != ''", 1);
+		assertProblemCount("groupNull!=west", 1);
+		assertProblemCount("west!=groupNull", 1);
+		assertProblemCount("objectNull!=1", 1);
+		assertProblemCount("displayNull!=''", 1);
+		assertProblemCount("locationNull!=false", 1);
+		assertProblemCount("(parseText '')!=0", 1);
 	}
 
 	public void testCompExpression_valid_variable() throws Exception {
