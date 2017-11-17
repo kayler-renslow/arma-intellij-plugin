@@ -120,7 +120,7 @@ public class CommandDescriptorPool {
 					CommandDescriptor d = getDescriptorFromFile(commandName);
 					if (d == null) {
 						//we are only going to report frequent commands as errors because we are lazy
-						throw new IllegalStateException("frequent command " + commandName + " should have syntax xml");
+						throw new IllegalStateException("frequent command '" + commandName + "' should have syntax xml");
 					}
 					frequentCache.put(commandName, d);
 					return d;

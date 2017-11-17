@@ -3,7 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType;
 
 /**
- * Tests for non-{@link SQFCommandExpression} syntax/type checking
+ * Tests for syntax/type checking for {@link SQFFile} instances
  *
  * @author Kayler
  * @since 11/15/2017
@@ -228,9 +228,175 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("true || _var");
 		assertNoProblems("true || {_var}");
 	}
-
 	//----END Bool Or Expression----
 
+	//----START Bool Not Expression----
+	public void testBoolNotExpression_valid() throws Exception {
+		assertNoProblems("!true");
+		assertNoProblems("!(true || false)");
+		assertNoProblems("!(false || {true})");
 
+		assertNoProblems("!_var");
+	}
+
+	public void testBoolNotExpression_bad() throws Exception {
+		assertProblemCount("!1", 1);
+		assertProblemCount("![]", 1);
+		assertProblemCount("!{5}", 1);
+		assertProblemCount("!{true}", 1);
+	}
+	//----END Bool Not Expression----
+
+	//----START Comp Expression----
+	public void testCompExpression_valid() throws Exception {
+		assertNoProblems("1 < 1");
+		assertNoProblems("1 < 0.5");
+
+		assertNoProblems("1 <= 10");
+		assertNoProblems("1 <= 0.5");
+
+		assertNoProblems("1 > 1");
+		assertNoProblems("1 > 0.5");
+
+		assertNoProblems("1 >= 10");
+		assertNoProblems("1 >= 0.5");
+
+		assertNoProblems("1==1"); //number
+		assertNoProblems("false == true"); //boolean
+		assertNoProblems("''==''"); //string
+
+		{ //group
+			assertEquals(getExitTypeForText("groupNull"), ValueType.GROUP);
+			assertNoProblems("groupNull==groupNull");
+		}
+
+		{ //side
+			assertEquals(getExitTypeForText("west"), ValueType.SIDE);
+			assertNoProblems("west==west");
+		}
+
+		{ //object
+			assertEquals(getExitTypeForText("objectNull"), ValueType.OBJECT);
+			assertNoProblems("objectNull==objectNull");
+		}
+
+		{ //config
+			assertEquals(getExitTypeForText("configFile"), ValueType.CONFIG);
+			assertNoProblems("configFile==configFile");
+		}
+
+		{ //display
+			assertEquals(getExitTypeForText("displayNull"), ValueType.DISPLAY);
+			assertNoProblems("displayNull==displayNull");
+		}
+
+		{ //control
+			assertEquals(getExitTypeForText("controlNull"), ValueType.CONTROL);
+			assertNoProblems("controlNull==controlNull");
+		}
+
+		{ //location
+			assertEquals(getExitTypeForText("locationNull"), ValueType.LOCATION);
+			assertNoProblems("locationNull==controlNull");
+		}
+
+		{ //structured text
+			assertEquals(getExitTypeForText("parseText ''"), ValueType.STRUCTURED_TEXT);
+			assertNoProblems("(parseText '')==(parseText '')");
+		}
+
+		assertNoProblems("1 != ''");
+		assertNoProblems("groupNull!=west");
+		assertNoProblems("west!=groupNull");
+		assertNoProblems("objectNull!=1");
+		assertNoProblems("displayNull!=''");
+		assertNoProblems("locationNull!=false");
+		assertNoProblems("(parseText '')!=0");
+
+	}
+
+	public void testCompExpression_bad() throws Exception {
+		assertProblemCount("1 < ''", 1);
+		assertProblemCount("1 < []", 1);
+		assertProblemCount("'' < []", 1);
+		assertProblemCount("[] < 1", 1);
+		assertProblemCount("[] < []", 1);
+
+		assertProblemCount("1 <= ''", 1);
+		assertProblemCount("1 <= []", 1);
+		assertProblemCount("'' <= []", 1);
+		assertProblemCount("[] <= 1", 1);
+		assertProblemCount("[] <= []", 1);
+
+		assertProblemCount("1 > ''", 1);
+		assertProblemCount("1 > []", 1);
+		assertProblemCount("'' > []", 1);
+		assertProblemCount("[] > 1", 1);
+		assertProblemCount("[] > []", 1);
+
+		assertProblemCount("1 >= ''", 1);
+		assertProblemCount("1 >= []", 1);
+		assertProblemCount("'' >= []", 1);
+		assertProblemCount("[] >= 1", 1);
+		assertProblemCount("[] >= []", 1);
+
+		assertProblemCount("1 == ''", 1);
+		assertProblemCount("[] == []", 1);
+		assertProblemCount("1 == []", 1);
+		assertProblemCount("'' == []", 1);
+		assertProblemCount("[] == 1", 1);
+		assertProblemCount("[] == false", 1);
+		assertProblemCount("groupNull==west", 1);
+		assertProblemCount("west==groupNull", 1);
+		assertProblemCount("objectNull==1", 1);
+		assertProblemCount("configFile==[]", 1);
+		assertProblemCount("displayNull==''", 1);
+		assertProblemCount("controlNull==[]", 1);
+		assertProblemCount("locationNull==false", 1);
+		assertProblemCount("(parseText '')==0", 1);
+
+		assertProblemCount("[] != []", 1);
+		assertProblemCount("1 != []", 1);
+		assertProblemCount("'' != []", 1);
+		assertProblemCount("[] != 1", 1);
+		assertProblemCount("[] != false", 1);
+		assertProblemCount("configFile!=[]", 1);
+		assertProblemCount("controlNull!=[]", 1);
+	}
+
+	public void testCompExpression_valid_variable() throws Exception {
+		assertNoProblems("_var < _var");
+		assertNoProblems("1 < _var");
+		assertNoProblems("_var < 1");
+
+		assertNoProblems("_var <= _var");
+		assertNoProblems("1 <= _var");
+		assertNoProblems("_var <= 1");
+
+		assertNoProblems("_var > _var");
+		assertNoProblems("1 > _var");
+		assertNoProblems("_var > 1");
+
+		assertNoProblems("_var >= _var");
+		assertNoProblems("1 >= _var");
+		assertNoProblems("_var >= 1");
+
+		assertNoProblems("_var == _var");
+		assertNoProblems("1 == _var");
+		assertNoProblems("_var == 1");
+		assertNoProblems("_var == configFile");
+		assertNoProblems("_var == true");
+		assertNoProblems("configFile == _var");
+		assertNoProblems("true == _var");
+
+		assertNoProblems("_var != _var");
+		assertNoProblems("1 != _var");
+		assertNoProblems("_var != 1");
+		assertNoProblems("_var != configFile");
+		assertNoProblems("_var != true");
+		assertNoProblems("configFile != _var");
+		assertNoProblems("true != _var");
+	}
+	//----END Comp Expression----
 
 }

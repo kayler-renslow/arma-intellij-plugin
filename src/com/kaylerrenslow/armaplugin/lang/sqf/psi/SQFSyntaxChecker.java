@@ -333,7 +333,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFCompExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		if (expr.getComparisonType() != SQFCompExpression.ComparisonType.Equals) {
+		if (expr.getComparisonType() != SQFCompExpression.ComparisonType.Equals
+				&& expr.getComparisonType() != SQFCompExpression.ComparisonType.NotEquals) {
 			binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
 			return ValueType.BOOLEAN;
 		}
