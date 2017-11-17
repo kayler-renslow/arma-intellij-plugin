@@ -96,7 +96,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
 
     config_fetch_expression ::= expression (FSLASH | GTGT) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFConfigFetchExpression"}
 
-    exponent_expression ::= expression (CARET expression)+ {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExponentExpression"}
+    exponent_expression ::= expression CARET expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExponentExpression"}
 
     literal_expression ::= string
                         | variable

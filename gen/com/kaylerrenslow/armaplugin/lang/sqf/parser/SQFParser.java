@@ -468,7 +468,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   // 1: BINARY(add_expression) BINARY(sub_expression)
   // 2: BINARY(comp_expression)
   // 3: BINARY(mul_expression) BINARY(div_expression) BINARY(mod_expression)
-  // 4: N_ARY(exponent_expression)
+  // 4: BINARY(exponent_expression)
   // 5: BINARY(config_fetch_expression)
   // 6: ATOM(command_expression)
   // 7: PREFIX(signed_expression)
@@ -530,10 +530,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
         exit_section_(b, l, m, MOD_EXPRESSION, r, true, null);
       }
       else if (g < 4 && consumeTokenSmart(b, CARET)) {
-        while (true) {
-          r = report_error_(b, expression(b, l, 4));
-          if (!consumeTokenSmart(b, CARET)) break;
-        }
+        r = expression(b, l, 4);
         exit_section_(b, l, m, EXPONENT_EXPRESSION, r, true, null);
       }
       else if (g < 5 && config_fetch_expression_0(b, l + 1)) {

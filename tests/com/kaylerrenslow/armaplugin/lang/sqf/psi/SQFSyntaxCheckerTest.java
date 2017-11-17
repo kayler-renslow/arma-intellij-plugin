@@ -415,13 +415,41 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("configFile >> _var >> '' >> _var");
 		assertNoProblems("configFile >> _var");
 		assertNoProblems("configFile >> '' >> _var >> _var");
+		assertNoProblems("_var >> ''");
+		assertNoProblems("_var >> _var");
 	}
 
 	public void testConfigFetchExpression_bad() throws Exception {
 		assertProblemCount("configFile >> 1", 1);
 		assertProblemCount("configFile >> 1 >> 2", 2);
 		assertProblemCount("1 >> '' >> ''", 1);
+		assertProblemCount("_var >> 1 >> ''", 1);
 	}
 	//----END config fetch Expression----
+
+	//----START exponent Expression----
+	public void testExponentExpression_valid() throws Exception {
+		assertNoProblems("1^1");
+		assertNoProblems("1^1^5");
+		assertNoProblems("1^1^5^7");
+
+		assertNoProblems("_var^1^5^7");
+		assertNoProblems("_var^_var^5^7");
+		assertNoProblems("_var^1^5^_var");
+		assertNoProblems("1^1^_var^7");
+		assertNoProblems("_var^_var^_var^_var");
+	}
+
+	public void testExponentExpression_bad() throws Exception {
+		assertProblemCount("1^1^''", 1);
+		assertProblemCount("''^1^5", 1);
+		assertProblemCount("''^1^5^''", 2);
+
+		assertProblemCount("_var^''^5^7", 1);
+		assertProblemCount("''^_var^5^7", 1);
+		assertProblemCount("_var^1^''^_var", 1);
+		assertProblemCount("''^''", 2);
+	}
+	//----END exponent Expression----
 
 }
