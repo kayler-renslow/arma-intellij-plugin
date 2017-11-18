@@ -475,4 +475,35 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 	//----END signed Expression----
 
+	//----START code block Expression----
+	public void testCodeBlockExpression() throws Exception {
+		assertNoProblems("{1}");
+		assertNoProblems("{+1.5}");
+		assertNoProblems("{}");
+
+		assertEquals(getExitTypeForText("{}"), ValueType.CODE);
+		assertEquals(getExitTypeForText("{1}"), ValueType.CODE);
+		assertEquals(getExitTypeForText("{_var}"), ValueType.CODE);
+		assertEquals(getExitTypeForText("{1+1;1}"), ValueType.CODE);
+	}
+	//----END code block Expression----
+
+	//----START case statement----
+	public void testCaseStatement_valid() throws Exception {
+		assertNoProblems("case 1;");
+		assertNoProblems("case 2:{};");
+		assertNoProblems("case '';");
+		assertNoProblems("case [];");
+		assertNoProblems("case []{};");
+
+		assertNoProblems("case configFile;");
+
+		assertNoProblems("case _var{};");
+		assertNoProblems("case _var;");
+
+		assertEquals(getExitTypeForText("case 1:{};"), ValueType.SWITCH);
+		assertEquals(getExitTypeForText("case 1;"), ValueType.SWITCH);
+		assertEquals(getExitTypeForText("case configFile;"), ValueType.SWITCH);
+	}
+	//----END case statement----
 }

@@ -416,7 +416,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFParenExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return (ValueType) expr.getExpresssion().accept(this, cluster);
+		return (ValueType) expr.getExpr().accept(this, cluster);
 	}
 
 	@Nullable

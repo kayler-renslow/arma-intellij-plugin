@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public interface SQFExpression extends PsiElement, SQFSyntaxNode {
 	/**
 	 * If this {@link SQFExpression} happens to be a {@link SQFParenExpression},
-	 * this method will traverse down through {@link SQFParenExpression#getExpresssion()} until the first
+	 * this method will traverse down through {@link SQFParenExpression#getExpr()} until the first
 	 * non-{@link SQFParenExpression} is found. If this isn't a {@link SQFParenExpression}, then this will simply be returned.
 	 *
 	 * The point of this method is to ignore all {@link SQFParenExpression} instances so that it is easier to check
@@ -22,7 +22,7 @@ public interface SQFExpression extends PsiElement, SQFSyntaxNode {
 	default SQFExpression withoutParenthesis() {
 		SQFExpression expr = this;
 		while (expr instanceof SQFParenExpression) {
-			expr = ((SQFParenExpression) expr).getExpresssion();
+			expr = ((SQFParenExpression) expr).getExpr();
 		}
 		return expr;
 	}
