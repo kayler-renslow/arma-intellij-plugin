@@ -502,10 +502,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("case _var:{};");
 		assertNoProblems("case _var;");
 
-		assertEquals(getExitTypeForText("case 1:{};"), ValueType.SWITCH);
-		assertEquals(getExitTypeForText("case 1:{2};"), ValueType.SWITCH);
-		assertEquals(getExitTypeForText("case 1;"), ValueType.SWITCH);
-		assertEquals(getExitTypeForText("case configFile;"), ValueType.SWITCH);
+		assertEquals(getExitTypeForText("case 1:{};"), ValueType.NOTHING);
+		assertEquals(getExitTypeForText("case 1:{2};"), ValueType.NOTHING);
+		assertEquals(getExitTypeForText("case 1;"), ValueType.NOTHING);
+		assertEquals(getExitTypeForText("case configFile;"), ValueType.NOTHING);
 	}
 	//----END case statement----
 
