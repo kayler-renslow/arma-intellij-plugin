@@ -428,7 +428,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@Nullable
 	@Override
 	public ValueType visit(@NotNull SQFCodeBlockExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		SQFLocalScope scope = expr.getBlock().getScope();
+		if (scope != null) {
+			scope.accept(this, cluster);
+		}
+		//we return Code because it is a literal, like 1 or 10. When commands take them as arguments,
+		// they are responsible for executing the code and getting the returned value.
+		return ValueType.CODE;
 	}
 
 	@Nullable

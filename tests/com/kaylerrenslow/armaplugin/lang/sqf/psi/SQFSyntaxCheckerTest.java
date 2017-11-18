@@ -489,21 +489,42 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END code block Expression----
 
 	//----START case statement----
-	public void testCaseStatement_valid() throws Exception {
+	public void testCaseStatement() throws Exception {
 		assertNoProblems("case 1;");
 		assertNoProblems("case 2:{};");
 		assertNoProblems("case '';");
 		assertNoProblems("case [];");
-		assertNoProblems("case []{};");
+		assertNoProblems("case []:{};");
+		assertNoProblems("case []:{1};");
 
 		assertNoProblems("case configFile;");
 
-		assertNoProblems("case _var{};");
+		assertNoProblems("case _var:{};");
 		assertNoProblems("case _var;");
 
 		assertEquals(getExitTypeForText("case 1:{};"), ValueType.SWITCH);
+		assertEquals(getExitTypeForText("case 1:{2};"), ValueType.SWITCH);
 		assertEquals(getExitTypeForText("case 1;"), ValueType.SWITCH);
 		assertEquals(getExitTypeForText("case configFile;"), ValueType.SWITCH);
 	}
 	//----END case statement----
+
+	//----START assignment statement----
+	public void testAssignmentStatement() throws Exception {
+		assertNoProblems("a = {};");
+		assertNoProblems("a={2};");
+		assertNoProblems("a = 1+1;");
+
+		assertNoProblems("_var = configFile;");
+		assertNoProblems("_var = _var;");
+
+		//this problem should be a grammar error, not a type error
+		assertNoProblems("a = ;");
+
+		assertEquals(getExitTypeForText("a = {};"), ValueType.NOTHING);
+		assertEquals(getExitTypeForText("a={2};"), ValueType.NOTHING);
+		assertEquals(getExitTypeForText("a = 1+1;"), ValueType.NOTHING);
+		assertEquals(getExitTypeForText("a = _var;"), ValueType.NOTHING);
+	}
+	//----END assignment statement----
 }
