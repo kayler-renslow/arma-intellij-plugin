@@ -527,4 +527,23 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertEquals(getExitTypeForText("a = _var;"), ValueType.NOTHING);
 	}
 	//----END assignment statement----
+
+	//----START quest statement----
+	public void testQuestStatement_valid() throws Exception {
+		assertNoProblems("? true : false;");
+		assertNoProblems("? true : {};");
+		assertNoProblems("? _var : 1+1;");
+
+		//this problem should be a grammar error, not a type error
+		assertNoProblems("? ;");
+
+		assertEquals(getExitTypeForText("? true : false;"), ValueType.NOTHING);
+		assertEquals(getExitTypeForText("? ;"), ValueType.NOTHING);
+	}
+
+	public void testQuestStatement_bad() throws Exception {
+		assertProblemCount("? 1 : false;", 1);
+		assertProblemCount("? {} : false;", 1);
+	}
+	//----END quest statement----
 }
