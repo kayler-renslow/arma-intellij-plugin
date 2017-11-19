@@ -23,7 +23,7 @@ public abstract class SQFSyntaxCheckerTestHelper extends LightCodeInsightFixture
 	 * <p>
 	 * Asserts that the problems detected are > 0
 	 *
-	 * @param text             the SQF code to parse into a {@link SQFFile}
+	 * @param text the SQF code to parse into a {@link SQFFile}
 	 * @see #assertNoProblems(String)
 	 */
 	public void assertHasProblems(@NotNull String text) {
@@ -64,6 +64,26 @@ public abstract class SQFSyntaxCheckerTestHelper extends LightCodeInsightFixture
 		ProblemsHolder problems = getProblemsHolder(file);
 		CommandDescriptorCluster cluster = SQFSyntaxHelper.getInstance().getCommandDescriptors(file.getNode());
 		return new SQFSyntaxChecker(file.getFileScope().getChildStatements(), cluster, problems).begin();
+	}
+
+	/**
+	 * Parses the given text into a {@link SQFFile}. Then it creates a {@link SQFSyntaxChecker} and runs
+	 * it on the entire file and returns the last {@link ValueType} of all the statements.
+	 * <p>
+	 * This will then assert that the return types match and that there were no problems reported
+	 *
+	 * @param text            SQF code to parse
+	 * @param cluster         command descriptors to use
+	 * @param expectedRetType expected return type
+	 */
+	public void assertExitTypeAndNoProblems(@NotNull String text, @Nullable CommandDescriptorCluster cluster,
+											@Nullable ValueType expectedRetType) {
+		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, text);
+		ProblemsHolder problems = getProblemsHolder(file);
+		cluster = cluster == null ? SQFSyntaxHelper.getInstance().getCommandDescriptors(file.getNode()) : cluster;
+		ValueType ret = new SQFSyntaxChecker(file.getFileScope().getChildStatements(), cluster, problems).begin();
+		assertEquals(0, problems.getResultCount());
+		assertEquals(expectedRetType, ret);
 	}
 
 	/**

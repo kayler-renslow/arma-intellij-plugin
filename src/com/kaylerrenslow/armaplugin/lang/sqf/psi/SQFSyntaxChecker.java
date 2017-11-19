@@ -527,9 +527,6 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			postfixType = getTypeForPart.apply(postfixPart);
 		}
 
-		//syntaxes that currently work given the expression
-		LinkedList<CommandSyntax> fittingSyntaxes = new LinkedList<>();
-
 		//find syntaxes with matching prefix and postfix value types
 		for (CommandSyntax syntax : descriptor.getSyntaxList()) {
 			Param prefixParam = syntax.getPrefixParam();
@@ -553,7 +550,6 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			} else {
 				ValueType postfixTypeTemp = postfixType;
 				if (postfixType == null) {
-					//todo copy parts list and get return type of next command in list
 					CommandExpressionPart peekPart = parts.peekFirst();
 					if (!peekPart.isCommandPart()) {
 						continue;
@@ -569,35 +565,23 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					postfixType = postfixTypeTemp;
 					continue;
 				}
-				postfixType = postfixTypeTemp;
 			}
-			fittingSyntaxes.add(syntax);
-		}
 
-		if (fittingSyntaxes.isEmpty()) {
-			problems.registerProblem(
-					command,
-					"No syntax for " +
-							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
-							+ commandName +
-							(postfixType == null ? "" : "" + postfixType.getDisplayName())
-			);
-			return ValueType.Lookup.Lookup._ERROR;
-		}
-
-		ValueType retType = ValueType.Lookup._ERROR;
-		if (fittingSyntaxes.size() == 1) {
-			retType = fittingSyntaxes.getFirst().getReturnValue().getType();
+			ValueType retType = syntax.getReturnValue().getType();
 			if (!parts.isEmpty()) {
 				problems.registerProblem(parts.getFirst().getPsiElement(), "Expected ;");
 			}
 			return retType;
 		}
 
-		//todo check remaining syntaxes and check argument by argument
-
-
-		return retType;
+		problems.registerProblem(
+				command,
+				"No syntax for " +
+						(prefixType == null ? "" : prefixType.getDisplayName() + " ")
+						+ commandName +
+						(postfixType == null ? "" : "" + postfixType.getDisplayName())
+		);
+		return ValueType.Lookup.Lookup._ERROR;
 	}
 
 	@NotNull
