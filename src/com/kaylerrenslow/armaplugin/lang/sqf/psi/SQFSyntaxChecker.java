@@ -44,6 +44,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		for (SQFStatement statement : statements) {
 			ret = (ValueType) statement.accept(this, cluster);
 		}
+		//System.out.println(problems.getResults());
 		return ret;
 	}
 
@@ -495,9 +496,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 		CommandExpressionPart peek = parts.peekFirst();
 		if (peek != null) {
-			if (peek.isCommandPart()) {
-				postfixType = getReturnTypeForCommand(parts, null, problems);
-			} else {
+			if (!peek.isCommandPart()) {
 				postfixPart = parts.removeFirst();
 			}
 		}
@@ -580,7 +579,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		ValueType retType = ValueType._ERROR;
-		if (prefixType == null && postfixType == null) {
+		if (fittingSyntaxes.size() == 1) {
 			retType = fittingSyntaxes.getFirst().getReturnValue().getType();
 			if (!parts.isEmpty()) {
 				problems.registerProblem(parts.getFirst().getPsiElement(), "Expected ;");
@@ -589,6 +588,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		//todo check remaining syntaxes and check argument by argument
+		
 
 		return retType;
 	}
