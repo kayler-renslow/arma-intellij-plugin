@@ -4,6 +4,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -16,8 +17,6 @@ import java.util.List;
 public class ExpandedValueType implements ValueType {
 	@NotNull
 	private final List<ValueType> valueTypes;
-	@NotNull
-	private final List<Boolean> isRequired;
 	private final boolean isUnbounded;
 
 	/**
@@ -34,7 +33,6 @@ public class ExpandedValueType implements ValueType {
 
 	/**
 	 * Create an instance with the specified <b>required</b> {@link ValueType} instances.
-	 * Every value type provided will be marked as required.
 	 *
 	 * @param isUnbounded true if the last element in valueTypes is repeating, false otherwise
 	 * @param valueTypes  value types to use
@@ -44,35 +42,6 @@ public class ExpandedValueType implements ValueType {
 
 		this.valueTypes = new ArrayList<>(valueTypes.length);
 		Collections.addAll(this.valueTypes, valueTypes);
-
-		this.isRequired = new ArrayList<>();
-		for (ValueType t : valueTypes) {
-			isRequired.add(true);
-		}
-	}
-
-	/**
-	 * Create an instance with the specified {@link ValueType} instances. By passing in an array <code>isRequired</code>,
-	 * you can mark which indexes of <code>valueTypes</code> are required and not
-	 *
-	 * @param isUnbounded true if the last element in valueTypes is repeating, false otherwise
-	 * @param valueTypes  value types to use
-	 * @param isRequired  array of boolean dictating what elements in valueTypes are required and not required
-	 * @throws IllegalArgumentException when valueTypes.length != isRequired.length
-	 */
-	public ExpandedValueType(boolean isUnbounded, @NotNull ValueType[] valueTypes, @NotNull boolean[] isRequired) {
-		if (isRequired.length != valueTypes.length) {
-			throw new IllegalArgumentException("isRequired.length != valueTypes.length");
-		}
-		this.isUnbounded = isUnbounded;
-
-		this.valueTypes = new ArrayList<>(valueTypes.length);
-		Collections.addAll(this.valueTypes, valueTypes);
-
-		this.isRequired = new ArrayList<>(isRequired.length);
-		for (boolean b : isRequired) {
-			this.isRequired.add(b);
-		}
 	}
 
 	/**
@@ -84,27 +53,6 @@ public class ExpandedValueType implements ValueType {
 	}
 
 	/**
-	 * Check if the given index is required or not.
-	 *
-	 * @return true if index is required, false if it isn't
-	 * @throws IndexOutOfBoundsException when ind &lt;0 or ind &gt;= the number of elements
-	 */
-	public boolean isRequired(int ind) {
-		if (ind < 0 || ind >= isRequired.size()) {
-			throw new IndexOutOfBoundsException();
-		}
-		return isRequired.get(ind);
-	}
-
-	/**
-	 * @return a mutable list containing required indices
-	 */
-	@NotNull
-	public List<Boolean> getIsRequired() {
-		return isRequired;
-	}
-
-	/**
 	 * @return mutable list containing value types
 	 */
 	@NotNull
@@ -112,9 +60,8 @@ public class ExpandedValueType implements ValueType {
 		return valueTypes;
 	}
 
-	public void addValueType(@NotNull ValueType type, boolean isRequired) {
+	public void addValueType(@NotNull ValueType type) {
 		valueTypes.add(type);
-		this.isRequired.add(isRequired);
 	}
 
 	@NotNull
@@ -139,6 +86,9 @@ public class ExpandedValueType implements ValueType {
 		return isUnbounded;
 	}
 
+	/**
+	 * @return true if {@link #getValueTypes()} are equal (same size and order) and if {@link #isUnbounded()} are equal
+	 */
 	@Override
 	public boolean equals(Object o) {
 		if (o == this) {
@@ -146,10 +96,19 @@ public class ExpandedValueType implements ValueType {
 		}
 		if (o instanceof ExpandedValueType) {
 			ExpandedValueType other = (ExpandedValueType) o;
-			return this.getValueTypes().equals(other.getValueTypes())
-					&& this.getIsRequired().equals(other.getIsRequired())
-					&& this.isUnbounded == other.isUnbounded
-					;
+
+			if (getValueTypes().size() != other.getValueTypes().size()) {
+				return false;
+			}
+
+			Iterator<ValueType> myTypes = getValueTypes().iterator();
+			Iterator<ValueType> otherTypes = other.getValueTypes().iterator();
+			while (myTypes.hasNext()) {
+				if (!myTypes.next().equals(otherTypes.next())) {
+					return false;
+				}
+			}
+			return this.isUnbounded == other.isUnbounded;
 		}
 		return false;
 	}
@@ -157,7 +116,6 @@ public class ExpandedValueType implements ValueType {
 	public String debugToString() {
 		return "ExpandedValueType{" +
 				"valueTypes=" + valueTypes +
-				", isRequired=" + isRequired +
 				", isUnbounded=" + isUnbounded +
 				'}';
 	}

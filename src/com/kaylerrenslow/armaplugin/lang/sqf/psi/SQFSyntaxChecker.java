@@ -422,7 +422,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 			ExpandedValueType expandedValueType = new ExpandedValueType();
 			for (SQFExpression arrItemExpr : arr.getExpressions()) {
-				expandedValueType.addValueType((ValueType) arrItemExpr.accept(this, cluster), true);
+				expandedValueType.addValueType((ValueType) arrItemExpr.accept(this, cluster));
 			}
 			return expandedValueType;
 		}
@@ -551,12 +551,25 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					continue;
 				}
 			} else {
+				ValueType postfixTypeTemp = postfixType;
 				if (postfixType == null) {
-					continue;
+					//todo copy parts list and get return type of next command in list
+					CommandExpressionPart peekPart = parts.peekFirst();
+					if (!peekPart.isCommandPart()) {
+						continue;
+					}
+					LinkedList<CommandExpressionPart> dup = new LinkedList<>();
+					dup.addAll(parts);
+					postfixType = getReturnTypeForCommand(dup, null, problems);
+					if (postfixType == null) {
+						continue;
+					}
 				}
 				if (postfixType != _VARIABLE && !postfixParam.allowedTypesContains(postfixType)) {
+					postfixType = postfixTypeTemp;
 					continue;
 				}
+				postfixType = postfixTypeTemp;
 			}
 			fittingSyntaxes.add(syntax);
 		}

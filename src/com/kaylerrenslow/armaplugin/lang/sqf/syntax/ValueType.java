@@ -30,7 +30,7 @@ public interface ValueType {
 								new ExpandedValueType(true, Lookup.GROUP),
 								new ExpandedValueType(true, Lookup.OBJECT),
 								new ExpandedValueType(true, Lookup.OBJECT),
-								new ExpandedValueType(true, Lookup.WAYPOINT.expandedValueType),
+								new ExpandedValueType(true, Lookup.WAYPOINT.getExpanded()),
 								new ExpandedValueType(true, Lookup.STRING),
 								new ExpandedValueType(true, Lookup.NUMBER),
 								new ExpandedValueType(true, Lookup.NUMBER)
@@ -73,8 +73,7 @@ public interface ValueType {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(false,
-						new ValueType[]{Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER},
-						new boolean[]{true, true, false}
+						Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER
 				);
 			}
 		}),
@@ -219,6 +218,7 @@ public interface ValueType {
 		public ExpandedValueType getExpanded() {
 			return expandedValueType;
 		}
+
 	}
 
 }
