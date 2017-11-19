@@ -6,7 +6,6 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.TokenSet;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kayler
@@ -21,7 +20,7 @@ public class SQFCompExpression extends ASTWrapperPsiElement implements SQFBinary
 		super(node);
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);

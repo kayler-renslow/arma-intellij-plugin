@@ -32,7 +32,7 @@ public class SQFCaseStatement extends ASTWrapperPsiElement implements SQFStateme
 		return PsiTreeUtil.getChildOfType(this, SQFCodeBlock.class);
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);

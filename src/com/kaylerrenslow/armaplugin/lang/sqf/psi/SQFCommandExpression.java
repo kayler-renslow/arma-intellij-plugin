@@ -66,7 +66,7 @@ public class SQFCommandExpression extends ASTWrapperPsiElement implements SQFExp
 		return null;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);

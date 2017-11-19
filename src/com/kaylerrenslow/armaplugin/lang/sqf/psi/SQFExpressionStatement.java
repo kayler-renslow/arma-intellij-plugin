@@ -5,7 +5,6 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kayler
@@ -25,7 +24,7 @@ public class SQFExpressionStatement extends ASTWrapperPsiElement implements SQFS
 		return expression;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);

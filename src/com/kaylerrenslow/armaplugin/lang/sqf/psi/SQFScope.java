@@ -8,7 +8,6 @@ import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -305,7 +304,7 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 		return getText().replaceAll("\n", " ");
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	default Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);

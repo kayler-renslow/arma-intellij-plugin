@@ -3,13 +3,14 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
-import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
-import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.function.Function;
 
 /**
  * Checks syntax and type for validity. This will not report problems related to grammar errors.
@@ -46,7 +47,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return ret;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFScope scope, @NotNull CommandDescriptorCluster cluster) {
 		List<SQFStatement> statements = scope.getChildStatements();
@@ -58,7 +59,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	}
 
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFAssignmentStatement statement, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression expr = statement.getExpr();
@@ -69,7 +70,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return ValueType.NOTHING;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFCaseStatement statement, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression cond = statement.getCondition();
@@ -87,13 +88,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return ValueType.NOTHING;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFExpressionStatement statement, @NotNull CommandDescriptorCluster cluster) {
 		return (ValueType) statement.getExpr().accept(this, cluster);
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFQuestStatement statement, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression cond = statement.getCondition();
@@ -108,7 +109,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return ValueType.NOTHING;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFAddExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression leftExpr = expr.getLeft();
@@ -158,7 +159,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return ValueType.NUMBER;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFSubExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression leftExpr = expr.getLeft();
@@ -206,13 +207,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return left;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFMultExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		return binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFDivExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression leftExpr = expr.getLeft();
@@ -257,13 +258,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFModExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		return binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFBoolAndExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression leftExpr = expr.getLeft();
@@ -282,15 +283,20 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		assertIsType(left, ValueType.BOOLEAN, leftExpr);
-		assertIsType(right, new ValueType[]{
-						ValueType.BOOLEAN, ValueType.CODE
-				}, rightExpr
-		);
+
+		if (right == ValueType.CODE) {
+			SQFCodeBlockExpression blockExp = (SQFCodeBlockExpression) rightExpr;
+			right = fullyVisitCodeBlockScope(blockExp.getBlock(), cluster);
+			assertIsType(right, ValueType.BOOLEAN, blockExp);
+			return ValueType.BOOLEAN;
+		}
+
+		assertIsType(right, new ValueType[]{ValueType.BOOLEAN, ValueType.CODE}, rightExpr);
 
 		return ValueType.BOOLEAN;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFBoolOrExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression leftExpr = expr.getLeft();
@@ -309,28 +315,31 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		assertIsType(left, ValueType.BOOLEAN, leftExpr);
-		assertIsType(right, new ValueType[]{
-						ValueType.BOOLEAN, ValueType.CODE
-				}, rightExpr
-		);
+
+		if (right == ValueType.CODE) {
+			SQFCodeBlockExpression blockExp = (SQFCodeBlockExpression) rightExpr;
+			right = fullyVisitCodeBlockScope(blockExp.getBlock(), cluster);
+			assertIsType(right, ValueType.BOOLEAN, blockExp);
+			return ValueType.BOOLEAN;
+		}
+
+		assertIsType(right, new ValueType[]{ValueType.BOOLEAN, ValueType.CODE}, rightExpr);
 
 		return ValueType.BOOLEAN;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFBoolNotExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression expr1 = expr.getExpr();
 		if (expr1 != null) {
 			ValueType type = (ValueType) expr1.accept(this, cluster);
-			if (type != null) {
-				assertIsType(type, ValueType.BOOLEAN, expr1);
-			}
+			assertIsType(type, ValueType.BOOLEAN, expr1);
 		}
 		return ValueType.BOOLEAN;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFCompExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		if (expr.getComparisonType() != SQFCompExpression.ComparisonType.Equals
@@ -383,19 +392,37 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return ValueType.BOOLEAN;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFConfigFetchExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		SQFExpression leftExpr = expr.getLeft();
+		ValueType left = null, right = null;
+		if (leftExpr != null) {
+			left = (ValueType) leftExpr.accept(this, cluster);
+		}
+
+		SQFExpression rightExpr = expr.getRight();
+		if (rightExpr != null) {
+			right = (ValueType) rightExpr.accept(this, cluster);
+		}
+
+		if (left == null || right == null) {
+			return ValueType.CONFIG;
+		}
+
+		assertIsType(left, ValueType.CONFIG, leftExpr);
+		assertIsType(right, ValueType.STRING, rightExpr);
+
+		return ValueType.CONFIG;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFExponentExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		return binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFLiteralExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		if (expr.getVar() != null) {
@@ -413,19 +440,159 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		throw new IllegalStateException("literal expression '" + expr.getText() + "' couldn't determine type");
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFParenExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		return (ValueType) expr.getExpr().accept(this, cluster);
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFCommandExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		LinkedList<CommandExpressionPart> parts = new LinkedList<>();
+		SQFCommandExpression cursor = expr;
+		while (true) {
+			SQFCommand command = cursor.getSQFCommand();
+			SQFCommandArgument pre = cursor.getPrefixArgument();
+			SQFCommandArgument post = cursor.getPostfixArgument();
+			if (pre != null) {
+				parts.add(new CommandExpressionPart(pre));
+			}
+			parts.add(new CommandExpressionPart(command));
+			if (post != null) {
+				parts.add(new CommandExpressionPart(post));
+				SQFExpression postExpr = post.getExpr();
+				if (postExpr instanceof SQFCommandExpression) {
+					cursor = (SQFCommandExpression) postExpr;
+				} else {
+					break;
+				}
+			} else {
+				break;
+			}
+		}
+
+		return getReturnTypeForCommand(parts, null, problems);
 	}
 
-	@Nullable
+	private ValueType getReturnTypeForCommand(@NotNull LinkedList<CommandExpressionPart> parts,
+											  @Nullable ValueType previousCommandReturnType,
+											  @NotNull ProblemsHolder problems) {
+
+		ValueType prefixType = null, postfixType = null;
+
+		CommandExpressionPart prefixPart = parts.removeFirst();
+		CommandExpressionPart commandPart = null;
+		CommandExpressionPart postfixPart = null;
+		if (!prefixPart.isCommandPart()) {
+			commandPart = parts.removeFirst();
+			if (!commandPart.isCommandPart()) {
+				throw new IllegalStateException("expected command part");
+			}
+		} else {
+			commandPart = prefixPart;
+			prefixPart = null;
+		}
+		CommandExpressionPart peek = parts.peekFirst();
+		if (peek != null) {
+			if (peek.isCommandPart()) {
+				postfixType = getReturnTypeForCommand(parts, null, problems);
+			} else {
+				postfixPart = parts.removeFirst();
+			}
+		}
+
+		SQFCommand command = commandPart.getCommand();
+		String commandName = command.getCommandName();
+		CommandDescriptor descriptor;
+		{ //get the descriptor
+			descriptor = cluster.get(commandName);
+			if (descriptor == null) {
+				throw new IllegalStateException("descriptor doesn't exist for command " + commandName);
+			}
+			if (descriptor.getSyntaxList().size() == 0) {
+				throw new IllegalStateException("command '" + commandName + "' has no syntaxes");
+			}
+		}
+
+		Function<CommandExpressionPart, ValueType> getTypeForPart = commandExpressionPart -> {
+			SQFCommandArgument arg = commandExpressionPart.getArgument();
+			SQFExpression expr = arg.getExpr();
+			SQFCodeBlock block = arg.getBlock();
+			if (block == null) {
+				if (expr == null) {
+					throw new IllegalStateException("didn't have a block or expression:" + arg.getText());
+				}
+				return (ValueType) expr.accept(this, cluster);
+			}
+			return ValueType.CODE;
+		};
+
+		if (prefixPart != null) {
+			prefixType = getTypeForPart.apply(prefixPart);
+		} else {
+			prefixType = previousCommandReturnType;
+		}
+		if (postfixPart != null) {
+			postfixType = getTypeForPart.apply(postfixPart);
+		}
+
+		//syntaxes that currently work given the expression
+		LinkedList<CommandSyntax> fittingSyntaxes = new LinkedList<>();
+
+		//find syntaxes with matching prefix and postfix value types
+		for (CommandSyntax syntax : descriptor.getSyntaxList()) {
+			Param prefixParam = syntax.getPrefixParam();
+			Param postfixParam = syntax.getPostfixParam();
+			if (prefixParam == null) {
+				if (prefixType != null) {
+					continue;
+				}
+			} else {
+				if (prefixType == null) {
+					continue;
+				}
+				if (prefixType != ValueType._VARIABLE && !prefixParam.allowedTypesContains(prefixType)) {
+					continue;
+				}
+			}
+			if (postfixParam == null) {
+				if (postfixType != null) {
+					continue;
+				}
+			} else {
+				if (postfixType == null) {
+					continue;
+				}
+				if (postfixType != ValueType._VARIABLE && !postfixParam.allowedTypesContains(postfixType)) {
+					continue;
+				}
+			}
+			fittingSyntaxes.add(syntax);
+		}
+
+		if (fittingSyntaxes.isEmpty()) {
+			problems.registerProblem(
+					command,
+					"No syntax for " +
+							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
+							+ commandName +
+							(postfixType == null ? "" : "" + postfixType.getDisplayName())
+			);
+			return ValueType._ERROR;
+		}
+
+		ValueType retType = ValueType.NOTHING;
+		if (prefixType == null && postfixType == null) {
+			return fittingSyntaxes.getFirst().getReturnValue().getType();
+		}
+
+		//todo check remaining syntaxes and check argument by argument
+
+		return retType;
+	}
+
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFCodeBlockExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		SQFLocalScope scope = expr.getBlock().getScope();
@@ -437,10 +604,27 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return ValueType.CODE;
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFSignedExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		return null;
+	}
+
+	/**
+	 * Fully visit the block and return the last {@link SQFStatement} type
+	 *
+	 * @param block   block to fully visit
+	 * @param cluster cluster
+	 * @return the type returned from the last {@link SQFStatement},
+	 * or {@link ValueType#NOTHING} if there was no statements
+	 */
+	@NotNull
+	private ValueType fullyVisitCodeBlockScope(@NotNull SQFCodeBlock block, @NotNull CommandDescriptorCluster cluster) {
+		SQFLocalScope scope = block.getScope();
+		if (scope != null) {
+			return (ValueType) scope.accept(this, cluster);
+		}
+		return ValueType.NOTHING;
 	}
 
 	@NotNull
@@ -522,4 +706,46 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 		return true;
 	}
+
+	private static class CommandExpressionPart {
+		@Nullable
+		private final SQFCommandArgument argument;
+		@Nullable
+		private final SQFCommand command;
+
+		public CommandExpressionPart(@NotNull SQFCommand command) {
+			this.command = command;
+			this.argument = null;
+		}
+
+		public CommandExpressionPart(@NotNull SQFCommandArgument argument) {
+			this.command = null;
+			this.argument = argument;
+		}
+
+		public boolean isCommandPart() {
+			return command != null;
+		}
+
+		public boolean isArgumentPart() {
+			return argument != null;
+		}
+
+		@NotNull
+		public SQFCommand getCommand() {
+			if (!isCommandPart()) {
+				throw new IllegalStateException("can't get command on a non-command part");
+			}
+			return command;
+		}
+
+		@NotNull
+		public SQFCommandArgument getArgument() {
+			if (!isArgumentPart()) {
+				throw new IllegalStateException("can't get command on a non-argument part");
+			}
+			return argument;
+		}
+	}
+
 }

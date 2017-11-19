@@ -45,6 +45,12 @@ public class CommandSyntax {
 		return postfixParam;
 	}
 
+	/**
+	 * Will traverse all parameters (both prefix and postfix). Note that this will also fully traverse the elements in
+	 * arrays that are parameters.
+	 *
+	 * @return an iterable that will iterate the parameters in order.
+	 */
 	@NotNull
 	public Iterable<Param> getAllParams() {
 		List<Param> list = new LinkedList<>();

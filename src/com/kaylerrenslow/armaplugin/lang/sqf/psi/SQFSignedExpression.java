@@ -4,7 +4,6 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kayler
@@ -34,7 +33,7 @@ public class SQFSignedExpression extends ASTWrapperPsiElement implements SQFUnar
 		throw new IllegalStateException("couldn't determine sign");
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);

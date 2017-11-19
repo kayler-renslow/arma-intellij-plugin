@@ -41,7 +41,7 @@ public class SQFAssignmentStatement extends ASTWrapperPsiElement implements SQFS
 		return command != null && command.commandNameEquals("private");
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);

@@ -36,7 +36,7 @@ public class SQFLiteralExpression extends ASTWrapperPsiElement implements SQFExp
 		return PsiTreeUtil.getChildOfType(this, SQFNumber.class);
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);

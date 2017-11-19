@@ -42,7 +42,7 @@ public class SQFQuestStatement extends ASTWrapperPsiElement implements SQFStatem
 		return children[1];
 	}
 
-	@Nullable
+	@NotNull
 	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);
