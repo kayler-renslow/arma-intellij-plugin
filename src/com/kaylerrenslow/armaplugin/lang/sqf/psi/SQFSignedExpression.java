@@ -28,7 +28,7 @@ public class SQFSignedExpression extends ASTWrapperPsiElement implements SQFUnar
 			return Sign.Plus;
 		}
 		if (t.charAt(0) == '-') {
-			return Sign.Plus;
+			return Sign.Minus;
 		}
 		throw new IllegalStateException("couldn't determine sign");
 	}

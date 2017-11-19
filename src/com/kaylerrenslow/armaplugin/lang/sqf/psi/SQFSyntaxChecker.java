@@ -100,7 +100,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	public ValueType visit(@NotNull SQFQuestStatement statement, @NotNull CommandDescriptorCluster cluster) {
 		SQFExpression cond = statement.getCondition();
 		if (cond != null) {
-			cond.accept(this, cluster);
+			ValueType condType = (ValueType) cond.accept(this, cluster);
+			assertIsType(condType, ValueType.BOOLEAN, cond);
 		}
 		SQFExpression ifTrue = statement.getIfTrueExpr();
 		if (ifTrue != null) {
@@ -588,7 +589,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		//todo check remaining syntaxes and check argument by argument
-		
+
 
 		return retType;
 	}
