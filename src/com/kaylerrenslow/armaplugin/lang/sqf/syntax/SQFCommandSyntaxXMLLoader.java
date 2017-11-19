@@ -109,7 +109,7 @@ class SQFCommandSyntaxXMLLoader {
 		String desc;
 
 		String type = returnValueElement.getAttribute("type");
-		dataType = ValueType.valueOf(type);
+		dataType = ValueType.Lookup.valueOf(type);
 		desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(returnValueElement) : "";
 
 		ReturnValueHolder returnValue = new ReturnValueHolder(dataType, desc);
@@ -162,7 +162,7 @@ class SQFCommandSyntaxXMLLoader {
 		boolean optional;
 
 		String type = paramElement.getAttribute("type");
-		dataType = ValueType.valueOf(type);
+		dataType = ValueType.Lookup.valueOf(type);
 		paramName = paramElement.getAttribute("name");
 		optional = valueOfTF(paramElement.getAttribute("optional"));
 		desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(paramElement) : "";
@@ -185,7 +185,7 @@ class SQFCommandSyntaxXMLLoader {
 			List<Element> tElements = XmlUtil.getChildElementsWithTagName(altTypeElement, "t");
 			for (Element tElement : tElements) {
 				String altType = tElement.getAttribute("type");
-				alternateDataTypes.add(ValueType.valueOf(altType));
+				alternateDataTypes.add(ValueType.Lookup.valueOf(altType));
 			}
 		}
 	}
@@ -226,6 +226,6 @@ class SQFCommandSyntaxXMLLoader {
 	}
 
 
-	private static final ReturnValueHolder PLACEHOLDER_RETURN_VALUE = new ReturnValueHolder(ValueType.ANYTHING, "PLACEHOLDER");
-	private static final Param PLACEHOLDER_PARAM = new Param("PLACEHOLDER", ValueType.ANYTHING, "", true);
+	private static final ReturnValueHolder PLACEHOLDER_RETURN_VALUE = new ReturnValueHolder(ValueType.Lookup.ANYTHING, "PLACEHOLDER");
+	private static final Param PLACEHOLDER_PARAM = new Param("PLACEHOLDER", ValueType.Lookup.ANYTHING, "", true);
 }

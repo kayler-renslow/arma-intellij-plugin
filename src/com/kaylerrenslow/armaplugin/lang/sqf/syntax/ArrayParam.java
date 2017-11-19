@@ -22,7 +22,7 @@ public class ArrayParam extends Param implements ArrayValueHolder {
 	}
 
 	public ArrayParam(boolean unboundedParams, @NotNull List<Param> params, boolean optional, @NotNull String description) {
-		super("ARRAY", ValueType.ARRAY, description, optional);
+		super("ARRAY", ValueType.Lookup.ARRAY, description, optional);
 		this.unboundedParams = unboundedParams;
 		this.params = params;
 	}

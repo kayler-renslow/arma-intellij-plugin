@@ -48,6 +48,7 @@ public abstract class SQFSyntaxCheckerTestHelper extends LightCodeInsightFixture
 		ProblemsHolder problems = getProblemsHolder(file);
 		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
 
+		System.out.println(problems.getResults());
 		assertEquals(0, problems.getResultCount());
 	}
 

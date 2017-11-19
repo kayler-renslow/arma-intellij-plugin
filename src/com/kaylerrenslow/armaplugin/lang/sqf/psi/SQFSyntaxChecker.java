@@ -12,6 +12,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
 
+import static com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.Lookup.*;
+
 /**
  * Checks syntax and type for validity. This will not report problems related to grammar errors.
  * This will handle syntax errors where commands take too few or too many arguments.
@@ -36,11 +38,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 	/**
 	 * @return the last statement's resulted {@link ValueType}.
-	 * If there was no statements to check, will return {@link ValueType#NOTHING}
+	 * If there was no statements to check, will return {@link ValueType.Lookup#NOTHING}
 	 */
 	@Nullable
 	public ValueType begin() {
-		ValueType ret = ValueType.NOTHING;
+		ValueType ret = ValueType.Lookup.NOTHING;
 		for (SQFStatement statement : statements) {
 			ret = (ValueType) statement.accept(this, cluster);
 		}
@@ -52,7 +54,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@Override
 	public ValueType visit(@NotNull SQFScope scope, @NotNull CommandDescriptorCluster cluster) {
 		List<SQFStatement> statements = scope.getChildStatements();
-		ValueType ret = ValueType.NOTHING;
+		ValueType ret = ValueType.Lookup.NOTHING;
 		for (SQFStatement statement : statements) {
 			ret = (ValueType) statement.accept(this, cluster);
 		}
@@ -68,7 +70,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			expr.accept(this, cluster);
 		}
 
-		return ValueType.NOTHING;
+		return ValueType.Lookup.NOTHING;
 	}
 
 	@NotNull
@@ -86,7 +88,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 		}
 
-		return ValueType.NOTHING;
+		return ValueType.Lookup.NOTHING;
 	}
 
 	@NotNull
@@ -101,14 +103,14 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		SQFExpression cond = statement.getCondition();
 		if (cond != null) {
 			ValueType condType = (ValueType) cond.accept(this, cluster);
-			assertIsType(condType, ValueType.BOOLEAN, cond);
+			assertIsType(condType, ValueType.Lookup.BOOLEAN, cond);
 		}
 		SQFExpression ifTrue = statement.getIfTrueExpr();
 		if (ifTrue != null) {
 			ifTrue.accept(this, cluster);
 		}
 
-		return ValueType.NOTHING;
+		return ValueType.Lookup.NOTHING;
 	}
 
 	@NotNull
@@ -127,38 +129,31 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType._ERROR;
+			return ValueType.Lookup._ERROR;
 		}
 
 		ValueType[] allowedTypes = {
-				ValueType.NUMBER,
-				ValueType.STRING,
-				ValueType.ARRAY
+				ValueType.Lookup.NUMBER,
+				ValueType.Lookup.STRING,
+				ValueType.Lookup.ARRAY
 		};
 
-		switch (left) {
-			case NUMBER: //fall
-			case STRING: {
-				assertIsType(right, left, rightExpr);
-				break;
-			}
-			case _VARIABLE: {
-				assertIsType(right, allowedTypes, rightExpr);
-				return ValueType._VARIABLE;
-			}
-			default: {
-				if (left.isArray() && right == ValueType._VARIABLE) {
-					return ValueType.ARRAY;
-				}
-				if (left.isArray() && right.isArray()) {
-					return ValueType.ARRAY;
-				}
-				notOfType(allowedTypes, right, rightExpr);
-				return ValueType.ANYTHING;
-			}
+		if (left == NUMBER || left == STRING) {
+			assertIsType(right, left, rightExpr);
+			return NUMBER;
+		} else if (left == _VARIABLE) {
+			assertIsType(right, allowedTypes, rightExpr);
+			return _VARIABLE;
 		}
 
-		return ValueType.NUMBER;
+		if (left.isArray() && right == _VARIABLE) {
+			return ValueType.Lookup.ARRAY;
+		}
+		if (left.isArray() && right.isArray()) {
+			return ValueType.Lookup.ARRAY;
+		}
+		notOfType(allowedTypes, right, rightExpr);
+		return ValueType.Lookup.ANYTHING;
 	}
 
 	@NotNull
@@ -177,42 +172,36 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType._ERROR;
+			return ValueType.Lookup._ERROR;
 		}
 
 		ValueType[] allowedTypes = {
-				ValueType.NUMBER,
-				ValueType.ARRAY
+				ValueType.Lookup.NUMBER,
+				ValueType.Lookup.ARRAY
 		};
-
-		switch (left) {
-			case NUMBER: {
-				assertIsType(right, ValueType.NUMBER, rightExpr);
-				break;
-			}
-			case _VARIABLE: {
-				assertIsType(right, allowedTypes, rightExpr);
-				return ValueType._VARIABLE;
-			}
-			default: {
-				if (left.isArray() && right == ValueType._VARIABLE) {
-					return ValueType.ARRAY;
-				}
-				if (left.isArray() && right.isArray()) {
-					return ValueType.ARRAY;
-				}
-				notOfType(allowedTypes, right, rightExpr);
-				return ValueType.ANYTHING;
-			}
+		if (left == NUMBER) {
+			assertIsType(right, ValueType.Lookup.NUMBER, rightExpr);
+			return NUMBER;
+		}
+		if (left == _VARIABLE) {
+			assertIsType(right, allowedTypes, rightExpr);
+			return _VARIABLE;
 		}
 
-		return left;
+		if (left.isArray() && right == _VARIABLE) {
+			return ValueType.Lookup.ARRAY;
+		}
+		if (left.isArray() && right.isArray()) {
+			return ValueType.Lookup.ARRAY;
+		}
+		notOfType(allowedTypes, right, rightExpr);
+		return ValueType.Lookup.ANYTHING;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFMultExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
+		return binaryExprSameTypeHelper(expr, ValueType.Lookup.NUMBER, cluster);
 	}
 
 	@NotNull
@@ -231,39 +220,35 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType._ERROR;
+			return ValueType.Lookup._ERROR;
 		}
 
 		ValueType[] allowedTypes = {
-				ValueType.NUMBER,
-				ValueType.STRING
+				ValueType.Lookup.NUMBER,
+				ValueType.Lookup.STRING
 		};
 
-		switch (left) {
-			case NUMBER: {
-				assertIsType(right, ValueType.NUMBER, rightExpr);
-				return ValueType.NUMBER;
-			}
-			case CONFIG: {
-				assertIsType(right, ValueType.STRING, rightExpr);
-				return ValueType.CONFIG;
-			}
-			case _VARIABLE: {
-				assertIsType(right, allowedTypes, rightExpr);
-				return ValueType._VARIABLE;
-			}
-			default: {
-				notOfType(allowedTypes, right, rightExpr
-				);
-				return ValueType.ANYTHING;
-			}
+		if (left == NUMBER) {
+			assertIsType(right, ValueType.Lookup.NUMBER, rightExpr);
+			return ValueType.Lookup.NUMBER;
 		}
+		if (left == CONFIG) {
+			assertIsType(right, ValueType.Lookup.STRING, rightExpr);
+			return CONFIG;
+		}
+		if (left == _VARIABLE) {
+			assertIsType(right, allowedTypes, rightExpr);
+			return _VARIABLE;
+		}
+
+		notOfType(allowedTypes, right, rightExpr);
+		return ValueType.Lookup.ANYTHING;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFModExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
+		return binaryExprSameTypeHelper(expr, ValueType.Lookup.NUMBER, cluster);
 	}
 
 	@NotNull
@@ -281,21 +266,21 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		if (left == null || right == null) {
-			return ValueType.BOOLEAN;
+			return ValueType.Lookup.BOOLEAN;
 		}
 
-		assertIsType(left, ValueType.BOOLEAN, leftExpr);
+		assertIsType(left, ValueType.Lookup.BOOLEAN, leftExpr);
 
-		if (right == ValueType.CODE) {
+		if (right == ValueType.Lookup.CODE) {
 			SQFCodeBlockExpression blockExp = (SQFCodeBlockExpression) rightExpr;
 			right = fullyVisitCodeBlockScope(blockExp.getBlock(), cluster);
-			assertIsType(right, ValueType.BOOLEAN, blockExp);
-			return ValueType.BOOLEAN;
+			assertIsType(right, ValueType.Lookup.BOOLEAN, blockExp);
+			return ValueType.Lookup.BOOLEAN;
 		}
 
-		assertIsType(right, new ValueType[]{ValueType.BOOLEAN, ValueType.CODE}, rightExpr);
+		assertIsType(right, new ValueType[]{ValueType.Lookup.BOOLEAN, ValueType.Lookup.CODE}, rightExpr);
 
-		return ValueType.BOOLEAN;
+		return ValueType.Lookup.BOOLEAN;
 	}
 
 	@NotNull
@@ -313,21 +298,21 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		if (left == null || right == null) {
-			return ValueType.BOOLEAN;
+			return ValueType.Lookup.BOOLEAN;
 		}
 
-		assertIsType(left, ValueType.BOOLEAN, leftExpr);
+		assertIsType(left, ValueType.Lookup.BOOLEAN, leftExpr);
 
-		if (right == ValueType.CODE) {
+		if (right == ValueType.Lookup.CODE) {
 			SQFCodeBlockExpression blockExp = (SQFCodeBlockExpression) rightExpr;
 			right = fullyVisitCodeBlockScope(blockExp.getBlock(), cluster);
-			assertIsType(right, ValueType.BOOLEAN, blockExp);
-			return ValueType.BOOLEAN;
+			assertIsType(right, ValueType.Lookup.BOOLEAN, blockExp);
+			return ValueType.Lookup.BOOLEAN;
 		}
 
-		assertIsType(right, new ValueType[]{ValueType.BOOLEAN, ValueType.CODE}, rightExpr);
+		assertIsType(right, new ValueType[]{ValueType.Lookup.BOOLEAN, ValueType.Lookup.CODE}, rightExpr);
 
-		return ValueType.BOOLEAN;
+		return ValueType.Lookup.BOOLEAN;
 	}
 
 	@NotNull
@@ -336,9 +321,9 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		SQFExpression expr1 = expr.getExpr();
 		if (expr1 != null) {
 			ValueType type = (ValueType) expr1.accept(this, cluster);
-			assertIsType(type, ValueType.BOOLEAN, expr1);
+			assertIsType(type, ValueType.Lookup.BOOLEAN, expr1);
 		}
-		return ValueType.BOOLEAN;
+		return ValueType.Lookup.BOOLEAN;
 	}
 
 	@NotNull
@@ -346,8 +331,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	public ValueType visit(@NotNull SQFCompExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		if (expr.getComparisonType() != SQFCompExpression.ComparisonType.Equals
 				&& expr.getComparisonType() != SQFCompExpression.ComparisonType.NotEquals) {
-			binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
-			return ValueType.BOOLEAN;
+			binaryExprSameTypeHelper(expr, ValueType.Lookup.NUMBER, cluster);
+			return ValueType.Lookup.BOOLEAN;
 		}
 
 		SQFExpression leftExpr = expr.getLeft();
@@ -363,35 +348,35 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType._ERROR;
+			return ValueType.Lookup._ERROR;
 		}
 		ValueType[] allowedTypes = {
-				ValueType.NUMBER,
-				ValueType.GROUP,
-				ValueType.SIDE,
-				ValueType.STRING,
-				ValueType.OBJECT,
-				ValueType.STRUCTURED_TEXT,
-				ValueType.CONFIG,
-				ValueType.DISPLAY,
-				ValueType.CONTROL,
-				ValueType.LOCATION
+				ValueType.Lookup.NUMBER,
+				ValueType.Lookup.GROUP,
+				ValueType.Lookup.SIDE,
+				ValueType.Lookup.STRING,
+				ValueType.Lookup.OBJECT,
+				ValueType.Lookup.STRUCTURED_TEXT,
+				CONFIG,
+				ValueType.Lookup.DISPLAY,
+				ValueType.Lookup.CONTROL,
+				ValueType.Lookup.LOCATION
 		};
-		if (left == ValueType._VARIABLE) {
+		if (left == _VARIABLE) {
 			assertIsType(right, allowedTypes, rightExpr);
-			return ValueType.BOOLEAN;
+			return ValueType.Lookup.BOOLEAN;
 		}
 
 		for (ValueType type : allowedTypes) {
 			if (left == type) {
 				assertIsType(right, left, rightExpr);
-				return ValueType.BOOLEAN;
+				return ValueType.Lookup.BOOLEAN;
 			}
 		}
 		notOfType(allowedTypes, left, leftExpr);
 		assertIsType(right, allowedTypes, rightExpr);
 
-		return ValueType.BOOLEAN;
+		return ValueType.Lookup.BOOLEAN;
 	}
 
 	@NotNull
@@ -409,35 +394,43 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		if (left == null || right == null) {
-			return ValueType.CONFIG;
+			return CONFIG;
 		}
 
-		assertIsType(left, ValueType.CONFIG, leftExpr);
-		assertIsType(right, ValueType.STRING, rightExpr);
+		assertIsType(left, CONFIG, leftExpr);
+		assertIsType(right, ValueType.Lookup.STRING, rightExpr);
 
-		return ValueType.CONFIG;
+		return CONFIG;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFExponentExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return binaryExprSameTypeHelper(expr, ValueType.NUMBER, cluster);
+		return binaryExprSameTypeHelper(expr, ValueType.Lookup.NUMBER, cluster);
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFLiteralExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		if (expr.getVar() != null) {
-			return ValueType._VARIABLE;
+			return _VARIABLE;
 		}
-		if (expr.getArr() != null) {
-			return ValueType.ARRAY;
+		SQFArray arr = expr.getArr();
+		if (arr != null) {
+			if (arr.getExpressions().isEmpty()) {
+				return Lookup.ARRAY;
+			}
+			ExpandedValueType expandedValueType = new ExpandedValueType();
+			for (SQFExpression arrItemExpr : arr.getExpressions()) {
+				expandedValueType.addValueType((ValueType) arrItemExpr.accept(this, cluster), true);
+			}
+			return expandedValueType;
 		}
 		if (expr.getStr() != null) {
-			return ValueType.STRING;
+			return ValueType.Lookup.STRING;
 		}
 		if (expr.getNum() != null) {
-			return ValueType.NUMBER;
+			return ValueType.Lookup.NUMBER;
 		}
 		throw new IllegalStateException("literal expression '" + expr.getText() + "' couldn't determine type");
 	}
@@ -522,7 +515,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			if (block == null) {
 				return (ValueType) expr.accept(this, cluster);
 			}
-			return ValueType.CODE;
+			return ValueType.Lookup.CODE;
 		};
 
 		if (prefixPart != null) {
@@ -549,7 +542,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				if (prefixType == null) {
 					continue;
 				}
-				if (prefixType != ValueType._VARIABLE && !prefixParam.allowedTypesContains(prefixType)) {
+				if (prefixType != _VARIABLE && !prefixParam.allowedTypesContains(prefixType)) {
 					continue;
 				}
 			}
@@ -561,7 +554,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				if (postfixType == null) {
 					continue;
 				}
-				if (postfixType != ValueType._VARIABLE && !postfixParam.allowedTypesContains(postfixType)) {
+				if (postfixType != _VARIABLE && !postfixParam.allowedTypesContains(postfixType)) {
 					continue;
 				}
 			}
@@ -576,10 +569,10 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 							+ commandName +
 							(postfixType == null ? "" : "" + postfixType.getDisplayName())
 			);
-			return ValueType._ERROR;
+			return ValueType.Lookup.Lookup._ERROR;
 		}
 
-		ValueType retType = ValueType._ERROR;
+		ValueType retType = ValueType.Lookup._ERROR;
 		if (fittingSyntaxes.size() == 1) {
 			retType = fittingSyntaxes.getFirst().getReturnValue().getType();
 			if (!parts.isEmpty()) {
@@ -603,7 +596,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 		//we return Code because it is a literal, like 1 or 10. When commands take them as arguments,
 		// they are responsible for executing the code and getting the returned value.
-		return ValueType.CODE;
+		return ValueType.Lookup.CODE;
 	}
 
 	@NotNull
@@ -614,17 +607,17 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		switch (expr.getSign()) {
 			case Plus: {
 				if (type.isArray()) {
-					return ValueType.ARRAY;
+					return ValueType.Lookup.ARRAY;
 				}
-				if (type == ValueType.NUMBER) {
-					return ValueType.NUMBER;
+				if (type == ValueType.Lookup.NUMBER) {
+					return ValueType.Lookup.NUMBER;
 				}
-				assertIsType(type, new ValueType[]{ValueType.NUMBER, ValueType.ARRAY}, expr1);
-				return ValueType._ERROR;
+				assertIsType(type, new ValueType[]{ValueType.Lookup.NUMBER, ValueType.Lookup.ARRAY}, expr1);
+				return ValueType.Lookup._ERROR;
 			}
 			case Minus: {
-				assertIsType(type, ValueType.NUMBER, expr1);
-				return ValueType.NUMBER;
+				assertIsType(type, ValueType.Lookup.NUMBER, expr1);
+				return ValueType.Lookup.NUMBER;
 			}
 			default: {
 				throw new IllegalStateException("unhandled sign:" + expr.getSign());
@@ -638,7 +631,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * @param block   block to fully visit
 	 * @param cluster cluster
 	 * @return the type returned from the last {@link SQFStatement},
-	 * or {@link ValueType#NOTHING} if there was no statements
+	 * or {@link ValueType.Lookup#NOTHING} if there was no statements
 	 */
 	@NotNull
 	private ValueType fullyVisitCodeBlockScope(@NotNull SQFCodeBlock block, @NotNull CommandDescriptorCluster cluster) {
@@ -646,7 +639,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		if (scope != null) {
 			return (ValueType) scope.accept(this, cluster);
 		}
-		return ValueType.NOTHING;
+		return ValueType.Lookup.NOTHING;
 	}
 
 	@NotNull
@@ -665,7 +658,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType._ERROR;
+			return ValueType.Lookup._ERROR;
 		}
 
 		assertIsType(left, expected, leftExpr);
@@ -677,7 +670,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	/**
 	 * Reports a type error.
 	 *
-	 * @param expected    an array of expected {@link ValueType}. Be sure to exclude {@link ValueType#_VARIABLE}
+	 * @param expected    an array of expected {@link ValueType}. Be sure to exclude {@link ValueType.Lookup#_VARIABLE}
 	 * @param got         the unexpected {@link ValueType}.
 	 * @param gotPsiOwner the PsiElement to which the <code>got</code> type is owner of
 	 */
@@ -689,44 +682,56 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * Checks if the given type matches one of the {@link ValueType} in expected. If they aren't equal, this method
 	 * will register a problem and return false. If they are equal, this method will return true.
 	 * <p>
-	 * This method will automatically return true and not report an error if <code>check</code> is {@link ValueType#_VARIABLE}
+	 * This method will automatically return true and not report an error if <code>check</code> is {@link ValueType.Lookup#_VARIABLE}
+	 * <p>
+	 * If expected contains an array type ({@link ValueType#isArray()}), this method will return true if check is an array as well.
+	 * <p>
+	 * This method simply checks by {@link ValueType.Lookup} instances and not {@link ExpandedValueType}.
 	 *
 	 * @param check         the {@link ValueType} to look for in <code>expected</code>
-	 * @param expected      an array of expected {@link ValueType}. Be sure to exclude {@link ValueType#_VARIABLE}
+	 * @param expected      an array of expected {@link ValueType}. Be sure to exclude {@link ValueType.Lookup#_VARIABLE}
 	 * @param checkPsiOwner the PsiElement to which the <code>check</code> type is owner of
 	 */
-	private boolean assertIsType(@NotNull ValueType check, @NotNull ValueType[] expected, @NotNull PsiElement checkPsiOwner) {
-		if (check == ValueType._VARIABLE) {
-			return true;
+	private void assertIsType(@NotNull ValueType check, @NotNull ValueType[] expected, @NotNull PsiElement checkPsiOwner) {
+		if (check == _VARIABLE) {
+			return;
 		}
 		for (ValueType expect : expected) {
+			if (check.isArray() && expect.isArray()) {
+				return;
+			}
 			if (check == expect) {
-				return true;
+				return;
 			}
 		}
 		problems.registerProblem(checkPsiOwner, "Type(s) " + Arrays.toString(expected) + " expected. Got " + check + ".", ProblemHighlightType.ERROR);
-		return false;
 	}
 
 	/**
 	 * Checks if the given type matches the expected {@link ValueType}. If they aren't equal, this method
 	 * will register a problem and return false. If they are equal, this method will return true.
 	 * <p>
-	 * This method will automatically return true and not report an error if <code>check</code> is {@link ValueType#_VARIABLE}
+	 * This method will automatically return true and not report an error if <code>check</code> is {@link ValueType.Lookup#_VARIABLE}.
+	 * <p>
+	 * If expected is an array, this method will return true if check is an array as well. This will not compare elements in the array!
+	 * To check if a type is an array, {@link ValueType#isArray()} is used.
+	 * <p>
+	 * This method simply checks by {@link ValueType.Lookup} instances and not {@link ExpandedValueType}.
 	 *
 	 * @param check         the {@link ValueType} to look for in <code>expected</code>
-	 * @param expected      the expected {@link ValueType}. Be sure to not use {@link ValueType#_VARIABLE}
+	 * @param expected      the expected {@link ValueType}. Be sure to not use {@link ValueType.Lookup#_VARIABLE}
 	 * @param checkPsiOwner the PsiElement to which the <code>check</code> type is owner of
 	 */
-	private boolean assertIsType(@NotNull ValueType check, @NotNull ValueType expected, @NotNull PsiElement checkPsiOwner) {
-		if (check == ValueType._VARIABLE) {
-			return true;
+	private void assertIsType(@NotNull ValueType check, @NotNull ValueType expected, @NotNull PsiElement checkPsiOwner) {
+		if (check == _VARIABLE) {
+			return;
+		}
+		if (check.isArray() && expected.isArray()) {
+			return;
 		}
 		if (check != expected) {
 			problems.registerProblem(checkPsiOwner, "Type " + expected + " expected. Got " + check + ".", ProblemHighlightType.ERROR);
-			return false;
 		}
-		return true;
 	}
 
 	private static class CommandExpressionPart {
