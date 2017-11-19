@@ -129,7 +129,7 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider {
 				//check arguments
 				{
 					SQFCommandArgument prefixArg = cmdExpr.getValue().getPrefixArgument();
-					if (prefixArg != null && prefixArg.getExpr() != null) {
+					if (prefixArg != null) {
 						SQFExpression prefixExp = prefixArg.getExpr().withoutParenthesis();
 						if (prefixExp instanceof SQFLiteralExpression) {
 							SQFLiteralExpression prefixLiteral = (SQFLiteralExpression) prefixExp;
@@ -148,7 +148,7 @@ public class ArmaUsageTypeProvider implements UsageTypeProvider {
 				//check function being executed
 				{
 					SQFCommandArgument postfixArg = cmdExpr.getValue().getPostfixArgument();
-					if (postfixArg != null && postfixArg.getExpr() != null) {
+					if (postfixArg != null) {
 						SQFExpression postfixExp = postfixArg.getExpr().withoutParenthesis();
 						if (postfixExp instanceof SQFLiteralExpression) {
 							SQFLiteralExpression postfixLiteral = (SQFLiteralExpression) postfixExp;

@@ -26,8 +26,12 @@ public class SQFCommandArgument extends ASTWrapperPsiElement implements SQFBlock
 	}
 
 	@Override
-	@Nullable
+	@NotNull
 	public SQFExpression getExpr() {
-		return PsiTreeUtil.getChildOfType(this, SQFExpression.class);
+		SQFExpression expr = PsiTreeUtil.getChildOfType(this, SQFExpression.class);
+		if (expr == null) {
+			throw new IllegalStateException("expression was null for " + getText());
+		}
+		return expr;
 	}
 }

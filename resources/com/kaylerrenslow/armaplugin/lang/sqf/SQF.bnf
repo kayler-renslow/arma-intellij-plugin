@@ -115,8 +115,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
         //postfix argument, or is an argument of the child/parent command. (I know. It's weird.)
         command_before ::= code_block_expression | signed_expression | paren_expression | literal_expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
 
-        //"code_block expression?" is for cases like if () then {} else{};
-        command_after ::= expression /*| (code_block expression?)*/ {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
+        command_after ::= expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
     //end command expression
 //end expression
 

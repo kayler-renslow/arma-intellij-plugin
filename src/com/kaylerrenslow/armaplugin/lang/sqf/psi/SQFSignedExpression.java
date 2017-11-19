@@ -35,6 +35,16 @@ public class SQFSignedExpression extends ASTWrapperPsiElement implements SQFUnar
 
 	@NotNull
 	@Override
+	public SQFExpression getExpr() {
+		SQFExpression expr = SQFUnaryExpression.super.getExpr();
+		if (expr == null) {
+			throw new IllegalStateException("expr is null for " + getText());
+		}
+		return expr;
+	}
+
+	@NotNull
+	@Override
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);
 	}

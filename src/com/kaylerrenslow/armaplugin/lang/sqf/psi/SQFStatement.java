@@ -92,7 +92,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 				switch (cmdExpr.getSQFCommand().getCommandName().toLowerCase()) {
 					case "private": {
 						SQFCommandArgument postfixArgument = cmdExpr.getPostfixArgument();
-						if (postfixArgument == null || postfixArgument.getExpr() == null) {
+						if (postfixArgument == null) {
 							return vars;
 						}
 
@@ -193,9 +193,6 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 			if (postArg == null) {
 				return null;
 			}
-			if (postArg.getExpr() == null) {
-				return null;
-			}
 			SQFCommandExpression thenExp = (SQFCommandExpression) postArg.getExpr().withoutParenthesis();
 			if (!thenExp.commandNameEquals("then")
 					&& !thenExp.commandNameEquals("exitWith")) {
@@ -206,10 +203,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 				if (thenExpPrefix == null) {
 					return null;
 				}
-				condition = thenExpPrefix.getExpr();
-				if (condition != null) {
-					condition = condition.withoutParenthesis();
-				}
+				condition = thenExpPrefix.getExpr().withoutParenthesis();
 			}
 			{ //get then block and else block
 				SQFCommandArgument thenExpPostfix = thenExp.getPostfixArgument();
@@ -236,9 +230,6 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 					Reference<SQFBlockOrExpression> elseBlockRef = new Reference<>(null);
 
 					Function<Void, Void> getElseBlock = aVoid -> {
-						if (afterThenExp == null) {
-							return null;
-						}
 						if (!(afterThenExp.withoutParenthesis() instanceof SQFCommandExpression)) {
 							return null;
 						}
@@ -260,7 +251,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 				}
 			}
 		}
-		if (thenBlock == null || condition == null) {
+		if (thenBlock == null) {
 			return null;
 		}
 		return new SQFIfHelperStatement(condition, thenBlock, elseBlock);
@@ -399,9 +390,6 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 			return null;
 		}
 		SQFExpression whilePostArgExpr = whilePostArg.getExpr();
-		if (whilePostArgExpr == null) {
-			return null;
-		}
 		whilePostArgExpr = whilePostArgExpr.withoutParenthesis();
 		if (!(whilePostArgExpr instanceof SQFCommandExpression)) {
 			return null;

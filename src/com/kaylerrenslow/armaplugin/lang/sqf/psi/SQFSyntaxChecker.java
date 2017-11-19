@@ -125,7 +125,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType.ANYTHING;
+			return ValueType._ERROR;
 		}
 
 		ValueType[] allowedTypes = {
@@ -175,7 +175,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType.ANYTHING;
+			return ValueType._ERROR;
 		}
 
 		ValueType[] allowedTypes = {
@@ -229,7 +229,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType.ANYTHING;
+			return ValueType._ERROR;
 		}
 
 		ValueType[] allowedTypes = {
@@ -361,7 +361,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType.ANYTHING;
+			return ValueType._ERROR;
 		}
 		ValueType[] allowedTypes = {
 				ValueType.NUMBER,
@@ -520,9 +520,6 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			SQFExpression expr = arg.getExpr();
 			SQFCodeBlock block = arg.getBlock();
 			if (block == null) {
-				if (expr == null) {
-					throw new IllegalStateException("didn't have a block or expression:" + arg.getText());
-				}
 				return (ValueType) expr.accept(this, cluster);
 			}
 			return ValueType.CODE;
@@ -582,9 +579,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			return ValueType._ERROR;
 		}
 
-		ValueType retType = ValueType.NOTHING;
+		ValueType retType = ValueType._ERROR;
 		if (prefixType == null && postfixType == null) {
-			return fittingSyntaxes.getFirst().getReturnValue().getType();
+			retType = fittingSyntaxes.getFirst().getReturnValue().getType();
+			if (!parts.isEmpty()) {
+				problems.registerProblem(parts.getFirst().getPsiElement(), "Expected ;");
+			}
+			return retType;
 		}
 
 		//todo check remaining syntaxes and check argument by argument
@@ -607,7 +608,27 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFSignedExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
+		SQFExpression expr1 = expr.getExpr();
+		ValueType type = (ValueType) expr1.accept(this, cluster);
+		switch (expr.getSign()) {
+			case Plus: {
+				if (type.isArray()) {
+					return ValueType.ARRAY;
+				}
+				if (type == ValueType.NUMBER) {
+					return ValueType.NUMBER;
+				}
+				assertIsType(type, new ValueType[]{ValueType.NUMBER, ValueType.ARRAY}, expr1);
+				return ValueType._ERROR;
+			}
+			case Minus: {
+				assertIsType(type, ValueType.NUMBER, expr1);
+				return ValueType.NUMBER;
+			}
+			default: {
+				throw new IllegalStateException("unhandled sign:" + expr.getSign());
+			}
+		}
 	}
 
 	/**
@@ -643,7 +664,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (left == null || right == null) {
 			//can't be determined
-			return ValueType.ANYTHING;
+			return ValueType._ERROR;
 		}
 
 		assertIsType(left, expected, leftExpr);
@@ -745,6 +766,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				throw new IllegalStateException("can't get command on a non-argument part");
 			}
 			return argument;
+		}
+
+		@NotNull
+		public PsiElement getPsiElement() {
+			return isArgumentPart() ? argument : command;
 		}
 	}
 
