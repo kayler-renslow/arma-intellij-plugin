@@ -382,7 +382,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		for (ValueType type : allowedTypes) {
 			if (left == type) {
-				assertIsType(right, allowedTypes, rightExpr);
+				assertIsType(right, left, rightExpr);
 				return ValueType.BOOLEAN;
 			}
 		}

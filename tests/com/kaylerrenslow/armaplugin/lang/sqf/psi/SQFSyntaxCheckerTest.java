@@ -13,17 +13,17 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----START Literal Expression----
 	public void testLiteralExpression_number() throws Exception {
 		ValueType ret = getExitTypeForText("1");
-		assertEquals(ret, ValueType.NUMBER);
+		assertEquals(ValueType.NUMBER, ret);
 	}
 
 	public void testLiteralExpression_string() throws Exception {
 		ValueType ret = getExitTypeForText("'hello'");
-		assertEquals(ret, ValueType.STRING);
+		assertEquals(ValueType.STRING, ret);
 	}
 
 	public void testLiteralExpression_array() throws Exception {
 		ValueType ret = getExitTypeForText("[1,2,3]");
-		assertEquals(ret, ValueType.ARRAY);
+		assertEquals(ValueType.ARRAY, ret);
 	}
 
 	//----END Literal Expression----
@@ -32,22 +32,22 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	public void testParenExpression1() throws Exception {
 		ValueType ret = getExitTypeForText("(1)");
-		assertEquals(ret, ValueType.NUMBER);
+		assertEquals(ValueType.NUMBER, ret);
 	}
 
 	public void testParenExpression2() throws Exception {
 		ValueType ret = getExitTypeForText("('hello')");
-		assertEquals(ret, ValueType.STRING);
+		assertEquals(ValueType.STRING, ret);
 	}
 
 	public void testParenExpression3() throws Exception {
 		ValueType ret = getExitTypeForText("([1,2,3])");
-		assertEquals(ret, ValueType.ARRAY);
+		assertEquals(ValueType.ARRAY, ret);
 	}
 
 	public void testParenExpression4() throws Exception {
 		ValueType ret = getExitTypeForText("(1+1)");
-		assertEquals(ret, ValueType.NUMBER);
+		assertEquals(ValueType.NUMBER, ret);
 	}
 
 	//----END Paren Expression----
@@ -77,18 +77,18 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testAddExpression_bad_numAndString() throws Exception {
-		assertProblemCount("1e1+''", 1);
-		assertProblemCount("''+1e1", 1);
+		assertHasProblems("1e1+''");
+		assertHasProblems("''+1e1");
 	}
 
 	public void testAddExpression_bad_numAndArray() throws Exception {
-		assertProblemCount("0.5+[]", 1);
-		assertProblemCount("[]+0.5", 1);
+		assertHasProblems("0.5+[]");
+		assertHasProblems("[]+0.5");
 	}
 
 	public void testAddExpression_bad_stringAndArray() throws Exception {
-		assertProblemCount("'hi'+[]", 1);
-		assertProblemCount("[]+'hello'", 1);
+		assertHasProblems("'hi'+[]");
+		assertHasProblems("[]+'hello'");
 	}
 
 	//----END Add Expression----
@@ -112,13 +112,13 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testSubExpression_bad_numAndString() throws Exception {
-		assertProblemCount("1e1-''", 1);
-		assertProblemCount("''-1e1", 1);
+		assertHasProblems("1e1-''");
+		assertHasProblems("''-1e1");
 	}
 
 	public void testSubExpression_bad_numAndArray() throws Exception {
-		assertProblemCount("0.5-[]", 1);
-		assertProblemCount("[]-0.5", 1);
+		assertHasProblems("0.5-[]");
+		assertHasProblems("[]-0.5");
 	}
 
 	//----END Sub Expression----
@@ -129,8 +129,8 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testMultExpression_bad() throws Exception {
-		assertProblemCount("0*[]", 1);
-		assertProblemCount("[]*0", 1);
+		assertHasProblems("0*[]");
+		assertHasProblems("[]*0");
 	}
 
 	public void testMultExpression_valid_variable() throws Exception {
@@ -146,8 +146,8 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testModExpression_bad() throws Exception {
-		assertProblemCount("0%[]", 1);
-		assertProblemCount("[]%0", 1);
+		assertHasProblems("0%[]");
+		assertHasProblems("[]%0");
 	}
 
 	public void testModExpression_valid_variable() throws Exception {
@@ -168,15 +168,15 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testDivExpression_bad_config() throws Exception {
-		assertProblemCount("'test'/_var", 1);
-		assertProblemCount("'test'/configFile", 1);
-		assertProblemCount("0/configFile", 1);
-		assertProblemCount("configFile/0", 1);
+		assertHasProblems("'test'/_var");
+		assertHasProblems("'test'/configFile");
+		assertHasProblems("0/configFile");
+		assertHasProblems("configFile/0");
 	}
 
 	public void testDivExpression_bad_number() throws Exception {
-		assertProblemCount("0/[]", 1);
-		assertProblemCount("[]/0", 1);
+		assertHasProblems("0/[]");
+		assertHasProblems("[]/0");
 	}
 
 	public void testDivExpression_valid_number_variable() throws Exception {
@@ -195,9 +195,9 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testBoolAndExpression_bad() throws Exception {
-		assertProblemCount("true && 1", 1);
-		assertProblemCount("true && []", 1);
-		assertProblemCount("false && {5}", 1);
+		assertHasProblems("true && 1");
+		assertHasProblems("true && []");
+		assertHasProblems("false && {5}");
 	}
 
 	public void testBoolAndExpression_valid_variable() throws Exception {
@@ -217,9 +217,9 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testBoolOrExpression_bad() throws Exception {
-		assertProblemCount("true || 1", 1);
-		assertProblemCount("true || []", 1);
-		assertProblemCount("false || {5}", 1);
+		assertHasProblems("true || 1");
+		assertHasProblems("true || []");
+		assertHasProblems("false || {5}");
 	}
 
 	public void testBoolOrExpression_valid_variable() throws Exception {
@@ -240,10 +240,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testBoolNotExpression_bad() throws Exception {
-		assertProblemCount("!1", 1);
-		assertProblemCount("![]", 1);
-		assertProblemCount("!{5}", 1);
-		assertProblemCount("!{true}", 1);
+		assertHasProblems("!1");
+		assertHasProblems("![]");
+		assertHasProblems("!{5}");
+		assertHasProblems("!{true}");
 	}
 	//----END Bool Not Expression----
 
@@ -262,53 +262,52 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("1 >= 0.5");
 
 		assertNoProblems("1==1"); //number
-		assertNoProblems("false == true"); //boolean
 		assertNoProblems("''==''"); //string
 
 		{ //group
-			assertEquals(getExitTypeForText("groupNull"), ValueType.GROUP);
-			assertNoProblems("groupNull==groupNull");
-			assertNoProblems("groupNull!=groupNull");
+			assertEquals(ValueType.GROUP, getExitTypeForText("grpNull"));
+			assertNoProblems("grpNull==grpNull");
+			assertNoProblems("grpNull!=grpNull");
 		}
 
 		{ //side
-			assertEquals(getExitTypeForText("west"), ValueType.SIDE);
+			assertEquals(ValueType.SIDE, getExitTypeForText("west"));
 			assertNoProblems("west==west");
 			assertNoProblems("west!=west");
 		}
 
 		{ //object
-			assertEquals(getExitTypeForText("objectNull"), ValueType.OBJECT);
-			assertNoProblems("objectNull==objectNull");
-			assertNoProblems("objectNull!=objectNull");
+			assertEquals(ValueType.OBJECT, getExitTypeForText("objNull"));
+			assertNoProblems("objNull==objNull");
+			assertNoProblems("objNull!=objNull");
 		}
 
 		{ //config
-			assertEquals(getExitTypeForText("configFile"), ValueType.CONFIG);
+			assertEquals(ValueType.CONFIG, getExitTypeForText("configFile"));
 			assertNoProblems("configFile==configFile");
 			assertNoProblems("configFile!=configFile");
 		}
 
 		{ //display
-			assertEquals(getExitTypeForText("displayNull"), ValueType.DISPLAY);
+			assertEquals(ValueType.DISPLAY, getExitTypeForText("displayNull"));
 			assertNoProblems("displayNull==displayNull");
 			assertNoProblems("displayNull!=displayNull");
 		}
 
 		{ //control
-			assertEquals(getExitTypeForText("controlNull"), ValueType.CONTROL);
+			assertEquals(ValueType.CONTROL, getExitTypeForText("controlNull"));
 			assertNoProblems("controlNull==controlNull");
 			assertNoProblems("controlNull!=controlNull");
 		}
 
 		{ //location
-			assertEquals(getExitTypeForText("locationNull"), ValueType.LOCATION);
-			assertNoProblems("locationNull==controlNull");
-			assertNoProblems("locationNull!=controlNull");
+			assertEquals(ValueType.LOCATION, getExitTypeForText("locationNull"));
+			assertNoProblems("locationNull==locationNull");
+			assertNoProblems("locationNull!=locationNull");
 		}
 
 		{ //structured text
-			assertEquals(getExitTypeForText("parseText ''"), ValueType.STRUCTURED_TEXT);
+			assertEquals(ValueType.STRUCTURED_TEXT, getExitTypeForText("parseText ''"));
 			assertNoProblems("(parseText '')==(parseText '')");
 			assertNoProblems("(parseText '')!=(parseText '')");
 		}
@@ -316,59 +315,66 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testCompExpression_bad() throws Exception {
-		assertProblemCount("1 < ''", 1);
-		assertProblemCount("1 < []", 1);
-		assertProblemCount("'' < []", 2);
-		assertProblemCount("[] < 1", 1);
-		assertProblemCount("[] < []", 2);
+		assertHasProblems("1 < ''");
+		assertHasProblems("1 < []");
+		assertHasProblems("'' < []");
+		assertHasProblems("[] < 1");
+		assertHasProblems("[] < []");
 
-		assertProblemCount("1 <= ''", 1);
-		assertProblemCount("1 <= []", 1);
-		assertProblemCount("'' <= []", 2);
-		assertProblemCount("[] <= 1", 1);
-		assertProblemCount("[] <= []", 2);
+		assertHasProblems("1 <= ''");
+		assertHasProblems("1 <= []");
+		assertHasProblems("'' <= []");
+		assertHasProblems("[] <= 1");
+		assertHasProblems("[] <= []");
 
-		assertProblemCount("1 > ''", 1);
-		assertProblemCount("1 > []", 1);
-		assertProblemCount("'' > []", 2);
-		assertProblemCount("[] > 1", 1);
-		assertProblemCount("[] > []", 2);
+		assertHasProblems("1 > ''");
+		assertHasProblems("1 > []");
+		assertHasProblems("'' > []");
+		assertHasProblems("[] > 1");
+		assertHasProblems("[] > []");
 
-		assertProblemCount("1 >= ''", 1);
-		assertProblemCount("1 >= []", 1);
-		assertProblemCount("'' >= []", 2);
-		assertProblemCount("[] >= 1", 1);
-		assertProblemCount("[] >= []", 2);
+		assertHasProblems("1 >= ''");
+		assertHasProblems("1 >= []");
+		assertHasProblems("'' >= []");
+		assertHasProblems("[] >= 1");
+		assertHasProblems("[] >= []");
 
-		assertProblemCount("1 == ''", 1);
-		assertProblemCount("[] == []", 2);
-		assertProblemCount("1 == []", 1);
-		assertProblemCount("'' == []", 2);
-		assertProblemCount("[] == 1", 1);
-		assertProblemCount("[] == false", 1);
-		assertProblemCount("groupNull==west", 1);
-		assertProblemCount("west==groupNull", 1);
-		assertProblemCount("objectNull==1", 1);
-		assertProblemCount("configFile==[]", 1);
-		assertProblemCount("displayNull==''", 1);
-		assertProblemCount("controlNull==[]", 1);
-		assertProblemCount("locationNull==false", 1);
-		assertProblemCount("(parseText '')==0", 1);
+		assertHasProblems("1 == ''");
+		assertHasProblems("[] == []");
+		assertHasProblems("1 == []");
+		assertHasProblems("'' == []");
+		assertHasProblems("[] == 1");
+		assertHasProblems("[] == false");
+		assertHasProblems("grpNull==west");
+		assertHasProblems("west==grpNull");
+		assertHasProblems("objNull==1");
+		assertHasProblems("configFile==[]");
+		assertHasProblems("displayNull==''");
+		assertHasProblems("controlNull==[]");
+		assertHasProblems("locationNull==false");
+		assertHasProblems("(parseText '')==0");
 
-		assertProblemCount("[] != []", 2);
-		assertProblemCount("1 != []", 1);
-		assertProblemCount("'' != []", 2);
-		assertProblemCount("[] != 1", 1);
-		assertProblemCount("[] != false", 1);
-		assertProblemCount("configFile!=[]", 1);
-		assertProblemCount("controlNull!=[]", 1);
-		assertProblemCount("1 != ''", 1);
-		assertProblemCount("groupNull!=west", 1);
-		assertProblemCount("west!=groupNull", 1);
-		assertProblemCount("objectNull!=1", 1);
-		assertProblemCount("displayNull!=''", 1);
-		assertProblemCount("locationNull!=false", 1);
-		assertProblemCount("(parseText '')!=0", 1);
+		assertHasProblems("false == true");
+		assertHasProblems("_var == true");
+		assertHasProblems("true == _var");
+
+		assertHasProblems("[] != []");
+		assertHasProblems("1 != []");
+		assertHasProblems("'' != []");
+		assertHasProblems("[] != 1");
+		assertHasProblems("[] != false");
+		assertHasProblems("configFile!=[]");
+		assertHasProblems("controlNull!=[]");
+		assertHasProblems("1 != ''");
+		assertHasProblems("grpNull!=west");
+		assertHasProblems("west!=grpNull");
+		assertHasProblems("objNull!=1");
+		assertHasProblems("displayNull!=''");
+		assertHasProblems("locationNull!=false");
+		assertHasProblems("(parseText '')!=0");
+
+		assertHasProblems("_var != true");
+		assertHasProblems("true != _var");
 	}
 
 	public void testCompExpression_valid_variable() throws Exception {
@@ -392,17 +398,13 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("1 == _var");
 		assertNoProblems("_var == 1");
 		assertNoProblems("_var == configFile");
-		assertNoProblems("_var == true");
 		assertNoProblems("configFile == _var");
-		assertNoProblems("true == _var");
 
 		assertNoProblems("_var != _var");
 		assertNoProblems("1 != _var");
 		assertNoProblems("_var != 1");
 		assertNoProblems("_var != configFile");
-		assertNoProblems("_var != true");
 		assertNoProblems("configFile != _var");
-		assertNoProblems("true != _var");
 	}
 	//----END Comp Expression----
 
@@ -420,10 +422,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testConfigFetchExpression_bad() throws Exception {
-		assertProblemCount("configFile >> 1", 1);
-		assertProblemCount("configFile >> 1 >> 2", 2);
-		assertProblemCount("1 >> '' >> ''", 1);
-		assertProblemCount("_var >> 1 >> ''", 1);
+		assertHasProblems("configFile >> 1");
+		assertHasProblems("configFile >> 1 >> 2");
+		assertHasProblems("1 >> '' >> ''");
+		assertHasProblems("_var >> 1 >> ''");
 	}
 	//----END config fetch Expression----
 
@@ -441,14 +443,14 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testExponentExpression_bad() throws Exception {
-		assertProblemCount("1^1^''", 1);
-		assertProblemCount("''^1^5", 1);
-		assertProblemCount("''^1^5^''", 2);
+		assertHasProblems("1^1^''");
+		assertHasProblems("''^1^5");
+		assertHasProblems("''^1^5^''");
 
-		assertProblemCount("_var^''^5^7", 1);
-		assertProblemCount("''^_var^5^7", 1);
-		assertProblemCount("_var^1^''^_var", 1);
-		assertProblemCount("''^''", 2);
+		assertHasProblems("_var^''^5^7");
+		assertHasProblems("''^_var^5^7");
+		assertHasProblems("_var^1^''^_var");
+		assertHasProblems("''^''");
 	}
 	//----END exponent Expression----
 
@@ -467,11 +469,11 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testSignExpression_bad() throws Exception {
-		assertProblemCount("+configFile", 1);
-		assertProblemCount("+''", 1);
+		assertHasProblems("+configFile");
+		assertHasProblems("+''");
 
-		assertProblemCount("-[]", 1);
-		assertProblemCount("-''", 1);
+		assertHasProblems("-[]");
+		assertHasProblems("-''");
 	}
 	//----END signed Expression----
 
@@ -481,10 +483,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("{+1.5}");
 		assertNoProblems("{}");
 
-		assertEquals(getExitTypeForText("{}"), ValueType.CODE);
-		assertEquals(getExitTypeForText("{1}"), ValueType.CODE);
-		assertEquals(getExitTypeForText("{_var}"), ValueType.CODE);
-		assertEquals(getExitTypeForText("{1+1;1}"), ValueType.CODE);
+		assertEquals(ValueType.CODE, getExitTypeForText("{}"));
+		assertEquals(ValueType.CODE, getExitTypeForText("{1}"));
+		assertEquals(ValueType.CODE, getExitTypeForText("{_var}"));
+		assertEquals(ValueType.CODE, getExitTypeForText("{1+1;1}"));
 	}
 	//----END code block Expression----
 
@@ -502,10 +504,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("case _var:{};");
 		assertNoProblems("case _var;");
 
-		assertEquals(getExitTypeForText("case 1:{};"), ValueType.NOTHING);
-		assertEquals(getExitTypeForText("case 1:{2};"), ValueType.NOTHING);
-		assertEquals(getExitTypeForText("case 1;"), ValueType.NOTHING);
-		assertEquals(getExitTypeForText("case configFile;"), ValueType.NOTHING);
+		assertEquals(ValueType.NOTHING, getExitTypeForText("case 1:{};"));
+		assertEquals(ValueType.NOTHING, getExitTypeForText("case 1:{2};"));
+		assertEquals(ValueType.NOTHING, getExitTypeForText("case 1;"));
+		assertEquals(ValueType.NOTHING, getExitTypeForText("case configFile;"));
 	}
 	//----END case statement----
 
@@ -521,10 +523,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		//this problem should be a grammar error, not a type error
 		assertNoProblems("a = ;");
 
-		assertEquals(getExitTypeForText("a = {};"), ValueType.NOTHING);
-		assertEquals(getExitTypeForText("a={2};"), ValueType.NOTHING);
-		assertEquals(getExitTypeForText("a = 1+1;"), ValueType.NOTHING);
-		assertEquals(getExitTypeForText("a = _var;"), ValueType.NOTHING);
+		assertEquals(ValueType.NOTHING, getExitTypeForText("a = {};"));
+		assertEquals(ValueType.NOTHING, getExitTypeForText("a={2};"));
+		assertEquals(ValueType.NOTHING, getExitTypeForText("a = 1+1;"));
+		assertEquals(ValueType.NOTHING, getExitTypeForText("a = _var;"));
 	}
 	//----END assignment statement----
 
@@ -537,13 +539,13 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		//this problem should be a grammar error, not a type error
 		assertNoProblems("? ;");
 
-		assertEquals(getExitTypeForText("? true : false;"), ValueType.NOTHING);
-		assertEquals(getExitTypeForText("? ;"), ValueType.NOTHING);
+		assertEquals(ValueType.NOTHING, getExitTypeForText("? true : false;"));
+		assertEquals(ValueType.NOTHING, getExitTypeForText("? ;"));
 	}
 
 	public void testQuestStatement_bad() throws Exception {
-		assertProblemCount("? 1 : false;", 1);
-		assertProblemCount("? {} : false;", 1);
+		assertHasProblems("? 1 : false;");
+		assertHasProblems("? {} : false;");
 	}
 	//----END quest statement----
 }

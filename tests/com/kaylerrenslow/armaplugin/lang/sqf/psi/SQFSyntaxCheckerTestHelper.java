@@ -21,18 +21,17 @@ public abstract class SQFSyntaxCheckerTestHelper extends LightCodeInsightFixture
 	 * Parses the given text as SQF into a {@link SQFFile} and then runs
 	 * {@link SQFSyntaxHelper#checkSyntax(SQFFile, ProblemsHolder)} on it.
 	 * <p>
-	 * Asserts that the problems detected are equal to the ones provided.
+	 * Asserts that the problems detected are > 0
 	 *
 	 * @param text             the SQF code to parse into a {@link SQFFile}
-	 * @param expectedProblems number of problems to expect
 	 * @see #assertNoProblems(String)
 	 */
-	public void assertProblemCount(@NotNull String text, int expectedProblems) {
+	public void assertHasProblems(@NotNull String text) {
 		SQFFile file = (SQFFile) myFixture.configureByText(SQFFileType.INSTANCE, text);
 		ProblemsHolder problems = getProblemsHolder(file);
 		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
 
-		assertEquals(expectedProblems, problems.getResultCount());
+		assertEquals("Expected there to be problems.", true, problems.getResultCount() > 0);
 	}
 
 	/**
