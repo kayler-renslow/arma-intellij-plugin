@@ -173,4 +173,20 @@ public class ValueTypeEquivalenceTest {
 
 	}
 
+	@Test
+	public void typeEqual_notEmpty_array() throws Exception {
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(false, Lookup.NUMBER, Lookup.NUMBER),
+				new ExpandedValueType(true, Lookup.NUMBER)
+		));
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(true, Lookup.NUMBER),
+				new ExpandedValueType(false, Lookup.NUMBER, Lookup.NUMBER)
+		));
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(false, Lookup.NUMBER, Lookup.OBJECT),
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT)
+		));
+	}
+
 }
