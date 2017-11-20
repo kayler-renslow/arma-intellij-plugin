@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -35,8 +36,8 @@ public interface ValueType {
 	 * @throws IllegalArgumentException if {@link ExpandedValueType#isInvalid()} returns true for either provided type
 	 */
 	static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
-		LinkedList<ValueType> stackType1 = new LinkedList<>();
-		LinkedList<ValueType> stackType2 = new LinkedList<>();
+		LinkedList<ValueType> qType1 = new LinkedList<>();
+		LinkedList<ValueType> qType2 = new LinkedList<>();
 
 		ExpandedValueType type1Expanded = type1.getExpanded();
 		ExpandedValueType type2Expanded = type2.getExpanded();
@@ -60,30 +61,32 @@ public interface ValueType {
 		ValueType lastType1 = Lookup.NOTHING, lastType2 = Lookup.NOTHING;
 
 		if (type1IsUnboundedEmpty) {
-			stackType1.push(Lookup.ANYTHING);
-			lastType1 = stackType1.getFirst();
+			qType1.add(Lookup.ANYTHING);
+			lastType1 = qType1.getFirst();
 		} else {
-			for (ValueType t : type1Expanded.getValueTypes()) {
-				stackType1.push(t);
+			List<ValueType> types = type1Expanded.getValueTypes();
+			for (ValueType t : types) {
+				qType1.add(t);
 				lastType1 = t;
 			}
 		}
 
 		if (type2IsUnboundedEmpty) {
-			stackType2.push(Lookup.ANYTHING);
-			lastType2 = stackType2.getFirst();
+			qType2.add(Lookup.ANYTHING);
+			lastType2 = qType2.getFirst();
 		} else {
-			for (ValueType t : type2Expanded.getValueTypes()) {
-				stackType2.push(t);
+			List<ValueType> types = type2Expanded.getValueTypes();
+			for (ValueType t : types) {
+				qType2.add(t);
 				lastType2 = t;
 			}
 		}
 
-		while (!stackType1.isEmpty() || (type1IsUnbounded && !stackType2.isEmpty())) {
-			ValueType type1Pop = (stackType1.isEmpty() && type1IsUnbounded) ? lastType1 :
-					stackType1.isEmpty() ? null : stackType1.pop();
-			ValueType type2Pop = (stackType2.isEmpty() && type2IsUnbounded) ? lastType2 :
-					stackType2.isEmpty() ? null : stackType2.pop();
+		while (!qType1.isEmpty() || (type1IsUnbounded && !qType2.isEmpty())) {
+			ValueType type1Pop = (qType1.isEmpty() && type1IsUnbounded) ? lastType1 :
+					(qType1.isEmpty() ? null : qType1.removeFirst());
+			ValueType type2Pop = (qType2.isEmpty() && type2IsUnbounded) ? lastType2 :
+					(qType2.isEmpty() ? null : qType2.removeFirst());
 
 			if (type1Pop == null || type2Pop == null) {
 				return false;
@@ -100,10 +103,10 @@ public interface ValueType {
 					return false;
 				}
 				for (ValueType expandedElementType : type1Pop.getExpanded().getValueTypes()) {
-					stackType1.push(expandedElementType);
+					qType1.push(expandedElementType);
 				}
 				for (ValueType expandedElementType : type2Pop.getExpanded().getValueTypes()) {
-					stackType1.push(expandedElementType);
+					qType1.push(expandedElementType);
 				}
 			} else {
 				if (type2Pop.isArray()) {

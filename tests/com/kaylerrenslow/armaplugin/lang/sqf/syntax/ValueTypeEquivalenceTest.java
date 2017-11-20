@@ -74,7 +74,7 @@ public class ValueTypeEquivalenceTest {
 	}
 
 	@Test
-	public void typeNotEqual_emptyBoundedArray() throws Exception {
+	public void typeNotEqual_emptyBoundedExpandedType() throws Exception {
 		try {
 			typeEquivalent(new ExpandedValueType(false), Lookup.NUMBER);
 			assertEquals("Expected an exception", true, false);
@@ -116,6 +116,61 @@ public class ValueTypeEquivalenceTest {
 		} catch (IllegalArgumentException ignore) {
 
 		}
+	}
+
+	@Test
+	public void typeEqual_notEmpty_singleton_unboundedArray() throws Exception {
+		assertEquals(true, typeEquivalent(Lookup.NUMBER, new ExpandedValueType(true, Lookup.NUMBER)));
+		assertEquals(true, typeEquivalent(new ExpandedValueType(true, Lookup.NUMBER), Lookup.NUMBER));
+		assertEquals(true, typeEquivalent(Lookup.OBJECT, new ExpandedValueType(true)));
+		assertEquals(true, typeEquivalent(new ExpandedValueType(true, Lookup.OBJECT), Lookup.OBJECT));
+
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(true, Lookup.OBJECT),
+				new ExpandedValueType(true, Lookup.OBJECT)
+		));
+
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(true, Lookup.CODE),
+				new ExpandedValueType(true, Lookup.CODE)
+		));
+	}
+
+	@Test
+	public void typeEqual_notEmpty_notSingleton_unboundedArray() throws Exception {
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT),
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT)
+		));
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT),
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT, Lookup.OBJECT)
+		));
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(true, Lookup.CODE, Lookup.OBJECT, Lookup.OBJECT),
+				new ExpandedValueType(true, Lookup.CODE, Lookup.OBJECT)
+		));
+	}
+
+	@Test
+	public void typeNotEqual_notEmpty_unboundedArray() throws Exception {
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.NUMBER),
+				new ExpandedValueType(true, Lookup.OBJECT)
+		));
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(true, Lookup.NUMBER),
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT)
+		));
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.NUMBER),
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT)
+		));
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT),
+				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT, Lookup.CODE)
+		));
+
 	}
 
 }
