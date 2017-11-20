@@ -51,56 +51,15 @@ public interface ValueHolder {
 	}
 
 	/**
-	 * Checks if the given type is inside {@link #getAllAllowedTypes()}. If <code>type</code> is an array type
-	 * ({@link ValueType#isArray}), this method will compare {@link ExpandedValueType} instances.
-	 * <p>
-	 * For comparing {@link ExpandedValueType} instances, the given type's {@link ExpandedValueType} must have >= number
-	 * of elements to the allowed type's number of elements. Also, each element type must match at each index. If an array
-	 * type is in the array type, this comparison will be used recursively.
+	 * Checks each {@link #getAllAllowedTypes()} against type.
+	 * The comparing method used is {@link ValueType#typeEquivalent(ValueType, ValueType)}.
+	 * For each allowed type in {@link #getAllAllowedTypes()}, it specifies the required minimum length for it to be equal to type.
 	 *
-	 * @return true if {@link #getAllAllowedTypes()}.contains(type) or if an allowed type and the provided type are both arrays.
+	 * @return true if {@link #getAllAllowedTypes()} has 1 element that is equal to type, false otherwise
 	 */
 	default boolean allowedTypesContains(@NotNull ValueType type) {
-		ExpandedValueType typeExpanded = type.getExpanded();
 		for (ValueType allowedType : getAllAllowedTypes()) {
-			if (allowedType == type) {
-				return true;
-			}
-			if (allowedType.isArray() && type.isArray()) {
-				ExpandedValueType allowedExpanded = allowedType.getExpanded();
-
-				LinkedList<ValueType> stackAllowed = new LinkedList<>();
-				LinkedList<ValueType> stackProvided = new LinkedList<>();
-				for (ValueType t : allowedExpanded.getValueTypes()) {
-					stackAllowed.push(t);
-				}
-				for (ValueType t : typeExpanded.getValueTypes()) {
-					stackProvided.push(t);
-				}
-
-				while (!stackAllowed.isEmpty()) {
-					ValueType allowedTypePop = stackAllowed.pop();
-					ValueType providedTypePop = stackProvided.pop();
-					if (allowedTypePop.isArray()) {
-						if (!providedTypePop.isArray()) {
-							return false;
-						}
-						for (ValueType expandedElementType : allowedTypePop.getExpanded().getValueTypes()) {
-							stackAllowed.push(expandedElementType);
-						}
-						for (ValueType expandedElementType : providedTypePop.getExpanded().getValueTypes()) {
-							stackAllowed.push(expandedElementType);
-						}
-					} else {
-						if (providedTypePop.isArray()) {
-							return false;
-						}
-						if (!allowedTypePop.equals(providedTypePop)) {
-							return false;
-						}
-					}
-				}
-
+			if (ValueType.typeEquivalent(allowedType, type)) {
 				return true;
 			}
 		}

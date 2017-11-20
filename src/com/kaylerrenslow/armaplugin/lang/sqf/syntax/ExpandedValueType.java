@@ -9,7 +9,8 @@ import java.util.List;
 
 /**
  * A way of expanding {@link ValueType} instances from something like {@link ValueType.Lookup#COLOR_RGB}
- * to {NUMBER, NUMBER, NUMBER}
+ * to {NUMBER, NUMBER, NUMBER}. Note that this type isn't just for arrays. This type can contain a single {@link ValueType.Lookup}
+ * instance.
  *
  * @author Kayler
  * @since 11/18/2017
@@ -46,10 +47,9 @@ public class ExpandedValueType implements ValueType {
 
 	/**
 	 * @return true if this type contains more than one {@link ValueType} or {@link #isUnbounded()} is true.
-	 * Also returns true if the only element is {@link ValueType.Lookup#ARRAY}. Otherwise, returns false
 	 */
 	public boolean isArray() {
-		return isUnbounded || valueTypes.size() > 1 || (!valueTypes.isEmpty() && valueTypes.get(0) == ValueType.Lookup.ARRAY);
+		return isUnbounded || valueTypes.size() > 1;
 	}
 
 	/**
@@ -80,22 +80,50 @@ public class ExpandedValueType implements ValueType {
 	}
 
 	/**
-	 * @return true if the last element in {@link #getValueTypes()} is repeating, false otherwise
+	 * An unbounded array is where the number of elements are between 0 and +infinity.
+	 * The last element of an unbounded array is what repeats. If an array is empty and unbounded is true, then this {@link ExpandedValueType}
+	 * is representing any size array that can contain literally anything or contain nothing at all.
+	 * <p>
+	 * If this returns false and {@link #getValueTypes()} is empty, {@link #isInvalid()} will return true.
+	 *
+	 * @return true if the last element in {@link #getValueTypes()} is repeating, false otherwise.
 	 */
 	public boolean isUnbounded() {
 		return isUnbounded;
 	}
 
 	/**
-	 * @return true if {@link #getValueTypes()} are equal (same size and order) and if {@link #isUnbounded()} are equal
+	 * @return true if {@link #getValueTypes()} is empty and {@link #isUnbounded()} is false. Otherwise, returns false.
+	 */
+	public boolean isInvalid() {
+		return !isUnbounded && valueTypes.isEmpty();
+	}
+
+	/**
+	 * If obj is an instance of {@link ExpandedValueType}, objects are equal if {@link #getValueTypes()} are equal
+	 * (same size and order) and if {@link #isUnbounded()} are equal.
+	 * <p>
+	 * If obj is an instance of {@link ValueType.Lookup}, the objects are equal if:
+	 * <ul>
+	 * <li>{@link #getValueTypes()} size is 0, {@link #isArray()} is true, and {@link ValueType.Lookup#ARRAY} is obj</li>
+	 * <li>If {@link #getValueTypes()} size is 1 and {@link #getValueTypes()}.get(0) == obj</li>
+	 * </ul>
+	 *
+	 * @return true if equal, false if not equal
 	 */
 	@Override
-	public boolean equals(Object o) {
-		if (o == this) {
+	public boolean equals(Object obj) {
+		if (obj == this) {
 			return true;
 		}
-		if (o instanceof ExpandedValueType) {
-			ExpandedValueType other = (ExpandedValueType) o;
+		if (obj instanceof Lookup) {
+			if (isArray() && valueTypes.isEmpty()) {
+				return obj == Lookup.ARRAY;
+			}
+			return valueTypes.size() == 1 && valueTypes.get(0) == obj;
+		}
+		if (obj instanceof ExpandedValueType) {
+			ExpandedValueType other = (ExpandedValueType) obj;
 
 			if (getValueTypes().size() != other.getValueTypes().size()) {
 				return false;

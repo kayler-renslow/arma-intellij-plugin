@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.LinkedList;
 import java.util.function.Function;
 
 /**
@@ -18,9 +19,107 @@ public interface ValueType {
 	@NotNull
 	ExpandedValueType getExpanded();
 
+	/**
+	 * This method will compare {@link ExpandedValueType} instances returned from {@link ValueType#getExpanded()}.
+	 * <p>
+	 * For comparing {@link ExpandedValueType} instances, type2's {@link ExpandedValueType} must have >= number
+	 * of elements to type1's number of elements. Also, each element type must match at each index. If an array
+	 * type is in the array type, this comparison will be used recursively.
+	 * <p>
+	 * If an allowed type is equal to {@link ValueType.Lookup#ANYTHING} or <code>type</code> is {@link ValueType.Lookup#ANYTHING},
+	 * the comparison of {@link ValueType} instances will always be true.
+	 *
+	 * @param type1 type to check
+	 * @param type2 other type to check
+	 * @return true if types are equivalent, false otherwise
+	 * @throws IllegalArgumentException if {@link ExpandedValueType#isInvalid()} returns true for either provided type
+	 */
+	static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
+		LinkedList<ValueType> stackType1 = new LinkedList<>();
+		LinkedList<ValueType> stackType2 = new LinkedList<>();
+
+		ExpandedValueType type1Expanded = type1.getExpanded();
+		ExpandedValueType type2Expanded = type2.getExpanded();
+
+		if (type1Expanded.isInvalid()) {
+			throw new IllegalArgumentException("type1 is invalid");
+		}
+		if (type2Expanded.isInvalid()) {
+			throw new IllegalArgumentException("type2 is invalid");
+		}
+
+		final boolean type1IsUnbounded = type1Expanded.isUnbounded();
+		final boolean type2IsUnbounded = type2Expanded.isUnbounded();
+		final boolean type1IsUnboundedEmpty = type1IsUnbounded && type1Expanded.getValueTypes().isEmpty();
+		final boolean type2IsUnboundedEmpty = type2IsUnbounded && type2Expanded.getValueTypes().isEmpty();
+
+		if (type1IsUnboundedEmpty && type2IsUnboundedEmpty) {
+			return true;
+		}
+
+		ValueType lastType1 = Lookup.NOTHING, lastType2 = Lookup.NOTHING;
+
+		if (type1IsUnboundedEmpty) {
+			stackType1.push(Lookup.ANYTHING);
+			lastType1 = stackType1.getFirst();
+		} else {
+			for (ValueType t : type1Expanded.getValueTypes()) {
+				stackType1.push(t);
+				lastType1 = t;
+			}
+		}
+
+		if (type2IsUnboundedEmpty) {
+			stackType2.push(Lookup.ANYTHING);
+			lastType2 = stackType2.getFirst();
+		} else {
+			for (ValueType t : type2Expanded.getValueTypes()) {
+				stackType2.push(t);
+				lastType2 = t;
+			}
+		}
+
+		while (!stackType1.isEmpty() || (type1IsUnbounded && !stackType2.isEmpty())) {
+			ValueType type1Pop = (stackType1.isEmpty() && type1IsUnbounded) ? lastType1 :
+					stackType1.isEmpty() ? null : stackType1.pop();
+			ValueType type2Pop = (stackType2.isEmpty() && type2IsUnbounded) ? lastType2 :
+					stackType2.isEmpty() ? null : stackType2.pop();
+
+			if (type1Pop == null || type2Pop == null) {
+				return false;
+			}
+
+			if (type1Pop == Lookup.ANYTHING) {
+				continue;
+			}
+			if (type2Pop == Lookup.ANYTHING) {
+				continue;
+			}
+			if (type1Pop.isArray()) {
+				if (!type2Pop.isArray()) {
+					return false;
+				}
+				for (ValueType expandedElementType : type1Pop.getExpanded().getValueTypes()) {
+					stackType1.push(expandedElementType);
+				}
+				for (ValueType expandedElementType : type2Pop.getExpanded().getValueTypes()) {
+					stackType1.push(expandedElementType);
+				}
+			} else {
+				if (type2Pop.isArray()) {
+					return false;
+				}
+				if (!type1Pop.equals(type2Pop)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
 	enum Lookup implements ValueType {
 		ANYTHING("Anything"),
-		ARRAY("Array"),
+		ARRAY("Array", new ExpandedValueType(true)),
 		ARRAY_OF_EDEN_ENTITIES("Array of Eden Entities",
 				new Function<Void, ExpandedValueType>() {
 					@Override
@@ -194,6 +293,12 @@ public interface ValueType {
 			this.getExpandedFunc = getExpandedFunc;
 		}
 
+
+		Lookup(String displayName, ExpandedValueType expandedValueType) {
+			this.displayName = displayName;
+			this.expandedValueType = expandedValueType;
+		}
+
 		@Override
 		public String toString() {
 			return displayName;
@@ -218,7 +323,6 @@ public interface ValueType {
 		public ExpandedValueType getExpanded() {
 			return expandedValueType;
 		}
-
 	}
 
 }
