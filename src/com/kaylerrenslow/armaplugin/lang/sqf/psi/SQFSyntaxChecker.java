@@ -417,10 +417,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 		SQFArray arr = expr.getArr();
 		if (arr != null) {
-			if (arr.getExpressions().isEmpty()) {
-				return Lookup.ARRAY;
-			}
-			ExpandedValueType expandedValueType = new ExpandedValueType();
+			ExpandedValueType expandedValueType = new ExpandedValueType(false);
 			for (SQFExpression arrItemExpr : arr.getExpressions()) {
 				expandedValueType.addValueType((ValueType) arrItemExpr.accept(this, cluster));
 			}
@@ -571,7 +568,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 
 			ValueType retType = syntax.getReturnValue().getType();
-			if (!parts.isEmpty()) {
+			if (!parts.isEmpty() && syntax.getPostfixParam() != null) {
 				problems.registerProblem(parts.getFirst().getPsiElement(), "Expected ;");
 			}
 			return retType;

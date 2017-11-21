@@ -183,6 +183,62 @@ public class ValueTypeEquivalenceTest {
 				new ExpandedValueType(false, Lookup.OBJECT)
 		));
 	}
-	//todo add nested array tests
+
+	@Test
+	public void typeEqual_nestedArray() throws Exception {
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(false, Lookup.CODE,
+						new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER)
+				),
+				new ExpandedValueType(false, Lookup.CODE,
+						new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER)
+				)
+		));
+
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(false, Lookup.CODE,
+						new ExpandedValueType(true, Lookup.CODE, Lookup.NUMBER)
+				),
+				new ExpandedValueType(false, Lookup.CODE,
+						new ExpandedValueType(true, Lookup.CODE, Lookup.NUMBER)
+				)
+		));
+
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(false, Lookup.CODE,
+						new ExpandedValueType(true, Lookup.CODE, Lookup.NUMBER)
+				),
+				new ExpandedValueType(false, Lookup.CODE,
+						new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER),
+						new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER)
+				)
+		));
+	}
+
+	@Test
+	public void typeNotEqual_nestedArray() throws Exception {
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(false, Lookup.CODE,
+						new ExpandedValueType(true, Lookup.CODE)
+				),
+				new ExpandedValueType(false, Lookup.CODE,
+						new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER)
+				)
+		));
+
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(true, Lookup.CODE,
+						new ExpandedValueType(true, Lookup.CODE, Lookup.NUMBER)
+				),
+				new ExpandedValueType(false, Lookup.CODE)
+		));
+
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(true, Lookup.CODE,
+						new ExpandedValueType(true, Lookup.CODE, Lookup.NUMBER)
+				),
+				new ExpandedValueType(true, Lookup.CODE)
+		));
+	}
 
 }
