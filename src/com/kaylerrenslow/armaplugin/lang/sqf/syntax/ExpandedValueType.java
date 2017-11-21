@@ -46,10 +46,11 @@ public class ExpandedValueType implements ValueType {
 	}
 
 	/**
-	 * @return true if this type contains more than one {@link ValueType} or {@link #isUnbounded()} is true.
+	 * @return true if this type contains more than one {@link ValueType} or {@link #isUnbounded()} is true,
+	 * or {@link #isEmptyArray()} is true.
 	 */
 	public boolean isArray() {
-		return isUnbounded || valueTypes.size() > 1;
+		return isUnbounded || valueTypes.size() > 1 || isEmptyArray();
 	}
 
 	/**
@@ -84,7 +85,7 @@ public class ExpandedValueType implements ValueType {
 	 * The last element of an unbounded array is what repeats. If an array is empty and unbounded is true, then this {@link ExpandedValueType}
 	 * is representing any size array that can contain literally anything or contain nothing at all.
 	 * <p>
-	 * If this returns false and {@link #getValueTypes()} is empty, {@link #isInvalid()} will return true.
+	 * If this returns false and {@link #getValueTypes()} is empty, {@link #isEmptyArray()} will return true.
 	 *
 	 * @return true if the last element in {@link #getValueTypes()} is repeating, false otherwise.
 	 */
@@ -95,7 +96,7 @@ public class ExpandedValueType implements ValueType {
 	/**
 	 * @return true if {@link #getValueTypes()} is empty and {@link #isUnbounded()} is false. Otherwise, returns false.
 	 */
-	public boolean isInvalid() {
+	public boolean isEmptyArray() {
 		return !isUnbounded && valueTypes.isEmpty();
 	}
 

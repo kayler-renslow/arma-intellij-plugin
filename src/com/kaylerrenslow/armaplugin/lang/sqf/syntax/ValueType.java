@@ -12,14 +12,6 @@ import java.util.function.Function;
  */
 public interface ValueType {
 
-	@NotNull
-	String getDisplayName();
-
-	boolean isArray();
-
-	@NotNull
-	ExpandedValueType getExpanded();
-
 	/**
 	 * This method will compare {@link ExpandedValueType} instances returned from {@link ValueType#getExpanded()}.
 	 * <p>
@@ -27,13 +19,13 @@ public interface ValueType {
 	 * of elements to type1's number of elements. Also, each element type must match at each index. If an array
 	 * type is in the array type, this comparison will be used recursively.
 	 * <p>
-	 * If an allowed type is equal to {@link ValueType.Lookup#ANYTHING} or <code>type</code> is {@link ValueType.Lookup#ANYTHING},
+	 * If an allowed type is equal to {@link Lookup#ANYTHING} or <code>type</code> is {@link Lookup#ANYTHING},
 	 * the comparison of {@link ValueType} instances will always be true.
 	 *
 	 * @param type1 type to check
 	 * @param type2 other type to check
 	 * @return true if types are equivalent, false otherwise
-	 * @throws IllegalArgumentException if {@link ExpandedValueType#isInvalid()} returns true for either provided type
+	 * @throws IllegalArgumentException if {@link ExpandedValueType#isEmptyArray()} returns true for either provided type
 	 */
 	static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
 		LinkedList<ValueType> qType1 = new LinkedList<>();
@@ -42,13 +34,6 @@ public interface ValueType {
 		ExpandedValueType type1Expanded = type1.getExpanded();
 		ExpandedValueType type2Expanded = type2.getExpanded();
 
-		if (type1Expanded.isInvalid()) {
-			throw new IllegalArgumentException("type1 is invalid");
-		}
-		if (type2Expanded.isInvalid()) {
-			throw new IllegalArgumentException("type2 is invalid");
-		}
-
 		final boolean type1IsUnbounded = type1Expanded.isUnbounded();
 		final boolean type2IsUnbounded = type2Expanded.isUnbounded();
 		final boolean type1IsUnboundedEmpty = type1IsUnbounded && type1Expanded.getValueTypes().isEmpty();
@@ -56,6 +41,11 @@ public interface ValueType {
 
 		if (type1IsUnboundedEmpty && type2IsUnboundedEmpty) {
 			return true;
+		}
+
+		if (type1Expanded.isEmptyArray() || type2Expanded.isEmptyArray()) {
+			return (type1Expanded.isEmptyArray() || type1IsUnboundedEmpty)
+					&& (type2Expanded.isEmptyArray() || type2IsUnboundedEmpty);
 		}
 
 		ValueType lastType1 = Lookup.NOTHING, lastType2 = Lookup.NOTHING;
@@ -102,11 +92,9 @@ public interface ValueType {
 				if (!type2Pop.isArray()) {
 					return false;
 				}
-				for (ValueType expandedElementType : type1Pop.getExpanded().getValueTypes()) {
-					qType1.push(expandedElementType);
-				}
-				for (ValueType expandedElementType : type2Pop.getExpanded().getValueTypes()) {
-					qType1.push(expandedElementType);
+				boolean equal = typeEquivalent(type1Pop.getExpanded(), type2Pop.getExpanded());
+				if (!equal) {
+					return false;
 				}
 			} else {
 				if (type2Pop.isArray()) {
@@ -119,6 +107,14 @@ public interface ValueType {
 		}
 		return true;
 	}
+
+	@NotNull
+	String getDisplayName();
+
+	boolean isArray();
+
+	@NotNull
+	ExpandedValueType getExpanded();
 
 	enum Lookup implements ValueType {
 		ANYTHING("Anything"),

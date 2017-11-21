@@ -549,20 +549,23 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				}
 			} else {
 				ValueType postfixTypeTemp = postfixType;
+				LinkedList<CommandExpressionPart> partsTemp = parts;
 				if (postfixType == null) {
 					CommandExpressionPart peekPart = parts.peekFirst();
 					if (!peekPart.isCommandPart()) {
 						continue;
 					}
-					LinkedList<CommandExpressionPart> dup = new LinkedList<>();
-					dup.addAll(parts);
-					postfixType = getReturnTypeForCommand(dup, null, problems);
+					partsTemp = new LinkedList<>();
+					partsTemp.addAll(parts);
+					postfixType = getReturnTypeForCommand(parts, null, problems);
 					if (postfixType == null) {
+						parts = partsTemp;
 						continue;
 					}
 				}
 				if (postfixType != _VARIABLE && !postfixParam.allowedTypesContains(postfixType)) {
 					postfixType = postfixTypeTemp;
+					parts = partsTemp;
 					continue;
 				}
 			}

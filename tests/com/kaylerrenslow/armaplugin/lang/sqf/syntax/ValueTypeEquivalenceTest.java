@@ -74,48 +74,15 @@ public class ValueTypeEquivalenceTest {
 	}
 
 	@Test
-	public void typeNotEqual_emptyBoundedExpandedType() throws Exception {
-		try {
-			typeEquivalent(new ExpandedValueType(false), Lookup.NUMBER);
-			assertEquals("Expected an exception", true, false);
-		} catch (IllegalArgumentException ignore) {
+	public void typeEquivalence_emptyBoundedExpandedType() throws Exception {
+		assertEquals(false, typeEquivalent(new ExpandedValueType(false), Lookup.NUMBER));
+		assertEquals(false, typeEquivalent(new ExpandedValueType(false), Lookup.OBJECT));
+		assertEquals(false, typeEquivalent(Lookup.NUMBER, new ExpandedValueType(false)));
+		assertEquals(false, typeEquivalent(Lookup.OBJECT, new ExpandedValueType(false)));
 
-		}
-
-		try {
-			typeEquivalent(new ExpandedValueType(false), Lookup.OBJECT);
-			assertEquals("Expected an exception", true, false);
-		} catch (IllegalArgumentException ignore) {
-
-		}
-
-		try {
-			typeEquivalent(Lookup.NUMBER, new ExpandedValueType(false));
-			assertEquals("Expected an exception", true, false);
-		} catch (IllegalArgumentException ignore) {
-
-		}
-
-		try {
-			typeEquivalent(Lookup.OBJECT, new ExpandedValueType(false));
-			assertEquals("Expected an exception", true, false);
-		} catch (IllegalArgumentException ignore) {
-
-		}
-
-		try {
-			typeEquivalent(new ExpandedValueType(false), new ExpandedValueType(false));
-			assertEquals("Expected an exception", true, false);
-		} catch (IllegalArgumentException ignore) {
-
-		}
-
-		try {
-			typeEquivalent(new ExpandedValueType(false), new ExpandedValueType(false));
-			assertEquals("Expected an exception", true, false);
-		} catch (IllegalArgumentException ignore) {
-
-		}
+		assertEquals(true, typeEquivalent(new ExpandedValueType(false), new ExpandedValueType(false)));
+		assertEquals(true, typeEquivalent(Lookup.ARRAY, new ExpandedValueType(false)));
+		assertEquals(true, typeEquivalent(new ExpandedValueType(false), Lookup.ARRAY));
 	}
 
 	@Test
@@ -187,6 +154,35 @@ public class ValueTypeEquivalenceTest {
 				new ExpandedValueType(false, Lookup.NUMBER, Lookup.OBJECT),
 				new ExpandedValueType(true, Lookup.NUMBER, Lookup.OBJECT)
 		));
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(false, Lookup.OBJECT),
+				new ExpandedValueType(true, Lookup.OBJECT)
+		));
 	}
+
+	@Test
+	public void typeNotEqual_notEmpty_array() throws Exception {
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER),
+				new ExpandedValueType(true, Lookup.NUMBER)
+		));
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(true, Lookup.NUMBER),
+				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER)
+		));
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(false, Lookup.NUMBER, Lookup.OBJECT),
+				new ExpandedValueType(true, Lookup.OBJECT, Lookup.OBJECT)
+		));
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(false, Lookup.OBJECT),
+				new ExpandedValueType(true, Lookup.NUMBER)
+		));
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(true, Lookup.NUMBER),
+				new ExpandedValueType(false, Lookup.OBJECT)
+		));
+	}
+	//todo add nested array tests
 
 }
