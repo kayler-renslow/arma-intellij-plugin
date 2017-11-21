@@ -3,6 +3,8 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ExpandedValueType;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType;
 
+import static com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.Lookup;
+
 /**
  * Tests for syntax/type checking for {@link SQFFile} instances
  *
@@ -14,18 +16,18 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----START Literal Expression----
 	public void testLiteralExpression_number() throws Exception {
 		ValueType ret = getExitTypeForText("1");
-		assertEquals(ValueType.Lookup.NUMBER, ret);
+		assertEquals(Lookup.NUMBER, ret);
 	}
 
 	public void testLiteralExpression_string() throws Exception {
 		ValueType ret = getExitTypeForText("'hello'");
-		assertEquals(ValueType.Lookup.STRING, ret);
+		assertEquals(Lookup.STRING, ret);
 	}
 
 	public void testLiteralExpression_array() throws Exception {
 		ValueType ret = getExitTypeForText("[1,2,3]");
 
-		ValueType t = new ExpandedValueType(ValueType.Lookup.NUMBER, ValueType.Lookup.NUMBER, ValueType.Lookup.NUMBER);
+		ValueType t = new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
 
 		assertEquals(t, ret);
 	}
@@ -36,24 +38,24 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	public void testParenExpression1() throws Exception {
 		ValueType ret = getExitTypeForText("(1)");
-		assertEquals(ValueType.Lookup.NUMBER, ret);
+		assertEquals(Lookup.NUMBER, ret);
 	}
 
 	public void testParenExpression2() throws Exception {
 		ValueType ret = getExitTypeForText("('hello')");
-		assertEquals(ValueType.Lookup.STRING, ret);
+		assertEquals(Lookup.STRING, ret);
 	}
 
 	public void testParenExpression3() throws Exception {
 		ValueType ret = getExitTypeForText("([1,2,3])");
-		ValueType t = new ExpandedValueType(ValueType.Lookup.NUMBER, ValueType.Lookup.NUMBER, ValueType.Lookup.NUMBER);
+		ValueType t = new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
 
 		assertEquals(t, ret);
 	}
 
 	public void testParenExpression4() throws Exception {
 		ValueType ret = getExitTypeForText("(1+1)");
-		assertEquals(ValueType.Lookup.NUMBER, ret);
+		assertEquals(Lookup.NUMBER, ret);
 	}
 
 	//----END Paren Expression----
@@ -271,49 +273,49 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("''==''"); //string
 
 		{ //group
-			assertEquals(ValueType.Lookup.GROUP, getExitTypeForText("grpNull"));
+			assertEquals(Lookup.GROUP, getExitTypeForText("grpNull"));
 			assertNoProblems("grpNull==grpNull");
 			assertNoProblems("grpNull!=grpNull");
 		}
 
 		{ //side
-			assertEquals(ValueType.Lookup.SIDE, getExitTypeForText("west"));
+			assertEquals(Lookup.SIDE, getExitTypeForText("west"));
 			assertNoProblems("west==west");
 			assertNoProblems("west!=west");
 		}
 
 		{ //object
-			assertEquals(ValueType.Lookup.OBJECT, getExitTypeForText("objNull"));
+			assertEquals(Lookup.OBJECT, getExitTypeForText("objNull"));
 			assertNoProblems("objNull==objNull");
 			assertNoProblems("objNull!=objNull");
 		}
 
 		{ //config
-			assertEquals(ValueType.Lookup.CONFIG, getExitTypeForText("configFile"));
+			assertEquals(Lookup.CONFIG, getExitTypeForText("configFile"));
 			assertNoProblems("configFile==configFile");
 			assertNoProblems("configFile!=configFile");
 		}
 
 		{ //display
-			assertEquals(ValueType.Lookup.DISPLAY, getExitTypeForText("displayNull"));
+			assertEquals(Lookup.DISPLAY, getExitTypeForText("displayNull"));
 			assertNoProblems("displayNull==displayNull");
 			assertNoProblems("displayNull!=displayNull");
 		}
 
 		{ //control
-			assertEquals(ValueType.Lookup.CONTROL, getExitTypeForText("controlNull"));
+			assertEquals(Lookup.CONTROL, getExitTypeForText("controlNull"));
 			assertNoProblems("controlNull==controlNull");
 			assertNoProblems("controlNull!=controlNull");
 		}
 
 		{ //location
-			assertEquals(ValueType.Lookup.LOCATION, getExitTypeForText("locationNull"));
+			assertEquals(Lookup.LOCATION, getExitTypeForText("locationNull"));
 			assertNoProblems("locationNull==locationNull");
 			assertNoProblems("locationNull!=locationNull");
 		}
 
 		{ //structured text
-			assertEquals(ValueType.Lookup.STRUCTURED_TEXT, getExitTypeForText("parseText ''"));
+			assertEquals(Lookup.STRUCTURED_TEXT, getExitTypeForText("parseText ''"));
 			assertNoProblems("(parseText '')==(parseText '')");
 			assertNoProblems("(parseText '')!=(parseText '')");
 		}
@@ -489,10 +491,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("{+1.5}");
 		assertNoProblems("{}");
 
-		assertEquals(ValueType.Lookup.CODE, getExitTypeForText("{}"));
-		assertEquals(ValueType.Lookup.CODE, getExitTypeForText("{1}"));
-		assertEquals(ValueType.Lookup.CODE, getExitTypeForText("{_var}"));
-		assertEquals(ValueType.Lookup.CODE, getExitTypeForText("{1+1;1}"));
+		assertEquals(Lookup.CODE, getExitTypeForText("{}"));
+		assertEquals(Lookup.CODE, getExitTypeForText("{1}"));
+		assertEquals(Lookup.CODE, getExitTypeForText("{_var}"));
+		assertEquals(Lookup.CODE, getExitTypeForText("{1+1;1}"));
 	}
 	//----END code block Expression----
 
@@ -510,10 +512,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("case _var:{};");
 		assertNoProblems("case _var;");
 
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("case 1:{};"));
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("case 1:{2};"));
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("case 1;"));
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("case configFile;"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("case 1:{};"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("case 1:{2};"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("case 1;"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("case configFile;"));
 	}
 	//----END case statement----
 
@@ -529,10 +531,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		//this problem should be a grammar error, not a type error
 		assertNoProblems("a = ;");
 
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("a = {};"));
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("a={2};"));
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("a = 1+1;"));
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("a = _var;"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("a = {};"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("a={2};"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("a = 1+1;"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("a = _var;"));
 	}
 	//----END assignment statement----
 
@@ -545,8 +547,8 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		//this problem should be a grammar error, not a type error
 		assertNoProblems("? ;");
 
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("? true : false;"));
-		assertEquals(ValueType.Lookup.NOTHING, getExitTypeForText("? ;"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("? true : false;"));
+		assertEquals(Lookup.NOTHING, getExitTypeForText("? ;"));
 	}
 
 	public void testQuestStatement_bad() throws Exception {
@@ -554,4 +556,22 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertHasProblems("? {} : false;");
 	}
 	//----END quest statement----
+
+	//----START command expression----
+	public void testCommandExpression_ifThen_valid() throws Exception {
+		assertExitTypeAndNoProblems("if true then {};", null, Lookup.IF);
+		assertExitTypeAndNoProblems("if true then {} else {};", null, Lookup.IF);
+		assertExitTypeAndNoProblems("if true then [{},{}];", null, Lookup.IF);
+		assertExitTypeAndNoProblems("if true then [{},{},{}];", null, Lookup.IF);
+	}
+
+	public void testCommandExpression_ifThen_bad() throws Exception {
+		assertHasProblems("if 1 then {};");
+		assertHasProblems("if true then {} else;");
+		assertHasProblems("if true then [{}];");
+		assertHasProblems("if true then [];");
+		assertHasProblems("if true then [{},1];");
+		assertHasProblems("if true then [1,1];");
+	}
+	//----END command expression----
 }
