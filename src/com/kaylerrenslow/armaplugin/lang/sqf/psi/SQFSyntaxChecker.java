@@ -593,6 +593,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 							} else {
 								expectedSemicolon = true;
 							}
+						} else {
+							expectedSemicolon = true;
 						}
 					}
 				} else {

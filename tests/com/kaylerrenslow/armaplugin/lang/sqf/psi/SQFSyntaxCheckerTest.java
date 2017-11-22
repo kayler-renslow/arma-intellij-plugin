@@ -572,6 +572,14 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertHasProblems("if true then [];");
 		assertHasProblems("if true then [{},1];");
 		assertHasProblems("if true then [1,1];");
+		assertHasProblems("if then {};");
+		assertHasProblems("if true then;");
+	}
+
+	public void testCommandExpression_noArgsCommands_bad() throws Exception {
+		assertHasProblems("true true;"); //need semicolon
+		assertHasProblems("true 1;"); //need semicolon
+
 	}
 	//todo test optional params (including optional array params)
 	//----END command expression----
