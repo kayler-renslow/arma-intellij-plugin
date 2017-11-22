@@ -520,24 +520,20 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			prefixType = previousCommandReturnType;
 		}
 
-		LinkedList<CommandExpressionPart> partsBeforeGettingPeekNextPartType = parts;
-		ValueType peekNextTypeType = null;
+		LinkedList<CommandExpressionPart> partsAfterGettingPeekNextPartType;
+		ValueType peekNextPartType = null;
 		{
 			CommandExpressionPart peekNextPart = parts.peekFirst();
+			partsAfterGettingPeekNextPartType = new LinkedList<>();
+			partsAfterGettingPeekNextPartType.addAll(parts);
+
 			if (peekNextPart != null) {
 				if (peekNextPart.isCommandPart()) {
-					partsBeforeGettingPeekNextPartType = new LinkedList<>();
-					partsBeforeGettingPeekNextPartType.addAll(parts);
-					peekNextTypeType = getReturnTypeForCommand(parts, null, null);
-					if (peekNextTypeType == _ERROR) {
-						peekNextTypeType = previousCommandReturnType;
-						parts = partsBeforeGettingPeekNextPartType;
-					}
+					peekNextPartType = getReturnTypeForCommand(partsAfterGettingPeekNextPartType, null, null);
 				} else {
-					peekNextTypeType = getTypeForPart.apply(peekNextPart);
+					peekNextPartType = getTypeForPart.apply(peekNextPart);
+					partsAfterGettingPeekNextPartType.removeFirst();
 				}
-			} else {
-				peekNextTypeType = previousCommandReturnType;
 			}
 		}
 
@@ -561,19 +557,20 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			if (postfixParam == null) {
 				usingPeekedNextPart = false;
 			} else {
-				if (peekNextTypeType == null) {
+				if (peekNextPartType == null) {
 					continue;
 				}
-				if (peekNextTypeType != _VARIABLE && !postfixParam.allowedTypesContains(peekNextTypeType)) {
+				if (peekNextPartType == _ERROR) {
+					continue;
+				}
+				if (peekNextPartType != _VARIABLE && !postfixParam.allowedTypesContains(peekNextPartType)) {
 					continue;
 				}
 				usingPeekedNextPart = true;
 			}
 
 			if (usingPeekedNextPart) {
-				parts.removeFirst(); //remove the peeked part (peekNextPart)
-			} else {
-				parts = partsBeforeGettingPeekNextPartType;
+				parts = partsAfterGettingPeekNextPartType;
 			}
 
 			ValueType retType = syntax.getReturnValue().getType();
@@ -624,7 +621,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					"No syntax for '" +
 							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
 							+ commandName +
-							(peekNextTypeType == null ? "" : " " + peekNextTypeType.getDisplayName()) + "'"
+							(peekNextPartType == null ? "" : " " + peekNextPartType.getDisplayName()) + "'"
 			);
 		}
 		return Lookup._ERROR;

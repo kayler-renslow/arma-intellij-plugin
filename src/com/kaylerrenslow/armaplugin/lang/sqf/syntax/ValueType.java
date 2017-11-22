@@ -53,7 +53,7 @@ public interface ValueType {
 			return false;
 		}
 
-		if (type1Expanded.getValueTypes().size() < type2Expanded.getValueTypes().size()
+		if (type2Expanded.getValueTypes().size() < type1Expanded.getValueTypes().size()
 				&& !type1IsUnbounded && !type2IsUnbounded) {
 			return false;
 		}

@@ -235,9 +235,26 @@ public class ValueTypeEquivalenceTest {
 				new ExpandedValueType(false, Lookup.CODE, Lookup.CODE),
 				new SingletonArrayExpandedValueType(Lookup.CODE)
 		));
-		assertEquals(false, typeEquivalent(
+	}
+
+	@Test
+	public void typeEqual_largerSecondArray() throws Exception {
+		assertEquals(true, typeEquivalent(
+				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER),
+				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER, Lookup.NUMBER)
+		));
+
+		assertEquals(true, typeEquivalent(
 				new SingletonArrayExpandedValueType(Lookup.CODE),
 				new ExpandedValueType(false, Lookup.CODE, Lookup.CODE)
+		));
+	}
+
+	@Test
+	public void typeNotEqual_largerFirstArray() throws Exception {
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER, Lookup.NUMBER),
+				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER)
 		));
 	}
 
