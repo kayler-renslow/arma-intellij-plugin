@@ -21,7 +21,18 @@ public class ExpandedValueType implements ValueType {
 	private final boolean isUnbounded;
 
 	/**
-	 * Create an instance with the specified <b>required</b> {@link ValueType} instances.
+	 * Create an instance with the specified {@link ValueType} instances.
+	 *
+	 * @param isUnbounded true if the last element in valueTypes is repeating, false otherwise
+	 * @param valueTypes  value types to use (this list will be used internally for this class)
+	 */
+	protected ExpandedValueType(boolean isUnbounded, @NotNull List<ValueType> valueTypes) {
+		this.isUnbounded = isUnbounded;
+		this.valueTypes = valueTypes;
+	}
+
+	/**
+	 * Create an instance with the specified {@link ValueType} instances.
 	 * Every value type provided will be marked as required.
 	 * <p>
 	 * This will invoke {@link ExpandedValueType#ExpandedValueType(boolean, ValueType...)} with unbounded set to false
@@ -33,7 +44,7 @@ public class ExpandedValueType implements ValueType {
 	}
 
 	/**
-	 * Create an instance with the specified <b>required</b> {@link ValueType} instances.
+	 * Create an instance with the specified {@link ValueType} instances.
 	 *
 	 * @param isUnbounded true if the last element in valueTypes is repeating, false otherwise
 	 * @param valueTypes  value types to use
@@ -61,6 +72,9 @@ public class ExpandedValueType implements ValueType {
 		return valueTypes;
 	}
 
+	/**
+	 * Adds a {@link ValueType} to {@link #getValueTypes()}
+	 */
 	public void addValueType(@NotNull ValueType type) {
 		valueTypes.add(type);
 	}

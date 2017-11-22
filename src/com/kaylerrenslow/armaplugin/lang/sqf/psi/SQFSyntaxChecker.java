@@ -417,6 +417,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 		SQFArray arr = expr.getArr();
 		if (arr != null) {
+			if (arr.getExpressions().size() == 1) {
+				return new SingletonArrayExpandedValueType(
+						(ValueType) arr.getExpressions().get(0).accept(this, cluster)
+				);
+			}
 			ExpandedValueType expandedValueType = new ExpandedValueType(false);
 			for (SQFExpression arrItemExpr : arr.getExpressions()) {
 				expandedValueType.addValueType((ValueType) arrItemExpr.accept(this, cluster));

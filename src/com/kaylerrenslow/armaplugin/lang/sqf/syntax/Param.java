@@ -47,7 +47,7 @@ public class Param extends BasicValueHolder {
 	public String toString() {
 		return "Param{" +
 				"name=" + name +
-				"super.toString{" + super.toString() +
+				", super.toString{" + super.toString() +
 				"}}";
 	}
 }

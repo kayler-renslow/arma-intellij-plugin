@@ -28,6 +28,7 @@ public interface ValueType {
 	 * @throws IllegalArgumentException if {@link ExpandedValueType#isEmptyArray()} returns true for either provided type
 	 */
 	static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
+
 		LinkedList<ValueType> qType1 = new LinkedList<>();
 		LinkedList<ValueType> qType2 = new LinkedList<>();
 
@@ -46,6 +47,15 @@ public interface ValueType {
 		if (type1Expanded.isEmptyArray() || type2Expanded.isEmptyArray()) {
 			return (type1Expanded.isEmptyArray() || type1IsUnboundedEmpty)
 					&& (type2Expanded.isEmptyArray() || type2IsUnboundedEmpty);
+		}
+
+		if (!(type1.isArray() && type2.isArray()) && (type1.isArray() || type2.isArray())) {
+			return false;
+		}
+
+		if (type1Expanded.getValueTypes().size() < type2Expanded.getValueTypes().size()
+				&& !type1IsUnbounded && !type2IsUnbounded) {
+			return false;
 		}
 
 		ValueType lastType1 = Lookup.NOTHING, lastType2 = Lookup.NOTHING;

@@ -26,4 +26,18 @@ public class ArrayReturnValueHolder extends ReturnValueHolder implements ArrayVa
 	public List<ReturnValueHolder> getValueHolders() {
 		return values;
 	}
+
+	@NotNull
+	@Override
+	public ValueType getType() {
+		if (values.size() == 1 && !unbounded) {
+			return new SingletonArrayExpandedValueType(values.get(0).getType());
+		}
+
+		ExpandedValueType t = new ExpandedValueType(this.unbounded);
+		for (ReturnValueHolder v : values) {
+			t.getValueTypes().add(v.getType());
+		}
+		return t;
+	}
 }

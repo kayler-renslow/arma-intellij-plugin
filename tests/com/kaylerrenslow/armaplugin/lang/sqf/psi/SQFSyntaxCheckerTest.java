@@ -573,5 +573,6 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertHasProblems("if true then [{},1];");
 		assertHasProblems("if true then [1,1];");
 	}
+	//todo test optional params (including optional array params)
 	//----END command expression----
 }
