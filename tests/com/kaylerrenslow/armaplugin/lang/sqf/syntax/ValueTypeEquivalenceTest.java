@@ -239,6 +239,10 @@ public class ValueTypeEquivalenceTest {
 
 	@Test
 	public void typeEqual_largerSecondArray() throws Exception {
+		//If the length of the second array is >= to the first array, they are considered equal.
+		//The reason for this is that the first array specifies the minimum requirements. Anything after the requirements,
+		//can safely be ignored.
+
 		assertEquals(true, typeEquivalent(
 				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER),
 				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER, Lookup.NUMBER)
@@ -255,6 +259,10 @@ public class ValueTypeEquivalenceTest {
 		assertEquals(false, typeEquivalent(
 				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER, Lookup.NUMBER),
 				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER)
+		));
+		assertEquals(false, typeEquivalent(
+				new ExpandedValueType(false, Lookup.CODE, Lookup.NUMBER),
+				new SingletonArrayExpandedValueType(Lookup.CODE)
 		));
 	}
 
