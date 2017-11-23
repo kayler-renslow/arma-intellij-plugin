@@ -522,7 +522,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		LinkedList<CommandExpressionPart> partsAfterGettingPeekNextPartType;
-		Counter peekDepthBeforeGettingPeekNextPartType = new Counter(peekPartDepth.count);
+		int peekDepthBeforeGettingPeekNextPartType = peekPartDepth.count;
 		ValueType peekNextPartType = null;
 		{
 			CommandExpressionPart peekNextPart = parts.peekFirst();
@@ -592,7 +592,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				parts = partsAfterGettingPeekNextPartType;
 				peekPartDepth.count++;
 			} else {
-				peekPartDepth.count = peekDepthBeforeGettingPeekNextPartType.count;
+				peekPartDepth.count = peekDepthBeforeGettingPeekNextPartType;
 			}
 
 			ValueType retType = syntax.getReturnValue().getType();
