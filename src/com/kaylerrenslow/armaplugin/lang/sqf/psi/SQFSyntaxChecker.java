@@ -619,21 +619,23 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			return retType;
 		}
 		if (problems != null) {
-			problems.registerProblem(
-					command,
-					"No syntax for '" +
-							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
-							+ commandName + "'",
-					ProblemHighlightType.ERROR
-			);
-			problems.registerProblem(
-					command,
-					"No syntax for '" +
-							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
-							+ commandName +
-							(peekNextPartType == null ? "" : " " + peekNextPartType.getDisplayName()) + "'",
-					ProblemHighlightType.ERROR
-			);
+			if (peekNextPartType == null) {
+				problems.registerProblem(
+						command,
+						"No syntax for '" +
+								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
+								+ commandName + "'",
+						ProblemHighlightType.ERROR
+				);
+			} else {
+				problems.registerProblem(
+						command,
+						"No syntax for '" +
+								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
+								+ commandName + " " + peekNextPartType.getDisplayName() + "'",
+						ProblemHighlightType.ERROR
+				);
+			}
 		}
 		return Lookup._ERROR;
 	}

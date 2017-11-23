@@ -60,7 +60,6 @@ public interface ValueType {
 			) && (
 					type2Expanded.isEmptyArray()
 							|| type2IsUnboundedEmpty
-					//|| type2Expanded.getNumOptionalValues() >= type2Expanded.getValueTypes().size()
 			);
 		}
 

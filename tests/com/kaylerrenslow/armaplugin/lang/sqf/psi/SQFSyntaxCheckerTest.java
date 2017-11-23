@@ -559,6 +559,11 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END quest statement----
 
 	//----START command expression----
+	public void testCommandExpression_randomExpressions_valid() throws Exception {
+		assertNoProblems("_ctrl ctrlSetStructuredText parseText localize \"str_vsm_no_vehicle\";");
+		assertNoProblems("_ctrl ctrlSetStructuredText parseText '';");
+	}
+
 	public void testCommandExpression_ifThen_valid() throws Exception {
 		assertExitTypeAndNoProblems("if true then {};", null, Lookup.IF);
 		assertExitTypeAndNoProblems("if true then {} else {};", null, Lookup.IF);
