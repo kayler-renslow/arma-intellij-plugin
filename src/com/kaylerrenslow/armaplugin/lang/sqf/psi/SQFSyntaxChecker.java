@@ -469,12 +469,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 		}
 
-		return getReturnTypeForCommand(parts, null, problems);
+		return getReturnTypeForCommand(parts, null, new Counter(0), problems);
 	}
 
 	@NotNull
 	private ValueType getReturnTypeForCommand(@NotNull LinkedList<CommandExpressionPart> parts,
 											  @Nullable ValueType previousCommandReturnType,
+											  @NotNull Counter peekPartDepth,
 											  @Nullable ProblemsHolder problems) {
 
 		ValueType prefixType = null;
@@ -521,6 +522,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		LinkedList<CommandExpressionPart> partsAfterGettingPeekNextPartType;
+		Counter peekDepthBeforeGettingPeekNextPartType = new Counter(peekPartDepth.count);
 		ValueType peekNextPartType = null;
 		{
 			CommandExpressionPart peekNextPart = parts.peekFirst();
@@ -529,7 +531,14 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 			if (peekNextPart != null) {
 				if (peekNextPart.isCommandPart()) {
-					peekNextPartType = getReturnTypeForCommand(partsAfterGettingPeekNextPartType, null, null);
+					//pass null to problems reporter because we are TESTING to see if
+					//the peeked next part COULD work. If there was problems, we can just ignore it.
+					peekNextPartType = getReturnTypeForCommand(
+							partsAfterGettingPeekNextPartType,
+							null,
+							peekPartDepth,
+							null
+					);
 				} else {
 					peekNextPartType = getTypeForPart.apply(peekNextPart);
 					partsAfterGettingPeekNextPartType.removeFirst();
@@ -547,8 +556,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					continue;
 				}
 			} else {
-				if (prefixType == null) {
-					if (!prefixParam.isOptional()) {
+				if (!prefixParam.isOptional()) {
+					if (prefixType == null) {
 						continue;
 					}
 				}
@@ -559,13 +568,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			if (postfixParam == null) {
 				usingPeekedNextPart = false;
 			} else {
-				if (peekNextPartType == null) {
-					if (!postfixParam.isOptional()) {
-						continue;
-					}
-				}
 				if (peekNextPartType == _ERROR) {
 					continue;
+				}
+				if (!postfixParam.isOptional()) {
+					if (peekNextPartType == null) {
+						continue;
+					}
 				}
 				if (peekNextPartType != null && peekNextPartType != _VARIABLE && !postfixParam.allowedTypesContains(peekNextPartType)) {
 					continue;
@@ -574,7 +583,16 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 
 			if (usingPeekedNextPart) {
+				//since parts is duplicated for each recursive call, we need to make sure
+				//we consume the same amount of parts as the previous recursive call
+				//for cases like parseText localize ''
+				for (int i = 0; !partsAfterGettingPeekNextPartType.isEmpty() && i < peekPartDepth.count; i++) {
+					partsAfterGettingPeekNextPartType.removeFirst();
+				}
 				parts = partsAfterGettingPeekNextPartType;
+				peekPartDepth.count++;
+			} else {
+				peekPartDepth.count = peekDepthBeforeGettingPeekNextPartType.count;
 			}
 
 			ValueType retType = syntax.getReturnValue().getType();
@@ -613,7 +631,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					}
 				}
 				if (consumeMoreCommands) {
-					getReturnTypeForCommand(parts, retType, problems);
+					getReturnTypeForCommand(parts, retType, new Counter(0), problems);
 				}
 			}
 			return retType;
@@ -835,6 +853,19 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		@Override
 		public String toString() {
 			return getPsiElement().getText();
+		}
+	}
+
+	private static class Counter {
+		private int count = 0;
+
+		public Counter(int i) {
+			this.count = i;
+		}
+
+		@Override
+		public String toString() {
+			return count + "";
 		}
 	}
 
