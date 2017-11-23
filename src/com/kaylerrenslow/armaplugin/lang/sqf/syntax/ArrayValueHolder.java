@@ -47,9 +47,12 @@ public interface ArrayValueHolder extends ValueHolder {
 			return new SingletonArrayExpandedValueType(holders.get(0).getType());
 		}
 		ExpandedValueType t = new ExpandedValueType(unbounded);
+		int numOptional = 0;
 		for (ValueHolder childH : holders) {
 			t.getValueTypes().add(childH.getType());
+			numOptional += childH.isOptional() ? 1 : 0;
 		}
+		t.setNumOptionalValues(numOptional);
 		return t;
 	}
 }

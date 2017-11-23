@@ -19,9 +19,10 @@ public class ExpandedValueType implements ValueType {
 	@NotNull
 	private final List<ValueType> valueTypes;
 	private final boolean isUnbounded;
+	private int numOptionalValues;
 
 	/**
-	 * Create an instance with the specified {@link ValueType} instances.
+	 * Create an instance with the specified {@link ValueType} instances. This will set {@link #getNumOptionalValues()} to 0.
 	 *
 	 * @param isUnbounded true if the last element in valueTypes is repeating, false otherwise
 	 * @param valueTypes  value types to use (this list will be used internally for this class)
@@ -29,13 +30,14 @@ public class ExpandedValueType implements ValueType {
 	protected ExpandedValueType(boolean isUnbounded, @NotNull List<ValueType> valueTypes) {
 		this.isUnbounded = isUnbounded;
 		this.valueTypes = valueTypes;
+		numOptionalValues = 0;
 	}
 
 	/**
 	 * Create an instance with the specified {@link ValueType} instances.
 	 * Every value type provided will be marked as required.
 	 * <p>
-	 * This will invoke {@link ExpandedValueType#ExpandedValueType(boolean, ValueType...)} with unbounded set to false
+	 * This will invoke {@link ExpandedValueType#ExpandedValueType(boolean, ValueType...)} with unbounded set to false.
 	 *
 	 * @param valueTypes value types to use
 	 */
@@ -44,7 +46,7 @@ public class ExpandedValueType implements ValueType {
 	}
 
 	/**
-	 * Create an instance with the specified {@link ValueType} instances.
+	 * Create an instance with the specified {@link ValueType} instances. This will set {@link #getNumOptionalValues()} to 0.
 	 *
 	 * @param isUnbounded true if the last element in valueTypes is repeating, false otherwise
 	 * @param valueTypes  value types to use
@@ -54,6 +56,7 @@ public class ExpandedValueType implements ValueType {
 
 		this.valueTypes = new ArrayList<>(valueTypes.length);
 		Collections.addAll(this.valueTypes, valueTypes);
+		numOptionalValues = 0;
 	}
 
 	/**
@@ -70,6 +73,34 @@ public class ExpandedValueType implements ValueType {
 	@NotNull
 	public List<ValueType> getValueTypes() {
 		return valueTypes;
+	}
+
+	/**
+	 * Get how many optional values from {@link #getValueTypes()} there are. If 0, all values are required.
+	 * If >0, then the optional values are from the end of {@link #getValueTypes()} until this value.
+	 * For example, if this returned 1, then the last value is optional. If returns 2, the last 2 are optional.
+	 * Etc. If this returns a value >= <code>{@link #getValueTypes()}.size()</code>, then all values are optional.
+	 * <p>
+	 * Note that if this returns a number >1, then either the last parameter can be omitted, or the last 2. You cannot omit
+	 * a value in between other optional values!
+	 *
+	 * @return number of optional values (>=0)
+	 */
+	public int getNumOptionalValues() {
+		return numOptionalValues;
+	}
+
+	/**
+	 * Sets {@link #getNumOptionalValues()}
+	 *
+	 * @param numOptionalValues the new amount of optional value count
+	 * @throws IllegalArgumentException when numOptionalValues < 0
+	 */
+	public void setNumOptionalValues(int numOptionalValues) {
+		if (numOptionalValues < 0) {
+			throw new IllegalStateException("numOptionalValues is <0");
+		}
+		this.numOptionalValues = numOptionalValues;
 	}
 
 	/**
@@ -156,6 +187,7 @@ public class ExpandedValueType implements ValueType {
 		return false;
 	}
 
+	@NotNull
 	public String debugToString() {
 		return "ExpandedValueType{" +
 				"valueTypes=" + valueTypes +

@@ -44,18 +44,21 @@ public interface ValueType {
 		}
 
 		if (type1Expanded.isEmptyArray() || type2Expanded.isEmptyArray()) {
-			return (type1Expanded.isEmptyArray() || type1IsUnboundedEmpty)
-					&& (type2Expanded.isEmptyArray() || type2IsUnboundedEmpty);
+			return (
+					type1Expanded.isEmptyArray()
+							|| type1IsUnboundedEmpty
+							|| type1Expanded.getNumOptionalValues() >= type1Expanded.getValueTypes().size()
+			) && (
+					type2Expanded.isEmptyArray()
+							|| type2IsUnboundedEmpty
+					//|| type2Expanded.getNumOptionalValues() >= type2Expanded.getValueTypes().size()
+			);
 		}
 
 		if (!(type1.isArray() && type2.isArray()) && (type1.isArray() || type2.isArray())) {
 			return false;
 		}
 
-		if (type2Expanded.getValueTypes().size() < type1Expanded.getValueTypes().size()
-				&& !type1IsUnbounded && !type2IsUnbounded) {
-			return false;
-		}
 
 		ValueType lastType1 = Lookup.NOTHING, lastType2 = Lookup.NOTHING;
 
@@ -81,14 +84,26 @@ public interface ValueType {
 			}
 		}
 
+
 		while (!qType1.isEmpty() || (type1IsUnbounded && !qType2.isEmpty())) {
-			ValueType type1Pop = (qType1.isEmpty() && type1IsUnbounded) ? lastType1 :
-					(qType1.isEmpty() ? null : qType1.removeFirst());
+			ValueType type1Pop = (qType1.isEmpty() && type1IsUnbounded) ? lastType1 : qType1.removeFirst();
 			ValueType type2Pop = (qType2.isEmpty() && type2IsUnbounded) ? lastType2 :
 					(qType2.isEmpty() ? null : qType2.removeFirst());
 
-			if (type1Pop == null || type2Pop == null) {
-				return false;
+			//todo check if type 1 optional values can be used
+
+			if (type2Pop == null) {
+//				check if remaining qType1 values are optional
+
+				if (type1Expanded.getNumOptionalValues() <= 0) {
+					return false;
+				}
+				if (qType1.size() >= type1Expanded.getNumOptionalValues()) {
+					return false;
+				}
+
+				//we can omit last values because they are optional
+				return true;
 			}
 
 			if (type1Pop == Lookup.ANYTHING) {

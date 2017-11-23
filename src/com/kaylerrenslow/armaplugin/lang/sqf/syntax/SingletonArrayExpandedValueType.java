@@ -7,7 +7,8 @@ import java.util.List;
 
 /**
  * A type of {@link ExpandedValueType} where there is only 1 {@link ValueType}, {@link #isArray()} will always return true,
- * and {@link #isUnbounded()} will always return false
+ * and {@link #isUnbounded()} will always return false. Also, {@link #getNumOptionalValues()} will return 0 and
+ * {@link #setNumOptionalValues(int)} will throw exception.
  *
  * @author Kayler
  * @since 11/21/2017
@@ -61,4 +62,13 @@ public class SingletonArrayExpandedValueType extends ExpandedValueType {
 		throw new IllegalStateException("can't add type to singleton array");
 	}
 
+	@Override
+	public final int getNumOptionalValues() {
+		return 0;
+	}
+
+	@Override
+	public final void setNumOptionalValues(int numOptionalValues) {
+		throw new IllegalStateException("can't set number of optional values for singleton array");
+	}
 }

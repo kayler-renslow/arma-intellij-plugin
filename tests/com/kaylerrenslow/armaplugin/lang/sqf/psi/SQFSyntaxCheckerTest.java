@@ -641,6 +641,5 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertExitTypeAndNoProblems("position;", cluster, Lookup.CONFIG);
 
 	}
-	//todo test optional nested array params
 	//----END command expression----
 }
