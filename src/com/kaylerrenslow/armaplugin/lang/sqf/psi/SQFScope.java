@@ -118,6 +118,12 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 
 	@NotNull
 	static List<SQFVariableReference> getVariableReferencesFor(@NotNull SQFVariable variable) {
+		System.err.println("Implementation IDEA: We create a VarialeScopeMap data structure where" +
+				" we put a _var inside and then the private scope paired with it." +
+				" When we enter a new scope, we wrap that instance in a new one " +
+				"and if the wrapper instance doesn't contain the _var, we check the wrapped instance."+
+				"This will drastically improve speed of checking scope and should fix all of our issues when implemented."
+		);
 		List<SQFVariableReference> vars = new ArrayList<>();
 		PsiFile file = variable.getContainingFile();
 		if (file == null) {

@@ -86,7 +86,7 @@ public class PsiUtil {
 	 * It is also possible to stop the traversal at any time with callback by returning true in it
 	 *
 	 * @param start    starting ASTNode
-	 * @param callback TraversalObjectFinder
+	 * @param callback function that returns true to continue search, or null/false to end search completely
 	 */
 	public static void traverseBreadthFirstSearch(@NotNull ASTNode start, @NotNull Function<ASTNode, Boolean> callback) {
 		Boolean stop = callback.apply(start);
@@ -109,6 +109,38 @@ public class PsiUtil {
 			children = node.getChildren(null);
 			for (ASTNode child : children) {
 				nodes.addLast(child);
+			}
+		}
+	}
+
+	/**
+	 * Traverses the entire ast tree with DFS, starting from start. Each node that is found will be sent to callback.
+	 * It is also possible to stop the traversal at any time with callback by returning true in it
+	 *
+	 * @param start    starting ASTNode
+	 * @param callback function that returns true to continue search, or null/false to end search completely
+	 */
+	public static void traverseDepthFirstSearch(@NotNull ASTNode start, @NotNull Function<ASTNode, Boolean> callback) {
+		Boolean stop = callback.apply(start);
+		if (stop != null && stop) {
+			return;
+		}
+		ASTNode[] children = start.getChildren(null);
+		LinkedList<ASTNode> nodes = new LinkedList<>();
+
+		for (ASTNode child : children) {
+			nodes.push(child);
+		}
+		ASTNode node;
+		while (nodes.size() > 0) {
+			node = nodes.pop();
+			stop = callback.apply(node);
+			if (stop != null && stop) {
+				return;
+			}
+			children = node.getChildren(null);
+			for (ASTNode child : children) {
+				nodes.push(child);
 			}
 		}
 	}
