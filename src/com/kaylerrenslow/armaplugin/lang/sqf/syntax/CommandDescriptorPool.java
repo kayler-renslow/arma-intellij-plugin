@@ -22,12 +22,10 @@ public class CommandDescriptorPool {
 	 * once to save overall time when fetching lots of commands at once.
 	 */
 	private final Map<String, CommandDescriptor> frequentCache = new HashMap<>();
-	private final DescriptorWrapper PLACEHOLDER = new DescriptorWrapper(new CommandDescriptor(""));
 	private final Random random = new Random();
 	private final LinkedBlockingQueue<ProcessingCommand> processing = new LinkedBlockingQueue<>();
 
 	public CommandDescriptorPool() {
-		Arrays.fill(tallyCache, PLACEHOLDER);
 		String[] frequent = {
 				"addAction",
 				"and",
@@ -86,7 +84,7 @@ public class CommandDescriptorPool {
 				"while",
 		};
 		for (String command : frequent) {
-			frequentCache.put(command.toLowerCase(), PLACEHOLDER.descriptor);
+			frequentCache.put(command.toLowerCase(), getDescriptorFromFile(command));
 		}
 	}
 
@@ -111,22 +109,10 @@ public class CommandDescriptorPool {
 	@Nullable
 	public CommandDescriptor get(@NotNull String commandName) {
 		commandName = commandName.toLowerCase();
-		synchronized (frequentCache) {
-			if (frequentCache.containsKey(commandName)) {
-				CommandDescriptor descriptor = frequentCache.get(commandName);
-				if (descriptor == PLACEHOLDER.descriptor) {
-					//instead of loading them all at application start,
-					//we'll load them from file as we need them. This should reduce startup times.
-					CommandDescriptor d = getDescriptorFromFile(commandName);
-					if (d == null) {
-						//we are only going to report frequent commands as errors because we are lazy
-						throw new IllegalStateException("frequent command '" + commandName + "' should have syntax xml");
-					}
-					frequentCache.put(commandName, d);
-					return d;
-				}
-			}
+		if (frequentCache.containsKey(commandName)) {
+			return frequentCache.get(commandName);
 		}
+
 		synchronized (tallyCache) {
 			for (DescriptorWrapper w : tallyCache) {
 				if (w == null) {
