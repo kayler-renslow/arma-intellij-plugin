@@ -65,4 +65,5 @@ public interface ValueHolder {
 		}
 		return false;
 	}
+
 }

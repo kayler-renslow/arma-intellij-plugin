@@ -1,7 +1,8 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
-import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ExpandedValueType;
-import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType;
+import com.kaylerrenslow.armaplugin.lang.sqf.syntax.*;
+
+import java.util.Arrays;
 
 import static com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.Lookup;
 
@@ -581,6 +582,65 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertHasProblems("true 1;"); //need semicolon
 
 	}
-	//todo test optional params (including optional array params)
+
+	public void testCommandExpression_optionalParameters_valid() throws Exception {
+		//fake a command syntax to assert that the syntax isn't the creating false negatives
+		CommandDescriptor d1 = new CommandDescriptor("getPos", Arrays.asList(
+				new CommandSyntax(
+						null,
+						new ArrayParam(
+								false,
+								Arrays.asList(
+										new Param("required", Lookup.NUMBER, "", false),
+										new Param("optional", Lookup.NUMBER, "", true)
+								),
+								true
+						),
+						new ReturnValueHolder(Lookup.VOID, "")
+				)
+		), "", BIGame.UNKNOWN);
+
+		CommandDescriptor d2 = new CommandDescriptor("position", Arrays.asList(
+				new CommandSyntax(
+						new Param("optionalPrefix", Lookup.NUMBER, "", true),
+						new ArrayParam(
+								false,
+								Arrays.asList(
+										new ArrayParam(
+												false,
+												Arrays.asList(
+														new Param("required", Lookup.CODE, "", false)
+												),
+												true
+										),
+										new Param("optional", Lookup.NUMBER, "", true)
+								),
+								true
+						),
+						new ReturnValueHolder(Lookup.CONFIG, "")
+				)
+		), "", BIGame.UNKNOWN);
+
+
+		CommandDescriptorCluster cluster = new CommandDescriptorCluster(d1, d2);
+
+		assertExitTypeAndNoProblems("getPos [1,1];", cluster, Lookup.VOID);
+		assertExitTypeAndNoProblems("getPos [1];", cluster, Lookup.VOID);
+		assertExitTypeAndNoProblems("getPos;", cluster, Lookup.VOID);
+
+		assertExitTypeAndNoProblems("position [[{}],1];", cluster, Lookup.CONFIG);
+		assertExitTypeAndNoProblems("position [[{}]];", cluster, Lookup.CONFIG);
+		assertExitTypeAndNoProblems("position [];", cluster, Lookup.CONFIG);
+
+		assertExitTypeAndNoProblems("0 position;", cluster, Lookup.CONFIG);
+		assertExitTypeAndNoProblems("0 position [[{}],1];", cluster, Lookup.CONFIG);
+		assertExitTypeAndNoProblems("0 position [[{}]];", cluster, Lookup.CONFIG);
+		assertExitTypeAndNoProblems("0 position [];", cluster, Lookup.CONFIG);
+		assertExitTypeAndNoProblems("0 position;", cluster, Lookup.CONFIG);
+
+		assertExitTypeAndNoProblems("position;", cluster, Lookup.CONFIG);
+
+	}
+	//todo test optional nested array params
 	//----END command expression----
 }

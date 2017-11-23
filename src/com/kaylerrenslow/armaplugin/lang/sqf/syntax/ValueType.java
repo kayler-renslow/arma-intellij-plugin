@@ -28,7 +28,6 @@ public interface ValueType {
 	 * @throws IllegalArgumentException if {@link ExpandedValueType#isEmptyArray()} returns true for either provided type
 	 */
 	static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
-
 		LinkedList<ValueType> qType1 = new LinkedList<>();
 		LinkedList<ValueType> qType2 = new LinkedList<>();
 

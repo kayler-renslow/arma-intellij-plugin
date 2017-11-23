@@ -548,9 +548,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				}
 			} else {
 				if (prefixType == null) {
-					continue;
+					if (!prefixParam.isOptional()) {
+						continue;
+					}
 				}
-				if (prefixType != _VARIABLE && !prefixParam.allowedTypesContains(prefixType)) {
+				if (prefixType != null && prefixType != _VARIABLE && !prefixParam.allowedTypesContains(prefixType)) {
 					continue;
 				}
 			}
@@ -558,12 +560,14 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				usingPeekedNextPart = false;
 			} else {
 				if (peekNextPartType == null) {
-					continue;
+					if (!postfixParam.isOptional()) {
+						continue;
+					}
 				}
 				if (peekNextPartType == _ERROR) {
 					continue;
 				}
-				if (peekNextPartType != _VARIABLE && !postfixParam.allowedTypesContains(peekNextPartType)) {
+				if (peekNextPartType != null && peekNextPartType != _VARIABLE && !postfixParam.allowedTypesContains(peekNextPartType)) {
 					continue;
 				}
 				usingPeekedNextPart = true;

@@ -45,13 +45,6 @@ public class ArrayParam extends Param implements ArrayValueHolder {
 	@NotNull
 	@Override
 	public ValueType getType() {
-		if (params.size() == 1 && !unboundedParams) {
-			return new SingletonArrayExpandedValueType(params.get(0).getType());
-		}
-		ExpandedValueType t = new ExpandedValueType(this.unboundedParams);
-		for (Param p : params) {
-			t.getValueTypes().add(p.getType());
-		}
-		return t;
+		return ArrayValueHolder.createType(this);
 	}
 }

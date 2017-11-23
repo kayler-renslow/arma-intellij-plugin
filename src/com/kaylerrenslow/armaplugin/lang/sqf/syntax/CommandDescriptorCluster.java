@@ -16,15 +16,12 @@ import java.util.Map;
 public class CommandDescriptorCluster {
 	private final Map<String, CommandDescriptor> map = new HashMap<>();
 
-	public CommandDescriptorCluster(@NotNull CommandDescriptor[] descriptors) {
+	public CommandDescriptorCluster(@NotNull CommandDescriptor... descriptors) {
 		for (CommandDescriptor cd : descriptors) {
 			map.put(cd.getCommandName().toLowerCase(), cd);
 		}
 	}
 
-	public CommandDescriptorCluster() {
-
-	}
 
 	/**
 	 * @return the {@link CommandDescriptor} for the given command name (case-insensitive), or null if couldn't be found

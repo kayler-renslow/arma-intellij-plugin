@@ -35,4 +35,21 @@ public interface ArrayValueHolder extends ValueHolder {
 
 	@NotNull
 	List<? extends ValueHolder> getValueHolders();
+
+	@NotNull
+	static ValueType createType(@NotNull ArrayValueHolder h) {
+		return createType(h.getValueHolders(), h.hasUnboundedParams());
+	}
+
+	@NotNull
+	static ValueType createType(@NotNull List<? extends ValueHolder> holders, boolean unbounded) {
+		if (holders.size() == 1 && !unbounded) {
+			return new SingletonArrayExpandedValueType(holders.get(0).getType());
+		}
+		ExpandedValueType t = new ExpandedValueType(unbounded);
+		for (ValueHolder childH : holders) {
+			t.getValueTypes().add(childH.getType());
+		}
+		return t;
+	}
 }
