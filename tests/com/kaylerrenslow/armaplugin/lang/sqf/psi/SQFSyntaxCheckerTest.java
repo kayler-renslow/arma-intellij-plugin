@@ -583,7 +583,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	}
 
-	public void testCommandExpression_optionalParameters_valid() throws Exception {
+	public void testCommandExpression_optionalParameters() throws Exception {
 		//fake a command syntax to assert that the syntax isn't the creating false negatives
 		CommandDescriptor d1 = new CommandDescriptor("getPos", Arrays.asList(
 				new CommandSyntax(
@@ -627,6 +627,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertExitTypeAndNoProblems("getPos [1,1];", cluster, Lookup.VOID);
 		assertExitTypeAndNoProblems("getPos [1];", cluster, Lookup.VOID);
 		assertExitTypeAndNoProblems("getPos;", cluster, Lookup.VOID);
+		assertHasProblems("1 getPos"); //can't have prefix
 
 		assertExitTypeAndNoProblems("position [[{}],1];", cluster, Lookup.CONFIG);
 		assertExitTypeAndNoProblems("position [[{}]];", cluster, Lookup.CONFIG);

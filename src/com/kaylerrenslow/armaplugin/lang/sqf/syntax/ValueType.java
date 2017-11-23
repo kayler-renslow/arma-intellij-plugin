@@ -344,6 +344,9 @@ public interface ValueType {
 		@NotNull
 		@Override
 		public ExpandedValueType getExpanded() {
+			if (expandedValueType == null) {
+				expandedValueType = getExpandedFunc.apply(null);
+			}
 			return expandedValueType;
 		}
 	}
