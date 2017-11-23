@@ -47,6 +47,10 @@ public class SQFSyntaxHelper {
 		new SQFSyntaxChecker(Collections.singletonList(statement), cluster, holder).begin();
 	}
 
+	public void checkSyntax(@NotNull SQFStatement statement, @NotNull ProblemsHolder holder) {
+		new SQFSyntaxChecker(Collections.singletonList(statement), getCommandDescriptors(statement.getNode()), holder).begin();
+	}
+
 
 	/**
 	 * @return an array of all {@link CommandDescriptor} instances for every {@link SQFCommand} contained in the given {@link ASTNode}

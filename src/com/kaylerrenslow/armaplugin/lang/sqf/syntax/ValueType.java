@@ -20,7 +20,8 @@ public interface ValueType {
 	 * type is in the array type, this comparison will be used recursively.
 	 * <p>
 	 * If an allowed type is equal to {@link Lookup#ANYTHING} or <code>type</code> is {@link Lookup#ANYTHING},
-	 * the comparison of {@link ValueType} instances will always be true.
+	 * the comparison of {@link ValueType} instances will always be true. Also, this method will treat {@link Lookup#_VARIABLE}
+	 * like it is {@link Lookup#ANYTHING}.
 	 *
 	 * @param type1 type to check
 	 * @param type2 other type to check
@@ -28,6 +29,14 @@ public interface ValueType {
 	 * @throws IllegalArgumentException if {@link ExpandedValueType#isEmptyArray()} returns true for either provided type
 	 */
 	static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
+		if (type1 == Lookup.ANYTHING || type1 == Lookup._VARIABLE) {
+			return true;
+		}
+
+		if (type2 == Lookup.ANYTHING || type2 == Lookup._VARIABLE) {
+			return true;
+		}
+
 		LinkedList<ValueType> qType1 = new LinkedList<>();
 		LinkedList<ValueType> qType2 = new LinkedList<>();
 
@@ -90,8 +99,6 @@ public interface ValueType {
 			ValueType type2Pop = (qType2.isEmpty() && type2IsUnbounded) ? lastType2 :
 					(qType2.isEmpty() ? null : qType2.removeFirst());
 
-			//todo check if type 1 optional values can be used
-
 			if (type2Pop == null) {
 //				check if remaining qType1 values are optional
 
@@ -106,10 +113,10 @@ public interface ValueType {
 				return true;
 			}
 
-			if (type1Pop == Lookup.ANYTHING) {
+			if (type1Pop == Lookup.ANYTHING || type1Pop == Lookup._VARIABLE) {
 				continue;
 			}
-			if (type2Pop == Lookup.ANYTHING) {
+			if (type2Pop == Lookup.ANYTHING || type2Pop == Lookup._VARIABLE) {
 				continue;
 			}
 			if (type1Pop.isArray()) {

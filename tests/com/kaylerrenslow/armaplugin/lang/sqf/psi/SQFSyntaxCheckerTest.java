@@ -584,7 +584,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testCommandExpression_optionalParameters() throws Exception {
-		//fake a command syntax to assert that the syntax isn't the creating false negatives
+		//fake a command syntax to assert that the syntax xml isn't the creating false positives/negatives
 		CommandDescriptor d1 = new CommandDescriptor("getPos", Arrays.asList(
 				new CommandSyntax(
 						null,

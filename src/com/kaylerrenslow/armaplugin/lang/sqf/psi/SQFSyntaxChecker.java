@@ -606,7 +606,10 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				}
 				if (expectedSemicolon) {
 					if (problems != null) {
-						problems.registerProblem(parts.getFirst().getPsiElement(), "Expected ;");
+						problems.registerProblem(
+								parts.getFirst().getPsiElement(), "Expected ;",
+								ProblemHighlightType.ERROR
+						);
 					}
 				}
 				if (consumeMoreCommands) {
@@ -620,14 +623,16 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					command,
 					"No syntax for '" +
 							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
-							+ commandName + "'"
+							+ commandName + "'",
+					ProblemHighlightType.ERROR
 			);
 			problems.registerProblem(
 					command,
 					"No syntax for '" +
 							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
 							+ commandName +
-							(peekNextPartType == null ? "" : " " + peekNextPartType.getDisplayName()) + "'"
+							(peekNextPartType == null ? "" : " " + peekNextPartType.getDisplayName()) + "'",
+					ProblemHighlightType.ERROR
 			);
 		}
 		return Lookup._ERROR;

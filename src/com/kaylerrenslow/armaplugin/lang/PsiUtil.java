@@ -28,9 +28,26 @@ public class PsiUtil {
 	 * @throws ClassCastException when the PsiFile created couldn't be cast to T
 	 */
 	@NotNull
+	@SuppressWarnings("unchecked")
 	public static <T extends PsiFile> T createFile(@NotNull Project project, @NotNull String text, @NotNull FileType fileType) {
 		String fileName = "fake_sqf_file.sqf";
 		return (T) PsiFileFactory.getInstance(project).createFileFromText(fileName, fileType, text);
+	}
+
+	/**
+	 * Creates a new Psi file via {@link #createFile(Project, String, FileType)} and then gets the first element in the entire
+	 * file where the PsiElement's class is an instance of the given class
+	 *
+	 * @param project project
+	 * @param text    file text content
+	 * @param ft      the FileType
+	 * @param clazz   first PsiElement class to find
+	 * @return the element, or null if couldn't be found
+	 */
+	@Nullable
+	public static <T extends PsiElement> T createElement(@NotNull Project project, @NotNull String text, @NotNull FileType ft, @NotNull Class<T> clazz) {
+		PsiFile f = createFile(project, text, ft);
+		return findFirstDescendantElement(f, clazz);
 	}
 
 	@NotNull

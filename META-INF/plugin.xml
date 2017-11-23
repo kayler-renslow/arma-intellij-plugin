@@ -25,6 +25,12 @@
 		<psi.referenceContributor implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFReferenceContributor"/>
 		<annotator language="Arma.SQF"
 				   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.codestyle.SQFMagicVarColorizerAnnotator"/>
+		<localInspection language="Arma.SQF"
+						 implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.inspections.CommandCamelCaseInspection"
+						 enabledByDefault="true" groupName="Arma SQF"/>
+		<localInspection language="Arma.SQF"
+						 implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.inspections.SQFSyntaxAndTypeCheckingInspection"
+						 enabledByDefault="true" groupName="Arma SQF"/>
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Header Language -->
