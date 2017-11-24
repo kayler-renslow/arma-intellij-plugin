@@ -1,6 +1,5 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi.inspections;
 
-import com.intellij.codeHighlighting.HighlightDisplayLevel;
 import com.intellij.codeInspection.LocalInspectionTool;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElementVisitor;
@@ -18,11 +17,6 @@ import org.jetbrains.annotations.Nullable;
  * @since 11/22/2017
  */
 public class SQFSyntaxAndTypeCheckingInspection extends LocalInspectionTool {
-	@NotNull
-	@Override
-	public HighlightDisplayLevel getDefaultLevel() {
-		return HighlightDisplayLevel.ERROR;
-	}
 
 	@NotNull
 	@Override

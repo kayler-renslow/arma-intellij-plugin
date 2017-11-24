@@ -27,10 +27,10 @@
 				   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.codestyle.SQFMagicVarColorizerAnnotator"/>
 		<localInspection language="Arma.SQF"
 						 implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.inspections.CommandCamelCaseInspection"
-						 enabledByDefault="true" groupName="Arma SQF"/>
+						 enabledByDefault="true" groupName="Arma SQF" hasStaticDescription="true" level="WARNING"/>
 		<localInspection language="Arma.SQF"
 						 implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.inspections.SQFSyntaxAndTypeCheckingInspection"
-						 enabledByDefault="true" groupName="Arma SQF"/>
+						 enabledByDefault="true" groupName="Arma SQF" hasStaticDescription="true" level="ERROR"/>
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Header Language -->
