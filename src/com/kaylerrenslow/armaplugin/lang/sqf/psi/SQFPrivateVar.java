@@ -3,6 +3,10 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.psi.PsiElement;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Kayler
@@ -15,16 +19,30 @@ public class SQFPrivateVar {
 	private final PsiElement element;
 	@NotNull
 	private final SQFScope maxScope;
+	@NotNull
+	private final List<SQFScope> mergeScopes;
 
 	/**
 	 * @param variableName the variable name
 	 * @param element      the PsiElement that contains the variable name. This is either a {@link SQFString} or {@link SQFVariable}
 	 * @param maxScope     the {@link SQFScope} object that this private var exists in, as well as any children scopes in maxScope
+	 * @param mergeScopes  a list of scopes that are merged with maxScope. This is only relevant for control structures. If null, means no merged scopes.
 	 */
-	public SQFPrivateVar(@NotNull SQFVariableName variableName, @NotNull PsiElement element, @NotNull SQFScope maxScope) {
+	public SQFPrivateVar(@NotNull SQFVariableName variableName, @NotNull PsiElement element, @NotNull SQFScope maxScope,
+						 @Nullable List<SQFScope> mergeScopes) {
 		this.variableName = variableName;
 		this.element = element;
 		this.maxScope = maxScope;
+		this.mergeScopes = mergeScopes == null ? Collections.emptyList() : mergeScopes;
+	}
+
+	/**
+	 * @return a non-mutable list of scopes that are merged with maxScope. This is only relevant for control structures.
+	 * If empty, means no merged scopes.
+	 */
+	@NotNull
+	public List<SQFScope> getMergeScopes() {
+		return mergeScopes;
 	}
 
 	@NotNull
@@ -46,7 +64,7 @@ public class SQFPrivateVar {
 	}
 
 	/**
-	 * @return the {@link SQFScope} object that this private var exists in, as well as any children scopes in maxScope
+	 * @return the {@link SQFScope} object that this private var exists in
 	 */
 	@NotNull
 	public SQFScope getMaxScope() {
@@ -60,7 +78,7 @@ public class SQFPrivateVar {
 		}
 		if (o instanceof SQFPrivateVar) {
 			SQFPrivateVar other = (SQFPrivateVar) o;
-			return variableName.equals(other.variableName) && element.equals(other.element);
+			return variableName.equals(other.variableName) && maxScope == other.maxScope;
 		}
 		return false;
 	}

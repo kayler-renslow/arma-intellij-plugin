@@ -12,6 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 /**
@@ -29,36 +30,17 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 	 * statement, but not in the same scope as the statement!
 	 * <p>
 	 * This method will return an empty list if the statement can create private variables but none were made private.
-	 *
-	 * @return list of private vars
 	 */
-	@NotNull
-	public List<SQFPrivateVar> getDeclaredPrivateVars() {
+	public void searchForDeclaredPrivateVars(@NotNull SQFScope.VariableScopeHelper scopeHelper) {
 		SQFScope containingScope = SQFScope.getContainingScope(this);
-		List<SQFPrivateVar> vars = new ArrayList<>();
+		Set<SQFPrivateVar> privateVarsSet = scopeHelper.getPrivateVarsForScope(containingScope);
 
 		Function<SQFCodeBlockExpression, Void> checkCodeBlockExp = sqfCodeBlockExpression -> {
 			SQFCodeBlock codeBlock = sqfCodeBlockExpression.getBlock();
 			SQFLocalScope codeBlockScope = codeBlock.getScope();
 			if (codeBlockScope != null) {
 				//don't check containing scope because we already checked the assignment's scope, which is containing scope
-				List<SQFPrivateVar> blockPrivateVars = codeBlockScope.getPrivateVarInstances(false);
-
-				for (SQFPrivateVar blockPrivateVar : blockPrivateVars) {
-					boolean varEqual = false;
-					for (SQFPrivateVar statementPrivateVar : vars) {
-						if (blockPrivateVar.getVariableNameObj().nameEquals(statementPrivateVar.getVariableNameObj())
-								&& blockPrivateVar.getMaxScope() == statementPrivateVar.getMaxScope()) {
-							//we need to check scopes as well because a variable may be declared private in a scope
-							//but that may not be it's max scope
-							varEqual = true;
-							break;
-						}
-					}
-					if (!varEqual) {
-						vars.add(blockPrivateVar);
-					}
-				}
+				codeBlockScope.searchForPrivateVarInstances(false, scopeHelper);
 			}
 			return null;
 		};
@@ -83,13 +65,12 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 		if (this instanceof SQFAssignmentStatement) {
 			SQFAssignmentStatement assignment = (SQFAssignmentStatement) this;
 			if (assignment.isPrivate()) {
-				vars.add(new SQFPrivateVar(assignment.getVar().getVarNameObj(), assignment.getVar(), containingScope));
+				privateVarsSet.add(new SQFPrivateVar(assignment.getVar().getVarNameObj(), assignment.getVar(), containingScope, null));
 			}
 			if (assignment.getExpr() != null) {
 				SQFExpression assignmentExpr = assignment.getExpr();
 				findAllCodeExpr.apply(assignmentExpr);
 			}
-			return vars;
 		}
 		if (this instanceof SQFExpressionStatement) {
 			SQFExpression expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
@@ -99,7 +80,7 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 					case "private": {
 						SQFCommandArgument postfixArgument = cmdExpr.getPostfixArgument();
 						if (postfixArgument == null) {
-							return vars;
+							return;
 						}
 
 						if (postfixArgument.getExpr().withoutParenthesis() instanceof SQFLiteralExpression) {
@@ -113,10 +94,10 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 										if (arrExpLiteral.getStr() != null) {
 											SQFString str = arrExpLiteral.getStr();
 											if (str.containsLocalVariable()) {
-												vars.add(
+												privateVarsSet.add(
 														new SQFPrivateVar(
 																new SQFVariableName(str.getNonQuoteText()),
-																str, containingScope
+																str, containingScope, null
 														)
 												);
 											}
@@ -126,11 +107,11 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 							} else if (literal.getStr() != null) {
 								//private "_var"
 								if (literal.getStr().containsLocalVariable()) {
-									vars.add(
+									privateVarsSet.add(
 											new SQFPrivateVar(
 													new SQFVariableName(literal.getStr().getNonQuoteText()),
 													literal.getStr(),
-													containingScope
+													containingScope, null
 											)
 									);
 								}
@@ -148,7 +129,6 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 						break;
 					}
 				}
-				return vars;
 			} else {
 				findAllCodeExpr.apply(expr);
 			}
@@ -160,7 +140,6 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 			return vars;
 		}
 		*/
-		return vars;
 	}
 
 	/**
@@ -429,6 +408,27 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 		}
 		cs = getSwitchStatement();
 		return cs;
+	}
+
+	/**
+	 * @return the nearest ancestor {@link SQFStatement} that contains the given element, or null if not in a {@link SQFStatement}
+	 * @throws IllegalArgumentException when element is a PsiComment or when it is not in an SQFFile
+	 */
+	@Nullable
+	public static SQFStatement getStatementForElement(@NotNull PsiElement element) {
+		if (element instanceof PsiComment) {
+			throw new IllegalArgumentException("element is a comment");
+		}
+		if (element.getContainingFile() == null || !(element.getContainingFile() instanceof SQFFile)) {
+			throw new IllegalArgumentException("element isn't in an SQFFile");
+		}
+		while (!(element instanceof SQFStatement)) {
+			element = element.getParent();
+			if (element == null) {
+				return null;
+			}
+		}
+		return (SQFStatement) element;
 	}
 
 	/**

@@ -45,6 +45,9 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 	public PsiReference[] getReferences() {
 		List<SQFVariableReference> currentFileRefs = SQFScope.getVariableReferencesFor(this);
 		PsiReference[] refsFromProviders = ReferenceProvidersRegistry.getReferencesFromProviders(this);
+		if (currentFileRefs.size() == 0 && refsFromProviders.length == 0) {
+			return PsiReference.EMPTY_ARRAY;
+		}
 		PsiReference[] refsAsArray = new PsiReference[currentFileRefs.size() + refsFromProviders.length];
 		int i = 0;
 		for (; i < currentFileRefs.size(); i++) {
