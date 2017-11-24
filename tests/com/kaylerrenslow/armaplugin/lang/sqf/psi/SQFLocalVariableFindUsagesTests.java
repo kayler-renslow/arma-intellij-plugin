@@ -51,7 +51,7 @@ public class SQFLocalVariableFindUsagesTests extends LightCodeInsightFixtureTest
 
 		{ //_var2 assertions
 			assertEquals(1, _var2Elements.size());
-			assertEquals(_var2Elements.get(0), myFixture.findUsages(_var2Elements.get(0)));
+			assertEquals(1, myFixture.findUsages(_var2Elements.get(0)).size());
 		}
 	}
 
@@ -138,9 +138,7 @@ public class SQFLocalVariableFindUsagesTests extends LightCodeInsightFixtureTest
 					matched = true;
 				}
 			}
-			if (!matched) {
-				throw new IllegalStateException("variable '" + varName + "' wasn't in any section");
-			}
+			assertEquals("Variable '" + varName + "' should be in a section", true, matched);
 		}
 
 		//all variable names that should have usage count (case should not matter)
@@ -193,7 +191,7 @@ public class SQFLocalVariableFindUsagesTests extends LightCodeInsightFixtureTest
 	}
 
 	private class VariableSectionHelper {
-		final Map<String, Integer> usageCountMap = new IdentityHashMap<>();
+		final Map<String, Integer> usageCountMap = new HashMap<>();
 		final List<SQFVariable> varElements = new ArrayList<>();
 		final String name;
 

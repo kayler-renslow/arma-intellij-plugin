@@ -1,6 +1,5 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
@@ -11,7 +10,7 @@ import org.jetbrains.annotations.Nullable;
  * @author Kayler
  * @since 05/23/2017
  */
-public class SQFCaseStatement extends ASTWrapperPsiElement implements SQFStatement {
+public class SQFCaseStatement extends SQFStatement {
 	public SQFCaseStatement(@NotNull ASTNode node) {
 		super(node);
 	}

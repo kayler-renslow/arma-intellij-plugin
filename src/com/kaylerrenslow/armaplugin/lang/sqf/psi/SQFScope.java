@@ -1,5 +1,7 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -8,19 +10,20 @@ import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 /**
  * @author Kayler
  * @since 05/23/2017
  */
-public interface SQFScope extends PsiElement, SQFSyntaxNode {
-	Object NULL_CHILD_STATEMENT_VISIT = new Object();
+public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntaxNode {
+
+	public SQFScope(@NotNull ASTNode node) {
+		super(node);
+	}
 
 	/**
 	 * This will return all variables that are private in this scope.
@@ -30,7 +33,7 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 	 * @see #getPrivateVarInstances(boolean)
 	 */
 	@NotNull
-	default Set<SQFVariableName> getPrivateVars() {
+	public Set<SQFVariableName> getPrivateVars() {
 		List<SQFPrivateVar> varInstances = getPrivateVarInstances(true);
 		Set<SQFVariableName> vars = new HashSet<>(varInstances.size());
 		for (SQFPrivateVar var : varInstances) {
@@ -43,7 +46,7 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 	 * @return a list of {@link SQFStatement} instances that are direct children of this scope
 	 */
 	@NotNull
-	default List<SQFStatement> getChildStatements() {
+	public List<SQFStatement> getChildStatements() {
 		List<SQFStatement> statements = new ArrayList<>();
 		for (PsiElement element : getChildren()) {
 			if (!(element instanceof SQFStatement)) {
@@ -53,6 +56,17 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 			statements.add(statement);
 		}
 		return statements;
+	}
+
+	@NotNull
+	public String getTextNoNewlines() {
+		return getText().replaceAll("\n", " ");
+	}
+
+	@NotNull
+	@Override
+	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
+		return visitor.visit(this, cluster);
 	}
 
 	/**
@@ -67,7 +81,7 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 	 * @return a set containing all private variables for the scope and places them in {@link SQFPrivateVar} instances
 	 */
 	@NotNull
-	default List<SQFPrivateVar> getPrivateVarInstances(boolean checkContainingScope) {
+	public List<SQFPrivateVar> getPrivateVarInstances(boolean checkContainingScope) {
 		List<SQFPrivateVar> vars = new ArrayList<>();
 
 		Function<SQFScope, Void> collectPrivateVarsFromScope = sqfScope -> {
@@ -117,13 +131,7 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 	}
 
 	@NotNull
-	static List<SQFVariableReference> getVariableReferencesFor(@NotNull SQFVariable variable) {
-		System.err.println("Implementation IDEA: We create a VarialeScopeMap data structure where" +
-				" we put a _var inside and then the private scope paired with it." +
-				" When we enter a new scope, we wrap that instance in a new one " +
-				"and if the wrapper instance doesn't contain the _var, we check the wrapped instance."+
-				"This will drastically improve speed of checking scope and should fix all of our issues when implemented."
-		);
+	public static List<SQFVariableReference> getVariableReferencesFor(@NotNull SQFVariable variable) {
 		List<SQFVariableReference> vars = new ArrayList<>();
 		PsiFile file = variable.getContainingFile();
 		if (file == null) {
@@ -134,6 +142,7 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 		SQFScope containingScope = getContainingScope(variable);
 		TextRange containingScopeRange = containingScope.getTextRange();
 
+		//determine the max scope of the variable
 		if (containingScope instanceof SQFFileScope) {
 			variableMaxScope = containingScope;
 		} else if (variable.isLocal() && !variable.isMagicVar()) {
@@ -273,7 +282,7 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 	 * @throws IllegalArgumentException when element isn't in an {@link SQFFile}
 	 */
 	@NotNull
-	static SQFScope getContainingScope(@NotNull PsiElement element) {
+	public static SQFScope getContainingScope(@NotNull PsiElement element) {
 		if (element instanceof SQFFile) {
 			SQFFileScope fileScope = ((SQFFile) element).findChildByClass(SQFFileScope.class);
 			if (fileScope == null) {
@@ -305,14 +314,29 @@ public interface SQFScope extends PsiElement, SQFSyntaxNode {
 		return fileScope;
 	}
 
-	@NotNull
-	default String getTextNoNewlines() {
-		return getText().replaceAll("\n", " ");
-	}
+	private static class VariableScopeHelper {
+		private final Map<String, SQFScope> privateVarScopeMap = new HashMap<>();
+		private final VariableScopeHelper wrap;
 
-	@NotNull
-	@Override
-	default Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
-		return visitor.visit(this, cluster);
+		public VariableScopeHelper() {
+			wrap = null;
+		}
+
+		public VariableScopeHelper(@NotNull VariableScopeHelper wrap) {
+			this.wrap = wrap;
+		}
+
+		@Nullable
+		public SQFScope getMaxScope(@NotNull String varName) {
+			SQFScope s = privateVarScopeMap.get(varName.toLowerCase());
+			if (s != null) {
+				return s;
+			}
+			if (wrap != null) {
+				return wrap.getMaxScope(varName);
+			}
+			return null;
+		}
+
 	}
 }

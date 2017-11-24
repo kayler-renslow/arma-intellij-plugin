@@ -32,7 +32,7 @@ sqfFile ::= file_scope //first rule is private. place file_scope inside and file
 
 //file_scope is the scope for the entire SQF file. There will be only 1 file_scope per sqf file
 file_scope ::= items_ {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFFileScope"}
-//local_scope is a scope inside a code block (and is also the parent class of file_scope)
+//local_scope is a scope inside a code block
 local_scope ::= items_  {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFLocalScope"}
 //items_ is a helper for file_scope and local_scope
 private items_ ::= (statement SEMICOLON)* statement?

@@ -1,5 +1,7 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.kaylerrenslow.armaDialogCreator.util.Reference;
@@ -16,7 +18,11 @@ import java.util.function.Function;
  * @author Kayler
  * @since 05/23/2017
  */
-public interface SQFStatement extends PsiElement, SQFSyntaxNode {
+public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSyntaxNode {
+
+	public SQFStatement(@NotNull ASTNode node) {
+		super(node);
+	}
 
 	/**
 	 * Gets all private vars declared private in this statement. Note that private variables may be declared private in the
@@ -27,7 +33,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 	 * @return list of private vars
 	 */
 	@NotNull
-	default List<SQFPrivateVar> getDeclaredPrivateVars() {
+	public List<SQFPrivateVar> getDeclaredPrivateVars() {
 		SQFScope containingScope = SQFScope.getContainingScope(this);
 		List<SQFPrivateVar> vars = new ArrayList<>();
 
@@ -162,7 +168,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 	 * or null if the statement isn't a valid if statement
 	 */
 	@Nullable
-	default SQFIfHelperStatement getIfStatement() {
+	public SQFIfHelperStatement getIfStatement() {
 		SQFExpression expr;
 		if (this instanceof SQFExpressionStatement) {
 			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
@@ -267,7 +273,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 	 * or null if the statement isn't a valid spawn statement
 	 */
 	@Nullable
-	default SQFSpawnHelperStatement getSpawnStatement() {
+	public SQFSpawnHelperStatement getSpawnStatement() {
 		SQFExpression expr;
 		if (this instanceof SQFExpressionStatement) {
 			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
@@ -300,7 +306,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 	 * or null if the statement isn't a valid switch statement
 	 */
 	@Nullable
-	default SQFSwitchHelperStatement getSwitchStatement() {
+	public SQFSwitchHelperStatement getSwitchStatement() {
 		SQFExpression expr;
 		if (this instanceof SQFExpressionStatement) {
 			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
@@ -361,7 +367,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 	 * or null if the statement isn't a valid for loop statement
 	 */
 	@Nullable
-	default SQFForLoopHelperStatement getForLoopStatement() {
+	public SQFForLoopHelperStatement getForLoopStatement() {
 		//todo
 		return null;
 	}
@@ -371,7 +377,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 	 * or null if the statement isn't a valid for while statement
 	 */
 	@Nullable
-	default SQFWhileLoopHelperStatement getWhileLoopStatement() {
+	public SQFWhileLoopHelperStatement getWhileLoopStatement() {
 		SQFExpression expr;
 		if (this instanceof SQFExpressionStatement) {
 			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
@@ -408,7 +414,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 	 * or null if the statement isn't a valid control structure
 	 */
 	@Nullable
-	default SQFControlStructure getControlStructure() {
+	public SQFControlStructure getControlStructure() {
 		SQFControlStructure cs = getIfStatement();
 		if (cs != null) {
 			return cs;
@@ -435,7 +441,7 @@ public interface SQFStatement extends PsiElement, SQFSyntaxNode {
 	 * @return the text, or &lt;PsiComment&gt; if element is a PsiComment
 	 */
 	@NotNull
-	static String getStatementTextForElement(@NotNull PsiElement element) {
+	public static String getStatementTextForElement(@NotNull PsiElement element) {
 		if (element instanceof PsiComment) {
 			return "<PsiComment>";
 		}
