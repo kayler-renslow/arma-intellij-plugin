@@ -26,6 +26,9 @@ public class CommandDescriptorPool {
 	private final LinkedBlockingQueue<ProcessingCommand> processing = new LinkedBlockingQueue<>();
 
 	public CommandDescriptorPool() {
+		//fill the array to prevent null pointer exception when sorting array
+		Arrays.fill(tallyCache, new DescriptorWrapper(new CommandDescriptor("")));
+
 		String[] frequent = {
 				"addAction",
 				"and",
@@ -237,7 +240,7 @@ public class CommandDescriptorPool {
 
 	private class FutureImpl<T> implements Future<T> {
 		private final CountDownLatch latch = new CountDownLatch(1);
-		private T value;
+		private volatile T value;
 
 		@Override
 		public boolean cancel(boolean mayInterruptIfRunning) {

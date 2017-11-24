@@ -625,7 +625,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					if (problems != null) {
 						problems.registerProblem(
 								parts.getFirst().getPsiElement(), "Expected ;",
-								ProblemHighlightType.GENERIC_ERROR
+								ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 						);
 					}
 				}
@@ -642,7 +642,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 						"No syntax for '" +
 								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
 								+ commandName + "'",
-						ProblemHighlightType.GENERIC_ERROR
+						ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 				);
 			} else {
 				problems.registerProblem(
@@ -650,7 +650,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 						"No syntax for '" +
 								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
 								+ commandName + " " + peekNextPartType.getDisplayName() + "'",
-						ProblemHighlightType.GENERIC_ERROR
+						ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 				);
 			}
 		}
@@ -746,7 +746,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 */
 	private void notOfType(@NotNull ValueType[] expected, @NotNull ValueType got, @NotNull PsiElement gotPsiOwner) {
 		String expectedTypes = getExpectedArrayAsString(expected);
-		problems.registerProblem(gotPsiOwner, "Type(s) " + expectedTypes + " expected. Got " + got + ".", ProblemHighlightType.GENERIC_ERROR);
+		problems.registerProblem(gotPsiOwner, "Type(s) " + expectedTypes + " expected. Got " + got + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
 	}
 
 	/**
@@ -776,7 +776,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 		}
 		String expectedTypes = getExpectedArrayAsString(expected);
-		problems.registerProblem(checkPsiOwner, expectedTypes + " expected. Got " + check + ".", ProblemHighlightType.GENERIC_ERROR);
+		problems.registerProblem(checkPsiOwner, expectedTypes + " expected. Got " + check + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
 	}
 
 	@NotNull
@@ -820,7 +820,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			return;
 		}
 		if (check != expected) {
-			problems.registerProblem(checkPsiOwner, "Type " + expected + " expected. Got " + check + ".", ProblemHighlightType.GENERIC_ERROR);
+			problems.registerProblem(checkPsiOwner, "Type " + expected + " expected. Got " + check + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
 		}
 	}
 
