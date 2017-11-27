@@ -134,6 +134,15 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 			}
 		}
 
+		//todo when we are dealing with this:
+		/*
+		* private _a = {
+		* 	_a = 1;
+		* 	private _a = 1;
+		* };
+		*
+		* Check the text indicies of the variables to see which _a are references to each other
+		*/
 
 		List<SQFVariable> varTargets = new ArrayList<>();
 		List<SQFString> stringTargets = new ArrayList<>();

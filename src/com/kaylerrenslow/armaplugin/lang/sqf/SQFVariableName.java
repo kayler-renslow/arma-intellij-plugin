@@ -86,6 +86,11 @@ public class SQFVariableName {
 		return original;
 	}
 
+	@Override
+	public int hashCode() {
+		return original.hashCode();
+	}
+
 	/**
 	 * Return true if one of the following is true:
 	 * <ul>
