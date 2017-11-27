@@ -25,12 +25,6 @@ public class SQFLocalVarControlStructureFindUsagesTests extends LightCodeInsight
 		System.out.println("TODO: test in game if the then code block shares scope with else block");
 		System.out.println("TODO: test in game if each switch case and default block shares scope with each other");
 
-		SQFFile file = (SQFFile) myFixture.configureByFile(
-				getFilePath("localVarFindUsagesTests.controlStructuresImplicitPrivate.ifthen.sqf")
-		);
-
-		List<SQFVariable> allVariables = new ArrayList<>();
-
 		VariableScopeHelper fileScoped = new VariableScopeHelper("FILE");
 		VariableScopeHelper ifThenScoped = new VariableScopeHelper("IF");
 
@@ -41,7 +35,28 @@ public class SQFLocalVarControlStructureFindUsagesTests extends LightCodeInsight
 		ifThenScoped.addExpectedCount("_onlyInIfStatement", 1);
 		ifThenScoped.addExpectedCount("_sharedVar", 1);
 
-		VariableScopeHelper[] allScopes = {fileScoped, ifThenScoped};
+		runTest(
+				"localVarFindUsagesTests.controlStructuresImplicitPrivate.ifthen.sqf",
+				fileScoped,
+				ifThenScoped
+		);
+	}
+
+	private void runTest(@NotNull String fileName, @NotNull VariableScopeHelper fileScopeHelper,
+						 @NotNull VariableScopeHelper... otherHelpers) {
+		SQFFile file = (SQFFile) myFixture.configureByFile(getFilePath(fileName));
+
+		List<SQFVariable> allVariables = new ArrayList<>();
+
+		VariableScopeHelper ifThenScoped = new VariableScopeHelper("IF");
+
+		ifThenScoped.addExpectedCount("_ifVar", 2);
+		ifThenScoped.addExpectedCount("_onlyInIfStatement", 1);
+		ifThenScoped.addExpectedCount("_sharedVar", 1);
+
+		VariableScopeHelper[] allScopes = new VariableScopeHelper[1 + otherHelpers.length];
+		allScopes[0] = fileScopeHelper;
+		System.arraycopy(otherHelpers, 0, allScopes, 1, otherHelpers.length - 1);
 
 		PsiUtil.traverseDepthFirstSearch(file.getNode(), astNode -> {
 			PsiElement nodeAsElement = astNode.getPsi();
@@ -77,7 +92,7 @@ public class SQFLocalVarControlStructureFindUsagesTests extends LightCodeInsight
 		}
 
 		for (VariableScopeHelper helper : allScopes) {
-			if (helper.textScopeHelperRange == null && helper != fileScoped) {
+			if (helper != fileScopeHelper && helper.textScopeHelperRange == null) {
 				throw new IllegalStateException("scope helper didn't have a range:" + helper.name);
 			}
 		}
@@ -87,7 +102,7 @@ public class SQFLocalVarControlStructureFindUsagesTests extends LightCodeInsight
 			SQFVariableName varName = var.getVarNameObj();
 			boolean matched = false;
 			for (VariableScopeHelper helper : allScopes) {
-				if (helper == fileScoped) {
+				if (helper == fileScopeHelper) {
 					continue;
 				}
 				if (helper.textScopeHelperRange.contains(var.getTextRange())) {
@@ -97,7 +112,7 @@ public class SQFLocalVarControlStructureFindUsagesTests extends LightCodeInsight
 				}
 			}
 			if (!matched) {
-				fileScoped.actualUsageCountMap.put(varName, usages.size());
+				fileScopeHelper.actualUsageCountMap.put(varName, usages.size());
 			}
 		}
 
@@ -109,8 +124,6 @@ public class SQFLocalVarControlStructureFindUsagesTests extends LightCodeInsight
 				);
 			}
 		}
-
-		throw new RuntimeException("todo finish this test");
 	}
 
 	private String getFilePath(String fileName) {
