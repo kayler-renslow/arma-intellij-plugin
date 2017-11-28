@@ -48,17 +48,11 @@ public class SQFLocalVarControlStructureFindUsagesTests extends LightCodeInsight
 
 		List<SQFVariable> allVariables = new ArrayList<>();
 
-		VariableScopeHelper ifThenScoped = new VariableScopeHelper("IF");
-
-		ifThenScoped.addExpectedCount("_ifVar", 2);
-		ifThenScoped.addExpectedCount("_onlyInIfStatement", 1);
-		ifThenScoped.addExpectedCount("_sharedVar", 1);
-
 		VariableScopeHelper[] allScopes = new VariableScopeHelper[1 + otherHelpers.length];
 		allScopes[0] = fileScopeHelper;
-		System.arraycopy(otherHelpers, 0, allScopes, 1, otherHelpers.length - 1);
+		System.arraycopy(otherHelpers, 0, allScopes, 1, otherHelpers.length);
 
-		PsiUtil.traverseDepthFirstSearch(file.getNode(), astNode -> {
+		PsiUtil.traverseBreadthFirstSearch(file.getNode(), astNode -> {
 			PsiElement nodeAsElement = astNode.getPsi();
 			if (nodeAsElement instanceof SQFVariable) {
 				SQFVariable var = (SQFVariable) nodeAsElement;
@@ -142,6 +136,16 @@ public class SQFLocalVarControlStructureFindUsagesTests extends LightCodeInsight
 
 		public void addExpectedCount(@NotNull String varName, int count) {
 			expectedUsageCountMap.put(new SQFVariableName(varName), count);
+		}
+
+		@Override
+		public String toString() {
+			return "VariableScopeHelper{" +
+					"actualUsageCountMap=" + actualUsageCountMap +
+					", expectedUsageCountMap=" + expectedUsageCountMap +
+					", name='" + name + '\'' +
+					", textScopeHelperRange=" + textScopeHelperRange +
+					'}';
 		}
 	}
 }

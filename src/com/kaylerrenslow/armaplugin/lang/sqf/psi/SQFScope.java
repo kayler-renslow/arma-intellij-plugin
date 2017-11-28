@@ -30,12 +30,12 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 	 * that are not declared private in this scope.
 	 *
 	 * @return a set containing all private variables for the scope's file
-	 * @see #searchForPrivateVarInstances(boolean, SQFScope.VariableScopeHelper)
+	 * @see #searchForPrivateVarInstances(boolean, SQFScope.VariableScopeHelper, SQFImplicitPrivatizer)
 	 */
 	@NotNull
 	public Set<SQFVariableName> getPrivateVars() {
 		VariableScopeHelper helper = new VariableScopeHelper();
-		searchForPrivateVarInstances(true, helper);
+		searchForPrivateVarInstances(true, helper, null);
 		Set<SQFPrivateVar> privateVarsForScope = helper.getPrivateVarsForScope(this);
 		Set<SQFVariableName> vars = new HashSet<>(privateVarsForScope.size());
 		for (SQFPrivateVar var : privateVarsForScope) {
@@ -76,8 +76,12 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 	 *
 	 * @param checkFileScope if true, will get all private vars for the entire SQF file. If false, will only get them
 	 *                       for this {@link SQFScope} instance
+	 * @param scopeHelper    helper to store {@link SQFPrivateVar} instances
+	 * @param privatizer     passed into {@link SQFStatement#searchForDeclaredPrivateVars(VariableScopeHelper, SQFImplicitPrivatizer)}
 	 */
-	public void searchForPrivateVarInstances(boolean checkFileScope, @NotNull VariableScopeHelper scopeHelper) {
+	public void searchForPrivateVarInstances(boolean checkFileScope,
+											 @NotNull VariableScopeHelper scopeHelper,
+											 @Nullable SQFImplicitPrivatizer privatizer) {
 
 		Function<SQFScope, Void> collectPrivateVarsFromScope = sqfScope -> {
 			for (PsiElement element : sqfScope.getChildren()) {
@@ -85,7 +89,7 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 					continue;
 				}
 				SQFStatement statement = (SQFStatement) element;
-				statement.searchForDeclaredPrivateVars(scopeHelper);
+				statement.searchForDeclaredPrivateVars(scopeHelper, privatizer);
 			}
 
 			return null;
@@ -108,7 +112,7 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 		SQFScope containingScope = getContainingScope(variable);
 
 		VariableScopeHelper helper = new VariableScopeHelper();
-		containingScope.searchForPrivateVarInstances(true, helper);
+		containingScope.searchForPrivateVarInstances(true, helper, null);
 
 		SQFScope[] visitScopes;
 		SQFScope maxScope;
@@ -133,16 +137,6 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 				}
 			}
 		}
-
-		//todo when we are dealing with this:
-		/*
-		* private _a = {
-		* 	_a = 1;
-		* 	private _a = 1;
-		* };
-		*
-		* Check the text indicies of the variables to see which _a are references to each other
-		*/
 
 		List<SQFVariable> varTargets = new ArrayList<>();
 		List<SQFString> stringTargets = new ArrayList<>();
@@ -236,9 +230,10 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 
 	static class VariableScopeHelper {
 		private final Map<SQFScope, Set<SQFPrivateVar>> privateVarsScopeMap = new HashMap<>();
+		private final Set<SQFImplicitPrivateVar> implicitPrivateVarsSet = new HashSet<>();
 
 		/**
-		 * @return the mutable set containing all {@link SQFPrivateVar} instances for the given scope
+		 * @return the mutable set containing all {@link SQFPrivateVar}  Cinstances for the given scope
 		 */
 		@NotNull
 		public Set<SQFPrivateVar> getPrivateVarsForScope(@NotNull SQFScope scope) {
@@ -248,15 +243,10 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 		@Nullable
 		public SQFPrivateVar getPrivateVarForVar(@NotNull SQFVariable variable) {
 			final String varName = variable.getVarName();
-			SQFStatement statement = SQFStatement.getStatementForElement(variable);
-			if (statement == null) {
-				throw new IllegalStateException("variable isn't in a statement!");
-			}
-			SQFForLoopHelperStatement forLoopStatement = statement.getForLoopStatement();
-			if (forLoopStatement != null) {
-				throw new UnsupportedOperationException("we need to check if the variable is declared private in for loop (for [private _i=0...])");
-			}
+
 			SQFScope containingScope = SQFScope.getContainingScope(variable);
+
+			//check for explicit first
 			while (true) {
 				Set<SQFPrivateVar> set = privateVarsScopeMap.get(containingScope);
 				if (set != null) {
@@ -267,11 +257,23 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 					}
 				}
 				if (containingScope instanceof SQFFileScope) {
-					return null;
+					break;
 				}
 				containingScope = SQFScope.getContainingScope(containingScope);
 			}
+
+			for (SQFImplicitPrivateVar privateVar : implicitPrivateVarsSet) {
+				if (privateVar.getVar() == variable) {
+					return privateVar;
+				}
+			}
+
+			return null;
 		}
 
+		@NotNull
+		public Set<SQFImplicitPrivateVar> getImplicitPrivateVarsSet() {
+			return implicitPrivateVarsSet;
+		}
 	}
 }

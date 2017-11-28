@@ -59,7 +59,14 @@ public interface SQFBlockOrExpression {
 		@Override
 		@Nullable
 		public SQFCodeBlock getBlock() {
-			return block;
+			if (block != null) {
+				return block;
+			}
+			if (expression instanceof SQFCodeBlockExpression) {
+				SQFCodeBlockExpression expr = (SQFCodeBlockExpression) expression;
+				return expr.getBlock();
+			}
+			return null;
 		}
 
 		@Override

@@ -7,10 +7,12 @@ import com.intellij.psi.PsiElement;
 import com.kaylerrenslow.armaDialogCreator.util.Reference;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
+import com.kaylerrenslow.armaplugin.util.DoubleArgFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
@@ -30,31 +32,39 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 	 * statement, but not in the same scope as the statement!
 	 * <p>
 	 * This method will return an empty list if the statement can create private variables but none were made private.
+	 *
+	 * @param scopeHelper helper to store {@link SQFPrivateVar} instances
+	 * @param privatizer  the privatizer this {@link SQFStatement} is contained in,
+	 *                    or null if this {@link SQFStatement} isn't in one. This is to help determine
+	 *                    implicit private variables in control structures and spawn statements.
 	 */
-	public void searchForDeclaredPrivateVars(@NotNull SQFScope.VariableScopeHelper scopeHelper) {
-		SQFScope containingScope = SQFScope.getContainingScope(this);
-		Set<SQFPrivateVar> privateVarsSet = scopeHelper.getPrivateVarsForScope(containingScope);
-
-		Function<SQFCodeBlockExpression, Void> checkCodeBlockExp = sqfCodeBlockExpression -> {
-			SQFCodeBlock codeBlock = sqfCodeBlockExpression.getBlock();
-			SQFLocalScope codeBlockScope = codeBlock.getScope();
-			if (codeBlockScope != null) {
-				//don't check containing scope because we already checked the assignment's scope, which is containing scope
-				codeBlockScope.searchForPrivateVarInstances(false, scopeHelper);
+	public void searchForDeclaredPrivateVars(@NotNull SQFScope.VariableScopeHelper scopeHelper,
+											 @Nullable SQFImplicitPrivatizer privatizer) {
+		SQFScope maxScope;
+		List<SQFScope> mergeScopes = Collections.emptyList();
+		if (privatizer == null) {
+			maxScope = SQFScope.getContainingScope(this);
+		} else {
+			maxScope = privatizer.getImplicitPrivateScope();
+			List<SQFScope> ctrlStructMergeScopes = privatizer.getMergeScopes();
+			if (!ctrlStructMergeScopes.isEmpty()) {
+				mergeScopes = new ArrayList<>();
+				mergeScopes.addAll(privatizer.getMergeScopes());
 			}
-			return null;
-		};
+		}
+		Set<SQFPrivateVar> privateVarsSet = scopeHelper.getPrivateVarsForScope(maxScope);
+
 
 		/*
 		* Traverse SQFCodeBlock expressions, but not their children
 		* because each call to checkCodeBlockExpr will check the code block's children
 		*/
-		Function<SQFExpression, Void> findAllCodeExpr = sqfExpression -> {
-			PsiUtil.traverseInLayers(sqfExpression.getNode(), astNode -> {
+		final DoubleArgFunction<SQFExpression, SQFImplicitPrivatizer, Void> findAllCodeExpr = (expr, implPriv) -> {
+			PsiUtil.traverseInLayers(expr.getNode(), astNode -> {
 				PsiElement nodeAsElement = astNode.getPsi();
 				if (nodeAsElement instanceof SQFCodeBlockExpression) {
 					SQFCodeBlockExpression codeBlockExpression = ((SQFCodeBlockExpression) nodeAsElement);
-					checkCodeBlockExp.apply(codeBlockExpression);
+					collectPrivateVarsFromCodeBlockExp(scopeHelper, codeBlockExpression, implPriv);
 					return true; //don't add children
 				}
 				return false;
@@ -65,11 +75,13 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 		if (this instanceof SQFAssignmentStatement) {
 			SQFAssignmentStatement assignment = (SQFAssignmentStatement) this;
 			if (assignment.isPrivate()) {
-				privateVarsSet.add(new SQFPrivateVar(assignment.getVar().getVarNameObj(), assignment.getVar(), containingScope, null));
+				privateVarsSet.add(
+						new SQFExplicitPrivateVar(assignment.getVar().getVarNameObj(), assignment.getVar(), maxScope, mergeScopes)
+				);
 			}
 			if (assignment.getExpr() != null) {
 				SQFExpression assignmentExpr = assignment.getExpr();
-				findAllCodeExpr.apply(assignmentExpr);
+				findAllCodeExpr.apply(assignmentExpr, privatizer);
 			}
 		}
 		if (this instanceof SQFExpressionStatement) {
@@ -80,7 +92,7 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 					case "private": {
 						SQFCommandArgument postfixArgument = cmdExpr.getPostfixArgument();
 						if (postfixArgument == null) {
-							return;
+							break;
 						}
 
 						if (postfixArgument.getExpr().withoutParenthesis() instanceof SQFLiteralExpression) {
@@ -95,9 +107,9 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 											SQFString str = arrExpLiteral.getStr();
 											if (str.containsLocalVariable()) {
 												privateVarsSet.add(
-														new SQFPrivateVar(
+														new SQFExplicitPrivateVar(
 																new SQFVariableName(str.getNonQuoteText()),
-																str, containingScope, null
+																str, maxScope, mergeScopes
 														)
 												);
 											}
@@ -108,10 +120,10 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 								//private "_var"
 								if (literal.getStr().containsLocalVariable()) {
 									privateVarsSet.add(
-											new SQFPrivateVar(
+											new SQFExplicitPrivateVar(
 													new SQFVariableName(literal.getStr().getNonQuoteText()),
 													literal.getStr(),
-													containingScope, null
+													maxScope, mergeScopes
 											)
 									);
 								}
@@ -128,18 +140,75 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 					case "spawn": { //todo
 						break;
 					}
+
+					//control structures
+					case "if": {
+						SQFIfHelperStatement ifStatement = getIfStatement();
+						if (ifStatement == null) {
+							break;
+						}
+						SQFBlockOrExpression then = ifStatement.getThen();
+						if (then.getBlock() != null) {
+							collectPrivateVarsFromCodeBlock(scopeHelper, then.getBlock(), ifStatement);
+						}
+						SQFBlockOrExpression else1 = ifStatement.getElse();
+						if (else1 != null) {
+							if (else1.getBlock() != null) {
+								collectPrivateVarsFromCodeBlock(scopeHelper, else1.getBlock(), ifStatement);
+							}
+						}
+						break;
+					}
+					case "while": {//todo
+						break;
+					}
+					case "for": {//todo
+						break;
+					}
+					case "switch": {//todo
+						break;
+					}
+					default: {
+						collectImplicitPrivateVars(scopeHelper, privatizer);
+						break;
+					}
 				}
 			} else {
-				findAllCodeExpr.apply(expr);
+				collectImplicitPrivateVars(scopeHelper, privatizer);
+				findAllCodeExpr.apply(expr, privatizer);
 			}
 		}
-		/*todo
-		//(https://community.bistudio.com/wiki/Variables#Scope)
-		SQFControlStructure controlStructure = getControlStructure();
-		if (controlStructure == null) {
-			return vars;
+	}
+
+	private void collectPrivateVarsFromCodeBlockExp(SQFScope.VariableScopeHelper helper, SQFCodeBlockExpression codeBlockExpr, SQFImplicitPrivatizer implPriv) {
+		SQFCodeBlock codeBlock = codeBlockExpr.getBlock();
+		collectPrivateVarsFromCodeBlock(helper, codeBlock, implPriv);
+	}
+
+	private void collectPrivateVarsFromCodeBlock(@NotNull SQFScope.VariableScopeHelper scopeHelper, SQFCodeBlock codeBlock, SQFImplicitPrivatizer implPriv) {
+		SQFLocalScope codeBlockScope = codeBlock.getScope();
+		if (codeBlockScope != null) {
+			//don't check containing scope because we already checked the assignment's scope, which is containing scope
+			codeBlockScope.searchForPrivateVarInstances(false, scopeHelper, implPriv);
 		}
-		*/
+	}
+
+	private void collectImplicitPrivateVars(@NotNull SQFScope.VariableScopeHelper scopeHelper, @Nullable SQFImplicitPrivatizer privatizer) {
+		if (privatizer == null) {
+			return;
+		}
+
+		PsiUtil.traverseDepthFirstSearch(this.getNode(), astNode -> {
+			PsiElement nodeAsElement = astNode.getPsi();
+			if (nodeAsElement instanceof SQFVariable) {
+				SQFVariable var = (SQFVariable) nodeAsElement;
+
+				scopeHelper.getImplicitPrivateVarsSet().add(
+						new SQFImplicitPrivateVar(var, privatizer)
+				);
+			}
+			return false;
+		});
 	}
 
 	/**
@@ -178,18 +247,29 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 			if (postArg == null) {
 				return null;
 			}
-			SQFCommandExpression thenExp = (SQFCommandExpression) postArg.getExpr().withoutParenthesis();
+			SQFExpression postArgExpr = postArg.getExpr().withoutParenthesis();
+			if (!(postArgExpr instanceof SQFCommandExpression)) {
+				return null;
+			}
+
+			SQFCommandExpression condExpr = (SQFCommandExpression) postArgExpr;
+			condition = condExpr;
+
+			postArg = condExpr.getPostfixArgument();
+			if (postArg == null) {
+				return null;
+			}
+			postArgExpr = postArg.getExpr().withoutParenthesis();
+			if (!(postArgExpr instanceof SQFCommandExpression)) {
+				return null;
+			}
+
+			SQFCommandExpression thenExp = (SQFCommandExpression) postArgExpr;
 			if (!thenExp.commandNameEquals("then")
 					&& !thenExp.commandNameEquals("exitWith")) {
 				return null;
 			}
-			{ //get condition
-				SQFCommandArgument thenExpPrefix = thenExp.getPrefixArgument();
-				if (thenExpPrefix == null) {
-					return null;
-				}
-				condition = thenExpPrefix.getExpr().withoutParenthesis();
-			}
+
 			{ //get then block and else block
 				SQFCommandArgument thenExpPostfix = thenExp.getPostfixArgument();
 				if (thenExpPostfix == null) {
@@ -214,7 +294,8 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 					Reference<SQFBlockOrExpression> thenBlockRef = new Reference<>(null);
 					Reference<SQFBlockOrExpression> elseBlockRef = new Reference<>(null);
 
-					Function<Void, Void> getElseBlock = aVoid -> {
+					//using a lambda so we can use return instead of lots of nested if statements!!
+					final Function<Void, Void> getElseBlock = aVoid -> {
 						if (!(afterThenExp.withoutParenthesis() instanceof SQFCommandExpression)) {
 							return null;
 						}
@@ -432,6 +513,13 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 	}
 
 	/**
+	 * @return {@link #debug_getStatementTextForElement(PsiElement)} with this
+	 */
+	public String debug_getStatementTextForElement() {
+		return debug_getStatementTextForElement(this);
+	}
+
+	/**
 	 * Used for debugging. Will return the statement the given element is contained in.
 	 * If the element is a PsiComment, &lt;PsiComment&gt; will be returned. Otherwise, the element's ancestor statement
 	 * text will be returned with all newlines replaced with spaces.
@@ -441,7 +529,7 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 	 * @return the text, or &lt;PsiComment&gt; if element is a PsiComment
 	 */
 	@NotNull
-	public static String getStatementTextForElement(@NotNull PsiElement element) {
+	public static String debug_getStatementTextForElement(@NotNull PsiElement element) {
 		if (element instanceof PsiComment) {
 			return "<PsiComment>";
 		}

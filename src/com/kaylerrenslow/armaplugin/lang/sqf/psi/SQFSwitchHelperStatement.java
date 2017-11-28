@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -28,5 +29,17 @@ public class SQFSwitchHelperStatement implements SQFControlStructure {
 	@Nullable
 	public SQFBlockOrExpression getDefaultStatementBlock() {
 		return defaultStatementBlock;
+	}
+
+	@NotNull
+	@Override
+	public SQFScope getImplicitPrivateScope() {
+		return null;
+	}
+
+	@NotNull
+	@Override
+	public List<SQFScope> getMergeScopes() {
+		return Collections.emptyList();
 	}
 }

@@ -2,6 +2,9 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
+import java.util.List;
+
 /**
  * @author Kayler
  * @since 09/19/2017
@@ -26,5 +29,20 @@ public class SQFWhileLoopHelperStatement implements SQFControlStructure, SQFLoop
 	@NotNull
 	public SQFBlockOrExpression getWhileBody() {
 		return whileBody;
+	}
+
+	@NotNull
+	@Override
+	public SQFScope getImplicitPrivateScope() {
+		if (whileBody.getBlock() != null && whileBody.getBlock().getScope() != null) {
+			return whileBody.getBlock().getScope();
+		}
+		return null;
+	}
+
+	@NotNull
+	@Override
+	public List<SQFScope> getMergeScopes() {
+		return Collections.emptyList();
 	}
 }

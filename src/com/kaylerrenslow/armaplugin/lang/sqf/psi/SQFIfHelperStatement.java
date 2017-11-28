@@ -3,6 +3,8 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Kayler
@@ -35,5 +37,23 @@ public class SQFIfHelperStatement implements SQFControlStructure {
 	@Nullable
 	public SQFBlockOrExpression getElse() {
 		return elseBlock;
+	}
+
+	@NotNull
+	@Override
+	public SQFScope getImplicitPrivateScope() {
+		if (thenBlock.getBlock() != null && thenBlock.getBlock().getScope() != null) {
+			return thenBlock.getBlock().getScope();
+		}
+		return null;
+	}
+
+	@NotNull
+	@Override
+	public List<SQFScope> getMergeScopes() {
+		if (elseBlock != null && elseBlock.getBlock() != null && elseBlock.getBlock().getScope() != null) {
+			return Collections.singletonList(elseBlock.getBlock().getScope());
+		}
+		return Collections.emptyList();
 	}
 }

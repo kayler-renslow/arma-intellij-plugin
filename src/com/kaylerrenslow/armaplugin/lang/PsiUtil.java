@@ -86,7 +86,7 @@ public class PsiUtil {
 	 * It is also possible to stop the traversal at any time with callback by returning true in it
 	 *
 	 * @param start    starting ASTNode
-	 * @param callback function that returns true to continue search, or null/false to end search completely
+	 * @param callback function that returns true to null/false to end search completely, or false to continue search
 	 */
 	public static void traverseBreadthFirstSearch(@NotNull ASTNode start, @NotNull Function<ASTNode, Boolean> callback) {
 		Boolean stop = callback.apply(start);
@@ -118,7 +118,7 @@ public class PsiUtil {
 	 * It is also possible to stop the traversal at any time with callback by returning true in it
 	 *
 	 * @param start    starting ASTNode
-	 * @param callback function that returns true to continue search, or null/false to end search completely
+	 * @param callback function that returns true to end search completely, or null/false to continue search
 	 */
 	public static void traverseDepthFirstSearch(@NotNull ASTNode start, @NotNull Function<ASTNode, Boolean> callback) {
 		Boolean stop = callback.apply(start);
