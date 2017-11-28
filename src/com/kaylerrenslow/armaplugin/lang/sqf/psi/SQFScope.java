@@ -9,10 +9,9 @@ import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
-import java.util.function.Function;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Kayler
@@ -22,26 +21,6 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 
 	public SQFScope(@NotNull ASTNode node) {
 		super(node);
-	}
-
-
-	/**
-	 * This will return all variables that are private in this scope. Note that this may return private vars
-	 * that are not declared private in this scope.
-	 *
-	 * @return a set containing all private variables for the scope's file
-	 * @see #searchForPrivateVarInstances(boolean, SQFScope.VariableScopeHelper, SQFImplicitPrivatizer)
-	 */
-	@NotNull
-	public Set<SQFVariableName> getPrivateVars() {
-		VariableScopeHelper helper = new VariableScopeHelper();
-		searchForPrivateVarInstances(true, helper, null);
-		Set<SQFPrivateVar> privateVarsForScope = helper.getPrivateVarsForScope(this);
-		Set<SQFVariableName> vars = new HashSet<>(privateVarsForScope.size());
-		for (SQFPrivateVar var : privateVarsForScope) {
-			vars.add(var.getVariableNameObj());
-		}
-		return vars;
 	}
 
 	/**
@@ -71,36 +50,6 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 		return visitor.visit(this, cluster);
 	}
 
-	/**
-	 * This will return all variables that are private in this scope or the file's scope.
-	 *
-	 * @param checkFileScope if true, will get all private vars for the entire SQF file. If false, will only get them
-	 *                       for this {@link SQFScope} instance
-	 * @param scopeHelper    helper to store {@link SQFPrivateVar} instances
-	 * @param privatizer     passed into {@link SQFStatement#searchForDeclaredPrivateVars(VariableScopeHelper, SQFImplicitPrivatizer)}
-	 */
-	public void searchForPrivateVarInstances(boolean checkFileScope,
-											 @NotNull VariableScopeHelper scopeHelper,
-											 @Nullable SQFImplicitPrivatizer privatizer) {
-
-		Function<SQFScope, Void> collectPrivateVarsFromScope = sqfScope -> {
-			for (PsiElement element : sqfScope.getChildren()) {
-				if (!(element instanceof SQFStatement)) {
-					continue;
-				}
-				SQFStatement statement = (SQFStatement) element;
-				statement.searchForDeclaredPrivateVars(scopeHelper, privatizer);
-			}
-
-			return null;
-		};
-
-		if (checkFileScope) {
-			collectPrivateVarsFromScope.apply(getContainingScope(this.getContainingFile()));
-		} else {
-			collectPrivateVarsFromScope.apply(this);
-		}
-	}
 
 	@NotNull
 	public static List<SQFVariableReference> getVariableReferencesFor(@NotNull SQFVariable variable) {
@@ -109,70 +58,34 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 		if (file == null) {
 			throw new IllegalArgumentException("variable doesn't have a containing file");
 		}
-		SQFScope containingScope = getContainingScope(variable);
-
-		VariableScopeHelper helper = new VariableScopeHelper();
-		containingScope.searchForPrivateVarInstances(true, helper, null);
-
-		SQFScope[] visitScopes;
-		SQFScope maxScope;
-
-		if (!variable.isLocal()) {
-			maxScope = SQFScope.getContainingScope(variable.getContainingFile());
-			visitScopes = new SQFScope[]{maxScope};
-		} else if (variable.isMagicVar()) {
-			maxScope = SQFScope.getContainingScope(variable);
-			visitScopes = new SQFScope[]{maxScope};
-		} else {
-			SQFPrivateVar privateVar = helper.getPrivateVarForVar(variable);
-			if (privateVar == null) {
-				maxScope = SQFScope.getContainingScope(variable.getContainingFile());
-				visitScopes = new SQFScope[]{maxScope};
-			} else {
-				maxScope = privateVar.getMaxScope();
-				visitScopes = new SQFScope[1 + privateVar.getMergeScopes().size()];
-				visitScopes[0] = privateVar.getMaxScope();
-				for (int i = 1; i < visitScopes.length; i++) {
-					visitScopes[i] = privateVar.getMergeScopes().get(i - 1);
-				}
-			}
-		}
+		SQFScope fileScope = getContainingScope(file);
 
 		List<SQFVariable> varTargets = new ArrayList<>();
 		List<SQFString> stringTargets = new ArrayList<>();
 
-		for (SQFScope scope : visitScopes) {
-			PsiUtil.traverseBreadthFirstSearch(scope.getNode(), astNode -> {
-				PsiElement nodeAsPsi = astNode.getPsi();
-				if (!(nodeAsPsi instanceof SQFVariable || nodeAsPsi instanceof SQFString)) {
+		PsiUtil.traverseBreadthFirstSearch(fileScope.getNode(), astNode -> {
+			PsiElement nodeAsPsi = astNode.getPsi();
+			if (!(nodeAsPsi instanceof SQFVariable || nodeAsPsi instanceof SQFString)) {
+				return false;
+			}
+			if (nodeAsPsi instanceof SQFVariable) {
+				SQFVariable sqfVariable = (SQFVariable) nodeAsPsi;
+				if (SQFVariableName.nameEquals(sqfVariable.getVarName(), variable.getVarName())) {
+					varTargets.add(sqfVariable);
+				} else {
 					return false;
 				}
-				if (nodeAsPsi instanceof SQFVariable) {
-					SQFVariable sqfVariable = (SQFVariable) nodeAsPsi;
-					if (SQFVariableName.nameEquals(sqfVariable.getVarName(), variable.getVarName())) {
-						if (variable.isLocal()) {
-							SQFPrivateVar privateVar = helper.getPrivateVarForVar(variable);
-							if (privateVar == null || privateVar.getMaxScope() == maxScope) {
-								varTargets.add(sqfVariable);
-							}
-						} else {
-							varTargets.add(sqfVariable);
-						}
-					} else {
-						return false;
-					}
+			} else {
+				SQFString string = (SQFString) nodeAsPsi;
+				if (SQFVariableName.nameEquals(string.getNonQuoteText(), variable.getVarName())) {
+					stringTargets.add(string);
 				} else {
-					SQFString string = (SQFString) nodeAsPsi;
-					if (SQFVariableName.nameEquals(string.getNonQuoteText(), variable.getVarName())) {
-						stringTargets.add(string);
-					} else {
-						return false;
-					}
+					return false;
 				}
+			}
 
-				return false;
-			});
-		}
+			return false;
+		});
 
 		if (!varTargets.isEmpty()) {
 			vars.add(new SQFVariableReference.IdentifierReference(variable, varTargets));
@@ -228,52 +141,5 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 		return fileScope;
 	}
 
-	static class VariableScopeHelper {
-		private final Map<SQFScope, Set<SQFPrivateVar>> privateVarsScopeMap = new HashMap<>();
-		private final Set<SQFImplicitPrivateVar> implicitPrivateVarsSet = new HashSet<>();
 
-		/**
-		 * @return the mutable set containing all {@link SQFPrivateVar}  Cinstances for the given scope
-		 */
-		@NotNull
-		public Set<SQFPrivateVar> getPrivateVarsForScope(@NotNull SQFScope scope) {
-			return privateVarsScopeMap.computeIfAbsent(scope, scope1 -> new HashSet<>());
-		}
-
-		@Nullable
-		public SQFPrivateVar getPrivateVarForVar(@NotNull SQFVariable variable) {
-			final String varName = variable.getVarName();
-
-			SQFScope containingScope = SQFScope.getContainingScope(variable);
-
-			//check for explicit first
-			while (true) {
-				Set<SQFPrivateVar> set = privateVarsScopeMap.get(containingScope);
-				if (set != null) {
-					for (SQFPrivateVar privateVar : set) {
-						if (privateVar.getVariableNameObj().nameEquals(varName)) {
-							return privateVar;
-						}
-					}
-				}
-				if (containingScope instanceof SQFFileScope) {
-					break;
-				}
-				containingScope = SQFScope.getContainingScope(containingScope);
-			}
-
-			for (SQFImplicitPrivateVar privateVar : implicitPrivateVarsSet) {
-				if (privateVar.getVar() == variable) {
-					return privateVar;
-				}
-			}
-
-			return null;
-		}
-
-		@NotNull
-		public Set<SQFImplicitPrivateVar> getImplicitPrivateVarsSet() {
-			return implicitPrivateVarsSet;
-		}
-	}
 }
