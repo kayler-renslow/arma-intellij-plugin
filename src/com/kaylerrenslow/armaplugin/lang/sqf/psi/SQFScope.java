@@ -6,6 +6,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
+import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableInStringReference;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +50,6 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 	public Object accept(@NotNull SQFSyntaxVisitor visitor, @NotNull CommandDescriptorCluster cluster) {
 		return visitor.visit(this, cluster);
 	}
-
 
 	@NotNull
 	public static List<SQFVariableReference> getVariableReferencesFor(@NotNull SQFVariable variable) {
@@ -95,6 +95,40 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 		}
 		return vars;
 	}
+
+	@NotNull
+	public static List<SQFVariableInStringReference> getVariableReferencesFor(@NotNull SQFString string) {
+		List<SQFVariableInStringReference> vars = new ArrayList<>();
+		PsiFile file = string.getContainingFile();
+		if (file == null) {
+			throw new IllegalArgumentException("string doesn't have a containing file");
+		}
+		String varName = string.getNonQuoteText();
+		SQFScope fileScope = getContainingScope(file);
+
+		List<SQFVariable> varTargets = new ArrayList<>();
+
+		PsiUtil.traverseBreadthFirstSearch(fileScope.getNode(), astNode -> {
+			PsiElement nodeAsPsi = astNode.getPsi();
+			if (!(nodeAsPsi instanceof SQFVariable)) {
+				return false;
+			}
+			SQFVariable sqfVariable = (SQFVariable) nodeAsPsi;
+			if (SQFVariableName.nameEquals(sqfVariable.getVarName(), varName)) {
+				varTargets.add(sqfVariable);
+			} else {
+				return false;
+			}
+
+			return false;
+		});
+
+		if (!varTargets.isEmpty()) {
+			vars.add(new SQFVariableInStringReference(string, varTargets));
+		}
+		return vars;
+	}
+
 
 	/**
 	 * Gets the {@link SQFScope} for the given PsiElement. If the given element is an {@link SQFScope} instance,
