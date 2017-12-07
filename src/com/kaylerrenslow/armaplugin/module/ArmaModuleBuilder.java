@@ -106,7 +106,6 @@ public class ArmaModuleBuilder extends ModuleBuilder implements SourcePathsBuild
 			root.setLayout(new BoxLayout(root, BoxLayout.Y_AXIS));
 			JLabel subHeader = new JLabel(ArmaPlugin.getPluginBundle().getString("arma-module.description"));
 
-//			root.add(new JLabel(ArmaPluginIcons.ARMA_LOGO));
 			root.add(subHeader);
 
 			return root;

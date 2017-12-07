@@ -1,13 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <idea-plugin>
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
-	<name>Arma Intellij Plugin</name>
+	<name>Arma IntelliJ Plugin</name>
 	<version>2.0.0</version>
-	<vendor email="armaintellijplugin@kaylerrenslow.com" url="https://github.com/kayler-renslow/arma-intellij-plugin">
+	<vendor url="https://github.com/kayler-renslow/arma-intellij-plugin">
 		Kayler Renslow
 	</vendor>
 	<description>
-
+		<![CDATA[
+			<p>
+			<b>NOTICE: this plugin is not intended for C/C++ Development.</b>
+			</p>
+			<p>
+			Arma IntelliJ Plugin provides support for the SQF scripting language used in the video game Arma 3.<br>
+			Some of the most notable plugin features are:
+			<ul>
+			<li>Full command syntax analysis</li>
+			<li>Type checking</li>
+			<li>Config function auto-completion</li>
+			<li>Code and file templates</li>
+			<li>Syntax highlighting</li>
+			<li>Arma Addon Indexing Support</li>
+			</ul>
+			<p>
+			Arma IntelliJ Plugin is also bundled with <a href='https://github.com/kayler-renslow/arma-dialog-creator'>Arma Dialog Creator</a>.
+			You can launch it via Tools->Arma Dialog Creator
+		]]>
 	</description>
 	<idea-version since-build="171"/>
 	<extensions defaultExtensionNs="com.intellij">
@@ -69,5 +87,12 @@
 						serviceInterface="com.kaylerrenslow.armaplugin.settings.ArmaPluginProjectSettings"/>
 
 	</extensions>
+	<actions>
+		<action id="armaplugin.launch_adc" class="com.kaylerrenslow.armaplugin.LaunchArmaDialogCreatorAction"
+				text="Launch Arma Dialog Creator" description="Launches Arma Dialog Creator"
+				icon="/com/kaylerrenslow/armaplugin/icons/adc.png">
+			<add-to-group group-id="ToolsMenu"/>
+		</action>
+	</actions>
 	<change-notes></change-notes>
 </idea-plugin>
