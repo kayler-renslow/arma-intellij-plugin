@@ -53,6 +53,10 @@
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Misc -->
+
+		<moduleBuilder builderClass="com.kaylerrenslow.armaplugin.module.ArmaModuleBuilder"/>
+		<moduleType implementationClass="com.kaylerrenslow.armaplugin.module.ArmaModuleType" id="arma.moduleType"/>
+
 		<additionalTextAttributes scheme="Darcula" file="com/kaylerrenslow/armaplugin/armaPluginColorSchemes.xml"/>
 		<additionalTextAttributes scheme="Default" file="com/kaylerrenslow/armaplugin/armaPluginColorSchemes.xml"/>
 

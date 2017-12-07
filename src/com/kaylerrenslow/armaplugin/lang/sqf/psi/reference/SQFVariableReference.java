@@ -146,7 +146,6 @@ public abstract class SQFVariableReference implements PsiReference {
 
 		@Override
 		public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
-			System.out.println("StringReference.handleElementRename newElementName=" + newElementName);
 			return variable.setName(newElementName);
 		}
 
