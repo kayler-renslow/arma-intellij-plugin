@@ -31,15 +31,17 @@ public interface ValueType {
 	 * @throws IllegalArgumentException if {@link ExpandedValueType#isEmptyArray()} returns true for either provided type
 	 */
 	static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
-		if (type1 == BaseType.ANYTHING || type1 == BaseType._VARIABLE
-				|| type1 == BaseType.ANYTHING.getExpanded()
-				|| type1 == BaseType._VARIABLE.getExpanded()) {
+		if (type1.equals(BaseType.ANYTHING)
+				|| type1.equals(BaseType._VARIABLE)
+				|| type1.equals(BaseType.ANYTHING.getExpanded())
+				|| type1.equals(BaseType._VARIABLE.getExpanded())) {
 			return true;
 		}
 
-		if (type2 == BaseType.ANYTHING || type2 == BaseType._VARIABLE
-				|| type2 == BaseType.ANYTHING.getExpanded()
-				|| type2 == BaseType._VARIABLE.getExpanded()) {
+		if (type2.equals(BaseType.ANYTHING)
+				|| type2.equals(BaseType._VARIABLE)
+				|| type2.equals(BaseType.ANYTHING.getExpanded())
+				|| type2.equals(BaseType._VARIABLE.getExpanded())) {
 			return true;
 		}
 
@@ -117,10 +119,10 @@ public interface ValueType {
 				return true;
 			}
 
-			if (type1Pop == BaseType.ANYTHING || type1Pop == BaseType._VARIABLE) {
+			if (type1Pop.equals(BaseType.ANYTHING) || type1Pop.equals(BaseType._VARIABLE)) {
 				continue;
 			}
-			if (type2Pop == BaseType.ANYTHING || type2Pop == BaseType._VARIABLE) {
+			if (type2Pop.equals(BaseType.ANYTHING) || type2Pop.equals(BaseType._VARIABLE)) {
 				continue;
 			}
 			if (type1Pop.isArray()) {
@@ -206,6 +208,15 @@ public interface ValueType {
 	 */
 	@NotNull
 	List<ValueType> getPolymorphicTypes();
+
+
+	/**
+	 * @return the class name with {@link #getDisplayName()} inside it
+	 */
+	@NotNull
+	default String getDebugName() {
+		return getClass().getName() + "{" + getDisplayName() + "}";
+	}
 
 	class BaseType implements ValueType {
 		public static final BaseType ANYTHING = new BaseType("Anything");
