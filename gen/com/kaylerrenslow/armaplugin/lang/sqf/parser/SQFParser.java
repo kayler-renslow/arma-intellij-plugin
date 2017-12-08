@@ -277,12 +277,13 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // expression
+  // literal_expression | expression
   public static boolean command_after(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "command_after")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, COMMAND_AFTER, "<command after>");
-    r = expression(b, l + 1, -1);
+    r = literal_expression(b, l + 1);
+    if (!r) r = expression(b, l + 1, -1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

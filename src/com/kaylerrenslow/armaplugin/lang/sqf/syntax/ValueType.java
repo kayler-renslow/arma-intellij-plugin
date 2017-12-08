@@ -29,11 +29,15 @@ public interface ValueType {
 	 * @throws IllegalArgumentException if {@link ExpandedValueType#isEmptyArray()} returns true for either provided type
 	 */
 	static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
-		if (type1 == Lookup.ANYTHING || type1 == Lookup._VARIABLE) {
+		if (type1 == Lookup.ANYTHING || type1 == Lookup._VARIABLE
+				|| type1 == Lookup.ANYTHING.getExpanded()
+				|| type1 == Lookup._VARIABLE.getExpanded()) {
 			return true;
 		}
 
-		if (type2 == Lookup.ANYTHING || type2 == Lookup._VARIABLE) {
+		if (type2 == Lookup.ANYTHING || type2 == Lookup._VARIABLE
+				|| type2 == Lookup.ANYTHING.getExpanded()
+				|| type2 == Lookup._VARIABLE.getExpanded()) {
 			return true;
 		}
 
@@ -310,6 +314,9 @@ public interface ValueType {
 
 		private final String displayName;
 		private Function<Void, ExpandedValueType> getExpandedFunc;
+		/**
+		 * DO NOT ACCESS THIS DIRECTLY. USE {@link #getExpanded()}
+		 */
 		private ExpandedValueType expandedValueType;
 
 		Lookup(String displayName) {

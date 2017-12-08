@@ -25,9 +25,11 @@ public class CommandDescriptorPool {
 	private final Random random = new Random();
 	private final LinkedBlockingQueue<ProcessingCommand> processing = new LinkedBlockingQueue<>();
 
+	private final DescriptorWrapper PLACEHOLDER = new DescriptorWrapper(new CommandDescriptor(""));
+
 	public CommandDescriptorPool() {
 		//fill the array to prevent null pointer exception when sorting array
-		Arrays.fill(tallyCache, new DescriptorWrapper(new CommandDescriptor("")));
+		Arrays.fill(tallyCache, PLACEHOLDER);
 
 		String[] frequent = {
 				"addAction",
@@ -118,7 +120,7 @@ public class CommandDescriptorPool {
 
 		synchronized (tallyCache) {
 			for (DescriptorWrapper w : tallyCache) {
-				if (w == null) {
+				if (w == null || w == PLACEHOLDER) {
 					continue;
 				}
 				if (w.descriptor.getCommandName().equalsIgnoreCase(commandName)) {
@@ -214,6 +216,11 @@ public class CommandDescriptorPool {
 		public int compareTo(@NotNull DescriptorWrapper o) {
 			//sort from -infinity to +infinity (A to Z)
 			return this.requestCount - o.requestCount;
+		}
+
+		@Override
+		public String toString() {
+			return "DescriptorWrapper{name=" + descriptor.getCommandName() + ", reqCount=" + requestCount + "}";
 		}
 	}
 

@@ -563,6 +563,15 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("_ctrl ctrlSetStructuredText parseText localize \"str_vsm_no_vehicle\";");
 		assertNoProblems("_ctrl ctrlSetStructuredText parseText '';");
 		assertNoProblems("parseText localize \"str_vsm_no_vehicle\";");
+		assertNoProblems("if(count _numArr == 0) exitWith{};");
+		assertNoProblems("if((_i + 1) >= count _numArr || (_i + 1) >= count _opNumArr) exitWith{};");
+		assertNoProblems("if(_numArr select _i > _opNumArr select _i) then {};");
+		assertNoProblems("_numArr select _i == _opNumArr select _i");
+		assertNoProblems("[_mhq, [_deployLabel, { [_this select 0] call MHQ_fnc_mhqDeployAction; }, [], 6, false, false, \"\", \"(speed (vehicle _target)) < 1 && (getPosATL _target) select 2 < 2\"]] remoteExec [\"addAction\", 0, true]");
+	}
+
+	public void testCommandExpression_randomExpressions_bad() throws Exception {
+		assertHasProblems("createVehicle");
 	}
 
 	public void testCommandExpression_ifThen_valid() throws Exception {

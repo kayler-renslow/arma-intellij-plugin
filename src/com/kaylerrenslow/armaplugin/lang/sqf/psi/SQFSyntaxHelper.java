@@ -87,7 +87,7 @@ public class SQFSyntaxHelper {
 			return new CommandDescriptorCluster(descriptors);
 		}
 
-		final String[] first = new String[commands.size() >= 2 ? (commands.size() / 2) : 1];
+		final String[] first = new String[commands.size() / 2];
 		final String[] second = new String[commands.size() - first.length];
 		{ //split the commands up
 			int i = 0;

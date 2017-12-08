@@ -197,6 +197,9 @@ public class ExpandedValueType implements ValueType {
 
 	@Override
 	public String toString() {
-		return valueTypes.toString();
+		if (isEmptyArray()) {
+			return "[]";
+		}
+		return valueTypes.size() == 1 ? valueTypes.get(0).toString() : valueTypes.toString();
 	}
 }

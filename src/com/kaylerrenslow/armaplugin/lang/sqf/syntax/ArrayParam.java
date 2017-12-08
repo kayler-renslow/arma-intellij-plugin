@@ -41,10 +41,4 @@ public class ArrayParam extends Param implements ArrayValueHolder {
 	public List<Param> getParams() {
 		return params;
 	}
-
-	@NotNull
-	@Override
-	public ValueType getType() {
-		return ArrayValueHolder.createType(this);
-	}
 }

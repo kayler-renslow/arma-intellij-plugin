@@ -367,7 +367,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		for (ValueType type : allowedTypes) {
-			if (left == type) {
+			if (ValueType.typeEquivalent(left, type)) {
 				assertIsType(right, left, rightExpr);
 				return Lookup.BOOLEAN;
 			}
@@ -560,7 +560,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 						continue;
 					}
 				}
-				if (prefixType != null && prefixType != _VARIABLE && !prefixParam.allowedTypesContains(prefixType)) {
+				if (prefixType != null && !prefixParam.allowedTypesContains(prefixType)) {
 					continue;
 				}
 			}
@@ -575,7 +575,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 						continue;
 					}
 				}
-				if (peekNextPartType != null && peekNextPartType != _VARIABLE && !postfixParam.allowedTypesContains(peekNextPartType)) {
+				if (peekNextPartType != null && !postfixParam.allowedTypesContains(peekNextPartType)) {
 					continue;
 				}
 				usingPeekedNextPart = true;
@@ -755,9 +755,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * <p>
 	 * This method will automatically return true and not report an error if <code>check</code> is {@link Lookup#_VARIABLE}
 	 * <p>
-	 * If expected contains an array type ({@link ValueType#isArray()}), this method will return true if check is an array as well.
-	 * <p>
-	 * This method simply checks by {@link Lookup} instances and not {@link ExpandedValueType}.
+	 * This method simply checks by via {@link ValueType#typeEquivalent(ValueType, ValueType)}.
 	 *
 	 * @param check         the {@link ValueType} to look for in <code>expected</code>
 	 * @param expected      an array of expected {@link ValueType}. Be sure to exclude {@link Lookup#_VARIABLE}
@@ -768,10 +766,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			return;
 		}
 		for (ValueType expect : expected) {
-			if (check.isArray() && expect.isArray()) {
-				return;
-			}
-			if (check == expect) {
+			if (ValueType.typeEquivalent(expect, check)) {
 				return;
 			}
 		}
@@ -803,10 +798,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * <p>
 	 * This method will automatically return true and not report an error if <code>check</code> is {@link Lookup#_VARIABLE}.
 	 * <p>
-	 * If expected is an array, this method will return true if check is an array as well. This will not compare elements in the array!
-	 * To check if a type is an array, {@link ValueType#isArray()} is used.
-	 * <p>
-	 * This method simply checks by {@link Lookup} instances and not {@link ExpandedValueType}.
+	 * This method simply checks by via {@link ValueType#typeEquivalent(ValueType, ValueType)}.
 	 *
 	 * @param check         the {@link ValueType} to look for in <code>expected</code>
 	 * @param expected      the expected {@link ValueType}. Be sure to not use {@link Lookup#_VARIABLE}
@@ -816,12 +808,10 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		if (check == _VARIABLE) {
 			return;
 		}
-		if (check.isArray() && expected.isArray()) {
+		if (ValueType.typeEquivalent(expected, check)) {
 			return;
 		}
-		if (check != expected) {
-			problems.registerProblem(checkPsiOwner, "Type " + expected + " expected. Got " + check + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
-		}
+		problems.registerProblem(checkPsiOwner, "Type " + expected + " expected. Got " + check + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
 	}
 
 	private static class CommandExpressionPart {

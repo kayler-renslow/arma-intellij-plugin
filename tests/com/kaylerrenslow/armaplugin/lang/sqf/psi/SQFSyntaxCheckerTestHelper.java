@@ -48,7 +48,7 @@ public abstract class SQFSyntaxCheckerTestHelper extends LightCodeInsightFixture
 		ProblemsHolder problems = getProblemsHolder(file);
 		SQFSyntaxHelper.getInstance().checkSyntax(file, problems);
 
-		assertEquals(0, problems.getResultCount());
+		assertEquals("Expected no problems, got " + problems.getResults(), 0, problems.getResultCount());
 	}
 
 	/**
@@ -82,7 +82,7 @@ public abstract class SQFSyntaxCheckerTestHelper extends LightCodeInsightFixture
 		ProblemsHolder problems = getProblemsHolder(file);
 		cluster = cluster == null ? SQFSyntaxHelper.getInstance().getCommandDescriptors(file.getNode()) : cluster;
 		ValueType ret = new SQFSyntaxChecker(file.getFileScope().getChildStatements(), cluster, problems).begin();
-		assertEquals(0, problems.getResultCount());
+		assertEquals("Expected no problems, got " + problems.getResults(), 0, problems.getResultCount());
 		assertEquals(expectedRetType, ret);
 	}
 

@@ -36,6 +36,27 @@ public interface ArrayValueHolder extends ValueHolder {
 	@NotNull
 	List<? extends ValueHolder> getValueHolders();
 
+	/**
+	 * Checks each {@link #getAllAllowedTypes()} against type.
+	 * The comparing method used is {@link ValueType#typeEquivalent(ValueType, ValueType)}.
+	 * For each allowed type in {@link #getAllAllowedTypes()}, it specifies the required minimum length for it to be equal to type.
+	 * <p>
+	 * If {@link #getAllAllowedTypes()} doesn't contain type, then this method will iterate index by index of {@link #getValueHolders()}
+	 * as well as index of type's expanded type and check each {@link ValueHolder#getAllAllowedTypes()} against each index of type
+	 *
+	 * @return true if {@link #getAllAllowedTypes()} has 1 element that is equal to type, false otherwise
+	 */
+
+
+	/**
+	 * @return {@link #createType(ArrayValueHolder)} of this
+	 */
+	@NotNull
+	@Override
+	default ValueType getType() {
+		return ArrayValueHolder.createType(this);
+	}
+
 	@NotNull
 	static ValueType createType(@NotNull ArrayValueHolder h) {
 		return createType(h.getValueHolders(), h.hasUnboundedParams());

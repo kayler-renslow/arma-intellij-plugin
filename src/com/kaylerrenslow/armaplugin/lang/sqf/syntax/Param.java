@@ -2,7 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -20,7 +20,7 @@ public class Param extends BasicValueHolder {
 	 * @param optional    true if the parameter is not required, false if it is required
 	 */
 	public Param(@NotNull String name, @NotNull ValueType type, @NotNull String description, boolean optional) {
-		this(name, type, description, optional, Collections.emptyList());
+		this(name, type, description, optional, new ArrayList<>());
 	}
 
 	/**

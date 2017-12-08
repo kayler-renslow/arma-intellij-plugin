@@ -323,4 +323,15 @@ public class ValueTypeEquivalenceTest {
 		));
 	}
 
+	@Test
+	public void typeEqual_expandedAndLookup() throws Exception {
+		assertEquals(true, typeEquivalent(Lookup.ANYTHING, Lookup.ANYTHING.getExpanded()));
+		assertEquals(true, typeEquivalent(Lookup.ANYTHING.getExpanded(), Lookup.ANYTHING));
+		assertEquals(true, typeEquivalent(Lookup._VARIABLE, Lookup._VARIABLE.getExpanded()));
+		assertEquals(true, typeEquivalent(Lookup._VARIABLE.getExpanded(), Lookup._VARIABLE));
+
+		assertEquals(true, typeEquivalent(Lookup.NUMBER.getExpanded(), Lookup.NUMBER));
+		assertEquals(true, typeEquivalent(Lookup.NUMBER, Lookup.NUMBER.getExpanded()));
+	}
+
 }
