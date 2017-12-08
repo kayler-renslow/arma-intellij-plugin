@@ -27,11 +27,10 @@ public class ArrayValueHolderTest {
 					firstArrayParam,
 					lastArrayParam
 			));
-			p.getAlternateValueTypes().add(new ExpandedValueType(false, ValueType.Lookup.NUMBER, ValueType.Lookup.STRING));
 		}
 
 		ExpandedValueType expect1 = new ExpandedValueType(false, ValueType.Lookup.NUMBER, ValueType.Lookup.BOOLEAN);
-		ExpandedValueType expect2 = new ExpandedValueType(false, ValueType.Lookup.NUMBER, ValueType.Lookup.STRING);
+		ExpandedValueType expect2 = new ExpandedValueType(false, ValueType.Lookup.CONTROL, ValueType.Lookup.BOOLEAN);
 		ExpandedValueType expect3 = new ExpandedValueType(false, ValueType.Lookup.NUMBER, ValueType.Lookup.CODE);
 		ExpandedValueType expect4 = new ExpandedValueType(false, ValueType.Lookup.NUMBER, ValueType.Lookup.CONFIG);
 		ExpandedValueType expect5 = new SingletonArrayExpandedValueType(ValueType.Lookup.NUMBER);

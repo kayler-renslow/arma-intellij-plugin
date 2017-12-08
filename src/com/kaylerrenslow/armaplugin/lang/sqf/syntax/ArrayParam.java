@@ -41,4 +41,16 @@ public class ArrayParam extends Param implements ArrayValueHolder {
 	public List<Param> getParams() {
 		return params;
 	}
+
+	@NotNull
+	@Override
+	public ValueType getType() {
+		//cannot inherit from ArrayValueHolder implementation because we are extending Param
+		return ArrayValueHolder.createType(this);
+	}
+
+	@Override
+	public boolean allowedTypesContains(@NotNull ValueType type) {
+		return ArrayValueHolder.super.allowedTypesContains(type);
+	}
 }

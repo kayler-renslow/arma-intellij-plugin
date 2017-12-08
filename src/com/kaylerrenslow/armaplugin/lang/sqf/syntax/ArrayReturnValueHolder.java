@@ -26,4 +26,16 @@ public class ArrayReturnValueHolder extends ReturnValueHolder implements ArrayVa
 	public List<ReturnValueHolder> getValueHolders() {
 		return values;
 	}
+
+	@NotNull
+	@Override
+	public ValueType getType() {
+		//cannot inherit from ArrayValueHolder implementation because we are extending ReturnValueHolder
+		return ArrayValueHolder.createType(this);
+	}
+
+	@Override
+	public boolean allowedTypesContains(@NotNull ValueType type) {
+		return ArrayValueHolder.super.allowedTypesContains(type);
+	}
 }

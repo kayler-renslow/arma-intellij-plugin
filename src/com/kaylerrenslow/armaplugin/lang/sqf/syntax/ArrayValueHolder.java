@@ -2,6 +2,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -37,24 +38,35 @@ public interface ArrayValueHolder extends ValueHolder {
 	List<? extends ValueHolder> getValueHolders();
 
 	/**
-	 * Checks each {@link #getAllAllowedTypes()} against type.
-	 * The comparing method used is {@link ValueType#typeEquivalent(ValueType, ValueType)}.
-	 * For each allowed type in {@link #getAllAllowedTypes()}, it specifies the required minimum length for it to be equal to type.
-	 * <p>
-	 * If {@link #getAllAllowedTypes()} doesn't contain type, then this method will iterate index by index of {@link #getValueHolders()}
-	 * as well as index of type's expanded type and check each {@link ValueHolder#getAllAllowedTypes()} against each index of type
+	 * Invokes {@link ValueHolder#allowedTypesContains(ValueType)}. If it returns true, this returns true. If it returns false,
+	 * then this method will iterate index by index of {@link #getValueHolders()}  as well as
+	 * index of type's expanded type and check each {@link ValueHolder#getAllAllowedTypes()} against each index of type.
 	 *
-	 * @return true if {@link #getAllAllowedTypes()} has 1 element that is equal to type, false otherwise
+	 * @return true if type is in allowed types
 	 */
-
-
-	/**
-	 * @return {@link #createType(ArrayValueHolder)} of this
-	 */
-	@NotNull
 	@Override
-	default ValueType getType() {
-		return ArrayValueHolder.createType(this);
+	default boolean allowedTypesContains(@NotNull ValueType type) {
+		if (ValueHolder.super.allowedTypesContains(type)) {
+			return true;
+		}
+		if (!type.isArray()) {
+			return false;
+		}
+		//check index by index by also checking their allowed types
+		Iterator<ValueType> typesIter = type.getExpanded().getValueTypes().iterator();
+		for (ValueHolder h : getValueHolders()) {
+			if (!typesIter.hasNext() && h.isOptional()) {
+				//assuming remaining holders are optional, return true
+				return true;
+			}
+			if (!typesIter.hasNext()) {
+				return false;
+			}
+			if (!h.allowedTypesContains(typesIter.next())) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	@NotNull
