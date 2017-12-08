@@ -1,7 +1,9 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Function;
@@ -19,9 +21,9 @@ public interface ValueType {
 	 * of elements to type1's number of elements. Also, each element type must match at each index. If an array
 	 * type is in the array type, this comparison will be used recursively.
 	 * <p>
-	 * If an allowed type is equal to {@link Lookup#ANYTHING} or <code>type</code> is {@link Lookup#ANYTHING},
-	 * the comparison of {@link ValueType} instances will always be true. Also, this method will treat {@link Lookup#_VARIABLE}
-	 * like it is {@link Lookup#ANYTHING}.
+	 * If an allowed type is equal to {@link BaseType#ANYTHING} or <code>type</code> is {@link BaseType#ANYTHING},
+	 * the comparison of {@link ValueType} instances will always be true. Also, this method will treat {@link BaseType#_VARIABLE}
+	 * like it is {@link BaseType#ANYTHING}.
 	 *
 	 * @param type1 type to check
 	 * @param type2 other type to check
@@ -29,15 +31,15 @@ public interface ValueType {
 	 * @throws IllegalArgumentException if {@link ExpandedValueType#isEmptyArray()} returns true for either provided type
 	 */
 	static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
-		if (type1 == Lookup.ANYTHING || type1 == Lookup._VARIABLE
-				|| type1 == Lookup.ANYTHING.getExpanded()
-				|| type1 == Lookup._VARIABLE.getExpanded()) {
+		if (type1 == BaseType.ANYTHING || type1 == BaseType._VARIABLE
+				|| type1 == BaseType.ANYTHING.getExpanded()
+				|| type1 == BaseType._VARIABLE.getExpanded()) {
 			return true;
 		}
 
-		if (type2 == Lookup.ANYTHING || type2 == Lookup._VARIABLE
-				|| type2 == Lookup.ANYTHING.getExpanded()
-				|| type2 == Lookup._VARIABLE.getExpanded()) {
+		if (type2 == BaseType.ANYTHING || type2 == BaseType._VARIABLE
+				|| type2 == BaseType.ANYTHING.getExpanded()
+				|| type2 == BaseType._VARIABLE.getExpanded()) {
 			return true;
 		}
 
@@ -72,10 +74,10 @@ public interface ValueType {
 		}
 
 
-		ValueType lastType1 = Lookup.NOTHING, lastType2 = Lookup.NOTHING;
+		ValueType lastType1 = BaseType.NOTHING, lastType2 = BaseType.NOTHING;
 
 		if (type1IsUnboundedEmpty) {
-			qType1.add(Lookup.ANYTHING);
+			qType1.add(BaseType.ANYTHING);
 			lastType1 = qType1.getFirst();
 		} else {
 			List<ValueType> types = type1Expanded.getValueTypes();
@@ -86,7 +88,7 @@ public interface ValueType {
 		}
 
 		if (type2IsUnboundedEmpty) {
-			qType2.add(Lookup.ANYTHING);
+			qType2.add(BaseType.ANYTHING);
 			lastType2 = qType2.getFirst();
 		} else {
 			List<ValueType> types = type2Expanded.getValueTypes();
@@ -95,7 +97,6 @@ public interface ValueType {
 				lastType2 = t;
 			}
 		}
-
 
 		while (!qType1.isEmpty() || (type1IsUnbounded && !qType2.isEmpty())) {
 			ValueType type1Pop = (qType1.isEmpty() && type1IsUnbounded) ? lastType1 : qType1.removeFirst();
@@ -116,10 +117,10 @@ public interface ValueType {
 				return true;
 			}
 
-			if (type1Pop == Lookup.ANYTHING || type1Pop == Lookup._VARIABLE) {
+			if (type1Pop == BaseType.ANYTHING || type1Pop == BaseType._VARIABLE) {
 				continue;
 			}
-			if (type2Pop == Lookup.ANYTHING || type2Pop == Lookup._VARIABLE) {
+			if (type2Pop == BaseType.ANYTHING || type2Pop == BaseType._VARIABLE) {
 				continue;
 			}
 			if (type1Pop.isArray()) {
@@ -130,12 +131,62 @@ public interface ValueType {
 				if (!equal) {
 					return false;
 				}
-			} else {
-				if (type2Pop.isArray()) {
+				continue;
+			}
+
+			if (type2Pop.isArray()) {
+				//type1 must also be an array
+				return false;
+			}
+			if (type1Pop.equals(type2Pop)) {
+				continue;
+			}
+			//check polymorphic types
+			final boolean noType1Poly = type1Pop.getPolymorphicTypes().isEmpty();
+			final boolean noType2Poly = type2Pop.getPolymorphicTypes().isEmpty();
+			if (noType1Poly) {
+				if (noType2Poly) {
+					//nothing left to check
 					return false;
 				}
-				if (!type1Pop.equals(type2Pop)) {
+				boolean found = false;
+				for (ValueType polyType2 : type2Pop.getPolymorphicTypes()) {
+					if (typeEquivalent(type1Pop, polyType2)) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
 					return false;
+				}
+			} else {
+				if (noType2Poly) {
+					boolean found = false;
+					for (ValueType polyType1 : type1Pop.getPolymorphicTypes()) {
+						if (typeEquivalent(polyType1, type2Pop)) {
+							found = true;
+							break;
+						}
+					}
+					if (!found) {
+						return false;
+					}
+				} else {
+					boolean found = false;
+					for (ValueType polyType1 : type1Pop.getPolymorphicTypes()) {
+						for (ValueType polyType2 : type2Pop.getPolymorphicTypes()) {
+							if (typeEquivalent(polyType1, polyType2)) {
+								found = true;
+								break;
+							}
+						}
+						if (found) {
+							break;
+						}
+					}
+					if (!found) {
+						return false;
+					}
 				}
 			}
 		}
@@ -150,167 +201,173 @@ public interface ValueType {
 	@NotNull
 	ExpandedValueType getExpanded();
 
-	enum Lookup implements ValueType {
-		ANYTHING("Anything"),
-		ARRAY("Array", new ExpandedValueType(true)),
-		ARRAY_OF_EDEN_ENTITIES("Array of Eden Entities",
+	/**
+	 * @return a mutable list of other {@link ValueType} this type can represent
+	 */
+	@NotNull
+	List<ValueType> getPolymorphicTypes();
+
+	class BaseType implements ValueType {
+		public static final BaseType ANYTHING = new BaseType("Anything");
+		public static final BaseType ARRAY = new BaseType("Array", new ExpandedValueType(true));
+		public static final BaseType ARRAY_OF_EDEN_ENTITIES = new BaseType("Array of Eden Entities",
 				new Function<Void, ExpandedValueType>() {
 					@Override
 					public ExpandedValueType apply(Void aVoid) {
 						return new ExpandedValueType(
-								new ExpandedValueType(true, Lookup.OBJECT),
-								new ExpandedValueType(true, Lookup.GROUP),
-								new ExpandedValueType(true, Lookup.OBJECT),
-								new ExpandedValueType(true, Lookup.OBJECT),
-								new ExpandedValueType(true, Lookup.WAYPOINT.getExpanded()),
-								new ExpandedValueType(true, Lookup.STRING),
-								new ExpandedValueType(true, Lookup.NUMBER),
-								new ExpandedValueType(true, Lookup.NUMBER)
+								new ExpandedValueType(true, BaseType.OBJECT),
+								new ExpandedValueType(true, BaseType.GROUP),
+								new ExpandedValueType(true, BaseType.OBJECT),
+								new ExpandedValueType(true, BaseType.OBJECT),
+								new ExpandedValueType(true, BaseType.WAYPOINT.getExpanded()),
+								new ExpandedValueType(true, BaseType.STRING),
+								new ExpandedValueType(true, BaseType.NUMBER),
+								new ExpandedValueType(true, BaseType.NUMBER)
 						);
 					}
 				}
-		),
-		BOOLEAN("Boolean"),
-		CODE("Code"),
-		COLOR("Color", new Function<Void, ExpandedValueType>() {
+		);
+		public static final BaseType BOOLEAN = new BaseType("Boolean");
+		public static final BaseType CODE = new BaseType("Code");
+		public static final BaseType COLOR = new BaseType("Color", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		COLOR_RGB("Color RGB", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType COLOR_RGB = new BaseType("Color RGB", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		CONFIG("Config"),
-		CONTROL("Control"),
-		DIARY_RECORD("Diary Record"),
-		DISPLAY("Display"),
-		EDEN_ENTITY("Eden Entity"),
-		EXCEPTION_TYPE("Exception Type"),
-		GROUP("Group"),
-		LOCATION("Location"),
-		NAMESPACE("Namespace"),
-		NET_OBJECT("NetObject"),
-		NIL("nil"),
-		NUMBER("Number"),
-		NOTHING("Nothing"),
-		OBJECT("Object"),
-		OBJECT_RTD("ObjectRTD"),
-		ORIENT("Orient"),
-		ORIENTATION("Orientation"),
-		POSITION("Position", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType CONFIG = new BaseType("Config");
+		public static final BaseType CONTROL = new BaseType("Control");
+		public static final BaseType DIARY_RECORD = new BaseType("Diary Record");
+		public static final BaseType DISPLAY = new BaseType("Display");
+		public static final BaseType EDEN_ENTITY = new BaseType("Eden Entity");
+		public static final BaseType EXCEPTION_TYPE = new BaseType("Exception Type");
+		public static final BaseType GROUP = new BaseType("Group");
+		public static final BaseType LOCATION = new BaseType("Location");
+		public static final BaseType NAMESPACE = new BaseType("Namespace");
+		public static final BaseType NET_OBJECT = new BaseType("NetObject");
+		public static final BaseType NIL = new BaseType("nil");
+		public static final BaseType NUMBER = new BaseType("Number");
+		public static final BaseType NOTHING = new BaseType("Nothing");
+		public static final BaseType OBJECT = new BaseType("Object");
+		public static final BaseType OBJECT_RTD = new BaseType("ObjectRTD");
+		public static final BaseType ORIENT = new BaseType("Orient");
+		public static final BaseType ORIENTATION = new BaseType("Orientation");
+		public static final BaseType POSITION = new BaseType("Position", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(false,
-						Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER
+						BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER
 				);
 			}
-		}),
-		POSITION_2D("Position 2D", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_2D = new BaseType("Position 2D", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		POSITION_3D("Position 3D", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_3D = new BaseType("Position 3D", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		POSITION_ASL("Position ASL", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_ASL = new BaseType("Position ASL", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		POSITION_ASLW("Position ASLW", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_ASLW = new BaseType("Position ASLW", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		POSITION_ATL("Position ATL", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_ATL = new BaseType("Position ATL", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		POSITION_AGL("Position AGL", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_AGL = new BaseType("Position AGL", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		POSITION_AGLS("Position AGLS", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_AGLS = new BaseType("Position AGLS", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		POSITION_WORLD("Position World", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_WORLD = new BaseType("Position World", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		POSITION_RELATIVE("Position Relative", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_RELATIVE = new BaseType("Position Relative", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		POSITION_CONFIG("Position Config", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType POSITION_CONFIG = new BaseType("Position Config", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		SCRIPT_HANDLE("Script (Handle)"),
-		SIDE("Side"),
-		STRING("String"),
-		STRUCTURED_TEXT("Structured Text"),
-		TARGET("Target"),
-		TASK("Task"),
-		TEAM("Team"),
-		TEAM_MEMBER("Team Member"),
-		TRANS("Trans"),
-		TRANSFORMATION("Transformation"),
-		WAYPOINT("Waypoint", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType SCRIPT_HANDLE = new BaseType("Script (Handle)");
+		public static final BaseType SIDE = new BaseType("Side");
+		public static final BaseType STRING = new BaseType("String");
+		public static final BaseType STRUCTURED_TEXT = new BaseType("Structured Text");
+		public static final BaseType TARGET = new BaseType("Target");
+		public static final BaseType TASK = new BaseType("Task");
+		public static final BaseType TEAM = new BaseType("Team");
+		public static final BaseType TEAM_MEMBER = new BaseType("Team Member");
+		public static final BaseType TRANS = new BaseType("Trans");
+		public static final BaseType TRANSFORMATION = new BaseType("Transformation");
+		public static final BaseType WAYPOINT = new BaseType("Waypoint", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.GROUP, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.GROUP, BaseType.NUMBER);
 			}
-		}),
-		VECTOR_3D("Vector 3D", new Function<Void, ExpandedValueType>() {
+		});
+		public static final BaseType VECTOR_3D = new BaseType("Vector 3D", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
-		}),
-		VOID("Void"),
+		});
+		public static final BaseType VOID = new BaseType("Void");
 
 		/*fake types*/
-		IF("If Type"),
-		FOR("For Type"),
-		SWITCH("Switch Type"),
-		WHILE("While Type"),
-		WITH("With Type"),
+		public static final BaseType IF = new BaseType("If Type");
+		public static final BaseType FOR = new BaseType("For Type");
+		public static final BaseType SWITCH = new BaseType("Switch Type");
+		public static final BaseType WHILE = new BaseType("While Type");
+		public static final BaseType WITH = new BaseType("With Type");
 
 		/**
 		 * Not an actual Arma 3 data type.
 		 * This is for Arma Intellij Plugin to signify a variable is being used
 		 * and that the type is indeterminate with static type checking.
 		 */
-		_VARIABLE("`VARIABLE`"),
+		public static final BaseType _VARIABLE = new BaseType("`VARIABLE`");
 		/**
 		 * Not an actual Arma 3 data type.
 		 * This is for Arma Intellij Plugin to signify a type couldn't be determined because of an error.
 		 */
-		_ERROR("Generic Error");
+		public static final BaseType _ERROR = new BaseType("Generic Error");
 
 		private final String displayName;
 		private Function<Void, ExpandedValueType> getExpandedFunc;
@@ -319,18 +376,18 @@ public interface ValueType {
 		 */
 		private ExpandedValueType expandedValueType;
 
-		Lookup(String displayName) {
+		BaseType(String displayName) {
 			this.displayName = displayName;
 			this.expandedValueType = new ExpandedValueType(this);
 		}
 
-		Lookup(String displayName, Function<Void, ExpandedValueType> getExpandedFunc) {
+		BaseType(String displayName, Function<Void, ExpandedValueType> getExpandedFunc) {
 			this.displayName = displayName;
 			this.getExpandedFunc = getExpandedFunc;
 		}
 
 
-		Lookup(String displayName, ExpandedValueType expandedValueType) {
+		BaseType(String displayName, ExpandedValueType expandedValueType) {
 			this.displayName = displayName;
 			this.expandedValueType = expandedValueType;
 		}
@@ -361,6 +418,35 @@ public interface ValueType {
 				expandedValueType = getExpandedFunc.apply(null);
 			}
 			return expandedValueType;
+		}
+
+		/**
+		 * @return a mutable list that won't persist for this lookup value type
+		 */
+		@NotNull
+		@Override
+		public List<ValueType> getPolymorphicTypes() {
+			return new ArrayList<>(); //list should be mutable according to api, but we don't want the lookups to be polymorphic
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (obj == this) {
+				return true;
+			}
+			if (obj instanceof PolymorphicWrapperValueType) {
+				return obj.equals(this);
+			}
+			return false;
+		}
+
+		@Nullable
+		public static ValueType valueOf(@NotNull String type) {
+			try {
+				return (ValueType) BaseType.class.getField(type).get(null);
+			} catch (Exception e) {
+				return null;
+			}
 		}
 	}
 

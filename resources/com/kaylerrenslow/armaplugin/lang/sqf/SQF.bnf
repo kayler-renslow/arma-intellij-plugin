@@ -115,8 +115,9 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
         //postfix argument, or is an argument of the child/parent command. (I know. It's weird.)
         command_before ::= code_block_expression | signed_expression | paren_expression | literal_expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
 
-        //for the some like command _var == 0, we want the command expression to consume _var and then be wrapped in a boolean comparison node. (COMMAND_EXPR==0 rather than COMMAND_EXPR BOOL_COMP_EXPR)
-        command_after ::= literal_expression | expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
+        //we don't want non command expressions to consume tokens that would be consumed by commands. For example, in
+        //COMMAND _var==0, we want COMMAND _var to go to command_expression and then that command_expression be wrapped in a comp_expression
+        command_after ::= command_expression | literal_expression | expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
     //end command expression
 //end expression
 

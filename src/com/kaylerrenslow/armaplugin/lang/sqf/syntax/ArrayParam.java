@@ -22,7 +22,7 @@ public class ArrayParam extends Param implements ArrayValueHolder {
 	}
 
 	public ArrayParam(boolean unboundedParams, @NotNull List<Param> params, boolean optional, @NotNull String description) {
-		super("ARRAY", ValueType.Lookup.ARRAY, description, optional);
+		super("ARRAY", ValueType.BaseType.ARRAY, description, optional);
 		this.unboundedParams = unboundedParams;
 		this.params = params;
 	}
@@ -48,9 +48,9 @@ public class ArrayParam extends Param implements ArrayValueHolder {
 		//cannot inherit from ArrayValueHolder implementation because we are extending Param
 		return ArrayValueHolder.createType(this);
 	}
-
-	@Override
-	public boolean allowedTypesContains(@NotNull ValueType type) {
-		return ArrayValueHolder.super.allowedTypesContains(type);
-	}
+//
+//	@Override
+//	public boolean allowedTypesContains(@NotNull ValueType type) {
+//		return ArrayValueHolder.super.allowedTypesContains(type);
+//	}
 }

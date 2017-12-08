@@ -3,7 +3,6 @@ package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -16,7 +15,6 @@ public class BasicValueHolder implements ValueHolder {
 
 	private final ValueType type;
 	private final String description;
-	private final List<ValueType> alternateValueTypes = new LinkedList<>();
 	private final List<String> literals;
 
 	public BasicValueHolder(@NotNull ValueType type, @NotNull String description, boolean optional) {
@@ -24,12 +22,11 @@ public class BasicValueHolder implements ValueHolder {
 	}
 
 	public BasicValueHolder(@NotNull ValueType type, @NotNull String description, boolean optional, @NotNull List<String> literals) {
-		this.type = type;
+		this.type = new PolymorphicWrapperValueType(type);
 		this.description = description.trim();
 		this.optional = optional;
 		this.literals = literals;
 	}
-
 
 	@Override
 	@NotNull
@@ -46,12 +43,6 @@ public class BasicValueHolder implements ValueHolder {
 	@Override
 	public boolean isOptional() {
 		return optional;
-	}
-
-	@Override
-	@NotNull
-	public List<ValueType> getAlternateValueTypes() {
-		return alternateValueTypes;
 	}
 
 	@NotNull

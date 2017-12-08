@@ -8,8 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * A way of expanding {@link ValueType} instances from something like {@link ValueType.Lookup#COLOR_RGB}
- * to {NUMBER, NUMBER, NUMBER}. Note that this type isn't just for arrays. This type can contain a single {@link ValueType.Lookup}
+ * A way of expanding {@link ValueType} instances from something like {@link BaseType#COLOR_RGB}
+ * to {NUMBER, NUMBER, NUMBER}. Note that this type isn't just for arrays. This type can contain a single {@link BaseType}
  * instance.
  *
  * @author Kayler
@@ -20,6 +20,48 @@ public class ExpandedValueType implements ValueType {
 	private final List<ValueType> valueTypes;
 	private final boolean isUnbounded;
 	private int numOptionalValues;
+	private final List<ValueType> polymorphicTypes;
+
+	/**
+	 * Create an instance with the specified {@link ValueType} instances. This will set {@link #getNumOptionalValues()} to 0.
+	 *
+	 * @param isUnbounded      true if the last element in valueTypes is repeating, false otherwise
+	 * @param valueTypes       value types to use (this list will be used internally for this class)
+	 * @param polymorphicTypes polymorphic types to use for {@link #getPolymorphicTypes()}
+	 */
+	protected ExpandedValueType(boolean isUnbounded, @NotNull List<ValueType> valueTypes, @NotNull List<ValueType> polymorphicTypes) {
+		this.isUnbounded = isUnbounded;
+		this.valueTypes = valueTypes;
+		this.polymorphicTypes = polymorphicTypes;
+		numOptionalValues = 0;
+	}
+
+	/**
+	 * Create an instance with the specified {@link ValueType} instances.
+	 * Every value type provided will be marked as required.
+	 * <p>
+	 * This will invoke {@link ExpandedValueType#ExpandedValueType(boolean, List, ValueType...)} with unbounded set to false.
+	 *
+	 * @param valueTypes       value types to use
+	 */
+	public ExpandedValueType(@NotNull ValueType... valueTypes) {
+		this(false, valueTypes);
+	}
+
+	/**
+	 * Create an instance with the specified {@link ValueType} instances. This will set {@link #getNumOptionalValues()} to 0.
+	 *
+	 * @param isUnbounded      true if the last element in valueTypes is repeating, false otherwise
+	 * @param valueTypes       value types to use
+	 */
+	public ExpandedValueType(boolean isUnbounded, @NotNull ValueType... valueTypes) {
+		this.isUnbounded = isUnbounded;
+		this.polymorphicTypes = new ArrayList<>();
+
+		this.valueTypes = new ArrayList<>(valueTypes.length);
+		Collections.addAll(this.valueTypes, valueTypes);
+		numOptionalValues = 0;
+	}
 
 	/**
 	 * Create an instance with the specified {@link ValueType} instances. This will set {@link #getNumOptionalValues()} to 0.
@@ -30,6 +72,7 @@ public class ExpandedValueType implements ValueType {
 	protected ExpandedValueType(boolean isUnbounded, @NotNull List<ValueType> valueTypes) {
 		this.isUnbounded = isUnbounded;
 		this.valueTypes = valueTypes;
+		this.polymorphicTypes = new ArrayList<>();
 		numOptionalValues = 0;
 	}
 
@@ -37,26 +80,42 @@ public class ExpandedValueType implements ValueType {
 	 * Create an instance with the specified {@link ValueType} instances.
 	 * Every value type provided will be marked as required.
 	 * <p>
-	 * This will invoke {@link ExpandedValueType#ExpandedValueType(boolean, ValueType...)} with unbounded set to false.
+	 * This will invoke {@link ExpandedValueType#ExpandedValueType(boolean, List, ValueType...)} with unbounded set to false.
 	 *
-	 * @param valueTypes value types to use
+	 * @param polymorphicTypes polymorphic types to use for {@link #getPolymorphicTypes()}
+	 * @param valueTypes       value types to use
 	 */
-	public ExpandedValueType(@NotNull ValueType... valueTypes) {
-		this(false, valueTypes);
+	public ExpandedValueType(@NotNull List<ValueType> polymorphicTypes, @NotNull ValueType... valueTypes) {
+		this(false, polymorphicTypes, valueTypes);
 	}
 
 	/**
 	 * Create an instance with the specified {@link ValueType} instances. This will set {@link #getNumOptionalValues()} to 0.
 	 *
-	 * @param isUnbounded true if the last element in valueTypes is repeating, false otherwise
-	 * @param valueTypes  value types to use
+	 * @param isUnbounded      true if the last element in valueTypes is repeating, false otherwise
+	 * @param polymorphicTypes polymorphic types to use for {@link #getPolymorphicTypes()}
+	 * @param valueTypes       value types to use
 	 */
-	public ExpandedValueType(boolean isUnbounded, @NotNull ValueType... valueTypes) {
+	public ExpandedValueType(boolean isUnbounded, @NotNull List<ValueType> polymorphicTypes, @NotNull ValueType... valueTypes) {
 		this.isUnbounded = isUnbounded;
+		this.polymorphicTypes = polymorphicTypes;
 
 		this.valueTypes = new ArrayList<>(valueTypes.length);
 		Collections.addAll(this.valueTypes, valueTypes);
 		numOptionalValues = 0;
+	}
+
+	/**
+	 * Sets this type to reference, however, the new polymorphic types will be used for this instance rather than reference's
+	 *
+	 * @param reference           what to set to ({@link #getValueTypes()} will be passed by referenced and NOT copied)
+	 * @param newPolymorphicTypes new types for {@link #getPolymorphicTypes()}
+	 */
+	public ExpandedValueType(@NotNull ExpandedValueType reference, @NotNull List<ValueType> newPolymorphicTypes) {
+		this.isUnbounded = reference.isUnbounded;
+		this.polymorphicTypes = newPolymorphicTypes;
+		this.valueTypes = reference.valueTypes;
+		this.numOptionalValues = reference.numOptionalValues;
 	}
 
 	/**
@@ -125,6 +184,12 @@ public class ExpandedValueType implements ValueType {
 		return this;
 	}
 
+	@NotNull
+	@Override
+	public List<ValueType> getPolymorphicTypes() {
+		return polymorphicTypes;
+	}
+
 	/**
 	 * An unbounded array is where the number of elements are between 0 and +infinity.
 	 * The last element of an unbounded array is what repeats. If an array is empty and unbounded is true, then this {@link ExpandedValueType}
@@ -149,9 +214,9 @@ public class ExpandedValueType implements ValueType {
 	 * If obj is an instance of {@link ExpandedValueType}, objects are equal if {@link #getValueTypes()} are equal
 	 * (same size and order) and if {@link #isUnbounded()} are equal.
 	 * <p>
-	 * If obj is an instance of {@link ValueType.Lookup}, the objects are equal if:
+	 * If obj is an instance of {@link BaseType}, the objects are equal if:
 	 * <ul>
-	 * <li>{@link #getValueTypes()} size is 0, {@link #isArray()} is true, and {@link ValueType.Lookup#ARRAY} is obj</li>
+	 * <li>{@link #getValueTypes()} size is 0, {@link #isArray()} is true, and {@link BaseType#ARRAY} is obj</li>
 	 * <li>If {@link #getValueTypes()} size is 1 and {@link #getValueTypes()}.get(0) == obj</li>
 	 * </ul>
 	 *
@@ -162,9 +227,9 @@ public class ExpandedValueType implements ValueType {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof Lookup) {
+		if (obj instanceof BaseType) {
 			if (isArray() && valueTypes.isEmpty()) {
-				return obj == Lookup.ARRAY;
+				return obj == BaseType.ARRAY;
 			}
 			return valueTypes.size() == 1 && valueTypes.get(0) == obj;
 		}

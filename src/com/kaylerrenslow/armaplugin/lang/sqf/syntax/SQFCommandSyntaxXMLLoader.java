@@ -109,12 +109,12 @@ class SQFCommandSyntaxXMLLoader {
 		String desc;
 
 		String type = returnValueElement.getAttribute("type");
-		dataType = ValueType.Lookup.valueOf(type);
+		dataType = ValueType.BaseType.valueOf(type);
 		desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(returnValueElement) : "";
 
 		ReturnValueHolder returnValue = new ReturnValueHolder(dataType, desc);
 
-		addAltTypes(returnValueElement, returnValue.getAlternateValueTypes());
+		addAltTypes(returnValueElement, returnValue.getType().getPolymorphicTypes());
 
 		//get literals
 		List<Element> literalElements = XmlUtil.getChildElementsWithTagName(returnValueElement, "literal");
@@ -162,13 +162,13 @@ class SQFCommandSyntaxXMLLoader {
 		boolean optional;
 
 		String type = paramElement.getAttribute("type");
-		dataType = ValueType.Lookup.valueOf(type);
+		dataType = ValueType.BaseType.valueOf(type);
 		paramName = paramElement.getAttribute("name");
 		optional = valueOfTF(paramElement.getAttribute("optional"));
 		desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(paramElement) : "";
 
 		Param p = new Param(paramName, dataType, desc, optional);
-		addAltTypes(paramElement, p.getAlternateValueTypes());
+		addAltTypes(paramElement, p.getType().getPolymorphicTypes());
 
 		//get literals
 		List<Element> literalElements = XmlUtil.getChildElementsWithTagName(paramElement, "literal");
@@ -185,7 +185,7 @@ class SQFCommandSyntaxXMLLoader {
 			List<Element> tElements = XmlUtil.getChildElementsWithTagName(altTypeElement, "t");
 			for (Element tElement : tElements) {
 				String altType = tElement.getAttribute("type");
-				alternateDataTypes.add(ValueType.Lookup.valueOf(altType));
+				alternateDataTypes.add(ValueType.BaseType.valueOf(altType));
 			}
 		}
 	}
@@ -226,6 +226,6 @@ class SQFCommandSyntaxXMLLoader {
 	}
 
 
-	private static final ReturnValueHolder PLACEHOLDER_RETURN_VALUE = new ReturnValueHolder(ValueType.Lookup.ANYTHING, "PLACEHOLDER");
-	private static final Param PLACEHOLDER_PARAM = new Param("PLACEHOLDER", ValueType.Lookup.ANYTHING, "", true);
+	private static final ReturnValueHolder PLACEHOLDER_RETURN_VALUE = new ReturnValueHolder(ValueType.BaseType.ANYTHING, "PLACEHOLDER");
+	private static final Param PLACEHOLDER_PARAM = new Param("PLACEHOLDER", ValueType.BaseType.ANYTHING, "", true);
 }

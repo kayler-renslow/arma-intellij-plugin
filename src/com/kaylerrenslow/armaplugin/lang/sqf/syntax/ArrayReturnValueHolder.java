@@ -13,7 +13,7 @@ public class ArrayReturnValueHolder extends ReturnValueHolder implements ArrayVa
 	private boolean unbounded;
 
 	public ArrayReturnValueHolder(@NotNull String description, @NotNull List<ReturnValueHolder> values, boolean unbounded) {
-		super(ValueType.Lookup.ARRAY, description);
+		super(ValueType.BaseType.ARRAY, description);
 		this.values = values;
 		this.unbounded = unbounded;
 	}
@@ -34,8 +34,4 @@ public class ArrayReturnValueHolder extends ReturnValueHolder implements ArrayVa
 		return ArrayValueHolder.createType(this);
 	}
 
-	@Override
-	public boolean allowedTypesContains(@NotNull ValueType type) {
-		return ArrayValueHolder.super.allowedTypesContains(type);
-	}
 }

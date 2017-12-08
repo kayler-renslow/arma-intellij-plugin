@@ -4,7 +4,7 @@ import com.kaylerrenslow.armaplugin.lang.sqf.syntax.*;
 
 import java.util.Arrays;
 
-import static com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.Lookup;
+import static com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.BaseType;
 
 /**
  * Tests for syntax/type checking for {@link SQFFile} instances
@@ -17,18 +17,18 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----START Literal Expression----
 	public void testLiteralExpression_number() throws Exception {
 		ValueType ret = getExitTypeForText("1");
-		assertEquals(Lookup.NUMBER, ret);
+		assertEquals(ValueType.BaseType.NUMBER, ret);
 	}
 
 	public void testLiteralExpression_string() throws Exception {
 		ValueType ret = getExitTypeForText("'hello'");
-		assertEquals(Lookup.STRING, ret);
+		assertEquals(ValueType.BaseType.STRING, ret);
 	}
 
 	public void testLiteralExpression_array() throws Exception {
 		ValueType ret = getExitTypeForText("[1,2,3]");
 
-		ValueType t = new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+		ValueType t = new ExpandedValueType(ValueType.BaseType.NUMBER, ValueType.BaseType.NUMBER, BaseType.NUMBER);
 
 		assertEquals(t, ret);
 	}
@@ -39,24 +39,24 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	public void testParenExpression1() throws Exception {
 		ValueType ret = getExitTypeForText("(1)");
-		assertEquals(Lookup.NUMBER, ret);
+		assertEquals(BaseType.NUMBER, ret);
 	}
 
 	public void testParenExpression2() throws Exception {
 		ValueType ret = getExitTypeForText("('hello')");
-		assertEquals(Lookup.STRING, ret);
+		assertEquals(BaseType.STRING, ret);
 	}
 
 	public void testParenExpression3() throws Exception {
 		ValueType ret = getExitTypeForText("([1,2,3])");
-		ValueType t = new ExpandedValueType(Lookup.NUMBER, Lookup.NUMBER, Lookup.NUMBER);
+		ValueType t = new ExpandedValueType(ValueType.BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 
 		assertEquals(t, ret);
 	}
 
 	public void testParenExpression4() throws Exception {
 		ValueType ret = getExitTypeForText("(1+1)");
-		assertEquals(Lookup.NUMBER, ret);
+		assertEquals(BaseType.NUMBER, ret);
 	}
 
 	//----END Paren Expression----
@@ -274,49 +274,49 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("''==''"); //string
 
 		{ //group
-			assertEquals(Lookup.GROUP, getExitTypeForText("grpNull"));
+			assertEquals(ValueType.BaseType.GROUP, getExitTypeForText("grpNull"));
 			assertNoProblems("grpNull==grpNull");
 			assertNoProblems("grpNull!=grpNull");
 		}
 
 		{ //side
-			assertEquals(Lookup.SIDE, getExitTypeForText("west"));
+			assertEquals(BaseType.SIDE, getExitTypeForText("west"));
 			assertNoProblems("west==west");
 			assertNoProblems("west!=west");
 		}
 
 		{ //object
-			assertEquals(Lookup.OBJECT, getExitTypeForText("objNull"));
+			assertEquals(BaseType.OBJECT, getExitTypeForText("objNull"));
 			assertNoProblems("objNull==objNull");
 			assertNoProblems("objNull!=objNull");
 		}
 
 		{ //config
-			assertEquals(Lookup.CONFIG, getExitTypeForText("configFile"));
+			assertEquals(BaseType.CONFIG, getExitTypeForText("configFile"));
 			assertNoProblems("configFile==configFile");
 			assertNoProblems("configFile!=configFile");
 		}
 
 		{ //display
-			assertEquals(Lookup.DISPLAY, getExitTypeForText("displayNull"));
+			assertEquals(ValueType.BaseType.DISPLAY, getExitTypeForText("displayNull"));
 			assertNoProblems("displayNull==displayNull");
 			assertNoProblems("displayNull!=displayNull");
 		}
 
 		{ //control
-			assertEquals(Lookup.CONTROL, getExitTypeForText("controlNull"));
+			assertEquals(ValueType.BaseType.CONTROL, getExitTypeForText("controlNull"));
 			assertNoProblems("controlNull==controlNull");
 			assertNoProblems("controlNull!=controlNull");
 		}
 
 		{ //location
-			assertEquals(Lookup.LOCATION, getExitTypeForText("locationNull"));
+			assertEquals(ValueType.BaseType.LOCATION, getExitTypeForText("locationNull"));
 			assertNoProblems("locationNull==locationNull");
 			assertNoProblems("locationNull!=locationNull");
 		}
 
 		{ //structured text
-			assertEquals(Lookup.STRUCTURED_TEXT, getExitTypeForText("parseText ''"));
+			assertEquals(BaseType.STRUCTURED_TEXT, getExitTypeForText("parseText ''"));
 			assertNoProblems("(parseText '')==(parseText '')");
 			assertNoProblems("(parseText '')!=(parseText '')");
 		}
@@ -492,10 +492,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("{+1.5}");
 		assertNoProblems("{}");
 
-		assertEquals(Lookup.CODE, getExitTypeForText("{}"));
-		assertEquals(Lookup.CODE, getExitTypeForText("{1}"));
-		assertEquals(Lookup.CODE, getExitTypeForText("{_var}"));
-		assertEquals(Lookup.CODE, getExitTypeForText("{1+1;1}"));
+		assertEquals(ValueType.BaseType.CODE, getExitTypeForText("{}"));
+		assertEquals(BaseType.CODE, getExitTypeForText("{1}"));
+		assertEquals(ValueType.BaseType.CODE, getExitTypeForText("{_var}"));
+		assertEquals(BaseType.CODE, getExitTypeForText("{1+1;1}"));
 	}
 	//----END code block Expression----
 
@@ -513,10 +513,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("case _var:{};");
 		assertNoProblems("case _var;");
 
-		assertEquals(Lookup.NOTHING, getExitTypeForText("case 1:{};"));
-		assertEquals(Lookup.NOTHING, getExitTypeForText("case 1:{2};"));
-		assertEquals(Lookup.NOTHING, getExitTypeForText("case 1;"));
-		assertEquals(Lookup.NOTHING, getExitTypeForText("case configFile;"));
+		assertEquals(BaseType.NOTHING, getExitTypeForText("case 1:{};"));
+		assertEquals(BaseType.NOTHING, getExitTypeForText("case 1:{2};"));
+		assertEquals(BaseType.NOTHING, getExitTypeForText("case 1;"));
+		assertEquals(ValueType.BaseType.NOTHING, getExitTypeForText("case configFile;"));
 	}
 	//----END case statement----
 
@@ -532,10 +532,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		//this problem should be a grammar error, not a type error
 		assertNoProblems("a = ;");
 
-		assertEquals(Lookup.NOTHING, getExitTypeForText("a = {};"));
-		assertEquals(Lookup.NOTHING, getExitTypeForText("a={2};"));
-		assertEquals(Lookup.NOTHING, getExitTypeForText("a = 1+1;"));
-		assertEquals(Lookup.NOTHING, getExitTypeForText("a = _var;"));
+		assertEquals(ValueType.BaseType.NOTHING, getExitTypeForText("a = {};"));
+		assertEquals(ValueType.BaseType.NOTHING, getExitTypeForText("a={2};"));
+		assertEquals(ValueType.BaseType.NOTHING, getExitTypeForText("a = 1+1;"));
+		assertEquals(ValueType.BaseType.NOTHING, getExitTypeForText("a = _var;"));
 	}
 	//----END assignment statement----
 
@@ -548,8 +548,8 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		//this problem should be a grammar error, not a type error
 		assertNoProblems("? ;");
 
-		assertEquals(Lookup.NOTHING, getExitTypeForText("? true : false;"));
-		assertEquals(Lookup.NOTHING, getExitTypeForText("? ;"));
+		assertEquals(BaseType.NOTHING, getExitTypeForText("? true : false;"));
+		assertEquals(BaseType.NOTHING, getExitTypeForText("? ;"));
 	}
 
 	public void testQuestStatement_bad() throws Exception {
@@ -568,6 +568,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("if(_numArr select _i > _opNumArr select _i) then {};");
 		assertNoProblems("_numArr select _i == _opNumArr select _i");
 		assertNoProblems("[_mhq, [_deployLabel, { [_this select 0] call MHQ_fnc_mhqDeployAction; }, [], 6, false, false, \"\", \"(speed (vehicle _target)) < 1 && (getPosATL _target) select 2 < 2\"]] remoteExec [\"addAction\", 0, true]");
+		assertNoProblems("for \"_i\" from 0 to 1 step -1 do {};");
 	}
 
 	public void testCommandExpression_randomExpressions_bad() throws Exception {
@@ -575,10 +576,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testCommandExpression_ifThen_valid() throws Exception {
-		assertExitTypeAndNoProblems("if true then {};", null, Lookup.IF);
-		assertExitTypeAndNoProblems("if true then {} else {};", null, Lookup.IF);
-		assertExitTypeAndNoProblems("if true then [{},{}];", null, Lookup.IF);
-		assertExitTypeAndNoProblems("if true then [{},{},{}];", null, Lookup.IF);
+		assertExitTypeAndNoProblems("if true then {};", null, BaseType.IF);
+		assertExitTypeAndNoProblems("if true then {} else {};", null, ValueType.BaseType.IF);
+		assertExitTypeAndNoProblems("if true then [{},{}];", null, ValueType.BaseType.IF);
+		assertExitTypeAndNoProblems("if true then [{},{},{}];", null, ValueType.BaseType.IF);
 	}
 
 	public void testCommandExpression_ifThen_bad() throws Exception {
@@ -606,55 +607,55 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 						new ArrayParam(
 								false,
 								Arrays.asList(
-										new Param("required", Lookup.NUMBER, "", false),
-										new Param("optional", Lookup.NUMBER, "", true)
+										new Param("required", BaseType.NUMBER, "", false),
+										new Param("optional", ValueType.BaseType.NUMBER, "", true)
 								),
 								true
 						),
-						new ReturnValueHolder(Lookup.VOID, "")
+						new ReturnValueHolder(BaseType.VOID, "")
 				)
 		), "", BIGame.UNKNOWN);
 
 		CommandDescriptor d2 = new CommandDescriptor("position", Arrays.asList(
 				new CommandSyntax(
-						new Param("optionalPrefix", Lookup.NUMBER, "", true),
+						new Param("optionalPrefix", BaseType.NUMBER, "", true),
 						new ArrayParam(
 								false,
 								Arrays.asList(
 										new ArrayParam(
 												false,
 												Arrays.asList(
-														new Param("required", Lookup.CODE, "", false)
+														new Param("required", ValueType.BaseType.CODE, "", false)
 												),
 												true
 										),
-										new Param("optional", Lookup.NUMBER, "", true)
+										new Param("optional", ValueType.BaseType.NUMBER, "", true)
 								),
 								true
 						),
-						new ReturnValueHolder(Lookup.CONFIG, "")
+						new ReturnValueHolder(BaseType.CONFIG, "")
 				)
 		), "", BIGame.UNKNOWN);
 
 
 		CommandDescriptorCluster cluster = new CommandDescriptorCluster(d1, d2);
 
-		assertExitTypeAndNoProblems("getPos [1,1];", cluster, Lookup.VOID);
-		assertExitTypeAndNoProblems("getPos [1];", cluster, Lookup.VOID);
-		assertExitTypeAndNoProblems("getPos;", cluster, Lookup.VOID);
+		assertExitTypeAndNoProblems("getPos [1,1];", cluster, ValueType.BaseType.VOID);
+		assertExitTypeAndNoProblems("getPos [1];", cluster, ValueType.BaseType.VOID);
+		assertExitTypeAndNoProblems("getPos;", cluster, ValueType.BaseType.VOID);
 		assertHasProblems("1 getPos"); //can't have prefix
 
-		assertExitTypeAndNoProblems("position [[{}],1];", cluster, Lookup.CONFIG);
-		assertExitTypeAndNoProblems("position [[{}]];", cluster, Lookup.CONFIG);
-		assertExitTypeAndNoProblems("position [];", cluster, Lookup.CONFIG);
+		assertExitTypeAndNoProblems("position [[{}],1];", cluster, ValueType.BaseType.CONFIG);
+		assertExitTypeAndNoProblems("position [[{}]];", cluster, BaseType.CONFIG);
+		assertExitTypeAndNoProblems("position [];", cluster, ValueType.BaseType.CONFIG);
 
-		assertExitTypeAndNoProblems("0 position;", cluster, Lookup.CONFIG);
-		assertExitTypeAndNoProblems("0 position [[{}],1];", cluster, Lookup.CONFIG);
-		assertExitTypeAndNoProblems("0 position [[{}]];", cluster, Lookup.CONFIG);
-		assertExitTypeAndNoProblems("0 position [];", cluster, Lookup.CONFIG);
-		assertExitTypeAndNoProblems("0 position;", cluster, Lookup.CONFIG);
+		assertExitTypeAndNoProblems("0 position;", cluster, BaseType.CONFIG);
+		assertExitTypeAndNoProblems("0 position [[{}],1];", cluster, ValueType.BaseType.CONFIG);
+		assertExitTypeAndNoProblems("0 position [[{}]];", cluster, BaseType.CONFIG);
+		assertExitTypeAndNoProblems("0 position [];", cluster, BaseType.CONFIG);
+		assertExitTypeAndNoProblems("0 position;", cluster, BaseType.CONFIG);
 
-		assertExitTypeAndNoProblems("position;", cluster, Lookup.CONFIG);
+		assertExitTypeAndNoProblems("position;", cluster, ValueType.BaseType.CONFIG);
 
 	}
 	//----END command expression----

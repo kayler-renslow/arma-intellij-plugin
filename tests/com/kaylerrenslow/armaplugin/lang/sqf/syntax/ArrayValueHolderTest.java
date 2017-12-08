@@ -16,12 +16,12 @@ public class ArrayValueHolderTest {
 		//test if array param has alternate types by also checking in non-Array params alternate types
 		ArrayParam p;
 		{
-			Param firstArrayParam = new Param("p1", ValueType.Lookup.NUMBER, "", true);
-			firstArrayParam.getAlternateValueTypes().add(ValueType.Lookup.CONTROL);
+			Param firstArrayParam = new Param("p1", ValueType.BaseType.NUMBER, "", true);
+			firstArrayParam.getType().getPolymorphicTypes().add(ValueType.BaseType.CONTROL);
 
-			Param lastArrayParam = new Param("p2", ValueType.Lookup.BOOLEAN, "", true);
-			lastArrayParam.getAlternateValueTypes().add(ValueType.Lookup.CODE);
-			lastArrayParam.getAlternateValueTypes().add(ValueType.Lookup.CONFIG);
+			Param lastArrayParam = new Param("p2", ValueType.BaseType.BOOLEAN, "", true);
+			lastArrayParam.getType().getPolymorphicTypes().add(ValueType.BaseType.CODE);
+			lastArrayParam.getType().getPolymorphicTypes().add(ValueType.BaseType.CONFIG);
 
 			p = new ArrayParam(false, Arrays.asList(
 					firstArrayParam,
@@ -29,18 +29,20 @@ public class ArrayValueHolderTest {
 			));
 		}
 
-		ExpandedValueType expect1 = new ExpandedValueType(false, ValueType.Lookup.NUMBER, ValueType.Lookup.BOOLEAN);
-		ExpandedValueType expect2 = new ExpandedValueType(false, ValueType.Lookup.CONTROL, ValueType.Lookup.BOOLEAN);
-		ExpandedValueType expect3 = new ExpandedValueType(false, ValueType.Lookup.NUMBER, ValueType.Lookup.CODE);
-		ExpandedValueType expect4 = new ExpandedValueType(false, ValueType.Lookup.NUMBER, ValueType.Lookup.CONFIG);
-		ExpandedValueType expect5 = new SingletonArrayExpandedValueType(ValueType.Lookup.NUMBER);
-		ExpandedValueType expect6 = new SingletonArrayExpandedValueType(ValueType.Lookup.CONTROL);
+		ExpandedValueType expect1 = new ExpandedValueType(false, ValueType.BaseType.NUMBER, ValueType.BaseType.BOOLEAN);
+		ExpandedValueType expect2 = new ExpandedValueType(false, ValueType.BaseType.CONTROL, ValueType.BaseType.BOOLEAN);
+		ExpandedValueType expect3 = new ExpandedValueType(false, ValueType.BaseType.NUMBER, ValueType.BaseType.CODE);
+		ExpandedValueType expect4 = new ExpandedValueType(false, ValueType.BaseType.NUMBER, ValueType.BaseType.CONFIG);
+		ExpandedValueType expect5 = new SingletonArrayExpandedValueType(ValueType.BaseType.NUMBER);
+		ExpandedValueType expect6 = new SingletonArrayExpandedValueType(ValueType.BaseType.CONTROL);
 		ExpandedValueType expect7 = new ExpandedValueType(false);
+		ExpandedValueType expect8 = new ExpandedValueType(false, ValueType.BaseType.CONTROL, ValueType.BaseType.CONFIG);
 
-		ExpandedValueType[] allExpected = {expect1, expect2, expect3, expect4, expect5, expect6, expect7};
+		ExpandedValueType[] allExpected = {expect1, expect2, expect3, expect4, expect5, expect6, expect7, expect8};
 
 		for (ExpandedValueType expected : allExpected) {
-			assertEquals("Expected to contain type " + expected.toString(), true, p.allowedTypesContains(expected));
+			assertEquals("Expected to contain type " + expected.toString(), true, ValueType.typeEquivalent(p.getType(), expect2));
 		}
 	}
+
 }
