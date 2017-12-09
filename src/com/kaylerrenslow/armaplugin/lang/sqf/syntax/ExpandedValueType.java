@@ -292,7 +292,7 @@ public class ExpandedValueType extends ValueType {
 			}
 			return this.isUnbounded == other.isUnbounded;
 		}
-		if (isArray() && valueTypes.isEmpty()) {
+		if (isEmptyArray()) {
 			return obj.isHardEqual(BaseType.ARRAY);
 		}
 		return valueTypes.size() == 1 && valueTypes.get(0).isHardEqual(obj);

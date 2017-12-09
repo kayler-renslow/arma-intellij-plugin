@@ -32,15 +32,6 @@ public abstract class ValueType {
 	 * @see #equivalentByPolymorphicTypes(ValueType, ValueType)
 	 */
 	public static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
-		if (!(type1.isArray() && type2.isArray()) && (type1.isArray() || type2.isArray())) {
-			//both must be arrays
-			return false;
-		}
-
-		if (type1.isHardEqual(type2)) {
-			return true;
-		}
-
 		final boolean type1IsPoly = type1 instanceof PolymorphicWrapperValueType;
 		final boolean type2IsPoly = type2 instanceof PolymorphicWrapperValueType;
 
@@ -58,12 +49,21 @@ public abstract class ValueType {
 			}
 		}
 
+		if (type1.isHardEqual(type2)) {
+			return true;
+		}
+
 		if (isAnythingOrVariable(type1, type2)) {
 			return true;
 		}
 
 		if (equivalentByPolymorphicTypes(type1, type2)) {
 			return true;
+		}
+
+		if (!(type1.isArray() && type2.isArray()) && (type1.isArray() || type2.isArray())) {
+			//both must be arrays
+			return false;
 		}
 
 		//check expanded types

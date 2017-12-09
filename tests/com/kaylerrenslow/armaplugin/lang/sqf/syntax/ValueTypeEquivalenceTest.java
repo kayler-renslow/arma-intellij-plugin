@@ -334,4 +334,63 @@ public class ValueTypeEquivalenceTest {
 		assertEquals(true, typeEquivalent(ValueType.BaseType.NUMBER, BaseType.NUMBER.getExpanded()));
 	}
 
+	@Test
+	public void typeEqual_polymorphTypes() throws Exception {
+		assertEquals(true, typeEquivalent(BaseType.ANYTHING, new PolymorphicWrapperValueType(BaseType.ANYTHING)));
+		assertEquals(true, typeEquivalent(new PolymorphicWrapperValueType(BaseType.ANYTHING), BaseType.ANYTHING));
+		assertEquals(true, typeEquivalent(new PolymorphicWrapperValueType(BaseType.NUMBER), BaseType.NUMBER));
+		{
+			PolymorphicWrapperValueType wrap = new PolymorphicWrapperValueType(BaseType.NUMBER);
+			wrap.getPolymorphicTypes().add(new PolymorphicWrapperValueType(BaseType.CONFIG));
+
+			assertEquals(true, typeEquivalent(BaseType.ANYTHING, wrap));
+			assertEquals(true, typeEquivalent(wrap, BaseType.ANYTHING));
+			assertEquals(true, typeEquivalent(BaseType.NUMBER, wrap));
+			assertEquals(true, typeEquivalent(wrap, BaseType.NUMBER));
+			assertEquals(true, typeEquivalent(BaseType.CONFIG, wrap));
+			assertEquals(true, typeEquivalent(wrap, BaseType.CONFIG));
+		}
+
+		{
+			PolymorphicWrapperValueType wrap = new PolymorphicWrapperValueType(new ExpandedValueType(false, BaseType.NUMBER, BaseType.NUMBER));
+			wrap.getPolymorphicTypes().add(new PolymorphicWrapperValueType(BaseType.CONFIG));
+
+			assertEquals(true, typeEquivalent(BaseType.ANYTHING, wrap));
+			assertEquals(true, typeEquivalent(wrap, BaseType.ANYTHING));
+			assertEquals(true, typeEquivalent(new ExpandedValueType(false, BaseType.NUMBER, BaseType.NUMBER), wrap));
+			assertEquals(true, typeEquivalent(wrap, new ExpandedValueType(false, BaseType.NUMBER, BaseType.NUMBER)));
+			assertEquals(true, typeEquivalent(BaseType.CONFIG, wrap));
+			assertEquals(true, typeEquivalent(wrap, BaseType.CONFIG));
+		}
+	}
+
+	@Test
+	public void typeNotEqual_polymorphTypes() throws Exception {
+		assertEquals(false, typeEquivalent(BaseType.NUMBER, new PolymorphicWrapperValueType(BaseType.CONTROL)));
+		assertEquals(false, typeEquivalent(new PolymorphicWrapperValueType(BaseType.CONTROL), BaseType.NUMBER));
+		{
+			PolymorphicWrapperValueType wrap = new PolymorphicWrapperValueType(BaseType.CONTROL);
+			wrap.getPolymorphicTypes().add(new PolymorphicWrapperValueType(BaseType.DISPLAY));
+
+			assertEquals(false, typeEquivalent(BaseType.ANYTHING, wrap));
+			assertEquals(false, typeEquivalent(wrap, BaseType.ANYTHING));
+			assertEquals(false, typeEquivalent(BaseType.NUMBER, wrap));
+			assertEquals(false, typeEquivalent(wrap, BaseType.NUMBER));
+			assertEquals(false, typeEquivalent(BaseType.CONFIG, wrap));
+			assertEquals(false, typeEquivalent(wrap, BaseType.CONFIG));
+		}
+
+		{
+			PolymorphicWrapperValueType wrap = new PolymorphicWrapperValueType(new ExpandedValueType(false, BaseType.DISPLAY, BaseType.DISPLAY));
+			wrap.getPolymorphicTypes().add(new PolymorphicWrapperValueType(BaseType.CODE));
+
+			assertEquals(false, typeEquivalent(BaseType.ANYTHING, wrap));
+			assertEquals(false, typeEquivalent(wrap, BaseType.ANYTHING));
+			assertEquals(false, typeEquivalent(new ExpandedValueType(false, BaseType.NUMBER, BaseType.NUMBER), wrap));
+			assertEquals(false, typeEquivalent(wrap, new ExpandedValueType(false, BaseType.NUMBER, BaseType.NUMBER)));
+			assertEquals(false, typeEquivalent(BaseType.CONFIG, wrap));
+			assertEquals(false, typeEquivalent(wrap, BaseType.CONFIG));
+		}
+	}
+
 }
