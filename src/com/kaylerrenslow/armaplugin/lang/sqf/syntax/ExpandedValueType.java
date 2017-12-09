@@ -262,11 +262,7 @@ public class ExpandedValueType extends ValueType {
 	 * If obj is an instance of {@link ExpandedValueType}, objects are equal if {@link #getValueTypes()} are equal
 	 * (same size and order) and if {@link #isUnbounded()} are equal.
 	 * <p>
-	 * If obj is an instance of {@link BaseType}, the objects are equal if:
-	 * <ul>
-	 * <li>{@link #getValueTypes()} size is 0, {@link #isArray()} is true, and {@link BaseType#ARRAY} is obj</li>
-	 * <li>If {@link #getValueTypes()} size is 1 and {@link #getValueTypes()}.get(0) == obj</li>
-	 * </ul>
+	 * If obj is not an instance of {@link ExpandedValueType}, it's expanded type will be retrieved via {@link ValueType#getExpanded()}
 	 *
 	 * @return true if equal, false if not equal
 	 * @see ValueType#typeEquivalent(ValueType, ValueType) for more leanient type equivalence
@@ -276,26 +272,32 @@ public class ExpandedValueType extends ValueType {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof ExpandedValueType) {
-			ExpandedValueType other = (ExpandedValueType) obj;
+		if (polymorphicTypes.contains(obj)) {
+			return true;
+		}
+		if (!(obj instanceof ExpandedValueType)) {
+			obj = obj.getExpanded();
+		}
 
-			if (getValueTypes().size() != other.getValueTypes().size()) {
+		ExpandedValueType other = (ExpandedValueType) obj;
+
+		//this if statement is an optimization check so that we don't need to create iterator objects if we don't need to
+		if (isEmptyArray()) {
+			return other.isEmptyArray();
+		}
+
+		if (getValueTypes().size() != other.getValueTypes().size()) {
+			return false;
+		}
+
+		Iterator<ValueType> myTypes = getValueTypes().iterator();
+		Iterator<ValueType> otherTypes = other.getValueTypes().iterator();
+		while (myTypes.hasNext()) {
+			if (!myTypes.next().isHardEqual(otherTypes.next())) {
 				return false;
 			}
-
-			Iterator<ValueType> myTypes = getValueTypes().iterator();
-			Iterator<ValueType> otherTypes = other.getValueTypes().iterator();
-			while (myTypes.hasNext()) {
-				if (!myTypes.next().isHardEqual(otherTypes.next())) {
-					return false;
-				}
-			}
-			return this.isUnbounded == other.isUnbounded;
 		}
-		if (isEmptyArray()) {
-			return obj.isHardEqual(BaseType.ARRAY);
-		}
-		return valueTypes.size() == 1 && valueTypes.get(0).isHardEqual(obj);
+		return this.isUnbounded == other.isUnbounded;
 	}
 
 	@NotNull
@@ -308,9 +310,6 @@ public class ExpandedValueType extends ValueType {
 
 	@Override
 	public String toString() {
-		if (isEmptyArray()) {
-			return "[]";
-		}
-		return valueTypes.size() == 1 ? valueTypes.get(0).toString() : valueTypes.toString();
+		return getDisplayName();
 	}
 }
