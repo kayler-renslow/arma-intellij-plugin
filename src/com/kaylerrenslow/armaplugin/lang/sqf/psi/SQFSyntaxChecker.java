@@ -354,16 +354,16 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		ValueType[] allowedTypes = {
 				BaseType.NUMBER,
 				BaseType.GROUP,
-				ValueType.BaseType.SIDE,
+				BaseType.SIDE,
 				BaseType.STRING,
 				BaseType.OBJECT,
 				BaseType.STRUCTURED_TEXT,
 				BaseType.CONFIG,
 				BaseType.DISPLAY,
-				ValueType.BaseType.CONTROL,
+				BaseType.CONTROL,
 				BaseType.LOCATION
 		};
-		if (left.isHardEqual(_VARIABLE)) {
+		if (left.isAnythingOrVariable()) {
 			assertIsType(right, allowedTypes, rightExpr);
 			return BaseType.BOOLEAN;
 		}

@@ -61,4 +61,9 @@ public class PolymorphicWrapperValueType extends ValueType {
 	public String toString() {
 		return valueType.getDisplayName();
 	}
+
+	@Override
+	public boolean isHardEqual(@NotNull ValueType other) {
+		return valueType.isHardEqual(other) || polymorphicTypes.contains(other);
+	}
 }

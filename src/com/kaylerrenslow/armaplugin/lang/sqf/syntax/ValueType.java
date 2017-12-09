@@ -32,10 +32,6 @@ public abstract class ValueType {
 	 * @see #equivalentByPolymorphicTypes(ValueType, ValueType)
 	 */
 	public static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
-		if (isAnythingOrVariable(type1, type2)) {
-			return true;
-		}
-
 		final boolean type1IsPoly = type1 instanceof PolymorphicWrapperValueType;
 		final boolean type2IsPoly = type2 instanceof PolymorphicWrapperValueType;
 
@@ -51,6 +47,10 @@ public abstract class ValueType {
 			if (typeEquivalent(unwrappedType1, unwrappedType2)) {
 				return true;
 			}
+		}
+
+		if (isAnythingOrVariable(type1, type2)) {
+			return true;
 		}
 
 		if (!(type1 instanceof ExpandedValueType) && !(type2 instanceof ExpandedValueType)) {
@@ -157,10 +157,7 @@ public abstract class ValueType {
 	}
 
 	private static boolean isAnythingOrVariable(@NotNull ValueType type1, @NotNull ValueType type2) {
-		return type1.isHardEqual(BaseType.ANYTHING)
-				|| type1.isHardEqual(BaseType._VARIABLE)
-				|| type2.isHardEqual(BaseType.ANYTHING)
-				|| type2.isHardEqual(BaseType._VARIABLE);
+		return type1.isAnythingOrVariable() || type2.isAnythingOrVariable();
 	}
 
 	/**
@@ -234,6 +231,14 @@ public abstract class ValueType {
 	 */
 	@NotNull
 	public abstract List<ValueType> getPolymorphicTypes();
+
+	/**
+	 * @return true if this is {@link BaseType#_VARIABLE} || {@link BaseType#ANYTHING}
+	 */
+	public boolean isAnythingOrVariable() {
+		return this.isHardEqual(BaseType._VARIABLE) || this.isHardEqual(BaseType.ANYTHING);
+	}
+
 
 	/**
 	 * A String that is used for comparison in {@link #isHardEqual(ValueType)}. You can think of this as like a "class name"
