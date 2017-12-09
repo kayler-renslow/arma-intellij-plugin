@@ -12,7 +12,7 @@ import java.util.List;
  * @author Kayler
  * @since 12/08/2017
  */
-public class PolymorphicWrapperValueType implements ValueType {
+public class PolymorphicWrapperValueType extends ValueType {
 	@NotNull
 	private final ValueType valueType;
 	private final List<ValueType> polymorphicTypes = new ArrayList<>();
@@ -51,24 +51,14 @@ public class PolymorphicWrapperValueType implements ValueType {
 		return polymorphicTypes;
 	}
 
+	@NotNull
+	@Override
+	public String getType() {
+		return valueType.getType();
+	}
+
 	@Override
 	public String toString() {
 		return valueType.getDisplayName();
-	}
-
-	/**
-	 * @return true if obj == this or obj is an {@link ValueType} and it Object.equals() {@link #getWrappedValueType()}
-	 * or {@link #getPolymorphicTypes()} contains obj
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if (obj == this) {
-			return true;
-		}
-		if (obj instanceof ValueType) {
-			ValueType other = (ValueType) obj;
-			return this.valueType.equals(other) || this.polymorphicTypes.contains(other);
-		}
-		return false;
 	}
 }

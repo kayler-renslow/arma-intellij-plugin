@@ -116,8 +116,8 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
         command_before ::= code_block_expression | signed_expression | paren_expression | literal_expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
 
         //we don't want non command expressions to consume tokens that would be consumed by commands. For example, in
-        //COMMAND _var==0, we want COMMAND _var to go to command_expression and then that command_expression be wrapped in a comp_expression
-        command_after ::= command_expression | literal_expression | expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
+        //"COMMAND _var==0", we want "COMMAND _var" to go to command_expression and then that command_expression be wrapped in a comp_expression
+        command_after ::= expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
     //end command expression
 //end expression
 

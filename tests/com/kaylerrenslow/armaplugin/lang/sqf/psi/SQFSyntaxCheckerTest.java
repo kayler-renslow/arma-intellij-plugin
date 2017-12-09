@@ -568,6 +568,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("if(_numArr select _i > _opNumArr select _i) then {};");
 		assertNoProblems("_numArr select _i == _opNumArr select _i");
 		assertNoProblems("[_mhq, [_deployLabel, { [_this select 0] call MHQ_fnc_mhqDeployAction; }, [], 6, false, false, \"\", \"(speed (vehicle _target)) < 1 && (getPosATL _target) select 2 < 2\"]] remoteExec [\"addAction\", 0, true]");
+		assertNoProblems("for \"_i\" from 0 to 1 do {};");
 		assertNoProblems("for \"_i\" from 0 to 1 step -1 do {};");
 	}
 

@@ -15,7 +15,7 @@ import java.util.List;
  * @author Kayler
  * @since 11/18/2017
  */
-public class ExpandedValueType implements ValueType {
+public class ExpandedValueType extends ValueType {
 	@NotNull
 	private final List<ValueType> valueTypes;
 	private final boolean isUnbounded;
@@ -42,7 +42,7 @@ public class ExpandedValueType implements ValueType {
 	 * <p>
 	 * This will invoke {@link ExpandedValueType#ExpandedValueType(boolean, List, ValueType...)} with unbounded set to false.
 	 *
-	 * @param valueTypes       value types to use
+	 * @param valueTypes value types to use
 	 */
 	public ExpandedValueType(@NotNull ValueType... valueTypes) {
 		this(false, valueTypes);
@@ -51,8 +51,8 @@ public class ExpandedValueType implements ValueType {
 	/**
 	 * Create an instance with the specified {@link ValueType} instances. This will set {@link #getNumOptionalValues()} to 0.
 	 *
-	 * @param isUnbounded      true if the last element in valueTypes is repeating, false otherwise
-	 * @param valueTypes       value types to use
+	 * @param isUnbounded true if the last element in valueTypes is repeating, false otherwise
+	 * @param valueTypes  value types to use
 	 */
 	public ExpandedValueType(boolean isUnbounded, @NotNull ValueType... valueTypes) {
 		this.isUnbounded = isUnbounded;
@@ -172,7 +172,25 @@ public class ExpandedValueType implements ValueType {
 	@NotNull
 	@Override
 	public String getDisplayName() {
-		return valueTypes.size() == 1 ? valueTypes.get(0).getDisplayName() : valueTypes.toString();
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		int i = 0;
+		final int size = getValueTypes().size();
+		for (ValueType t : getValueTypes()) {
+			sb.append(t.getDisplayName());
+			if (size - i >= numOptionalValues) {
+				//is optional param
+				sb.append("?");
+			}
+			if (i != size - 1) {
+				sb.append(", ");
+			}
+		}
+		if (isUnbounded) {
+			sb.append("...");
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 
 	/**
@@ -188,6 +206,30 @@ public class ExpandedValueType implements ValueType {
 	@Override
 	public List<ValueType> getPolymorphicTypes() {
 		return polymorphicTypes;
+	}
+
+	@Override
+	@NotNull
+	public String getType() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		int i = 0;
+		final int size = getValueTypes().size();
+		for (ValueType t : getValueTypes()) {
+			sb.append(t.getType());
+			if (size - i >= numOptionalValues) {
+				//is optional param
+				sb.append("?");
+			}
+			if (i != size - 1) {
+				sb.append(",");
+			}
+		}
+		if (isUnbounded) {
+			sb.append("...");
+		}
+		sb.append("]");
+		return sb.toString();
 	}
 
 	/**
@@ -221,17 +263,12 @@ public class ExpandedValueType implements ValueType {
 	 * </ul>
 	 *
 	 * @return true if equal, false if not equal
+	 * @see ValueType#typeEquivalent(ValueType, ValueType) for more leanient type equivalence
 	 */
 	@Override
-	public boolean equals(Object obj) {
+	public boolean isHardEqual(@NotNull ValueType obj) {
 		if (obj == this) {
 			return true;
-		}
-		if (obj instanceof BaseType) {
-			if (isArray() && valueTypes.isEmpty()) {
-				return obj == BaseType.ARRAY;
-			}
-			return valueTypes.size() == 1 && valueTypes.get(0) == obj;
 		}
 		if (obj instanceof ExpandedValueType) {
 			ExpandedValueType other = (ExpandedValueType) obj;
@@ -243,13 +280,16 @@ public class ExpandedValueType implements ValueType {
 			Iterator<ValueType> myTypes = getValueTypes().iterator();
 			Iterator<ValueType> otherTypes = other.getValueTypes().iterator();
 			while (myTypes.hasNext()) {
-				if (!myTypes.next().equals(otherTypes.next())) {
+				if (!myTypes.next().isHardEqual(otherTypes.next())) {
 					return false;
 				}
 			}
 			return this.isUnbounded == other.isUnbounded;
 		}
-		return false;
+		if (isArray() && valueTypes.isEmpty()) {
+			return obj.isHardEqual(BaseType.ARRAY);
+		}
+		return valueTypes.size() == 1 && valueTypes.get(0).isHardEqual(obj);
 	}
 
 	@NotNull

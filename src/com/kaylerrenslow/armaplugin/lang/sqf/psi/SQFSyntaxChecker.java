@@ -137,15 +137,15 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				BaseType.ARRAY
 		};
 
-		if (left.equals(NUMBER) || left.equals(STRING)) {
+		if (left.typeEquivalent(NUMBER) || left.typeEquivalent(STRING)) {
 			assertIsType(right, left, rightExpr);
 			return NUMBER;
-		} else if (left.equals(_VARIABLE)) {
+		} else if (left.isHardEqual(_VARIABLE)) {
 			assertIsType(right, allowedTypes, rightExpr);
 			return _VARIABLE;
 		}
 
-		if (left.isArray() && right.equals(_VARIABLE)) {
+		if (left.isArray() && right.isHardEqual(_VARIABLE)) {
 			return BaseType.ARRAY;
 		}
 		if (left.isArray() && right.isArray()) {
@@ -178,16 +178,16 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				BaseType.NUMBER,
 				BaseType.ARRAY
 		};
-		if (left.equals(NUMBER)) {
+		if (left.typeEquivalent(NUMBER)) {
 			assertIsType(right, BaseType.NUMBER, rightExpr);
 			return NUMBER;
 		}
-		if (left.equals(_VARIABLE)) {
+		if (left.isHardEqual(_VARIABLE)) {
 			assertIsType(right, allowedTypes, rightExpr);
 			return _VARIABLE;
 		}
 
-		if (left.isArray() && right.equals(_VARIABLE)) {
+		if (left.isArray() && right.isHardEqual(_VARIABLE)) {
 			return ValueType.BaseType.ARRAY;
 		}
 		if (left.isArray() && right.isArray()) {
@@ -227,15 +227,15 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				BaseType.STRING
 		};
 
-		if (left.equals(NUMBER)) {
+		if (left.typeEquivalent(NUMBER)) {
 			assertIsType(right, BaseType.NUMBER, rightExpr);
 			return BaseType.NUMBER;
 		}
-		if (left.equals(CONFIG)) {
+		if (left.typeEquivalent(CONFIG)) {
 			assertIsType(right, BaseType.STRING, rightExpr);
 			return CONFIG;
 		}
-		if (left.equals(_VARIABLE)) {
+		if (left.isHardEqual(_VARIABLE)) {
 			assertIsType(right, allowedTypes, rightExpr);
 			return _VARIABLE;
 		}
@@ -270,7 +270,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		assertIsType(left, BaseType.BOOLEAN, leftExpr);
 
-		if (right.equals(CODE)) {
+		if (rightExpr instanceof SQFCodeBlockExpression) {
+			assertIsType(right, BaseType.CODE, rightExpr);
 			SQFCodeBlockExpression blockExp = (SQFCodeBlockExpression) rightExpr;
 			right = fullyVisitCodeBlockScope(blockExp.getBlock(), cluster);
 			assertIsType(right, BaseType.BOOLEAN, blockExp);
@@ -302,7 +303,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		assertIsType(left, ValueType.BaseType.BOOLEAN, leftExpr);
 
-		if (right.equals(CODE)) {
+		if (rightExpr instanceof SQFCodeBlockExpression) {
+			assertIsType(right, BaseType.CODE, rightExpr);
 			SQFCodeBlockExpression blockExp = (SQFCodeBlockExpression) rightExpr;
 			right = fullyVisitCodeBlockScope(blockExp.getBlock(), cluster);
 			assertIsType(right, BaseType.BOOLEAN, blockExp);
@@ -361,7 +363,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				ValueType.BaseType.CONTROL,
 				BaseType.LOCATION
 		};
-		if (left.equals(_VARIABLE)) {
+		if (left.isHardEqual(_VARIABLE)) {
 			assertIsType(right, allowedTypes, rightExpr);
 			return BaseType.BOOLEAN;
 		}
@@ -567,7 +569,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			if (postfixParam == null) {
 				usingPeekedNextPart = false;
 			} else {
-				if (peekNextPartType != null && peekNextPartType.equals(_ERROR)) {
+				if (peekNextPartType != null && peekNextPartType.isHardEqual(_ERROR)) {
 					continue;
 				}
 				if (!postfixParam.isOptional()) {
@@ -679,7 +681,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				if (type.isArray()) {
 					return BaseType.ARRAY;
 				}
-				if (type.equals(NUMBER)) {
+				if (type.typeEquivalent(NUMBER)) {
 					return BaseType.NUMBER;
 				}
 				assertIsType(type, new ValueType[]{BaseType.NUMBER, ValueType.BaseType.ARRAY}, expr1);
@@ -753,16 +755,18 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * Checks if the given type matches one of the {@link ValueType} in expected. If they aren't equal, this method
 	 * will register a problem and return false. If they are equal, this method will return true.
 	 * <p>
-	 * This method will automatically return true and not report an error if <code>check</code> is {@link ValueType.BaseType#_VARIABLE}
+	 * If check is hardEqual ({@link ValueType#isHardEqual(ValueType)}) to {@link BaseType#_VARIABLE}, this method will
+	 * return immediately without reporting errors.
 	 * <p>
 	 * This method simply checks by via {@link ValueType#typeEquivalent(ValueType, ValueType)}.
 	 *
 	 * @param check         the {@link ValueType} to look for in <code>expected</code>
-	 * @param expected      an array of expected {@link ValueType}. Be sure to exclude {@link BaseType#_VARIABLE}
+	 * @param expected      an array of expected {@link ValueType}. Be sure to exclude {@link BaseType#_VARIABLE},
+	 *                      otherwise it will show up in the error message.
 	 * @param checkPsiOwner the PsiElement to which the <code>check</code> type is owner of
 	 */
 	private void assertIsType(@NotNull ValueType check, @NotNull ValueType[] expected, @NotNull PsiElement checkPsiOwner) {
-		if (check.equals(_VARIABLE)) {
+		if (check.isHardEqual(_VARIABLE)) {
 			return;
 		}
 		for (ValueType expect : expected) {
@@ -796,7 +800,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * Checks if the given type matches the expected {@link ValueType}. If they aren't equal, this method
 	 * will register a problem and return false. If they are equal, this method will return true.
 	 * <p>
-	 * This method will automatically return true and not report an error if <code>check</code> is {@link BaseType#_VARIABLE}.
+	 * If check is hardEqual ({@link ValueType#isHardEqual(ValueType)}) to {@link BaseType#_VARIABLE}, this method will
+	 * return immediately without reporting errors.
 	 * <p>
 	 * This method simply checks by via {@link ValueType#typeEquivalent(ValueType, ValueType)}.
 	 *
@@ -805,7 +810,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * @param checkPsiOwner the PsiElement to which the <code>check</code> type is owner of
 	 */
 	private void assertIsType(@NotNull ValueType check, @NotNull ValueType expected, @NotNull PsiElement checkPsiOwner) {
-		if (check.equals(_VARIABLE)) {
+		if (check.isHardEqual(_VARIABLE)) {
 			return;
 		}
 		if (ValueType.typeEquivalent(expected, check)) {
