@@ -172,25 +172,28 @@ public class ExpandedValueType extends ValueType {
 	@NotNull
 	@Override
 	public String getDisplayName() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		int i = 0;
-		final int size = getValueTypes().size();
-		for (ValueType t : getValueTypes()) {
-			sb.append(t.getDisplayName());
-			if (size - i >= numOptionalValues) {
-				//is optional param
-				sb.append("?");
+		if (isArray()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("[");
+			int i = 0;
+			final int size = getValueTypes().size();
+			for (ValueType t : getValueTypes()) {
+				sb.append(t.getDisplayName());
+				if (size - i >= numOptionalValues) {
+					//is optional param
+					sb.append("?");
+				}
+				if (i != size - 1) {
+					sb.append(", ");
+				}
 			}
-			if (i != size - 1) {
-				sb.append(", ");
+			if (isUnbounded) {
+				sb.append("...");
 			}
+			sb.append("]");
+			return sb.toString();
 		}
-		if (isUnbounded) {
-			sb.append("...");
-		}
-		sb.append("]");
-		return sb.toString();
+		return getValueTypes().get(0).getDisplayName();
 	}
 
 	/**
@@ -211,25 +214,28 @@ public class ExpandedValueType extends ValueType {
 	@Override
 	@NotNull
 	public String getType() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		int i = 0;
-		final int size = getValueTypes().size();
-		for (ValueType t : getValueTypes()) {
-			sb.append(t.getType());
-			if (size - i >= numOptionalValues) {
-				//is optional param
-				sb.append("?");
+		if (isArray()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append("[");
+			int i = 0;
+			final int size = getValueTypes().size();
+			for (ValueType t : getValueTypes()) {
+				sb.append(t.getType());
+				if (size - i >= numOptionalValues) {
+					//is optional param
+					sb.append("?");
+				}
+				if (i != size - 1) {
+					sb.append(",");
+				}
 			}
-			if (i != size - 1) {
-				sb.append(",");
+			if (isUnbounded) {
+				sb.append("...");
 			}
+			sb.append("]");
+			return sb.toString();
 		}
-		if (isUnbounded) {
-			sb.append("...");
-		}
-		sb.append("]");
-		return sb.toString();
+		return getValueTypes().get(0).getType();
 	}
 
 	/**

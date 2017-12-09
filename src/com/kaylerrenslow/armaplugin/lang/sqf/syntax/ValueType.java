@@ -32,7 +32,12 @@ public abstract class ValueType {
 	 * @see #equivalentByPolymorphicTypes(ValueType, ValueType)
 	 */
 	public static boolean typeEquivalent(@NotNull ValueType type1, @NotNull ValueType type2) {
-		if (type1 == type2) {
+		if (!(type1.isArray() && type2.isArray()) && (type1.isArray() || type2.isArray())) {
+			//both must be arrays
+			return false;
+		}
+
+		if (type1.isHardEqual(type2)) {
 			return true;
 		}
 
@@ -53,10 +58,7 @@ public abstract class ValueType {
 			}
 		}
 
-		if (type1.isHardEqual(BaseType.ANYTHING)
-				|| type1.isHardEqual(BaseType._VARIABLE)
-				|| type2.isHardEqual(BaseType.ANYTHING)
-				|| type2.isHardEqual(BaseType._VARIABLE)) {
+		if (isAnythingOrVariable(type1, type2)) {
 			return true;
 		}
 
@@ -90,11 +92,6 @@ public abstract class ValueType {
 					type2Expanded.isEmptyArray()
 							|| type2IsUnboundedEmpty
 			);
-		}
-
-		if (!(type1.isArray() && type2.isArray()) && (type1.isArray() || type2.isArray())) {
-			//both must be arrays
-			return false;
 		}
 
 		ValueType lastType1 = BaseType.NOTHING, lastType2 = BaseType.NOTHING;
@@ -144,6 +141,9 @@ public abstract class ValueType {
 					return false;
 				}
 			} else {
+				if (isAnythingOrVariable(type1Pop, type2Pop)) {
+					continue;
+				}
 				if (!type1Pop.isHardEqual(type2Pop)) {
 					if (!equivalentByPolymorphicTypes(type1Pop, type2Pop)) {
 						return false;
@@ -152,6 +152,13 @@ public abstract class ValueType {
 			}
 		}
 		return true;
+	}
+
+	private static boolean isAnythingOrVariable(@NotNull ValueType type1, @NotNull ValueType type2) {
+		return type1.isHardEqual(BaseType.ANYTHING)
+				|| type1.isHardEqual(BaseType._VARIABLE)
+				|| type2.isHardEqual(BaseType.ANYTHING)
+				|| type2.isHardEqual(BaseType._VARIABLE);
 	}
 
 	/**

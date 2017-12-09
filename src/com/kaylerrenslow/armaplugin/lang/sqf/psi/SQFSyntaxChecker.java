@@ -137,7 +137,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				BaseType.ARRAY
 		};
 
-		if (left.typeEquivalent(NUMBER) || left.typeEquivalent(STRING)) {
+		if (left.isHardEqual(NUMBER) || left.isHardEqual(STRING)) {
 			assertIsType(right, left, rightExpr);
 			return NUMBER;
 		} else if (left.isHardEqual(_VARIABLE)) {
@@ -178,7 +178,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				BaseType.NUMBER,
 				BaseType.ARRAY
 		};
-		if (left.typeEquivalent(NUMBER)) {
+		if (left.isHardEqual(NUMBER)) {
 			assertIsType(right, BaseType.NUMBER, rightExpr);
 			return NUMBER;
 		}
@@ -227,11 +227,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				BaseType.STRING
 		};
 
-		if (left.typeEquivalent(NUMBER)) {
+		if (left.isHardEqual(NUMBER)) {
 			assertIsType(right, BaseType.NUMBER, rightExpr);
 			return BaseType.NUMBER;
 		}
-		if (left.typeEquivalent(CONFIG)) {
+		if (left.isHardEqual(CONFIG)) {
 			assertIsType(right, BaseType.STRING, rightExpr);
 			return CONFIG;
 		}
@@ -369,7 +369,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		for (ValueType type : allowedTypes) {
-			if (ValueType.typeEquivalent(left, type)) {
+			if (left.isHardEqual(type)) {
 				assertIsType(right, left, rightExpr);
 				return BaseType.BOOLEAN;
 			}
@@ -681,7 +681,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				if (type.isArray()) {
 					return BaseType.ARRAY;
 				}
-				if (type.typeEquivalent(NUMBER)) {
+				if (type.isHardEqual(NUMBER)) {
 					return BaseType.NUMBER;
 				}
 				assertIsType(type, new ValueType[]{BaseType.NUMBER, ValueType.BaseType.ARRAY}, expr1);
