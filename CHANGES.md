@@ -1,5 +1,6 @@
 **Added**  
-* added localize "stringtable key" completion contributor
+* finished localize "stringtable key" completion contributor
+* added StringTable Key documentation to the documentation provider
 
 **Changed**  
 * 

@@ -1,5 +1,7 @@
 package com.kaylerrenslow.armaplugin.stringtable;
 
+import com.intellij.psi.xml.XmlAttribute;
+import com.intellij.psi.xml.XmlTag;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,6 +43,53 @@ public class StringTableKey {
 	 */
 	@NotNull
 	public String getID() {
-		return key.getID().getRawText() == null ? "" : key.getID().getRawText();
+		XmlAttribute attr = key.getID().getXmlAttribute();
+		return attr == null || attr.getValue() == null ? "<No ID>" : attr.getValue();
+	}
+
+	/**
+	 * @return the {@link XmlTag} associated with {@link #getID()}
+	 */
+	@NotNull
+	public XmlTag getIDXmlTag() {
+		return key.getID().getXmlTag();
+	}
+
+	@Override
+	public String toString() {
+		return getID();
+	}
+
+	/**
+	 * Gets the ID ({@link #getID()}) but replaces str_ with $STR_
+	 *
+	 * @return key id
+	 */
+	@NotNull
+	public String getDollarKeyName() {
+		return "$" + getID().replaceFirst("[sS][tT][rR]_", "STR_");
+	}
+
+	/**
+	 * Get documentation html for the given StringTable key XmlTag (this should be one returned from {@link #getIDXmlTag()})
+	 *
+	 * @param element key's tag
+	 * @return html showing all languages' values, or null if element was null, or null if element wasn't a key tag
+	 */
+	@Nullable
+	public static String getKeyDoc(@Nullable XmlTag element) {
+		if (element == null) {
+			return null;
+		}
+		if (!element.getName().equalsIgnoreCase("key")) {
+			return null;
+		}
+
+		final String format = "<div><b>%s</b> : <pre>%s</pre></div>";
+		StringBuilder doc = new StringBuilder();
+		for (XmlTag childTag : element.getSubTags()) {
+			doc.append(String.format(format, childTag.getName(), childTag.getText()));
+		}
+		return doc.toString();
 	}
 }

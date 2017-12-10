@@ -7,6 +7,7 @@ import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
+import com.intellij.psi.xml.XmlTag;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderClass;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaplugin.ArmaPluginUserData;
@@ -17,6 +18,7 @@ import com.kaylerrenslow.armaplugin.lang.header.GenericConfigException;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunctionUtil;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.*;
+import com.kaylerrenslow.armaplugin.stringtable.StringTableKey;
 import com.kaylerrenslow.armaplugin.util.FileResourceContentExtractor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -72,9 +74,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		if (element == null) {
 			return null;
 		}
-//		if (element instanceof XmlTag) {
-//			return StringTable.getKeyDoc((XmlTag) element);
-//		}
+		if (element instanceof XmlTag) {
+			return StringTableKey.getKeyDoc((XmlTag) element);
+		}
 		if (SQFParserDefinition.isCommand(element.getNode().getElementType())) {
 			return generateCommandDoc(element.getText());
 		}
@@ -103,9 +105,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	@Nullable
 	@Override
 	public PsiElement getDocumentationElementForLookupItem(PsiManager psiManager, Object object, PsiElement element) {
-//		if (object instanceof StringTableLookupElementDataObject) {
-//			return ((StringTableLookupElementDataObject) object).getTargetTag();
-//		}
+		if (object instanceof StringTableKey) {
+			return ((StringTableKey) object).getIDXmlTag();
+		}
 		if (SQFParserDefinition.isCommand(element.getNode().getElementType())) {
 			return element;
 		}
