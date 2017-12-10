@@ -36,17 +36,23 @@ public class HeaderConfigFunctionUtil {
 	/**
 	 * Get a {@link VirtualFile} instance that points to the {@link HeaderConfigFunction}'s implementation
 	 *
-	 * @param rootConfigVirtualFile a VirtualFile that points to config.cpp or description.ext
-	 * @param function              the function
+	 * @param configVirtualFiles a list of VirtualFiles that points to config.cpp files or description.ext
+	 * @param function           the function
 	 * @return the VirtualFile instance, or null if couldn't be located
 	 */
 	@Nullable
-	public static VirtualFile locateConfigFunctionVirtualFile(@NotNull VirtualFile rootConfigVirtualFile, @NotNull HeaderConfigFunction function) {
-		VirtualFile rootConfigDir = rootConfigVirtualFile.getParent();
-		if (rootConfigDir == null) {
-			return null;
+	public static VirtualFile locateConfigFunctionVirtualFile(@NotNull List<VirtualFile> configVirtualFiles, @NotNull HeaderConfigFunction function) {
+		for (VirtualFile configVirtualFile : configVirtualFiles) {
+			VirtualFile rootConfigDir = configVirtualFile.getParent();
+			if (rootConfigDir == null) {
+				return null;
+			}
+			VirtualFile match = rootConfigDir.findFileByRelativePath(function.getFullRelativePath());
+			if (match != null) {
+				return match;
+			}
 		}
-		return rootConfigDir.findFileByRelativePath(function.getFullRelativePath());
+		return null;
 	}
 
 	@NotNull
@@ -91,7 +97,7 @@ public class HeaderConfigFunctionUtil {
 	 */
 	@Nullable
 	public static HeaderConfigFunction getFunctionFromCfgFunctionsBody(@NotNull SQFVariableName functionName,
-																		@NotNull HeaderClass cfgFuncs)
+																	   @NotNull HeaderClass cfgFuncs)
 			throws FunctionNotDefinedInConfigException, MalformedConfigException {
 		//@formatter:off
 		/*

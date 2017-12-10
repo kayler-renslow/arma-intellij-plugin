@@ -18,9 +18,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -41,35 +39,36 @@ public class ArmaPluginUserData {
 	private final Map<Module, ArmaPluginModuleData> moduleMap = new IdentityHashMap<>();
 
 	/**
-	 * Get the {@link HeaderFile} instance. It will be either description.ext (for missions) or config.cpp (for addons/mods).
+	 * Get a list of {@link HeaderFile} instances. It will be either a single description.ext (for missions)
+	 * or multiple config.cpp (for addons/mods).
 	 * Note: this method will reparse only if it is unset or out of date (file was updated).
 	 *
-	 * @return the root config file, or null if couldn't locate a {@link Module} or couldn't be parsed
+	 * @return the root config file, or an empty list if couldn't locate a {@link Module} or couldn't be parsed
 	 */
-	@Nullable
-	public HeaderFile parseAndGetRootConfigHeaderFile(@NotNull PsiElement elementFromModule) {
+	@NotNull
+	public List<HeaderFile> parseAndGetConfigHeaderFiles(@NotNull PsiElement elementFromModule) {
 		synchronized (this) {
 			ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
 			if (moduleData == null) {
-				return null;
+				return Collections.emptyList();
 			}
-			if (!moduleData.shouldReparseRootConfigHeaderFile() && moduleData.getRootConfigHeaderFile() != null) {
-				return moduleData.getRootConfigHeaderFile();
+			if (!moduleData.shouldReparseConfigHeaderFiles() && moduleData.getConfigHeaderFiles() != null) {
+				return moduleData.getConfigHeaderFiles();
 			}
 
 			//find a place to save parse data
 			String imlDir = ArmaPlugin.getPathToTempDirectory(moduleData.getModule());
 			if (imlDir == null) {
-				return null;
+				return Collections.emptyList();
 			}
-			VirtualFile rootConfigVirtualFile = ArmaPluginUtil.getRootConfigVirtualFile(elementFromModule);
-			if (rootConfigVirtualFile == null) {
-				return null;
+			List<VirtualFile> rootConfigVirtualFiles = ArmaPluginUtil.getConfigVirtualFiles(elementFromModule);
+			if (rootConfigVirtualFiles.isEmpty()) {
+				return Collections.emptyList();
 			}
 
 			//the contents in the header files aren't always saved to file by intellij by the time this method is invoked,
 			//so we are going to force save the documents
-			CompletableFuture<HeaderFile> future = new CompletableFuture<>();
+			CompletableFuture<List<HeaderFile>> future = new CompletableFuture<>();
 			TransactionGuard.submitTransaction(() -> {/*Disposable class here*/}, /*Runnable*/() -> {
 				FileDocumentManager manager = FileDocumentManager.getInstance();
 				for (Document document : manager.getUnsavedDocuments()) {
@@ -85,9 +84,14 @@ public class ArmaPluginUserData {
 
 				//parse the root config
 				try {
-					moduleData.setRootConfigHeaderFile(HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(imlDir)));
-					moduleData.setReparseRootConfigHeaderFile(false);
-					future.complete(moduleData.getRootConfigHeaderFile());
+					List<HeaderFile> parsedFiles = new ArrayList<>();
+					for (VirtualFile rootConfigVirtualFile : rootConfigVirtualFiles) {
+						HeaderFile file = HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(imlDir));
+						parsedFiles.add(file);
+					}
+					moduleData.setConfigHeaderFiles(parsedFiles);
+					moduleData.setReparseConfigHeaderFiles(false);
+					future.complete(moduleData.getConfigHeaderFiles());
 
 //					new DialogWrapper(elementFromModule.getProject()){
 //						@Override
@@ -117,8 +121,8 @@ public class ArmaPluginUserData {
 			if (moduleData == null) {
 				return null;
 			}
-			if (moduleData.getRootConfigHeaderFile() == null || moduleData.shouldReparseRootConfigHeaderFile()) {
-				parseAndGetRootConfigHeaderFile(elementFromModule);
+			if (moduleData.getConfigHeaderFiles() == null || moduleData.shouldReparseConfigHeaderFiles()) {
+				parseAndGetConfigHeaderFiles(elementFromModule);
 			}
 			return moduleData.getAllConfigFunctions();
 		}
@@ -136,8 +140,8 @@ public class ArmaPluginUserData {
 	}
 
 	/**
-	 * Invoke when the root config file ({@link #parseAndGetRootConfigHeaderFile(PsiElement)}) or included files for it has been edited.
-	 * Note that this doesn't do any reparsing and instead tells {@link #parseAndGetRootConfigHeaderFile(PsiElement)} that it's cached
+	 * Invoke when the root config file ({@link #parseAndGetConfigHeaderFiles(PsiElement)}) or included files for it has been edited.
+	 * Note that this doesn't do any reparsing and instead tells {@link #parseAndGetConfigHeaderFiles(PsiElement)} that it's cached
 	 * {@link HeaderFile} is no longer valid and it should reparse.
 	 */
 	public void reparseRootConfig(@NotNull PsiFile fileFromModule) {
@@ -149,7 +153,7 @@ public class ArmaPluginUserData {
 			ArmaPluginModuleData moduleData = moduleMap.computeIfAbsent(module, module1 -> {
 				return new ArmaPluginModuleData(module);
 			});
-			moduleData.setReparseRootConfigHeaderFile(true);
+			moduleData.setReparseConfigHeaderFiles(true);
 		}
 	}
 

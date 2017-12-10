@@ -117,11 +117,11 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 			if (!function.getFunctionFileExtension().equals(".sqf")) {
 				return null;
 			}
-			VirtualFile rootConfigVirtFile = ArmaPluginUtil.getRootConfigVirtualFile(element);
-			if (rootConfigVirtFile == null) {
+			List<VirtualFile> rootConfigVirtFiles = ArmaPluginUtil.getConfigVirtualFiles(element);
+			if (rootConfigVirtFiles.isEmpty()) {
 				return null;
 			}
-			VirtualFile functionVirtFile = HeaderConfigFunctionUtil.locateConfigFunctionVirtualFile(rootConfigVirtFile, function);
+			VirtualFile functionVirtFile = HeaderConfigFunctionUtil.locateConfigFunctionVirtualFile(rootConfigVirtFiles, function);
 			if (functionVirtFile == null) {
 				return null;
 			}
@@ -146,30 +146,37 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 				return null;
 			}
 			String functionName = link.substring(DOC_LINK_PREFIX_USER_FUNCTION.length());
-			HeaderFile headerFile = ArmaPluginUserData.getInstance().parseAndGetRootConfigHeaderFile(context);
-			if (headerFile == null) {
+			List<HeaderFile> headerFiles = ArmaPluginUserData.getInstance().parseAndGetConfigHeaderFiles(context);
+			if (headerFiles.isEmpty()) {
 				return null;
 			}
 			HeaderClass cfgFunctions;
 			HeaderConfigFunction function;
-			try {
-				cfgFunctions = HeaderConfigFunctionUtil.getCfgFunctions(headerFile);
-				function = HeaderConfigFunctionUtil.getFunctionFromCfgFunctionsBody(new SQFVariableName(functionName), cfgFunctions);
-				if (function == null) {
-					return null;
+
+			List<VirtualFile> configVirtFiles = ArmaPluginUtil.getConfigVirtualFiles(context);
+			if (configVirtFiles.isEmpty()) {
+				return null;
+			}
+
+			for (HeaderFile headerFile : headerFiles) {
+				try {
+					cfgFunctions = HeaderConfigFunctionUtil.getCfgFunctions(headerFile);
+					function = HeaderConfigFunctionUtil.getFunctionFromCfgFunctionsBody(new SQFVariableName(functionName), cfgFunctions);
+					if (function == null) {
+						continue;
+					}
+				} catch (GenericConfigException e) {
+					continue;
 				}
-			} catch (GenericConfigException e) {
-				return null;
+				VirtualFile functionVirtFile = HeaderConfigFunctionUtil.locateConfigFunctionVirtualFile(configVirtFiles, function);
+				if (functionVirtFile == null) {
+					continue;
+				}
+				PsiFile match = psiManager.findFile(functionVirtFile);
+				if (match != null) {
+					return match;
+				}
 			}
-			VirtualFile rootConfigVirtFile = ArmaPluginUtil.getRootConfigVirtualFile(context);
-			if (rootConfigVirtFile == null) {
-				return null;
-			}
-			VirtualFile functionVirtFile = HeaderConfigFunctionUtil.locateConfigFunctionVirtualFile(rootConfigVirtFile, function);
-			if (functionVirtFile == null) {
-				return null;
-			}
-			return psiManager.findFile(functionVirtFile);
 		}
 		return null;
 	}

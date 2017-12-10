@@ -7,11 +7,13 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.FileTypeIndex;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderFileType;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * @author Kayler
@@ -19,28 +21,34 @@ import java.util.Collection;
  */
 public class ArmaPluginUtil {
 	/**
-	 * Gets the root config file (either description.ext or config.cpp (case sensitivity doesn't matter)), or null if neither could be found
+	 * Gets the config files (either a description.ext or multiple, at least 1, config.cpp (case sensitivity doesn't matter)).
+	 * If no description.ext file or config.cpp files could be found, this will return an empty list. This will also
+	 * return and empty list if a module for the given PsiElement couldn't be found.
+	 * <p>
+	 * If a description.ext file is found, this method will return a singleton list of the description.ext file,regardless
+	 * if there are config.cpp files. If there is no description.ext files, this will return all config.cpp files found
 	 *
 	 * @param elementFromModule a PsiElement used to determine what module the root config file is located in
-	 * @return the VirtualFile instance, or null if the root config file couldn't be found
+	 * @return a list of VirtualFile instances, or an empty list
 	 */
-	@Nullable
-	public static VirtualFile getRootConfigVirtualFile(@NotNull PsiElement elementFromModule) {
+	@NotNull
+	public static List<VirtualFile> getConfigVirtualFiles(@NotNull PsiElement elementFromModule) {
 		Module module = ModuleUtil.findModuleForPsiElement(elementFromModule);
 		if (module == null) {
-			return null;
+			return Collections.emptyList();
 		}
 		Collection<VirtualFile> files = FileTypeIndex.getFiles(HeaderFileType.INSTANCE, module.getModuleContentScope());
+		List<VirtualFile> configs = new ArrayList<>();
 		for (VirtualFile virtFile : files) {
 			if (virtFile.getName().equalsIgnoreCase("description.ext")) {
-				return virtFile;
+				return Collections.singletonList(virtFile);
 			}
 			if (virtFile.getName().equalsIgnoreCase("config.cpp")) {
-				return virtFile;
+				configs.add(virtFile);
 			}
 
 		}
-		return null;
+		return configs;
 	}
 
 	@NotNull

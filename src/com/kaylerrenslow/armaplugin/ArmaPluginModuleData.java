@@ -2,11 +2,13 @@ package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.module.Module;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
+import com.kaylerrenslow.armaplugin.lang.header.ConfigClassNotDefinedException;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunctionUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,8 +17,8 @@ import java.util.List;
  * @since 09/08/2017
  */
 public class ArmaPluginModuleData {
-	private HeaderFile rootConfigHeaderFile;
-	private boolean reparseRootConfigHeaderFile = true;
+	private List<HeaderFile> configHeaderFiles;
+	private boolean reparseConfigHeaderFiles = true;
 	private final Module module;
 	private List<HeaderConfigFunction> functions = null;
 
@@ -24,42 +26,57 @@ public class ArmaPluginModuleData {
 		this.module = module;
 	}
 
-	boolean shouldReparseRootConfigHeaderFile() {
-		return reparseRootConfigHeaderFile;
+	boolean shouldReparseConfigHeaderFiles() {
+		return reparseConfigHeaderFiles;
 	}
 
-	void setReparseRootConfigHeaderFile(boolean reparseRootConfigHeaderFile) {
-		this.reparseRootConfigHeaderFile = reparseRootConfigHeaderFile;
-		if (reparseRootConfigHeaderFile) {
+	void setReparseConfigHeaderFiles(boolean reparseConfigHeaderFiles) {
+		this.reparseConfigHeaderFiles = reparseConfigHeaderFiles;
+		if (reparseConfigHeaderFiles) {
 			this.functions = null;
 		}
 	}
 
-	void setRootConfigHeaderFile(@Nullable HeaderFile rootConfigHeaderFile) {
-		this.rootConfigHeaderFile = rootConfigHeaderFile;
-		if (rootConfigHeaderFile != null) {
+	/**
+	 * Sets {@link #getConfigHeaderFiles()} and also loads all {@link #getAllConfigFunctions()} instances
+	 *
+	 * @param configHeaderFiles a read-only list of config header files
+	 */
+	void setConfigHeaderFiles(@NotNull List<HeaderFile> configHeaderFiles) {
+		this.configHeaderFiles = configHeaderFiles;
+		ArrayList<HeaderConfigFunction> functions = new ArrayList<>();
+		for (HeaderFile file : configHeaderFiles) {
 			try {
-				functions = Collections.unmodifiableList(
-						HeaderConfigFunctionUtil.getAllConfigFunctionsFromRootConfig(HeaderConfigFunctionUtil.getCfgFunctions(rootConfigHeaderFile))
-				);
-			} catch (Exception ignore) {
-				ignore.printStackTrace();
+				functions.addAll(HeaderConfigFunctionUtil.getAllConfigFunctionsFromRootConfig(HeaderConfigFunctionUtil.getCfgFunctions(file)));
+			} catch (ConfigClassNotDefinedException e) {
+				e.printStackTrace();
 			}
 		}
+		this.functions = Collections.unmodifiableList(functions);
 	}
 
+	/**
+	 * Get a list of preprocessed and parsed config files. If the list is empty, there is no description.ext (for missions)
+	 * file or config.cpp files (for addons). If the list is non-empty, the list will be a singleton with the description.ext
+	 * file, or it will contain multiple, at least 1, config.cpp files (for addons).
+	 *
+	 * @return a read only list of config files
+	 */
 	@Nullable
-	public HeaderFile getRootConfigHeaderFile() {
-		return rootConfigHeaderFile;
+	public List<HeaderFile> getConfigHeaderFiles() {
+		return configHeaderFiles;
 	}
 
+	/**
+	 * @return the Module for which this data is relevant for
+	 */
 	@NotNull
 	public Module getModule() {
 		return module;
 	}
 
 	/**
-	 * @return a read-only list of all config functions
+	 * @return a read-only list of all config functions.
 	 */
 	@Nullable
 	public List<HeaderConfigFunction> getAllConfigFunctions() {
