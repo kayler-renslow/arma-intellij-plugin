@@ -8,6 +8,8 @@ import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
+import com.intellij.psi.xml.XmlFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
@@ -151,6 +153,35 @@ public class ArmaPluginUserData {
 	public void setArmaToolsDirectory(@Nullable File armaToolsDir) {
 		String path = armaToolsDir == null ? null : armaToolsDir.getAbsolutePath();
 		ArmaPluginApplicationSettings.getInstance().getState().armaToolsDirectory = path;
+	}
+
+	@Nullable
+	public XmlFile getStringTableXml(@NotNull PsiElement elementFromModule) {
+		synchronized (this) {
+			Module module = ModuleUtil.findModuleForPsiElement(elementFromModule);
+			if (module == null) {
+				return null;
+			}
+			ArmaPluginModuleData data = moduleMap.computeIfAbsent(module, module1 -> {
+				return new ArmaPluginModuleData(module);
+			});
+			XmlFile f = data.getStringTableXmlFile();
+			if (f == null) {
+				VirtualFile virtFile = ArmaPluginUtil.getStringTableXmlFile(module);
+				if (virtFile == null) {
+					return null;
+				}
+				XmlFile file = (XmlFile) PsiManager.getInstance(elementFromModule.getProject()).findFile(virtFile);
+				data.setStringTableXmlFile(file);
+			} else {
+				if (!f.getVirtualFile().exists()) {
+					data.setStringTableXmlFile(null);
+					return null;
+				}
+				return f;
+			}
+		}
+		return null;
 	}
 
 	private static class HeaderFileParseErrorNotification extends Notification {

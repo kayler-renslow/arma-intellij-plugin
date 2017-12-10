@@ -1,6 +1,7 @@
 package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.psi.xml.XmlFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaplugin.lang.header.ConfigClassNotDefinedException;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
@@ -21,6 +22,7 @@ public class ArmaPluginModuleData {
 	private boolean reparseConfigHeaderFiles = true;
 	private final Module module;
 	private List<HeaderConfigFunction> functions = null;
+	private XmlFile stringTableXmlFile;
 
 	public ArmaPluginModuleData(@NotNull Module module) {
 		this.module = module;
@@ -81,5 +83,14 @@ public class ArmaPluginModuleData {
 	@Nullable
 	public List<HeaderConfigFunction> getAllConfigFunctions() {
 		return functions;
+	}
+
+	@Nullable
+	public XmlFile getStringTableXmlFile() {
+		return stringTableXmlFile;
+	}
+
+	public void setStringTableXmlFile(@Nullable XmlFile stringTableXmlFile) {
+		this.stringTableXmlFile = stringTableXmlFile;
 	}
 }

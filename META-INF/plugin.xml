@@ -70,6 +70,11 @@
 		<usageTypeProvider implementation="com.kaylerrenslow.armaplugin.lang.ArmaUsageTypeProvider"/>
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
+		<!-- XML -->
+		<dom.fileDescription implementation="com.kaylerrenslow.armaplugin.stringtable.StringTableDomFileDescription"/>
+		<!--<dom.converter implementationClass="com.kaylerrenslow.armaplugin.stringtable.StringTableKeyDomConverter"/>-->
+	</extensions>
+	<extensions defaultExtensionNs="com.intellij">
 		<!-- Misc -->
 
 		<moduleBuilder builderClass="com.kaylerrenslow.armaplugin.module.ArmaModuleBuilder"/>

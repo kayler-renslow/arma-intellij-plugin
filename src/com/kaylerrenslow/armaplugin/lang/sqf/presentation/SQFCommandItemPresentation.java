@@ -1,4 +1,4 @@
-package com.kaylerrenslow.armaplugin.lang.presentation;
+package com.kaylerrenslow.armaplugin.lang.sqf.presentation;
 
 import com.intellij.navigation.ItemPresentation;
 import com.kaylerrenslow.armaplugin.ArmaPluginIcons;
@@ -6,7 +6,7 @@ import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommand;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.swing.*;
+import javax.swing.Icon;
 
 /**
  * ItemPresentation for any command.

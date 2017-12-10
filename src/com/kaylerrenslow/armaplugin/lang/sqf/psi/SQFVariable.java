@@ -11,11 +11,11 @@ import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.armaDialogCreator.util.Reference;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
-import com.kaylerrenslow.armaplugin.lang.presentation.SQFFunctionItemPresentation;
-import com.kaylerrenslow.armaplugin.lang.presentation.SQFVariableItemPresentation;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFFileType;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFStatic;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
+import com.kaylerrenslow.armaplugin.lang.sqf.presentation.SQFFunctionItemPresentation;
+import com.kaylerrenslow.armaplugin.lang.sqf.presentation.SQFVariableItemPresentation;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import org.jetbrains.annotations.NotNull;
 

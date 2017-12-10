@@ -1,5 +1,6 @@
 package com.kaylerrenslow.armaplugin;
 
+import com.intellij.ide.highlighter.XmlFileType;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -7,6 +8,7 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.search.FileTypeIndex;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderFileType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -20,6 +22,22 @@ import java.util.List;
  * @since 09/07/2017
  */
 public class ArmaPluginUtil {
+
+	/**
+	 * @param module {@link Module} instance to get a stringtable.xml file for
+	 * @return a {@link VirtualFile} that maps to a Stringtable.xml file (name case sensitivity doesn't matter),
+	 * or null if couldn't be found
+	 */
+	@Nullable
+	public static VirtualFile getStringTableXmlFile(@NotNull Module module) {
+		Collection<VirtualFile> files = FileTypeIndex.getFiles(XmlFileType.INSTANCE, module.getModuleContentScope());
+		for (VirtualFile virtFile : files) {
+			if (virtFile.getName().equalsIgnoreCase("stringtable.xml")) {
+				return virtFile;
+			}
+		}
+		return null;
+	}
 
 	/**
 	 * Gets the config files (either a description.ext or multiple, at least 1, config.cpp (case sensitivity doesn't matter)).

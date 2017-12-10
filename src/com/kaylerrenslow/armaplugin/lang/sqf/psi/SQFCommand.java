@@ -8,8 +8,8 @@ import com.intellij.psi.PsiNamedElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.util.IncorrectOperationException;
-import com.kaylerrenslow.armaplugin.lang.presentation.SQFCommandItemPresentation;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
+import com.kaylerrenslow.armaplugin.lang.sqf.presentation.SQFCommandItemPresentation;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
