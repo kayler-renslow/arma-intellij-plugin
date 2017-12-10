@@ -1,5 +1,8 @@
 package com.kaylerrenslow.armaplugin;
 
+import com.intellij.notification.Notification;
+import com.intellij.notification.NotificationType;
+import com.intellij.notification.Notifications;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -55,27 +58,27 @@ public class ArmaPluginUserData {
 			if (imlDir == null) {
 				return Collections.emptyList();
 			}
-			List<VirtualFile> rootConfigVirtualFiles = ArmaPluginUtil.getConfigVirtualFiles(elementFromModule);
-			if (rootConfigVirtualFiles.isEmpty()) {
+			List<VirtualFile> configVirtualFiles = ArmaPluginUtil.getConfigVirtualFiles(elementFromModule);
+			if (configVirtualFiles.isEmpty()) {
 				return Collections.emptyList();
 			}
 
-			try {
-				List<HeaderFile> parsedFiles = new ArrayList<>();
-				for (VirtualFile configVirtualFile : rootConfigVirtualFiles) {
+			List<HeaderFile> parsedFiles = new ArrayList<>();
+			for (VirtualFile configVirtualFile : configVirtualFiles) {
+				try {
 					HeaderFile file = HeaderParser.parse(
 							new VirtualFileHeaderFileTextProvider(configVirtualFile, elementFromModule.getProject()),
 							new File(imlDir)
 					);
 					parsedFiles.add(file);
+				} catch (Exception e) {
+					System.out.println("Header Parse Exception:" + e.getMessage());
+					Notifications.Bus.notify(new HeaderFileParseErrorNotification(e));
 				}
-				moduleData.setConfigHeaderFiles(parsedFiles);
-				moduleData.setReparseConfigHeaderFiles(false);
-
-			} catch (Exception e) {
-				System.out.println("Header Parse Exception:" + e.getMessage());
-				return Collections.emptyList();
 			}
+
+			moduleData.setConfigHeaderFiles(parsedFiles);
+			moduleData.setReparseConfigHeaderFiles(false);
 
 			return moduleData.getConfigHeaderFiles();
 		}
@@ -148,5 +151,30 @@ public class ArmaPluginUserData {
 	public void setArmaToolsDirectory(@Nullable File armaToolsDir) {
 		String path = armaToolsDir == null ? null : armaToolsDir.getAbsolutePath();
 		ArmaPluginApplicationSettings.getInstance().getState().armaToolsDirectory = path;
+	}
+
+	private static class HeaderFileParseErrorNotification extends Notification {
+		private final ResourceBundle bundle = ArmaPlugin.getPluginBundle();
+		@NotNull
+		private final Exception e;
+
+		public HeaderFileParseErrorNotification(@NotNull Exception e) {
+			super("Arma Plugin - Header Parse Error", "placeholder", "placeholder", NotificationType.ERROR);
+			//using "placeholder" because if we don't, an exception gets thrown for having empty Strings for some reason
+			//December 9, 2017
+			this.e = e;
+		}
+
+		@NotNull
+		@Override
+		public String getTitle() {
+			return bundle.getString("HeaderFileParseErrorNotification.title");
+		}
+
+		@NotNull
+		@Override
+		public String getContent() {
+			return String.format(bundle.getString("HeaderFileParseErrorNotification.body_f"), e.getMessage());
+		}
 	}
 }
