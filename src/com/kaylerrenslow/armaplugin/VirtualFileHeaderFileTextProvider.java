@@ -1,5 +1,7 @@
 package com.kaylerrenslow.armaplugin;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
@@ -59,15 +61,38 @@ public class VirtualFileHeaderFileTextProvider implements HeaderFileTextProvider
 
 	@Override
 	@Nullable
-	public HeaderFileTextProvider resolvePath(@NotNull String s) {
-		VirtualFile virtualFile = this.virtualFile.getParent();
-		if (virtualFile == null) {
+	public HeaderFileTextProvider resolvePath(@NotNull String path) {
+		VirtualFile resolvedFile;
+		path = path.replaceAll("\\\\", "/");
+		if (path.startsWith("/")) {
+			Module module = ModuleUtil.findModuleForFile(this.virtualFile, project);
+			if (module == null) {
+				return null;
+			}
+			path = path.substring(1); //remove \
+			VirtualFile rootDirectory;
+			{
+				VirtualFile imlFile = module.getModuleFile();
+				if (imlFile == null) {
+					return null;
+				}
+				rootDirectory = imlFile.getParent();
+				if (rootDirectory == null) {
+					return null;
+				}
+			}
+
+			resolvedFile = rootDirectory.findFileByRelativePath(path);
+		} else {
+			VirtualFile virtualFile = this.virtualFile.getParent();
+			if (virtualFile == null) {
+				return null;
+			}
+			resolvedFile = virtualFile.findFileByRelativePath(path);
+		}
+		if (resolvedFile == null) {
 			return null;
 		}
-		VirtualFile file = virtualFile.findFileByRelativePath(s);
-		if (file == null) {
-			return null;
-		}
-		return new VirtualFileHeaderFileTextProvider(file, project);
+		return new VirtualFileHeaderFileTextProvider(resolvedFile, project);
 	}
 }
