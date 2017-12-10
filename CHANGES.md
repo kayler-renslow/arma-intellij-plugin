@@ -2,7 +2,8 @@
 *
 
 **Changed**  
-* 
+* made config function parsing faster by not using the TransactionGaurd thing before. Instead of writing all updated header
+files to disk, we can just read them from RAM or from disk (IntelliJ decides with its VFS system)
 
 **Fixed**  
 * 

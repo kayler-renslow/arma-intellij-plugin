@@ -17,7 +17,7 @@ import java.util.List;
  * @since 09/08/2017
  */
 public class ArmaPluginModuleData {
-	private List<HeaderFile> configHeaderFiles;
+	private List<HeaderFile> configHeaderFiles = Collections.emptyList();
 	private boolean reparseConfigHeaderFiles = true;
 	private final Module module;
 	private List<HeaderConfigFunction> functions = null;
@@ -62,7 +62,7 @@ public class ArmaPluginModuleData {
 	 *
 	 * @return a read only list of config files
 	 */
-	@Nullable
+	@NotNull
 	public List<HeaderFile> getConfigHeaderFiles() {
 		return configHeaderFiles;
 	}

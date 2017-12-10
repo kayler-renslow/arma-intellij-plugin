@@ -20,6 +20,7 @@ import java.util.List;
  * @since 09/07/2017
  */
 public class ArmaPluginUtil {
+
 	/**
 	 * Gets the config files (either a description.ext or multiple, at least 1, config.cpp (case sensitivity doesn't matter)).
 	 * If no description.ext file or config.cpp files could be found, this will return an empty list. This will also
@@ -59,4 +60,5 @@ public class ArmaPluginUtil {
 		pw.close();
 		return sw.toString();
 	}
+
 }

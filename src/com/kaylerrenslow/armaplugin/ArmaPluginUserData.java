@@ -1,25 +1,19 @@
 package com.kaylerrenslow.armaplugin;
 
-import com.intellij.openapi.application.TransactionGuard;
-import com.intellij.openapi.editor.Document;
-import com.intellij.openapi.fileEditor.FileDocumentManager;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.util.PsiUtil;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
-import com.kaylerrenslow.armaplugin.lang.header.psi.HeaderPsiFile;
 import com.kaylerrenslow.armaplugin.settings.ArmaPluginApplicationSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.File;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 
 /**
  * Used for storing data collected from the current IntelliJ process's lifetime.
@@ -66,51 +60,24 @@ public class ArmaPluginUserData {
 				return Collections.emptyList();
 			}
 
-			//the contents in the header files aren't always saved to file by intellij by the time this method is invoked,
-			//so we are going to force save the documents
-			CompletableFuture<List<HeaderFile>> future = new CompletableFuture<>();
-			TransactionGuard.submitTransaction(() -> {/*Disposable class here*/}, /*Runnable*/() -> {
-				FileDocumentManager manager = FileDocumentManager.getInstance();
-				for (Document document : manager.getUnsavedDocuments()) {
-					VirtualFile virtFile = manager.getFile(document);
-					if (virtFile == null) {
-						continue;
-					}
-					PsiFile psiFile = PsiUtil.getPsiFile(moduleData.getModule().getProject(), virtFile);
-					if (psiFile instanceof HeaderPsiFile) {
-						manager.saveDocument(document);
-					}
+			try {
+				List<HeaderFile> parsedFiles = new ArrayList<>();
+				for (VirtualFile configVirtualFile : rootConfigVirtualFiles) {
+					HeaderFile file = HeaderParser.parse(
+							new VirtualFileHeaderFileTextProvider(configVirtualFile, elementFromModule.getProject()),
+							new File(imlDir)
+					);
+					parsedFiles.add(file);
 				}
+				moduleData.setConfigHeaderFiles(parsedFiles);
+				moduleData.setReparseConfigHeaderFiles(false);
 
-				//parse the root config
-				try {
-					List<HeaderFile> parsedFiles = new ArrayList<>();
-					for (VirtualFile rootConfigVirtualFile : rootConfigVirtualFiles) {
-						HeaderFile file = HeaderParser.parse(new File(rootConfigVirtualFile.getPath()), new File(imlDir));
-						parsedFiles.add(file);
-					}
-					moduleData.setConfigHeaderFiles(parsedFiles);
-					moduleData.setReparseConfigHeaderFiles(false);
-					future.complete(moduleData.getConfigHeaderFiles());
+			} catch (Exception e) {
+				System.out.println("Header Parse Exception:" + e.getMessage());
+				return Collections.emptyList();
+			}
 
-//					new DialogWrapper(elementFromModule.getProject()){
-//						@Override
-//						protected JComponent createCenterPanel() {
-//							init();
-//							this.createDefaultActions();
-//							return new JLabel("preprocessed");
-//						}
-//					}.show();
-				} catch (Exception e) {
-					System.out.println("Header Parse Exception:" + e.getMessage());
-					future.complete(null);
-				}
-
-			});
-
-			//using a future to ensure memory visibility
-			//note: using .get() or .get(long,TimeUnit) is making the transaction take a very long time.
-			return future.getNow(null);
+			return moduleData.getConfigHeaderFiles();
 		}
 	}
 
@@ -121,7 +88,7 @@ public class ArmaPluginUserData {
 			if (moduleData == null) {
 				return null;
 			}
-			if (moduleData.getConfigHeaderFiles() == null || moduleData.shouldReparseConfigHeaderFiles()) {
+			if (moduleData.getConfigHeaderFiles().isEmpty() || moduleData.shouldReparseConfigHeaderFiles()) {
 				parseAndGetConfigHeaderFiles(elementFromModule);
 			}
 			return moduleData.getAllConfigFunctions();
@@ -144,7 +111,7 @@ public class ArmaPluginUserData {
 	 * Note that this doesn't do any reparsing and instead tells {@link #parseAndGetConfigHeaderFiles(PsiElement)} that it's cached
 	 * {@link HeaderFile} is no longer valid and it should reparse.
 	 */
-	public void reparseRootConfig(@NotNull PsiFile fileFromModule) {
+	public void reparseConfigs(@NotNull PsiFile fileFromModule) {
 		synchronized (this) {
 			Module module = ModuleUtil.findModuleForPsiElement(fileFromModule);
 			if (module == null) {

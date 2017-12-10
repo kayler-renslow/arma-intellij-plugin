@@ -15,7 +15,7 @@ public class TreeChangePreprocessor implements PsiTreeChangePreprocessor {
 	@Override
 	public void treeChanged(@NotNull PsiTreeChangeEventImpl event) {
 			if (event.getFile() instanceof HeaderPsiFile) {
-				ArmaPluginUserData.getInstance().reparseRootConfig(event.getFile());
+				ArmaPluginUserData.getInstance().reparseConfigs(event.getFile());
 			}
 	}
 }
