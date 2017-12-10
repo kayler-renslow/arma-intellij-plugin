@@ -13,6 +13,6 @@ import java.util.List;
 public interface Package extends DomElement {
 	List<Container> getContainers();
 
-	List<Key> getKeys(); //containers aren't required
+	List<Key> getKeys();
 }
 

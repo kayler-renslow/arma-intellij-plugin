@@ -17,7 +17,7 @@ public interface StringTableProject extends DomElement {
 
 	List<Container> getContainers();
 
-	List<Key> getKeys(); //packages aren't required
+	List<Key> getKeys();
 
 	/**
 	 * @return a list of all keys in the entire file

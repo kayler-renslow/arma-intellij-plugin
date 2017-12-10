@@ -31,11 +31,15 @@ public class SQFFunctionNameCompletionProvider extends CompletionProvider<Comple
 		{ //testing code
 			Project p = parameters.getOriginalFile().getProject();
 			XmlFile stringTableXml = ArmaPluginUserData.getInstance().getStringTableXml(parameters.getOriginalFile());
-			DomFileElement<StringTableProject> domFileElement = DomManager.getDomManager(p).getFileElement(stringTableXml, StringTableProject.class);
-			if (domFileElement != null) {
-				StringTableProject stringTableProject = domFileElement.getRootElement();
-				List<Key> allKeys = stringTableProject.getAllKeys();
-				System.out.println("SQFFunctionNameCompletionProvider.addCompletions allKeys=" + allKeys);
+			System.out.println("SQFFunctionNameCompletionProvider.addCompletions stringTableXml=" + stringTableXml);
+			if (stringTableXml != null) {
+				DomFileElement<StringTableProject> domFileElement = DomManager.getDomManager(p).getFileElement(stringTableXml, StringTableProject.class);
+				System.out.println("SQFFunctionNameCompletionProvider.addCompletions domFileElement=" + domFileElement);
+				if (domFileElement != null) {
+					StringTableProject stringTableProject = domFileElement.getRootElement();
+					List<Key> allKeys = stringTableProject.getAllKeys();
+					System.out.println("SQFFunctionNameCompletionProvider.addCompletions allKeys=" + allKeys);
+				}
 			}
 		}
 		for (HeaderConfigFunction function : allConfigFunctions) {

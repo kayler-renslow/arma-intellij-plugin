@@ -173,6 +173,7 @@ public class ArmaPluginUserData {
 				}
 				XmlFile file = (XmlFile) PsiManager.getInstance(elementFromModule.getProject()).findFile(virtFile);
 				data.setStringTableXmlFile(file);
+				return file;
 			} else {
 				if (!f.getVirtualFile().exists()) {
 					data.setStringTableXmlFile(null);
@@ -181,7 +182,6 @@ public class ArmaPluginUserData {
 				return f;
 			}
 		}
-		return null;
 	}
 
 	private static class HeaderFileParseErrorNotification extends Notification {
