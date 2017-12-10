@@ -23,17 +23,22 @@ public interface StringTableProject extends DomElement {
 	 * @return a list of all keys in the entire file
 	 */
 	@NotNull
-	default List<Key> getAllKeys() {
-		List<Key> keys = new ArrayList<>();
-		keys.addAll(getKeys());
+	default List<StringTableKey> getAllKeys() {
+		List<StringTableKey> keys = new ArrayList<>();
+		for (Key k : getKeys()) {
+			keys.add(new StringTableKey(k, "<No Package> / <No Container>"));
+		}
 		for (Package p : getPackages()) {
-			keys.addAll(p.getKeys());
+			String packageName = p.getPackageName();
+			for (Key k : p.getKeys()) {
+				keys.add(new StringTableKey(k, packageName));
+			}
 			for (Container c : p.getContainers()) {
-				c.addAllKeys(keys);
+				c.addAllKeys(packageName, keys);
 			}
 		}
 		for (Container c : getContainers()) {
-			c.addAllKeys(keys);
+			c.addAllKeys("<No Package>", keys);
 		}
 		return keys;
 	}

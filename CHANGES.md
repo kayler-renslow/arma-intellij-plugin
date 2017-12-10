@@ -1,5 +1,5 @@
 **Added**  
-*
+* added localize "stringtable key" completion contributor
 
 **Changed**  
 * 

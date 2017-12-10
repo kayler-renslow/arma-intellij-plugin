@@ -29,5 +29,19 @@ public class SQFCompletionContributor extends CompletionContributor {
 						).withLanguage(SQFLanguage.INSTANCE),
 				new SQFFunctionNameCompletionProvider()
 		);
+
+		extend(
+				CompletionType.BASIC,
+				PlatformPatterns.psiElement(SQFTypes.GLOBAL_VAR)
+						.withAncestor(4,
+								psiElement(SQFPsiCommandAfter.class).afterSibling(
+										psiElement(SQFCommand.class)
+												.withText(
+														object("localize")
+												)
+								)
+						).withLanguage(SQFLanguage.INSTANCE),
+				new SQFLocalizeCompletionProvider()
+		);
 	}
 }
