@@ -1,5 +1,5 @@
 **Added**  
-* macro call in SQF support (EXAMPLE(blah,blah))
+* preprocessor coloring for both SQF and header now
 
 **Changed**  
 * 
