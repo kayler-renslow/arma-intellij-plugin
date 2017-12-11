@@ -69,7 +69,7 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 	}
 
 	/**
-	 * @return true if the variable starts with _, false otherwise
+	 * @return true if the variable starts with _, false otherwise (note that this may include magic variables)
 	 */
 	public boolean isLocal() {
 		return getVarName().charAt(0) == '_';

@@ -1,4 +1,4 @@
-package com.kaylerrenslow.armaplugin.lang.sqf;
+package com.kaylerrenslow.armaplugin.lang.sqf.completion;
 
 import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
