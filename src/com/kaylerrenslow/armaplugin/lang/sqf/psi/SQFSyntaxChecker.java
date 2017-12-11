@@ -435,6 +435,9 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		if (expr.getNum() != null) {
 			return BaseType.NUMBER;
 		}
+		if (expr.getMacroCall_() != null) {
+			return BaseType._VARIABLE;
+		}
 		throw new IllegalStateException("literal expression '" + expr.getText() + "' couldn't determine type");
 	}
 

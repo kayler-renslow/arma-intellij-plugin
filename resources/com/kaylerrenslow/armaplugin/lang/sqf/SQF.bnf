@@ -101,7 +101,10 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
     literal_expression ::= string
                         | variable
                         | array
-                        | number {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFLiteralExpression"}
+                        | number
+                        | macro_call {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFLiteralExpression"}
+
+    macro_call ::= MACRO_FUNC  {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFMacroCall"}
 
     paren_expression ::= LPAREN expression RPAREN {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParenExpression"}
 

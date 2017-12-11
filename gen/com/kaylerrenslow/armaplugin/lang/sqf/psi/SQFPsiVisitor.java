@@ -99,6 +99,10 @@ public class SQFPsiVisitor extends PsiElementVisitor {
     visitPsiElement(o);
   }
 
+  public void visitMacroCall(@NotNull SQFPsiMacroCall o) {
+    visitPsiElement(o);
+  }
+
   public void visitModExpression(@NotNull SQFPsiModExpression o) {
     visitExpression(o);
   }

@@ -5,8 +5,9 @@ package com.kaylerrenslow.armaplugin.lang.sqf;
 import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
-import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserDefinition;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes;
+import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserDefinition;
+import java.util.Collections;
 
 
 /**
@@ -128,10 +129,10 @@ public class SQFLexer implements FlexLexer {
 
   /* The ZZ_CMAP_A table has 1640 entries */
   static final char ZZ_CMAP_A[] = zzUnpackCMap(
-    "\11\2\1\7\1\6\1\50\1\7\1\5\6\2\4\0\1\7\1\26\1\17\1\3\1\24\1\33\1\31\1\20\1"+
-    "\36\1\37\1\21\1\34\1\44\1\13\1\11\1\22\1\14\11\10\1\47\1\45\1\30\1\25\1\27"+
-    "\1\46\1\0\4\16\1\12\1\16\11\24\1\15\2\24\1\42\1\23\1\43\1\35\1\1\1\15\2\24"+
-    "\1\40\1\32\1\41\1\0\6\2\1\51\2\2\2\0\4\4\4\0\1\4\2\0\1\2\7\0\1\4\4\0\1\4\5"+
+    "\11\2\1\7\1\6\1\50\1\7\1\5\6\2\4\0\1\7\1\31\1\17\1\3\1\24\1\36\1\34\1\20\1"+
+    "\26\1\27\1\22\1\37\1\25\1\13\1\11\1\21\1\14\11\10\1\47\1\45\1\33\1\30\1\32"+
+    "\1\46\1\0\4\16\1\12\1\16\11\24\1\15\2\24\1\43\1\23\1\44\1\40\1\1\1\15\2\24"+
+    "\1\41\1\35\1\42\1\0\6\2\1\51\2\2\2\0\4\4\4\0\1\4\2\0\1\2\7\0\1\4\4\0\1\4\5"+
     "\0\17\4\1\0\2\4\4\0\4\4\16\0\5\4\7\0\1\4\1\0\1\4\1\0\5\4\1\0\2\4\6\0\1\4\1"+
     "\0\3\4\1\0\1\4\1\0\4\4\1\0\13\4\1\0\3\4\1\0\5\2\2\0\6\4\1\0\7\4\1\0\1\4\15"+
     "\0\1\4\1\0\15\2\1\0\1\2\1\0\2\2\1\0\2\2\1\0\1\2\3\4\5\0\5\2\6\0\1\4\4\0\3"+
@@ -171,15 +172,15 @@ public class SQFLexer implements FlexLexer {
   private static final String ZZ_ACTION_PACKED_0 =
     "\1\0\1\1\1\2\1\1\1\3\1\4\1\5\1\1"+
     "\1\6\1\5\2\1\1\7\1\10\1\11\1\12\1\13"+
-    "\1\14\2\1\1\15\1\16\1\17\1\20\1\21\1\22"+
-    "\1\23\1\24\1\25\1\26\1\27\1\30\1\31\1\0"+
-    "\1\4\2\0\2\32\2\0\1\33\1\0\1\33\1\0"+
-    "\1\34\1\35\1\36\1\37\1\40\1\41\1\42\1\43"+
-    "\1\0\1\4\1\0\1\32\2\44\1\0\1\4\1\44"+
-    "\1\45\6\44";
+    "\1\14\1\15\1\16\1\17\2\1\1\20\1\21\1\22"+
+    "\1\23\1\24\1\25\1\26\1\27\1\30\1\31\2\0"+
+    "\1\4\2\0\2\32\2\0\1\33\1\0\1\33\1\34"+
+    "\1\0\1\35\1\36\1\37\1\40\1\41\1\42\1\43"+
+    "\4\0\1\4\1\0\1\32\2\44\1\0\1\45\2\0"+
+    "\1\4\1\44\1\46\6\44";
 
   private static int [] zzUnpackAction() {
-    int [] result = new int[69];
+    int [] result = new int[76];
     int offset = 0;
     offset = zzUnpackAction(ZZ_ACTION_PACKED_0, offset, result);
     return result;
@@ -205,17 +206,18 @@ public class SQFLexer implements FlexLexer {
 
   private static final String ZZ_ROWMAP_PACKED_0 =
     "\0\0\0\52\0\124\0\176\0\250\0\322\0\374\0\u0126"+
-    "\0\52\0\u0150\0\u017a\0\u01a4\0\52\0\u01ce\0\u01f8\0\u0222"+
-    "\0\u024c\0\u0276\0\u02a0\0\u02ca\0\52\0\52\0\52\0\52"+
+    "\0\52\0\u0150\0\u017a\0\u01a4\0\u01ce\0\52\0\52\0\52"+
+    "\0\52\0\u01f8\0\u0222\0\u024c\0\u0276\0\u02a0\0\u02ca\0\52"+
     "\0\52\0\52\0\52\0\52\0\52\0\52\0\52\0\52"+
-    "\0\52\0\u02f4\0\u031e\0\u0348\0\u0126\0\u0372\0\u039c\0\u03c6"+
-    "\0\u017a\0\u03f0\0\u01a4\0\u041a\0\u0444\0\u046e\0\52\0\52"+
-    "\0\52\0\52\0\52\0\52\0\52\0\u0498\0\u04c2\0\u04ec"+
-    "\0\u0516\0\u0540\0\u03c6\0\u056a\0\u0594\0\u05be\0\52\0\u05e8"+
-    "\0\u0612\0\u063c\0\u0666\0\u0690\0\52";
+    "\0\52\0\u02f4\0\u031e\0\u0348\0\u0372\0\u0126\0\u039c\0\u03c6"+
+    "\0\u03f0\0\u017a\0\u041a\0\u01a4\0\u0444\0\u046e\0\u0498\0\52"+
+    "\0\52\0\52\0\52\0\52\0\52\0\52\0\u04c2\0\u04ec"+
+    "\0\u0516\0\u0540\0\u056a\0\u0594\0\u05be\0\u05e8\0\u03f0\0\u0612"+
+    "\0\u04ec\0\u063c\0\u0666\0\u0690\0\u06ba\0\52\0\u06e4\0\u070e"+
+    "\0\u0738\0\u0762\0\u078c\0\52";
 
   private static int [] zzUnpackRowMap() {
-    int [] result = new int[69];
+    int [] result = new int[76];
     int offset = 0;
     offset = zzUnpackRowMap(ZZ_ROWMAP_PACKED_0, offset, result);
     return result;
@@ -244,36 +246,43 @@ public class SQFLexer implements FlexLexer {
     "\1\25\1\26\1\27\1\30\1\31\1\32\1\33\1\34"+
     "\1\35\1\36\1\37\1\40\1\41\55\0\2\3\1\42"+
     "\1\3\3\0\1\3\1\0\1\3\1\0\3\3\5\0"+
-    "\1\3\24\0\1\3\1\0\1\43\6\0\1\43\1\0"+
-    "\1\43\1\0\3\43\5\0\1\43\26\0\2\5\1\44"+
-    "\1\5\3\0\1\5\1\0\1\5\1\0\3\5\5\0"+
-    "\1\5\24\0\1\5\5\0\3\6\52\0\1\7\1\45"+
-    "\1\46\1\0\1\7\45\0\1\47\3\0\1\47\45\0"+
-    "\1\7\1\45\1\46\1\0\1\7\1\50\34\0\17\51"+
-    "\1\52\32\51\20\53\1\54\31\53\21\0\1\55\1\56"+
-    "\54\0\1\57\51\0\1\60\51\0\1\61\1\0\1\62"+
-    "\47\0\1\63\55\0\1\64\52\0\1\65\22\0\1\66"+
-    "\46\0\5\43\2\0\14\43\1\67\26\43\3\0\1\70"+
-    "\56\0\1\71\2\0\2\71\17\0\1\71\25\0\1\47"+
-    "\1\0\1\46\1\0\1\47\45\0\1\72\1\0\1\72"+
-    "\1\0\1\73\1\0\1\72\52\0\1\51\52\0\1\53"+
-    "\31\0\21\55\1\74\30\55\5\56\2\0\43\56\1\0"+
-    "\2\3\1\0\1\3\3\0\1\3\1\0\1\3\1\0"+
-    "\3\3\5\0\1\3\24\0\1\3\5\43\1\75\15\43"+
-    "\1\67\26\43\1\0\2\5\1\0\1\5\3\0\1\5"+
-    "\1\0\1\5\1\0\3\5\5\0\1\5\24\0\1\5"+
-    "\10\0\1\71\3\0\1\71\45\0\1\76\1\0\1\76"+
-    "\1\0\1\76\1\0\1\76\33\0\21\55\1\74\1\77"+
-    "\27\55\5\43\1\0\15\43\1\67\26\43\10\0\1\100"+
-    "\1\0\1\100\1\0\1\100\1\0\1\100\43\0\1\101"+
-    "\1\0\1\101\1\0\1\101\1\0\1\101\43\0\1\102"+
-    "\1\0\1\102\1\0\1\102\1\0\1\102\43\0\1\103"+
-    "\1\0\1\103\1\0\1\103\1\0\1\103\43\0\1\104"+
-    "\1\0\1\104\1\0\1\104\1\0\1\104\43\0\1\105"+
-    "\1\0\1\105\1\0\1\105\1\0\1\105\33\0";
+    "\1\3\1\0\1\43\22\0\1\3\1\0\1\44\6\0"+
+    "\1\44\1\0\1\44\1\0\3\44\5\0\1\44\26\0"+
+    "\2\5\1\45\1\5\3\0\1\5\1\0\1\5\1\0"+
+    "\3\5\5\0\1\5\1\0\1\43\22\0\1\5\5\0"+
+    "\3\6\52\0\1\7\1\46\1\47\1\0\1\7\45\0"+
+    "\1\50\3\0\1\50\45\0\1\7\1\46\1\47\1\0"+
+    "\1\7\1\51\34\0\17\52\1\53\32\52\20\54\1\55"+
+    "\31\54\21\0\1\56\1\57\57\0\1\60\51\0\1\61"+
+    "\51\0\1\62\1\0\1\63\47\0\1\64\55\0\1\65"+
+    "\52\0\1\66\17\0\1\67\46\0\5\70\2\71\14\70"+
+    "\1\72\1\70\1\0\24\70\5\44\2\0\14\44\1\73"+
+    "\26\44\3\0\1\74\56\0\1\75\2\0\2\75\22\0"+
+    "\1\75\22\0\1\50\1\0\1\47\1\0\1\50\45\0"+
+    "\1\76\1\0\1\76\1\0\1\77\1\0\1\76\52\0"+
+    "\1\52\52\0\1\54\31\0\5\56\2\0\43\56\22\57"+
+    "\1\100\27\57\1\0\2\3\1\0\1\3\3\0\1\3"+
+    "\1\0\1\3\1\0\3\3\5\0\1\3\24\0\1\3"+
+    "\5\70\2\71\14\70\1\72\1\70\1\43\1\70\1\101"+
+    "\22\70\23\71\1\102\1\71\1\0\24\71\5\70\1\103"+
+    "\15\70\1\72\1\70\1\43\1\70\1\101\22\70\5\44"+
+    "\1\104\15\44\1\73\26\44\1\0\2\5\1\0\1\5"+
+    "\3\0\1\5\1\0\1\5\1\0\3\5\5\0\1\5"+
+    "\24\0\1\5\10\0\1\75\3\0\1\75\45\0\1\105"+
+    "\1\0\1\105\1\0\1\105\1\0\1\105\33\0\21\57"+
+    "\1\106\1\100\27\57\5\71\1\103\1\70\14\71\1\102"+
+    "\1\71\1\0\24\71\5\70\1\71\15\70\1\72\1\70"+
+    "\1\43\1\70\1\101\22\70\5\44\1\0\15\44\1\73"+
+    "\26\44\10\0\1\107\1\0\1\107\1\0\1\107\1\0"+
+    "\1\107\43\0\1\110\1\0\1\110\1\0\1\110\1\0"+
+    "\1\110\43\0\1\111\1\0\1\111\1\0\1\111\1\0"+
+    "\1\111\43\0\1\112\1\0\1\112\1\0\1\112\1\0"+
+    "\1\112\43\0\1\113\1\0\1\113\1\0\1\113\1\0"+
+    "\1\113\43\0\1\114\1\0\1\114\1\0\1\114\1\0"+
+    "\1\114\33\0";
 
   private static int [] zzUnpackTrans() {
-    int [] result = new int[1722];
+    int [] result = new int[1974];
     int offset = 0;
     offset = zzUnpackTrans(ZZ_TRANS_PACKED_0, offset, result);
     return result;
@@ -311,13 +320,13 @@ public class SQFLexer implements FlexLexer {
   private static final int [] ZZ_ATTRIBUTE = zzUnpackAttribute();
 
   private static final String ZZ_ATTRIBUTE_PACKED_0 =
-    "\1\0\1\11\6\1\1\11\3\1\1\11\7\1\15\11"+
-    "\1\0\1\1\2\0\2\1\2\0\1\1\1\0\1\1"+
-    "\1\0\1\1\7\11\1\0\1\1\1\0\3\1\1\0"+
-    "\2\1\1\11\5\1\1\11";
+    "\1\0\1\11\6\1\1\11\4\1\4\11\6\1\12\11"+
+    "\2\0\1\1\2\0\2\1\2\0\1\1\1\0\2\1"+
+    "\1\0\7\11\4\0\1\1\1\0\3\1\1\0\1\1"+
+    "\2\0\2\1\1\11\5\1\1\11";
 
   private static int [] zzUnpackAttribute() {
-    int [] result = new int[69];
+    int [] result = new int[76];
     int offset = 0;
     offset = zzUnpackAttribute(ZZ_ATTRIBUTE_PACKED_0, offset, result);
     return result;
@@ -634,11 +643,11 @@ public class SQFLexer implements FlexLexer {
           case 1: 
             { return TokenType.BAD_CHARACTER;
             }
-          case 38: break;
+          case 39: break;
           case 2: 
             { return SQFTypes.LOCAL_VAR;
             }
-          case 39: break;
+          case 40: break;
           case 3: 
             { for(String command : SQFStatic.LIST_COMMANDS){  //don't use binary search so that we can do ignore case search
         if(command.equalsIgnoreCase(yytext().toString())){
@@ -647,143 +656,147 @@ public class SQFLexer implements FlexLexer {
     }
     return SQFTypes.GLOBAL_VAR;
             }
-          case 40: break;
+          case 41: break;
           case 4: 
             { return TokenType.WHITE_SPACE;
             }
-          case 41: break;
+          case 42: break;
           case 5: 
             { return SQFTypes.INTEGER_LITERAL;
             }
-          case 42: break;
+          case 43: break;
           case 6: 
             { return SQFTypes.MINUS;
             }
-          case 43: break;
-          case 7: 
-            { return SQFTypes.ASTERISK;
-            }
           case 44: break;
-          case 8: 
+          case 7: 
             { return SQFTypes.FSLASH;
             }
           case 45: break;
-          case 9: 
-            { return SQFTypes.EQ;
+          case 8: 
+            { return SQFTypes.ASTERISK;
             }
           case 46: break;
-          case 10: 
-            { return SQFTypes.EXCL;
-            }
-          case 47: break;
-          case 11: 
-            { return SQFTypes.GT;
-            }
-          case 48: break;
-          case 12: 
-            { return SQFTypes.LT;
-            }
-          case 49: break;
-          case 13: 
-            { return SQFTypes.PERC;
-            }
-          case 50: break;
-          case 14: 
-            { return SQFTypes.PLUS;
-            }
-          case 51: break;
-          case 15: 
-            { return SQFTypes.CARET;
-            }
-          case 52: break;
-          case 16: 
-            { return SQFTypes.LPAREN;
-            }
-          case 53: break;
-          case 17: 
-            { return SQFTypes.RPAREN;
-            }
-          case 54: break;
-          case 18: 
-            { return SQFTypes.L_CURLY_BRACE;
-            }
-          case 55: break;
-          case 19: 
-            { return SQFTypes.R_CURLY_BRACE;
-            }
-          case 56: break;
-          case 20: 
-            { return SQFTypes.L_SQ_BRACKET;
-            }
-          case 57: break;
-          case 21: 
-            { return SQFTypes.R_SQ_BRACKET;
-            }
-          case 58: break;
-          case 22: 
+          case 9: 
             { return SQFTypes.COMMA;
             }
+          case 47: break;
+          case 10: 
+            { return SQFTypes.LPAREN;
+            }
+          case 48: break;
+          case 11: 
+            { return SQFTypes.RPAREN;
+            }
+          case 49: break;
+          case 12: 
+            { return SQFTypes.EQ;
+            }
+          case 50: break;
+          case 13: 
+            { return SQFTypes.EXCL;
+            }
+          case 51: break;
+          case 14: 
+            { return SQFTypes.GT;
+            }
+          case 52: break;
+          case 15: 
+            { return SQFTypes.LT;
+            }
+          case 53: break;
+          case 16: 
+            { return SQFTypes.PERC;
+            }
+          case 54: break;
+          case 17: 
+            { return SQFTypes.PLUS;
+            }
+          case 55: break;
+          case 18: 
+            { return SQFTypes.CARET;
+            }
+          case 56: break;
+          case 19: 
+            { return SQFTypes.L_CURLY_BRACE;
+            }
+          case 57: break;
+          case 20: 
+            { return SQFTypes.R_CURLY_BRACE;
+            }
+          case 58: break;
+          case 21: 
+            { return SQFTypes.L_SQ_BRACKET;
+            }
           case 59: break;
+          case 22: 
+            { return SQFTypes.R_SQ_BRACKET;
+            }
+          case 60: break;
           case 23: 
             { return SQFTypes.SEMICOLON;
             }
-          case 60: break;
+          case 61: break;
           case 24: 
             { return SQFTypes.QUEST;
             }
-          case 61: break;
+          case 62: break;
           case 25: 
             { return SQFTypes.COLON;
             }
-          case 62: break;
+          case 63: break;
           case 26: 
             { return SQFTypes.DEC_LITERAL;
             }
-          case 63: break;
+          case 64: break;
           case 27: 
             { return SQFTypes.STRING_LITERAL;
             }
-          case 64: break;
+          case 65: break;
           case 28: 
             { return SQFParserDefinition.INLINE_COMMENT;
             }
-          case 65: break;
+          case 66: break;
           case 29: 
             { return SQFTypes.EQEQ;
             }
-          case 66: break;
+          case 67: break;
           case 30: 
             { return SQFTypes.NE;
             }
-          case 67: break;
+          case 68: break;
           case 31: 
             { return SQFTypes.GE;
             }
-          case 68: break;
+          case 69: break;
           case 32: 
             { return SQFTypes.GTGT;
             }
-          case 69: break;
+          case 70: break;
           case 33: 
             { return SQFTypes.LE;
             }
-          case 70: break;
+          case 71: break;
           case 34: 
             { return SQFTypes.AMPAMP;
             }
-          case 71: break;
+          case 72: break;
           case 35: 
             { return SQFTypes.BARBAR;
             }
-          case 72: break;
+          case 73: break;
           case 36: 
             { return SQFTypes.HEX_LITERAL;
             }
-          case 73: break;
+          case 74: break;
           case 37: 
+            { return SQFTypes.MACRO_FUNC;
+            }
+          case 75: break;
+          case 38: 
             { return SQFParserDefinition.BLOCK_COMMENT;
             }
-          case 74: break;
+          case 76: break;
           default:
             zzScanError(ZZ_NO_MATCH);
           }

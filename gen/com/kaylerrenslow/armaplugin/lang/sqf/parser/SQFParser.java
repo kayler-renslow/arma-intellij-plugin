@@ -59,6 +59,9 @@ public class SQFParser implements PsiParser, LightPsiParser {
     else if (t == LOCAL_SCOPE) {
       r = local_scope(b, 0);
     }
+    else if (t == MACRO_CALL) {
+      r = macro_call(b, 0);
+    }
     else if (t == NUMBER) {
       r = number(b, 0);
     }
@@ -377,6 +380,18 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // MACRO_FUNC
+  public static boolean macro_call(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "macro_call")) return false;
+    if (!nextTokenIs(b, MACRO_FUNC)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, MACRO_FUNC);
+    exit_section_(b, m, MACRO_CALL, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // INTEGER_LITERAL | DEC_LITERAL | HEX_LITERAL
   public static boolean number(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "number")) return false;
@@ -637,6 +652,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   //                         | variable
   //                         | array
   //                         | number
+  //                         | macro_call
   public static boolean literal_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "literal_expression")) return false;
     boolean r;
@@ -645,6 +661,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
     if (!r) r = variable(b, l + 1);
     if (!r) r = array(b, l + 1);
     if (!r) r = number(b, l + 1);
+    if (!r) r = macro_call(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
   }

@@ -47,6 +47,9 @@ MACRO_CHARACTER = [^\r\n] | (("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*)
 MACRO_TEXT = {MACRO_CHARACTER}+
 MACRO = "#"([a-zA-Z_0-9$]+) {MACRO_TEXT}?
 
+MACRO_FUNC_BODY = ([^,\r\n]+ | ([^,]* ("\\\n" | "\\\r\n" | "\\\r") [ \t\f]*))+
+MACRO_FUNC = {GLOBAL_VAR} "(" {MACRO_FUNC_BODY} ("," {MACRO_FUNC_BODY})* ")"
+
 %%
 
 <YYINITIAL> {WHITE_SPACE} { return TokenType.WHITE_SPACE; }
@@ -60,6 +63,7 @@ MACRO = "#"([a-zA-Z_0-9$]+) {MACRO_TEXT}?
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; }
 
+<YYINITIAL> {MACRO_FUNC} { return SQFTypes.MACRO_FUNC; }
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }
 <YYINITIAL> {GLOBAL_VAR} {
     for(String command : SQFStatic.LIST_COMMANDS){  //don't use binary search so that we can do ignore case search

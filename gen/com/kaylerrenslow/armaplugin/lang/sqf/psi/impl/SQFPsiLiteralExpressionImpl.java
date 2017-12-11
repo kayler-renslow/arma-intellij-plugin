@@ -34,6 +34,12 @@ public class SQFPsiLiteralExpressionImpl extends SQFLiteralExpression implements
 
   @Override
   @Nullable
+  public SQFPsiMacroCall getMacroCall() {
+    return findChildByClass(SQFPsiMacroCall.class);
+  }
+
+  @Override
+  @Nullable
   public SQFPsiNumber getNumber() {
     return findChildByClass(SQFPsiNumber.class);
   }

@@ -31,6 +31,7 @@ public interface SQFTypes {
   IElementType FILE_SCOPE = new SQFElementType("FILE_SCOPE");
   IElementType LITERAL_EXPRESSION = new SQFElementType("LITERAL_EXPRESSION");
   IElementType LOCAL_SCOPE = new SQFElementType("LOCAL_SCOPE");
+  IElementType MACRO_CALL = new SQFElementType("MACRO_CALL");
   IElementType MOD_EXPRESSION = new SQFElementType("MOD_EXPRESSION");
   IElementType MUL_EXPRESSION = new SQFElementType("MUL_EXPRESSION");
   IElementType NUMBER = new SQFElementType("NUMBER");
@@ -67,6 +68,7 @@ public interface SQFTypes {
   IElementType LT = new SQFTokenType("LT");
   IElementType L_CURLY_BRACE = new SQFTokenType("L_CURLY_BRACE");
   IElementType L_SQ_BRACKET = new SQFTokenType("L_SQ_BRACKET");
+  IElementType MACRO_FUNC = new SQFTokenType("MACRO_FUNC");
   IElementType MINUS = new SQFTokenType("MINUS");
   IElementType NE = new SQFTokenType("NE");
   IElementType PERC = new SQFTokenType("PERC");
@@ -146,6 +148,9 @@ public interface SQFTypes {
       }
       else if (type == LOCAL_SCOPE) {
         return new SQFPsiLocalScopeImpl(node);
+      }
+      else if (type == MACRO_CALL) {
+        return new SQFPsiMacroCallImpl(node);
       }
       else if (type == MOD_EXPRESSION) {
         return new SQFPsiModExpressionImpl(node);

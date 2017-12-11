@@ -11,6 +11,9 @@ public interface SQFPsiLiteralExpression extends SQFPsiExpression {
   SQFPsiArray getArray();
 
   @Nullable
+  SQFPsiMacroCall getMacroCall();
+
+  @Nullable
   SQFPsiNumber getNumber();
 
   @Nullable
