@@ -1,6 +1,5 @@
 **Added**  
-* command, local variable, and global variable auto completion
-* added doc tags auto completion 
+*  
 
 **Changed**  
 * 

@@ -13,7 +13,7 @@ import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * Used for completing variables and local variables
+ * Used for completing variables and commands
  *
  * @author Kayler
  * @since 12/10/2017
