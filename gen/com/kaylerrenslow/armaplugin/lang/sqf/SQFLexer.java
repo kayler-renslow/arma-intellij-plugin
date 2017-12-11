@@ -649,8 +649,9 @@ public class SQFLexer implements FlexLexer {
             }
           case 40: break;
           case 3: 
-            { for(String command : SQFStatic.LIST_COMMANDS){  //don't use binary search so that we can do ignore case search
-        if(command.equalsIgnoreCase(yytext().toString())){
+            { String yytext = yytext().toString();
+    for(String command : SQFStatic.LIST_COMMANDS){  //don't use binary search so that we can do ignore case search
+        if(command.equalsIgnoreCase(yytext)){
             return SQFTypes.COMMAND_TOKEN;
         }
     }
@@ -790,7 +791,22 @@ public class SQFLexer implements FlexLexer {
             }
           case 74: break;
           case 37: 
-            { return SQFTypes.MACRO_FUNC;
+            { String yytext = yytext().toString();
+    int parenIndex = yytext.indexOf('(');
+    String identifier = yytext.substring(0, parenIndex);
+    boolean isCommand = false;
+    for(String command : SQFStatic.LIST_COMMANDS) {
+        if(command.equalsIgnoreCase(identifier)) {
+            isCommand = true;
+            break;
+        }
+    }
+    if(isCommand) {
+        yypushback(yytext.length() - identifier.length()); //push the (...) back into stream to re-lex
+        return SQFTypes.COMMAND_TOKEN;
+    } else {
+        return SQFTypes.MACRO_FUNC;
+    }
             }
           case 75: break;
           case 38: 

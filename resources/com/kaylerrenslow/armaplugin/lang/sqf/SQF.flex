@@ -63,11 +63,29 @@ MACRO_FUNC = {GLOBAL_VAR} "(" {MACRO_FUNC_BODY} ("," {MACRO_FUNC_BODY})* ")"
 <YYINITIAL> {DEC_LITERAL} { return SQFTypes.DEC_LITERAL; }
 <YYINITIAL> {STRING_LITERAL} { return SQFTypes.STRING_LITERAL; }
 
-<YYINITIAL> {MACRO_FUNC} { return SQFTypes.MACRO_FUNC; }
+<YYINITIAL> {MACRO_FUNC} {
+    String yytext = yytext().toString();
+    int parenIndex = yytext.indexOf('(');
+    String identifier = yytext.substring(0, parenIndex);
+    boolean isCommand = false;
+    for(String command : SQFStatic.LIST_COMMANDS) {
+        if(command.equalsIgnoreCase(identifier)) {
+            isCommand = true;
+            break;
+        }
+    }
+    if(isCommand) {
+        yypushback(yytext.length() - identifier.length()); //push the (...) back into stream to re-lex
+        return SQFTypes.COMMAND_TOKEN;
+    } else {
+        return SQFTypes.MACRO_FUNC;
+    }
+}
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }
 <YYINITIAL> {GLOBAL_VAR} {
+    String yytext = yytext().toString();
     for(String command : SQFStatic.LIST_COMMANDS){  //don't use binary search so that we can do ignore case search
-        if(command.equalsIgnoreCase(yytext().toString())){
+        if(command.equalsIgnoreCase(yytext)){
             return SQFTypes.COMMAND_TOKEN;
         }
     }
