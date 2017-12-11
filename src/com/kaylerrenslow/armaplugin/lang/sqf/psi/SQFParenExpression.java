@@ -4,6 +4,7 @@ import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * @author Kayler
@@ -14,7 +15,7 @@ public class SQFParenExpression extends ASTWrapperPsiElement implements SQFUnary
 		super(node);
 	}
 
-	@NotNull
+	@Nullable
 	@Override
 	public SQFExpression getExpr() {
 		return SQFUnaryExpression.super.getExpr();

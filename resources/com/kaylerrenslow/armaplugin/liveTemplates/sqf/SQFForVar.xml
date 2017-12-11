@@ -1,0 +1,11 @@
+<templateSet group="SQF">
+	<template name="forvar" value="for &quot;$ITER_VAR$&quot; from $ITER_START$ to $ITER_END$ do {$END$};"
+			  description="Create a for loop on a variable" toReformat="false" toShortenFQNames="true">
+		<variable name="ITER_VAR" expression="" defaultValue="_i" alwaysStopAt="true"/>
+		<variable name="ITER_START" expression="" defaultValue="0" alwaysStopAt="true"/>
+		<variable name="ITER_END" expression="" defaultValue="0" alwaysStopAt="true"/>
+		<context>
+			<option name="SQF_CONTEXT" value="true"/>
+		</context>
+	</template>
+</templateSet>

@@ -1,0 +1,12 @@
+<templateSet group="SQF">
+	<template name="forspec" value="for [{$ITER_VAR$=$ITER_VAR_VAL$;},{$ITER_COND$},{$ITER_OPERATION$}] do {$END$};"
+			  description="Create a for loop" toReformat="false" toShortenFQNames="true">
+		<variable name="ITER_VAR" expression="" defaultValue="_i" alwaysStopAt="true"/>
+		<variable name="ITER_VAR_VAL" expression="" defaultValue="0" alwaysStopAt="true"/>
+		<variable name="ITER_COND" expression="" defaultValue="condition" alwaysStopAt="true"/>
+		<variable name="ITER_OPERATION" expression="" defaultValue="_i=_i+1" alwaysStopAt="true"/>
+		<context>
+			<option name="SQF_CONTEXT" value="true"/>
+		</context>
+	</template>
+</templateSet>

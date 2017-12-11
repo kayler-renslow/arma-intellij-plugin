@@ -77,6 +77,17 @@
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Misc -->
 
+		<!-- Live Templates-->
+		<liveTemplateContext implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFLiveTemplateContext"/>
+		<defaultLiveTemplatesProvider implementation="com.kaylerrenslow.armaplugin.lang.sqf.SQFLiveTemplatesProvider"/>
+
+		<!-- File Templates-->
+		<!-- NOTE TO SELF:
+			Any internal file template can't be created from file->new.
+			You can place internal file templates in fileTemplates/internal and normal file templates in directory fileTemplates.
+			https://intellij-support.jetbrains.com/hc/en-us/community/posts/207280245-File-Templates-in-plugin
+		-->
+
 		<moduleBuilder builderClass="com.kaylerrenslow.armaplugin.module.ArmaModuleBuilder"/>
 		<moduleType implementationClass="com.kaylerrenslow.armaplugin.module.ArmaModuleType" id="arma.moduleType"/>
 

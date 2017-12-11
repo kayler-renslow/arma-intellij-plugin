@@ -1,0 +1,9 @@
+<templateSet group="SQF">
+	<template name="ifthen" value="if ($COND$) then {$END$};" description="if then statement" toReformat="false"
+			  toShortenFQNames="true">
+		<variable name="COND" expression="" defaultValue="" alwaysStopAt="true"/>
+		<context>
+			<option name="SQF_CONTEXT" value="true"/>
+		</context>
+	</template>
+</templateSet>
