@@ -38,7 +38,7 @@ public class SQFLocalizeCompletionProvider extends CompletionProvider<Completion
 		List<StringTableKey> allKeys = stringTableProject.getAllKeys();
 		for (StringTableKey key : allKeys) {
 			LookupElementBuilder ele = LookupElementBuilder.create(key, key.getID()).appendTailText(" " + key.getContainerPath(), true);
-			ele = ele.withInsertHandler(new InsertHandler<>() {
+			ele = ele.withInsertHandler(new InsertHandler<LookupElement>() {
 				@Override
 				public void handleInsert(InsertionContext context, LookupElement item) {
 					WriteCommandAction.runWriteCommandAction(

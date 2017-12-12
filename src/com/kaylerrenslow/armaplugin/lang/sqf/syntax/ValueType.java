@@ -291,7 +291,7 @@ public abstract class ValueType {
 		public static final BaseType ANYTHING = new BaseType("ANYTHING", "Anything");
 		public static final BaseType ARRAY = new BaseType("ARRAY", "Array", new ExpandedValueType(true));
 		public static final BaseType ARRAY_OF_EDEN_ENTITIES = new BaseType("ARRAY_OF_EDEN_ENTITIES", "ArrayOfEdenEntities",
-				new Function<>() {
+				new Function<Void, ExpandedValueType>() {
 					@Override
 					public ExpandedValueType apply(Void aVoid) {
 						return new ExpandedValueType(
@@ -309,13 +309,13 @@ public abstract class ValueType {
 		);
 		public static final BaseType BOOLEAN = new BaseType("BOOLEAN", "Boolean");
 		public static final BaseType CODE = new BaseType("CODE", "Code");
-		public static final BaseType COLOR = new BaseType("COLOR", "Color", new Function<>() {
+		public static final BaseType COLOR = new BaseType("COLOR", "Color", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType COLOR_RGB = new BaseType("COLOR_RGB", "ColorRGB", new Function<>() {
+		public static final BaseType COLOR_RGB = new BaseType("COLOR_RGB", "ColorRGB", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
@@ -338,7 +338,7 @@ public abstract class ValueType {
 		public static final BaseType OBJECT_RTD = new BaseType("OBJECT_RTD", "ObjectRTD");
 		public static final BaseType ORIENT = new BaseType("ORIENT", "Orient");
 		public static final BaseType ORIENTATION = new BaseType("ORIENTATION", "Orientation");
-		public static final BaseType POSITION = new BaseType("POSITION", "Position", new Function<>() {
+		public static final BaseType POSITION = new BaseType("POSITION", "Position", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(false,
@@ -346,61 +346,61 @@ public abstract class ValueType {
 				);
 			}
 		});
-		public static final BaseType POSITION_2D = new BaseType("POSITION_2D", "Position2D", new Function<>() {
+		public static final BaseType POSITION_2D = new BaseType("POSITION_2D", "Position2D", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType POSITION_3D = new BaseType("POSITION_3D", "Position3D", new Function<>() {
+		public static final BaseType POSITION_3D = new BaseType("POSITION_3D", "Position3D", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType POSITION_ASL = new BaseType("POSITION_ASL", "PositionASL", new Function<>() {
+		public static final BaseType POSITION_ASL = new BaseType("POSITION_ASL", "PositionASL", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType POSITION_ASLW = new BaseType("POSITION_ASLW", "PositionASLW", new Function<>() {
+		public static final BaseType POSITION_ASLW = new BaseType("POSITION_ASLW", "PositionASLW", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType POSITION_ATL = new BaseType("POSITION_ATL", "PositionATL", new Function<>() {
+		public static final BaseType POSITION_ATL = new BaseType("POSITION_ATL", "PositionATL", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType POSITION_AGL = new BaseType("POSITION_AGL", "PositionAGL", new Function<>() {
+		public static final BaseType POSITION_AGL = new BaseType("POSITION_AGL", "PositionAGL", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType POSITION_AGLS = new BaseType("POSITION_AGLS", "PositionAGLS", new Function<>() {
+		public static final BaseType POSITION_AGLS = new BaseType("POSITION_AGLS", "PositionAGLS", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType POSITION_WORLD = new BaseType("POSITION_WORLD", "PositionWorld", new Function<>() {
+		public static final BaseType POSITION_WORLD = new BaseType("POSITION_WORLD", "PositionWorld", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType POSITION_RELATIVE = new BaseType("POSITION_RELATIVE", "PositionRelative", new Function<>() {
+		public static final BaseType POSITION_RELATIVE = new BaseType("POSITION_RELATIVE", "PositionRelative", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType POSITION_CONFIG = new BaseType("POSITION_CONFIG", "PositionConfig", new Function<>() {
+		public static final BaseType POSITION_CONFIG = new BaseType("POSITION_CONFIG", "PositionConfig", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
@@ -416,13 +416,13 @@ public abstract class ValueType {
 		public static final BaseType TEAM_MEMBER = new BaseType("TEAM_MEMBER", "TeamMember");
 		public static final BaseType TRANS = new BaseType("TRANS", "Trans");
 		public static final BaseType TRANSFORMATION = new BaseType("TRANSFORMATION", "Transformation");
-		public static final BaseType WAYPOINT = new BaseType("WAYPOINT", "Waypoint", new Function<>() {
+		public static final BaseType WAYPOINT = new BaseType("WAYPOINT", "Waypoint", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.GROUP, BaseType.NUMBER);
 			}
 		});
-		public static final BaseType VECTOR_3D = new BaseType("VECTOR_3D", "Vector3D", new Function<>() {
+		public static final BaseType VECTOR_3D = new BaseType("VECTOR_3D", "Vector3D", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
 				return new ExpandedValueType(BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);

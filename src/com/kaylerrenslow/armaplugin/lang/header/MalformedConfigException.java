@@ -11,6 +11,6 @@ import org.jetbrains.annotations.NotNull;
 public class MalformedConfigException extends GenericConfigException {
 
 	public MalformedConfigException(@NotNull HeaderFile file, @NotNull String message) {
-		super(file.getFile().getName() + " is incorrectly formatted. Message: " + message);
+		super(file.getPath() + " is incorrectly formatted. Message: " + message);
 	}
 }
