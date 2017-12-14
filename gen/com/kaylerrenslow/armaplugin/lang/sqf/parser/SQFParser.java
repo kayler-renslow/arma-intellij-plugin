@@ -265,14 +265,13 @@ public class SQFParser implements PsiParser, LightPsiParser {
   public static boolean code_block(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "code_block")) return false;
     if (!nextTokenIs(b, L_CURLY_BRACE)) return false;
-    boolean r, p;
-    Marker m = enter_section_(b, l, _NONE_, CODE_BLOCK, null);
+    boolean r;
+    Marker m = enter_section_(b);
     r = consumeToken(b, L_CURLY_BRACE);
-    p = r; // pin = 1
-    r = r && report_error_(b, code_block_1(b, l + 1));
-    r = p && consumeToken(b, R_CURLY_BRACE) && r;
-    exit_section_(b, l, m, r, p, null);
-    return r || p;
+    r = r && code_block_1(b, l + 1);
+    r = r && consumeToken(b, R_CURLY_BRACE);
+    exit_section_(b, m, CODE_BLOCK, r);
+    return r;
   }
 
   // local_scope?
@@ -382,7 +381,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
   //                             | PLUS| MINUS | ASTERISK | FSLASH | PERC | CARET
   //                             | AMPAMP | BARBAR | EXCL
   //                             | EQEQ | NE | LT | LE | GT | GE
-  //                             | FSLASH | GTGT
+  //                             | GTGT
   public static boolean expression_operator(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "expression_operator")) return false;
     boolean r;
@@ -403,7 +402,6 @@ public class SQFParser implements PsiParser, LightPsiParser {
     if (!r) r = consumeToken(b, LE);
     if (!r) r = consumeToken(b, GT);
     if (!r) r = consumeToken(b, GE);
-    if (!r) r = consumeToken(b, FSLASH);
     if (!r) r = consumeToken(b, GTGT);
     exit_section_(b, l, m, r, false, null);
     return r;

@@ -53,7 +53,7 @@ public abstract class ValueType {
 			return true;
 		}
 
-		if (!(type1 instanceof ExpandedValueType) && !(type2 instanceof ExpandedValueType)) {
+		if ((type1 instanceof BaseType) && (type2 instanceof BaseType)) {
 			//we don't want to use hardEqual on expanded types because it's invalid.
 
 			if (type1.isHardEqual(type2)) {
@@ -534,6 +534,7 @@ public abstract class ValueType {
 				return super.isHardEqual(other);
 			}
 			if (other instanceof CodeType) {
+				//preserve mathematical symmetric property
 				return true;
 			}
 			return super.isHardEqual(other);

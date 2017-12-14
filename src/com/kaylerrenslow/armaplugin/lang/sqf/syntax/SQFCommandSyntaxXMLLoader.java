@@ -167,7 +167,7 @@ class SQFCommandSyntaxXMLLoader {
 		optional = valueOfTF(paramElement.getAttribute("optional"));
 		desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(paramElement) : "";
 
-		Param p = new Param(paramName, BaseType._ERROR, desc, optional);
+		Param p = new Param(paramName, dataType, desc, optional);
 		addAltTypes(paramElement, p.getType().getPolymorphicTypes());
 
 		//get literals

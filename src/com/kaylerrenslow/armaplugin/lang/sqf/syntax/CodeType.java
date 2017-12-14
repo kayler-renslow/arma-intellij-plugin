@@ -12,6 +12,9 @@ import java.util.List;
  * but can also specify another {@link ValueType}
  * that the {@link BaseType#CODE} should return. For example, {0} is <code>new CodeType({@link BaseType#NUMBER})</code>
  * and {{}} can be either <code>new CodeType({@link BaseType#CODE})</code> or <code>new CodeType(new CodeType({@link BaseType#NOTHING}))</code>
+ * <p>
+ * Note that {@link BaseType#CODE} is equivalent to an instance of {@link CodeType} with {@link #getReturnType()} being
+ * {@link BaseType#ANYTHING} or {@link BaseType#_VARIABLE}.
  *
  * @author kayler
  * @since 12/14/17
@@ -69,7 +72,11 @@ public class CodeType extends ValueType {
 	/**
 	 * Does the following checks in the following order:
 	 * <ol>
-	 * <li>If t is an instance of {@link CodeType}, will return true if and only if both {@link #getReturnType()} are hard equal</li>
+	 * <li>If t is an instance of {@link CodeType}, will return true if and only if both {@link #getReturnType()} are hard equal.
+	 * However, if both {@link #getReturnType()} passed into {@link ValueType#isAnythingOrVariable(ValueType, ValueType)}
+	 * returns true, this will return true. If you are wondering why, it is the equivalent of {@link BaseType#CODE}
+	 * because it can be anything or nothing at all.
+	 * </li>
 	 * <li>If t is hard equal to {@link BaseType#CODE}</li>
 	 * </ol>
 	 */
@@ -77,6 +84,9 @@ public class CodeType extends ValueType {
 	public boolean isHardEqual(@NotNull ValueType t) {
 		if (t instanceof CodeType) {
 			CodeType other = (CodeType) t;
+			if (returnType.isAnythingOrVariable() || other.returnType.isAnythingOrVariable()) {
+				return true;
+			}
 			return returnType.isHardEqual(other.returnType);
 		}
 		if (t.isHardEqual(BaseType.CODE)) {
