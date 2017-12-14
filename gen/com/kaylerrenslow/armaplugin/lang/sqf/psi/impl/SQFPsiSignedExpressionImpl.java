@@ -27,9 +27,9 @@ public class SQFPsiSignedExpressionImpl extends SQFSignedExpression implements S
   }
 
   @Override
-  @Nullable
+  @NotNull
   public SQFPsiExpression getExpression() {
-    return findChildByClass(SQFPsiExpression.class);
+    return findNotNullChildByClass(SQFPsiExpression.class);
   }
 
 }

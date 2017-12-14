@@ -7,13 +7,13 @@ import com.intellij.psi.PsiElement;
 
 public interface SQFPsiCommandExpression extends SQFPsiExpression {
 
-  @NotNull
-  SQFPsiCommand getCommand();
-
   @Nullable
   SQFPsiCommandAfter getCommandAfter();
 
   @Nullable
   SQFPsiCommandBefore getCommandBefore();
+
+  @NotNull
+  SQFPsiExpressionOperator getExpressionOperator();
 
 }

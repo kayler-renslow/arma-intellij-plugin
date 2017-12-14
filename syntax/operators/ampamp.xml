@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<command name='&amp;&amp;' version='' game='' format='1'>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='BOOLEAN' name='l' optional='f' order='0'/>
+		<param type='BOOLEAN' name='r' optional='f' order='1'>
+			<alt-types>
+				<t type="CODE"/>
+			</alt-types>
+		</param>
+	</syntax>
+</command>

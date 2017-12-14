@@ -90,6 +90,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertHasProblems("''+1e1");
 	}
 
+	public void note() throws Exception {
+		throw new Exception("We need to remove Unary Expression because it will be confused in command expression");
+	}
+
 	public void testAddExpression_bad_numAndArray() throws Exception {
 		assertHasProblems("0.5+[]");
 		assertHasProblems("[]+0.5");

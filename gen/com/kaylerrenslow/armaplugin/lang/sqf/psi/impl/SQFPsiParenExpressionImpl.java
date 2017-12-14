@@ -27,9 +27,9 @@ public class SQFPsiParenExpressionImpl extends SQFParenExpression implements SQF
   }
 
   @Override
-  @Nullable
+  @NotNull
   public SQFPsiExpression getExpression() {
-    return findChildByClass(SQFPsiExpression.class);
+    return findNotNullChildByClass(SQFPsiExpression.class);
   }
 
 }

@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.CommandDescriptorCluster;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -16,46 +17,51 @@ public class SQFCommandExpression extends ASTWrapperPsiElement implements SQFExp
 		super(node);
 	}
 
-	@NotNull
+	@Nullable
 	public SQFCommand getSQFCommand() {
-		SQFCommand command = PsiTreeUtil.getChildOfType(this, SQFCommand.class);
-		if (command == null) {
-			throw new IllegalStateException("command shouldn't be null");
+		return getExprOperator().getCmd();
+	}
+
+	@NotNull
+	public SQFExpressionOperator getExprOperator(){
+		SQFExpressionOperator op = PsiTreeUtil.getChildOfType(this, SQFExpressionOperator.class);
+		if (op == null) {
+			throw new IllegalStateException("a command expression should always have an expression operator");
 		}
-		return command;
+		return op;
 	}
 
 	/**
-	 * Shortcut for {@link SQFCommand#commandNameEquals(String)} on {@link #getSQFCommand()}
+	 * Shortcut for {@link SQFVariableName#nameEquals(String, String)} on {@link #getExprOperator()}
 	 *
 	 * @return true if command name equals (case insensitive), or false if it doesn't equal
 	 */
 	public boolean commandNameEquals(@NotNull String commandName) {
-		return getSQFCommand().commandNameEquals(commandName);
+		return SQFVariableName.nameEquals(getExprOperator().getText(), commandName);
 	}
 
 	/**
-	 * @return the {@link SQFCommandArgument} instance that comes before {@link #getSQFCommand()},
+	 * @return the {@link SQFCommandArgument} instance that comes before {@link #getExprOperator()},
 	 * or null if doesn't exist (prefixArg? COMMAND postfixArg?)
 	 */
 	@Nullable
 	public SQFCommandArgument getPrefixArgument() {
 		SQFCommandArgument[] args = PsiTreeUtil.getChildrenOfType(this, SQFCommandArgument.class);
-		if (args != null && args.length > 0 && args[0].getTextOffset() < getSQFCommand().getTextOffset()) {
+		if (args != null && args.length > 0 && args[0].getTextOffset() < getExprOperator().getTextOffset()) {
 			return args[0];
 		}
 		return null;
 	}
 
 	/**
-	 * @return the {@link SQFCommandArgument} instance that comes after {@link #getSQFCommand()},\
+	 * @return the {@link SQFCommandArgument} instance that comes after {@link #getExprOperator()},\
 	 * or null if doesn't exist  (prefixArg? COMMAND postfixArg?)
 	 */
 	@Nullable
 	public SQFCommandArgument getPostfixArgument() {
 		SQFCommandArgument[] args = PsiTreeUtil.getChildrenOfType(this, SQFCommandArgument.class);
 		if (args != null && args.length > 0) {
-			int commandTextOffset = getSQFCommand().getTextOffset();
+			int commandTextOffset = getExprOperator().getTextOffset();
 			if (args[0].getTextOffset() > commandTextOffset) {
 				return args[0];
 			}

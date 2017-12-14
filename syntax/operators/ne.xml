@@ -1,0 +1,66 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<command name='!=' version='' game='' format='1'>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='NUMBER' name='l' optional='f' order='0'/>
+		<param type='NUMBER' name='r' optional='f' order='1'/>
+	</syntax>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='GROUP' name='l' optional='f' order='0'/>
+		<param type='GROUP' name='r' optional='f' order='1'/>
+	</syntax>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='SIDE' name='l' optional='f' order='0'/>
+		<param type='SIDE' name='r' optional='f' order='1'/>
+	</syntax>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='STRING' name='l' optional='f' order='0'/>
+		<param type='STRING' name='r' optional='f' order='1'/>
+	</syntax>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='OBJECT' name='l' optional='f' order='0'/>
+		<param type='OBJECT' name='r' optional='f' order='1'/>
+	</syntax>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='STRUCTURED_TEXT' name='l' optional='f' order='0'/>
+		<param type='STRUCTURED_TEXT' name='r' optional='f' order='1'/>
+	</syntax>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='CONFIG' name='l' optional='f' order='0'/>
+		<param type='CONFIG' name='r' optional='f' order='1'/>
+	</syntax>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='DISPLAY' name='l' optional='f' order='0'/>
+		<param type='DISPLAY' name='r' optional='f' order='1'/>
+	</syntax>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='CONTROL' name='l' optional='f' order='0'/>
+		<param type='CONTROL' name='r' optional='f' order='1'/>
+	</syntax>
+</command>

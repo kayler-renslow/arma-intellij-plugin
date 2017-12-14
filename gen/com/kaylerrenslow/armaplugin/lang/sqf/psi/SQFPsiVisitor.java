@@ -7,28 +7,12 @@ import com.intellij.psi.PsiElement;
 
 public class SQFPsiVisitor extends PsiElementVisitor {
 
-  public void visitAddExpression(@NotNull SQFPsiAddExpression o) {
-    visitExpression(o);
-  }
-
   public void visitArray(@NotNull SQFPsiArray o) {
     visitPsiElement(o);
   }
 
   public void visitAssignmentStatement(@NotNull SQFPsiAssignmentStatement o) {
     visitStatement(o);
-  }
-
-  public void visitBoolAndExpression(@NotNull SQFPsiBoolAndExpression o) {
-    visitExpression(o);
-  }
-
-  public void visitBoolNotExpression(@NotNull SQFPsiBoolNotExpression o) {
-    visitExpression(o);
-  }
-
-  public void visitBoolOrExpression(@NotNull SQFPsiBoolOrExpression o) {
-    visitExpression(o);
   }
 
   public void visitCaseCommand(@NotNull SQFPsiCaseCommand o) {
@@ -63,23 +47,11 @@ public class SQFPsiVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
-  public void visitCompExpression(@NotNull SQFPsiCompExpression o) {
-    visitExpression(o);
-  }
-
-  public void visitConfigFetchExpression(@NotNull SQFPsiConfigFetchExpression o) {
-    visitExpression(o);
-  }
-
-  public void visitDivExpression(@NotNull SQFPsiDivExpression o) {
-    visitExpression(o);
-  }
-
-  public void visitExponentExpression(@NotNull SQFPsiExponentExpression o) {
-    visitExpression(o);
-  }
-
   public void visitExpression(@NotNull SQFPsiExpression o) {
+    visitPsiElement(o);
+  }
+
+  public void visitExpressionOperator(@NotNull SQFPsiExpressionOperator o) {
     visitPsiElement(o);
   }
 
@@ -101,14 +73,6 @@ public class SQFPsiVisitor extends PsiElementVisitor {
 
   public void visitMacroCall(@NotNull SQFPsiMacroCall o) {
     visitPsiElement(o);
-  }
-
-  public void visitModExpression(@NotNull SQFPsiModExpression o) {
-    visitExpression(o);
-  }
-
-  public void visitMulExpression(@NotNull SQFPsiMulExpression o) {
-    visitExpression(o);
   }
 
   public void visitNumber(@NotNull SQFPsiNumber o) {
@@ -137,10 +101,6 @@ public class SQFPsiVisitor extends PsiElementVisitor {
 
   public void visitString(@NotNull SQFPsiString o) {
     visitPsiElement(o);
-  }
-
-  public void visitSubExpression(@NotNull SQFPsiSubExpression o) {
-    visitExpression(o);
   }
 
   public void visitVariable(@NotNull SQFPsiVariable o) {

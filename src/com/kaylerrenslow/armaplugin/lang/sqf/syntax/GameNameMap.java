@@ -65,9 +65,16 @@ public class GameNameMap {
 		return list;
 	}
 
+	/**
+	 * @return {@link BIGame} that matches the information, or {@link BIGame#UNKNOWN} if no game could be matched
+	 */
 	@NotNull
 	public BIGame getGame(@NotNull LookupType type, @NotNull String query) {
-		return hashMap.get(type).get(query);
+		BIGame game = hashMap.get(type).get(query);
+		if (game != null) {
+			return game;
+		}
+		return BIGame.UNKNOWN;
 	}
 
 	private void put(@NotNull BIGame biGame) {

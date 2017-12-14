@@ -20,7 +20,8 @@ public class CommandXMLInputStream extends InputStream {
 	/**
 	 * Creates a stream for getting command syntax xml files.
 	 *
-	 * @param commandName the command name (case doesn't matter)
+	 * @param commandName the command name (case doesn't matter). If you wish to get an operator as a descriptor,
+	 *                       prefix it with operators/ (i.e. operators/myOperator or operators/plus)
 	 * @throws UnsupportedOperationException if the command doesn't have a syntax xml file
 	 */
 	public CommandXMLInputStream(@NotNull String commandName) {

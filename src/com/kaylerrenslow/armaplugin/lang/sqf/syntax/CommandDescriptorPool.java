@@ -89,7 +89,7 @@ public class CommandDescriptorPool {
 				"while",
 		};
 		for (String command : frequent) {
-			frequentCache.put(command.toLowerCase(), getDescriptorFromFile(command));
+			frequentCache.put(command.toLowerCase(), CommandDescriptor.getDescriptorFromFile(command));
 		}
 	}
 
@@ -153,7 +153,7 @@ public class CommandDescriptorPool {
 			}
 		}
 
-		CommandDescriptor d = getDescriptorFromFile(commandName);
+		CommandDescriptor d = CommandDescriptor.getDescriptorFromFile(commandName);
 
 		if (d == null) {
 			synchronized (processing) {
@@ -185,21 +185,6 @@ public class CommandDescriptorPool {
 
 
 		return ret.descriptor;
-	}
-
-	@Nullable
-	private CommandDescriptor getDescriptorFromFile(@NotNull String commandName) {
-		try {
-			return SQFCommandSyntaxXMLLoader.importFromStream(new CommandXMLInputStream(commandName), false);
-		} catch (Exception e) {
-			if (e instanceof UnsupportedOperationException) {
-				//command doesn't have a syntax xml file
-				System.out.println(e.getMessage());
-				return null;
-			}
-			e.printStackTrace();
-			return null;
-		}
 	}
 
 	private class DescriptorWrapper implements Comparable<DescriptorWrapper> {

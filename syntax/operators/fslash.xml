@@ -1,0 +1,17 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<command name='/' version='' game='' format='1'>
+	<syntax>
+		<return>
+			<value type='NUMBER' order='0'></value>
+		</return>
+		<param type='NUMBER' name='l' optional='f' order='0'/>
+		<param type='NUMBER' name='r' optional='f' order='1'/>
+	</syntax>
+	<syntax>
+		<return>
+			<value type='CONFIG' order='0'></value>
+		</return>
+		<param type='CONFIG' name='cfg' optional='f' order='0'/>
+		<param type='STRING' name='nxtCfg' optional='f' order='1'/>
+	</syntax>
+</command>

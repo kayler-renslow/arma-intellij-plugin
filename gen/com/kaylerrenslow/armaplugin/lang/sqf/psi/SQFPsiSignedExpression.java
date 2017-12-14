@@ -7,7 +7,7 @@ import com.intellij.psi.PsiElement;
 
 public interface SQFPsiSignedExpression extends SQFPsiExpression {
 
-  @Nullable
+  @NotNull
   SQFPsiExpression getExpression();
 
 }

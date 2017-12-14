@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 import com.intellij.codeInspection.ProblemHighlightType;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.IElementType;
 import com.kaylerrenslow.armaplugin.lang.sqf.syntax.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -115,299 +116,67 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFAddExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		SQFExpression leftExpr = expr.getLeft();
-		ValueType left = null, right = null;
-		if (leftExpr != null) {
-			left = (ValueType) leftExpr.accept(this, cluster);
-		}
-
-		SQFExpression rightExpr = expr.getRight();
-		if (rightExpr != null) {
-			right = (ValueType) rightExpr.accept(this, cluster);
-		}
-
-		if (left == null || right == null) {
-			//can't be determined
-			return BaseType._ERROR;
-		}
-
-		ValueType[] allowedTypes = {
-				BaseType.NUMBER,
-				ValueType.BaseType.STRING,
-				BaseType.ARRAY
-		};
-
-		if (left.isHardEqual(NUMBER) || left.isHardEqual(STRING)) {
-			assertIsType(right, left, rightExpr);
-			return NUMBER;
-		} else if (left.isHardEqual(_VARIABLE)) {
-			assertIsType(right, allowedTypes, rightExpr);
-			return _VARIABLE;
-		}
-
-		if (left.isArray() && right.isHardEqual(_VARIABLE)) {
-			return BaseType.ARRAY;
-		}
-		if (left.isArray() && right.isArray()) {
-			return BaseType.ARRAY;
-		}
-		notOfType(allowedTypes, right, rightExpr);
-		return BaseType.ANYTHING;
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFSubExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		SQFExpression leftExpr = expr.getLeft();
-		ValueType left = null, right = null;
-		if (leftExpr != null) {
-			left = (ValueType) leftExpr.accept(this, cluster);
-		}
-
-		SQFExpression rightExpr = expr.getRight();
-		if (rightExpr != null) {
-			right = (ValueType) rightExpr.accept(this, cluster);
-		}
-
-		if (left == null || right == null) {
-			//can't be determined
-			return BaseType._ERROR;
-		}
-
-		ValueType[] allowedTypes = {
-				BaseType.NUMBER,
-				BaseType.ARRAY
-		};
-		if (left.isHardEqual(NUMBER)) {
-			assertIsType(right, BaseType.NUMBER, rightExpr);
-			return NUMBER;
-		}
-		if (left.isHardEqual(_VARIABLE)) {
-			assertIsType(right, allowedTypes, rightExpr);
-			return _VARIABLE;
-		}
-
-		if (left.isArray() && right.isHardEqual(_VARIABLE)) {
-			return ValueType.BaseType.ARRAY;
-		}
-		if (left.isArray() && right.isArray()) {
-			return BaseType.ARRAY;
-		}
-		notOfType(allowedTypes, right, rightExpr);
-		return BaseType.ANYTHING;
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFMultExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return binaryExprSameTypeHelper(expr, BaseType.NUMBER, cluster);
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFDivExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		SQFExpression leftExpr = expr.getLeft();
-		ValueType left = null, right = null;
-		if (leftExpr != null) {
-			left = (ValueType) leftExpr.accept(this, cluster);
-		}
-
-		SQFExpression rightExpr = expr.getRight();
-		if (rightExpr != null) {
-			right = (ValueType) rightExpr.accept(this, cluster);
-		}
-
-		if (left == null || right == null) {
-			//can't be determined
-			return BaseType._ERROR;
-		}
-
-		ValueType[] allowedTypes = {
-				BaseType.NUMBER,
-				BaseType.STRING
-		};
-
-		if (left.isHardEqual(NUMBER)) {
-			assertIsType(right, BaseType.NUMBER, rightExpr);
-			return BaseType.NUMBER;
-		}
-		if (left.isHardEqual(CONFIG)) {
-			assertIsType(right, BaseType.STRING, rightExpr);
-			return CONFIG;
-		}
-		if (left.isHardEqual(_VARIABLE)) {
-			assertIsType(right, allowedTypes, rightExpr);
-			return _VARIABLE;
-		}
-
-		notOfType(allowedTypes, right, rightExpr);
-		return BaseType.ANYTHING;
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFModExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return binaryExprSameTypeHelper(expr, BaseType.NUMBER, cluster);
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFBoolAndExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		SQFExpression leftExpr = expr.getLeft();
-		ValueType left = null, right = null;
-		if (leftExpr != null) {
-			left = (ValueType) leftExpr.accept(this, cluster);
-		}
-
-		SQFExpression rightExpr = expr.getRight();
-		if (rightExpr != null) {
-			right = (ValueType) rightExpr.accept(this, cluster);
-		}
-
-		if (left == null || right == null) {
-			return ValueType.BaseType.BOOLEAN;
-		}
-
-		assertIsType(left, BaseType.BOOLEAN, leftExpr);
-
-		if (rightExpr instanceof SQFCodeBlockExpression) {
-			assertIsType(right, BaseType.CODE, rightExpr);
-			SQFCodeBlockExpression blockExp = (SQFCodeBlockExpression) rightExpr;
-			right = fullyVisitCodeBlockScope(blockExp.getBlock(), cluster);
-			assertIsType(right, BaseType.BOOLEAN, blockExp);
-			return BaseType.BOOLEAN;
-		}
-
-		assertIsType(right, new ValueType[]{BaseType.BOOLEAN, BaseType.CODE}, rightExpr);
-
-		return BaseType.BOOLEAN;
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFBoolOrExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		SQFExpression leftExpr = expr.getLeft();
-		ValueType left = null, right = null;
-		if (leftExpr != null) {
-			left = (ValueType) leftExpr.accept(this, cluster);
-		}
-
-		SQFExpression rightExpr = expr.getRight();
-		if (rightExpr != null) {
-			right = (ValueType) rightExpr.accept(this, cluster);
-		}
-
-		if (left == null || right == null) {
-			return BaseType.BOOLEAN;
-		}
-
-		assertIsType(left, ValueType.BaseType.BOOLEAN, leftExpr);
-
-		if (rightExpr instanceof SQFCodeBlockExpression) {
-			assertIsType(right, BaseType.CODE, rightExpr);
-			SQFCodeBlockExpression blockExp = (SQFCodeBlockExpression) rightExpr;
-			right = fullyVisitCodeBlockScope(blockExp.getBlock(), cluster);
-			assertIsType(right, BaseType.BOOLEAN, blockExp);
-			return BaseType.BOOLEAN;
-		}
-
-		assertIsType(right, new ValueType[]{BaseType.BOOLEAN, ValueType.BaseType.CODE}, rightExpr);
-
-		return BaseType.BOOLEAN;
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFBoolNotExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		SQFExpression expr1 = expr.getExpr();
-		if (expr1 != null) {
-			ValueType type = (ValueType) expr1.accept(this, cluster);
-			assertIsType(type, BaseType.BOOLEAN, expr1);
-		}
-		return BaseType.BOOLEAN;
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFCompExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		if (expr.getComparisonType() != SQFCompExpression.ComparisonType.Equals
-				&& expr.getComparisonType() != SQFCompExpression.ComparisonType.NotEquals) {
-			binaryExprSameTypeHelper(expr, BaseType.NUMBER, cluster);
-			return BaseType.BOOLEAN;
-		}
-
-		SQFExpression leftExpr = expr.getLeft();
-		ValueType left = null, right = null;
-		if (leftExpr != null) {
-			left = (ValueType) leftExpr.accept(this, cluster);
-		}
-
-		SQFExpression rightExpr = expr.getRight();
-		if (rightExpr != null) {
-			right = (ValueType) rightExpr.accept(this, cluster);
-		}
-
-		if (left == null || right == null) {
-			//can't be determined
-			return BaseType._ERROR;
-		}
-		ValueType[] allowedTypes = {
-				BaseType.NUMBER,
-				BaseType.GROUP,
-				BaseType.SIDE,
-				BaseType.STRING,
-				BaseType.OBJECT,
-				BaseType.STRUCTURED_TEXT,
-				BaseType.CONFIG,
-				BaseType.DISPLAY,
-				BaseType.CONTROL,
-				BaseType.LOCATION
-		};
-		if (left.isAnythingOrVariable()) {
-			assertIsType(right, allowedTypes, rightExpr);
-			return BaseType.BOOLEAN;
-		}
-
-		for (ValueType type : allowedTypes) {
-			if (left.isHardEqual(type)) {
-				assertIsType(right, left, rightExpr);
-				return BaseType.BOOLEAN;
-			}
-		}
-		notOfType(allowedTypes, left, leftExpr);
-		assertIsType(right, allowedTypes, rightExpr);
-
-		return BaseType.BOOLEAN;
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFConfigFetchExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		SQFExpression leftExpr = expr.getLeft();
-		ValueType left = null, right = null;
-		if (leftExpr != null) {
-			left = (ValueType) leftExpr.accept(this, cluster);
-		}
-
-		SQFExpression rightExpr = expr.getRight();
-		if (rightExpr != null) {
-			right = (ValueType) rightExpr.accept(this, cluster);
-		}
-
-		if (left == null || right == null) {
-			return CONFIG;
-		}
-
-		assertIsType(left, CONFIG, leftExpr);
-		assertIsType(right, BaseType.STRING, rightExpr);
-
-		return CONFIG;
+		return null;
 	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFExponentExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return binaryExprSameTypeHelper(expr, BaseType.NUMBER, cluster);
+		return null;
 	}
 
 	@NotNull
@@ -457,13 +226,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		LinkedList<CommandExpressionPart> parts = new LinkedList<>();
 		SQFCommandExpression cursor = expr;
 		while (true) {
-			SQFCommand command = cursor.getSQFCommand();
+			SQFExpressionOperator op = cursor.getExprOperator();
 			SQFCommandArgument pre = cursor.getPrefixArgument();
 			SQFCommandArgument post = cursor.getPostfixArgument();
 			if (pre != null) {
 				parts.add(new CommandExpressionPart(pre));
 			}
-			parts.add(new CommandExpressionPart(command));
+			parts.add(new CommandExpressionPart(op));
 			if (post != null) {
 				SQFExpression postExpr = post.getExpr();
 				if (postExpr instanceof SQFCommandExpression) {
@@ -490,9 +259,9 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		CommandExpressionPart prefixPart = parts.removeFirst();
 		CommandExpressionPart commandPart = null;
-		if (!prefixPart.isCommandPart()) {
+		if (!prefixPart.isOperatorPart()) {
 			commandPart = parts.removeFirst();
-			if (!commandPart.isCommandPart()) {
+			if (!commandPart.isOperatorPart()) {
 				throw new IllegalStateException("expected command part");
 			}
 		} else {
@@ -500,17 +269,12 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			prefixPart = null;
 		}
 
-		SQFCommand command = commandPart.getCommand();
-		String commandName = command.getCommandName();
+		SQFExpressionOperator exprOperator = commandPart.getOperator();
+		String commandName;
 		CommandDescriptor descriptor;
-		{ //get the descriptor
-			descriptor = cluster.get(commandName);
-			if (descriptor == null) {
-				throw new IllegalStateException("descriptor doesn't exist for command " + commandName);
-			}
-			if (descriptor.getSyntaxList().size() == 0) {
-				throw new IllegalStateException("command '" + commandName + "' has no syntaxes");
-			}
+		{
+			descriptor = getDescriptor(exprOperator, cluster);
+			commandName = descriptor.getCommandName();
 		}
 
 		Function<CommandExpressionPart, ValueType> getTypeForPart = commandExpressionPart -> {
@@ -538,7 +302,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			partsAfterGettingPeekNextPartType.addAll(parts);
 
 			if (peekNextPart != null) {
-				if (peekNextPart.isCommandPart()) {
+				if (peekNextPart.isOperatorPart()) {
 					//pass null to problems reporter because we are TESTING to see if
 					//the peeked next part COULD work. If there was problems, we can just ignore it.
 					peekNextPartType = getReturnTypeForCommand(
@@ -608,12 +372,9 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				CommandExpressionPart peekFirst = parts.peekFirst();
 				boolean expectedSemicolon = false;
 				boolean consumeMoreCommands = false;
-				if (peekFirst.isCommandPart()) {
-					SQFCommand peekCommand = peekFirst.getCommand();
-					CommandDescriptor d = cluster.get(peekCommand.getCommandName());
-					if (d == null) {
-						throw new IllegalStateException("descriptor doesn't exist for command " + commandName);
-					}
+				if (peekFirst.isOperatorPart()) {
+					SQFExpressionOperator peekExprOperator = peekFirst.getOperator();
+					CommandDescriptor d = getDescriptor(peekExprOperator, cluster);
 					for (CommandSyntax syntax1 : d.getSyntaxList()) {
 						if (syntax1.getPrefixParam() != null) {
 							if (syntax1.getPrefixParam().containsType(retType)) {
@@ -647,7 +408,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		if (problems != null) {
 			if (peekNextPartType == null) {
 				problems.registerProblem(
-						command,
+						exprOperator,
 						"No syntax for '" +
 								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
 								+ commandName + "'",
@@ -655,7 +416,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				);
 			} else {
 				problems.registerProblem(
-						command,
+						exprOperator,
 						"No syntax for '" +
 								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
 								+ commandName + " " + peekNextPartType.getDisplayName() + "'",
@@ -722,28 +483,32 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	}
 
 	@NotNull
-	private ValueType binaryExprSameTypeHelper(@NotNull SQFBinaryExpression expr, @NotNull ValueType expected,
-											   @NotNull CommandDescriptorCluster cluster) {
-		SQFExpression leftExpr = expr.getLeft();
-		ValueType left = null, right = null;
-		if (leftExpr != null) {
-			left = (ValueType) leftExpr.accept(this, cluster);
+	public CommandDescriptor getDescriptor(@NotNull SQFExpressionOperator operator, @NotNull CommandDescriptorCluster cluster) {
+		CommandDescriptor descriptor;
+		SQFCommand command = operator.getCmd();
+		if (command != null) {
+			String commandName = command.getCommandName();
+			{ //get the descriptor
+				descriptor = cluster.get(commandName);
+			}
+			if (descriptor == null) {
+				throw new IllegalStateException("descriptor doesn't exist for command " + commandName);
+			}
+		} else {
+			IElementType operatorType = operator.getOperatorType();
+			if (operatorType == null) {
+				throw new IllegalStateException("SQFExpressionOperator should have a command or operator. Has neither");
+			}
+			descriptor = OperatorCommandDescriptors.get(operatorType);
+			if (descriptor == null) {
+				throw new IllegalStateException("operator " + operatorType + " doesn't have a command descriptor");
+			}
+		}
+		if (descriptor.getSyntaxList().size() == 0) {
+			throw new IllegalStateException("CommandDescriptor '" + descriptor.getCommandName() + "' has no syntaxes");
 		}
 
-		SQFExpression rightExpr = expr.getRight();
-		if (rightExpr != null) {
-			right = (ValueType) rightExpr.accept(this, cluster);
-		}
-
-		if (left == null || right == null) {
-			//can't be determined
-			return BaseType._ERROR;
-		}
-
-		assertIsType(left, expected, leftExpr);
-		assertIsType(right, expected, rightExpr);
-
-		return expected;
+		return descriptor;
 	}
 
 	/**
@@ -830,20 +595,20 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		@Nullable
 		private final SQFCommandArgument argument;
 		@Nullable
-		private final SQFCommand command;
+		private final SQFExpressionOperator operator;
 
-		public CommandExpressionPart(@NotNull SQFCommand command) {
-			this.command = command;
+		public CommandExpressionPart(@NotNull SQFExpressionOperator operator) {
+			this.operator = operator;
 			this.argument = null;
 		}
 
 		public CommandExpressionPart(@NotNull SQFCommandArgument argument) {
-			this.command = null;
+			this.operator = null;
 			this.argument = argument;
 		}
 
-		public boolean isCommandPart() {
-			return command != null;
+		public boolean isOperatorPart() {
+			return operator != null;
 		}
 
 		public boolean isArgumentPart() {
@@ -851,11 +616,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		@NotNull
-		public SQFCommand getCommand() {
-			if (!isCommandPart()) {
-				throw new IllegalStateException("can't get command on a non-command part");
+		public SQFExpressionOperator getOperator() {
+			if (!isOperatorPart()) {
+				throw new IllegalStateException("can't get operator on a non-operator part");
 			}
-			return command;
+			return operator;
 		}
 
 		@NotNull
@@ -868,7 +633,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		@NotNull
 		public PsiElement getPsiElement() {
-			return isArgumentPart() ? argument : command;
+			return isArgumentPart() ? argument : operator;
 		}
 
 		@Override

@@ -1,6 +1,7 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -10,10 +11,29 @@ import java.util.List;
  * @since 06/11/2016.
  */
 public class CommandDescriptor {
+	/**
+	 * @see CommandXMLInputStream#CommandXMLInputStream(String)
+	 */
+	@Nullable
+	public static CommandDescriptor getDescriptorFromFile(@NotNull String commandName) {
+		try {
+			return SQFCommandSyntaxXMLLoader.importFromStream(new CommandXMLInputStream(commandName), false);
+		} catch (Exception e) {
+			if (e instanceof UnsupportedOperationException) {
+				//command doesn't have a syntax xml file
+				System.out.println(e.getMessage());
+				return null;
+			}
+			e.printStackTrace();
+			return null;
+		}
+	}
+
 	private final List<CommandSyntax> syntaxList;
 	private final String commandName;
 	private String gameVersion;
 	private final BIGame game;
+
 	private boolean deprecated = false;
 
 	private boolean uncertain = false;

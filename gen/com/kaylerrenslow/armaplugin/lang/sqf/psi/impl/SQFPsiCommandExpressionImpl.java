@@ -27,12 +27,6 @@ public class SQFPsiCommandExpressionImpl extends SQFCommandExpression implements
   }
 
   @Override
-  @NotNull
-  public SQFPsiCommand getCommand() {
-    return findNotNullChildByClass(SQFPsiCommand.class);
-  }
-
-  @Override
   @Nullable
   public SQFPsiCommandAfter getCommandAfter() {
     return findChildByClass(SQFPsiCommandAfter.class);
@@ -42,6 +36,12 @@ public class SQFPsiCommandExpressionImpl extends SQFCommandExpression implements
   @Nullable
   public SQFPsiCommandBefore getCommandBefore() {
     return findChildByClass(SQFPsiCommandBefore.class);
+  }
+
+  @Override
+  @NotNull
+  public SQFPsiExpressionOperator getExpressionOperator() {
+    return findNotNullChildByClass(SQFPsiExpressionOperator.class);
   }
 
 }

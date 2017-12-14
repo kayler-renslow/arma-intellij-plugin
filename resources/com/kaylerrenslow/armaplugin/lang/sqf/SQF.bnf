@@ -57,14 +57,7 @@ assignment_statement ::= private_command? variable
                         EQ expression {pin=4 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFAssignmentStatement"}
 expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExpressionStatement"}
 //expression
-    expression ::= conditional_group_
-                | add_group_
-                | comp_expression
-                | mul_group_
-                | exponent_expression
-                | config_fetch_expression
-
-                | command_expression
+    expression ::= command_expression
 
                  // keep below command expression, otherwise the command may not be
                  // matched since a command can have a unary expression as an argument
@@ -76,27 +69,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
 
     code_block_expression ::= code_block {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCodeBlockExpression"}
 
-    private add_group_ ::= add_expression | sub_expression
-    private mul_group_ ::= mul_expression | div_expression | mod_expression
-    private conditional_group_::= bool_and_expression | bool_or_expression | bool_not_expression
-
     signed_expression ::= (PLUS | MINUS) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSignedExpression"}
-
-    add_expression ::= expression PLUS expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFAddExpression"}
-    sub_expression ::= expression MINUS expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSubExpression"}
-    mul_expression ::= expression ASTERISK expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFMultExpression"}
-    div_expression ::= expression FSLASH expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFDivExpression"}
-    mod_expression ::= expression PERC expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFModExpression"}
-
-    bool_and_expression ::= expression AMPAMP expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFBoolAndExpression"}
-    bool_or_expression ::= expression BARBAR expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFBoolOrExpression"}
-    bool_not_expression::= EXCL expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFBoolNotExpression"}
-
-    comp_expression ::= expression (EQEQ | NE | LT | LE | GT | GE) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCompExpression"}
-
-    config_fetch_expression ::= expression (FSLASH | GTGT) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFConfigFetchExpression"}
-
-    exponent_expression ::= expression CARET expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExponentExpression"}
 
     literal_expression ::= string
                         | variable
@@ -109,7 +82,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
     paren_expression ::= LPAREN expression RPAREN {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParenExpression"}
 
     //command expression (includes a standalone command token)
-        command_expression ::= command_before? command command_after? {pin=2 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandExpression"}
+        command_expression ::= command_before? expression_operator command_after? {pin=2 mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandExpression"}
         //We are excluding expression from this because it will be infinite left recursion
         //due to command_expression constantly being matched.
 
@@ -130,6 +103,13 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
     case_command ::= <<external_rule_case_command 0>> {extends("case_command")=command}
     private_command ::= <<external_rule_private_command 0>> {extends("private_command")=command}
 //end command
+
+    expression_operator ::= command
+                            | PLUS| MINUS | ASTERISK | FSLASH | PERC | CARET
+                            | AMPAMP | BARBAR | EXCL
+                            | EQEQ | NE | LT | LE | GT | GE
+                            | FSLASH | GTGT
+                            {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExpressionOperator"}
 
 //values
 string ::= STRING_LITERAL {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFString"}

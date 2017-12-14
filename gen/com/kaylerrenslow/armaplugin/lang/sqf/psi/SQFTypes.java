@@ -8,12 +8,8 @@ import com.kaylerrenslow.armaplugin.lang.sqf.psi.impl.*;
 
 public interface SQFTypes {
 
-  IElementType ADD_EXPRESSION = new SQFElementType("ADD_EXPRESSION");
   IElementType ARRAY = new SQFElementType("ARRAY");
   IElementType ASSIGNMENT_STATEMENT = new SQFElementType("ASSIGNMENT_STATEMENT");
-  IElementType BOOL_AND_EXPRESSION = new SQFElementType("BOOL_AND_EXPRESSION");
-  IElementType BOOL_NOT_EXPRESSION = new SQFElementType("BOOL_NOT_EXPRESSION");
-  IElementType BOOL_OR_EXPRESSION = new SQFElementType("BOOL_OR_EXPRESSION");
   IElementType CASE_COMMAND = new SQFElementType("CASE_COMMAND");
   IElementType CASE_STATEMENT = new SQFElementType("CASE_STATEMENT");
   IElementType CODE_BLOCK = new SQFElementType("CODE_BLOCK");
@@ -22,18 +18,13 @@ public interface SQFTypes {
   IElementType COMMAND_AFTER = new SQFElementType("COMMAND_AFTER");
   IElementType COMMAND_BEFORE = new SQFElementType("COMMAND_BEFORE");
   IElementType COMMAND_EXPRESSION = new SQFElementType("COMMAND_EXPRESSION");
-  IElementType COMP_EXPRESSION = new SQFElementType("COMP_EXPRESSION");
-  IElementType CONFIG_FETCH_EXPRESSION = new SQFElementType("CONFIG_FETCH_EXPRESSION");
-  IElementType DIV_EXPRESSION = new SQFElementType("DIV_EXPRESSION");
-  IElementType EXPONENT_EXPRESSION = new SQFElementType("EXPONENT_EXPRESSION");
   IElementType EXPRESSION = new SQFElementType("EXPRESSION");
+  IElementType EXPRESSION_OPERATOR = new SQFElementType("EXPRESSION_OPERATOR");
   IElementType EXPRESSION_STATEMENT = new SQFElementType("EXPRESSION_STATEMENT");
   IElementType FILE_SCOPE = new SQFElementType("FILE_SCOPE");
   IElementType LITERAL_EXPRESSION = new SQFElementType("LITERAL_EXPRESSION");
   IElementType LOCAL_SCOPE = new SQFElementType("LOCAL_SCOPE");
   IElementType MACRO_CALL = new SQFElementType("MACRO_CALL");
-  IElementType MOD_EXPRESSION = new SQFElementType("MOD_EXPRESSION");
-  IElementType MUL_EXPRESSION = new SQFElementType("MUL_EXPRESSION");
   IElementType NUMBER = new SQFElementType("NUMBER");
   IElementType PAREN_EXPRESSION = new SQFElementType("PAREN_EXPRESSION");
   IElementType PRIVATE_COMMAND = new SQFElementType("PRIVATE_COMMAND");
@@ -41,7 +32,6 @@ public interface SQFTypes {
   IElementType SIGNED_EXPRESSION = new SQFElementType("SIGNED_EXPRESSION");
   IElementType STATEMENT = new SQFElementType("STATEMENT");
   IElementType STRING = new SQFElementType("STRING");
-  IElementType SUB_EXPRESSION = new SQFElementType("SUB_EXPRESSION");
   IElementType VARIABLE = new SQFElementType("VARIABLE");
 
   IElementType AMPAMP = new SQFTokenType("AMPAMP");
@@ -83,23 +73,11 @@ public interface SQFTypes {
   class Factory {
     public static PsiElement createElement(ASTNode node) {
       IElementType type = node.getElementType();
-       if (type == ADD_EXPRESSION) {
-        return new SQFPsiAddExpressionImpl(node);
-      }
-      else if (type == ARRAY) {
+       if (type == ARRAY) {
         return new SQFPsiArrayImpl(node);
       }
       else if (type == ASSIGNMENT_STATEMENT) {
         return new SQFPsiAssignmentStatementImpl(node);
-      }
-      else if (type == BOOL_AND_EXPRESSION) {
-        return new SQFPsiBoolAndExpressionImpl(node);
-      }
-      else if (type == BOOL_NOT_EXPRESSION) {
-        return new SQFPsiBoolNotExpressionImpl(node);
-      }
-      else if (type == BOOL_OR_EXPRESSION) {
-        return new SQFPsiBoolOrExpressionImpl(node);
       }
       else if (type == CASE_COMMAND) {
         return new SQFPsiCaseCommandImpl(node);
@@ -125,17 +103,8 @@ public interface SQFTypes {
       else if (type == COMMAND_EXPRESSION) {
         return new SQFPsiCommandExpressionImpl(node);
       }
-      else if (type == COMP_EXPRESSION) {
-        return new SQFPsiCompExpressionImpl(node);
-      }
-      else if (type == CONFIG_FETCH_EXPRESSION) {
-        return new SQFPsiConfigFetchExpressionImpl(node);
-      }
-      else if (type == DIV_EXPRESSION) {
-        return new SQFPsiDivExpressionImpl(node);
-      }
-      else if (type == EXPONENT_EXPRESSION) {
-        return new SQFPsiExponentExpressionImpl(node);
+      else if (type == EXPRESSION_OPERATOR) {
+        return new SQFPsiExpressionOperatorImpl(node);
       }
       else if (type == EXPRESSION_STATEMENT) {
         return new SQFPsiExpressionStatementImpl(node);
@@ -151,12 +120,6 @@ public interface SQFTypes {
       }
       else if (type == MACRO_CALL) {
         return new SQFPsiMacroCallImpl(node);
-      }
-      else if (type == MOD_EXPRESSION) {
-        return new SQFPsiModExpressionImpl(node);
-      }
-      else if (type == MUL_EXPRESSION) {
-        return new SQFPsiMulExpressionImpl(node);
       }
       else if (type == NUMBER) {
         return new SQFPsiNumberImpl(node);
@@ -175,9 +138,6 @@ public interface SQFTypes {
       }
       else if (type == STRING) {
         return new SQFPsiStringImpl(node);
-      }
-      else if (type == SUB_EXPRESSION) {
-        return new SQFPsiSubExpressionImpl(node);
       }
       else if (type == VARIABLE) {
         return new SQFPsiVariableImpl(node);
