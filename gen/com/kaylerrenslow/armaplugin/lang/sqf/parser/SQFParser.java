@@ -318,14 +318,14 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // code_block_expression | signed_expression | paren_expression | literal_expression
+  // code_block_expression | paren_expression | signed_expression | literal_expression
   public static boolean command_before(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "command_before")) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, COMMAND_BEFORE, "<command before>");
     r = code_block_expression(b, l + 1);
-    if (!r) r = signed_expression(b, l + 1);
     if (!r) r = paren_expression(b, l + 1);
+    if (!r) r = signed_expression(b, l + 1);
     if (!r) r = literal_expression(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;
@@ -361,9 +361,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // command_expression
-  //                  // keep below command expression, otherwise the command may not be
-  //                  // matched since a command can have a unary expression as an argument
-  //                 | signed_expression
+  //                 // | signed_expression //we don't need signed_expression here because it is handled by command_expression
   //                 | literal_expression
   //                 | code_block_expression
   //                 | paren_expression
@@ -372,7 +370,6 @@ public class SQFParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, EXPRESSION, "<expression>");
     r = command_expression(b, l + 1);
-    if (!r) r = signed_expression(b, l + 1);
     if (!r) r = literal_expression(b, l + 1);
     if (!r) r = code_block_expression(b, l + 1);
     if (!r) r = paren_expression(b, l + 1);
@@ -546,6 +543,19 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
+  // PLUS | MINUS
+  static boolean plus_or_minus_expresion_operator_(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "plus_or_minus_expresion_operator_")) return false;
+    if (!nextTokenIs(b, "", MINUS, PLUS)) return false;
+    boolean r;
+    Marker m = enter_section_(b);
+    r = consumeToken(b, PLUS);
+    if (!r) r = consumeToken(b, MINUS);
+    exit_section_(b, m, null, r);
+    return r;
+  }
+
+  /* ********************************************************** */
   // <<external_rule_private_command 0>>
   public static boolean private_command(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "private_command")) return false;
@@ -573,26 +583,15 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // (PLUS | MINUS) expression
+  // plus_or_minus_expresion_operator_ command_after
   public static boolean signed_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "signed_expression")) return false;
     if (!nextTokenIs(b, "<signed expression>", MINUS, PLUS)) return false;
     boolean r;
-    Marker m = enter_section_(b, l, _COLLAPSE_, SIGNED_EXPRESSION, "<signed expression>");
-    r = signed_expression_0(b, l + 1);
-    r = r && expression(b, l + 1);
+    Marker m = enter_section_(b, l, _NONE_, SIGNED_EXPRESSION, "<signed expression>");
+    r = plus_or_minus_expresion_operator_(b, l + 1);
+    r = r && command_after(b, l + 1);
     exit_section_(b, l, m, r, false, null);
-    return r;
-  }
-
-  // PLUS | MINUS
-  private static boolean signed_expression_0(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "signed_expression_0")) return false;
-    boolean r;
-    Marker m = enter_section_(b);
-    r = consumeToken(b, PLUS);
-    if (!r) r = consumeToken(b, MINUS);
-    exit_section_(b, m, null, r);
     return r;
   }
 

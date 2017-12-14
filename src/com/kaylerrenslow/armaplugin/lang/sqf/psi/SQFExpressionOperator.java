@@ -24,6 +24,9 @@ public class SQFExpressionOperator extends ASTWrapperPsiElement {
 	}
 
 	/**
+	 * Get the {@link SQFCommand} instance if {@link #getOperatorType()} returns {@link SQFTypes#COMMAND},
+	 * or it will return null.
+	 *
 	 * @return the {@link SQFCommand} contained in this node, or null if there isn't one.
 	 */
 	@Nullable
@@ -32,19 +35,39 @@ public class SQFExpressionOperator extends ASTWrapperPsiElement {
 	}
 
 	/**
-	 * @return the {@link IElementType} that contains the operator, or null if doens't contain one. This will NOT return
-	 * a command element type.
+	 * Operators that can be returned:
+	 * <ul>
+	 *     <li>{@link SQFTypes#COMMAND}</li>
+	 *     <li>{@link SQFTypes#PLUS}</li>
+	 *     <li>{@link SQFTypes#MINUS}</li>
+	 *     <li>{@link SQFTypes#ASTERISK}</li>
+	 *     <li>{@link SQFTypes#FSLASH}</li>
+	 *     <li>{@link SQFTypes#PERC}</li>
+	 *     <li>{@link SQFTypes#CARET}</li>
+	 *     <li>{@link SQFTypes#AMPAMP}</li>
+	 *     <li>{@link SQFTypes#BARBAR}</li>
+	 *     <li>{@link SQFTypes#EXCL}</li>
+	 *     <li>{@link SQFTypes#EQEQ}</li>
+	 *     <li>{@link SQFTypes#NE}</li>
+	 *     <li>{@link SQFTypes#GT}</li>
+	 *     <li>{@link SQFTypes#GE}</li>
+	 *     <li>{@link SQFTypes#LT}</li>
+	 *     <li>{@link SQFTypes#LE}</li>
+	 *     <li>{@link SQFTypes#GTGT}</li>
+	 * </ul>
+	 *
+	 * @return the {@link IElementType} that contains the operator
 	 */
-	@Nullable
+	@NotNull
 	public IElementType getOperatorType() {
 		ASTNode[] nodes = getNode().getChildren(TokenSet.create(
-				PLUS, MINUS, ASTERISK, FSLASH, PERC, CARET,
+				COMMAND, PLUS, MINUS, ASTERISK, FSLASH, PERC, CARET,
 				AMPAMP, BARBAR, EXCL,
 				EQEQ, NE, LT, LE, GT, GE,
 				GTGT
 		));
 		if (nodes.length == 0) {
-			return null;
+			throw new IllegalStateException("SQFExpressionOperator operator type should always exist");
 		}
 		return nodes[0].getElementType();
 	}

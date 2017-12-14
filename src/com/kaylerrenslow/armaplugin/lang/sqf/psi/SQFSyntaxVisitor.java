@@ -24,39 +24,6 @@ interface SQFSyntaxVisitor<T> {
 	T visit(@NotNull SQFQuestStatement statement, @NotNull CommandDescriptorCluster cluster);
 
 	@NotNull
-	T visit(@NotNull SQFAddExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFSubExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFMultExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFDivExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFModExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFBoolAndExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFBoolOrExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFBoolNotExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFCompExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFConfigFetchExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFExponentExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
 	T visit(@NotNull SQFLiteralExpression expr, @NotNull CommandDescriptorCluster cluster);
 
 	@NotNull
@@ -67,7 +34,4 @@ interface SQFSyntaxVisitor<T> {
 
 	@NotNull
 	T visit(@NotNull SQFCodeBlockExpression expr, @NotNull CommandDescriptorCluster cluster);
-
-	@NotNull
-	T visit(@NotNull SQFSignedExpression expr, @NotNull CommandDescriptorCluster cluster);
 }

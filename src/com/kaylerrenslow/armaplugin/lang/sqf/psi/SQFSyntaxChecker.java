@@ -115,72 +115,6 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 	@NotNull
 	@Override
-	public ValueType visit(@NotNull SQFAddExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFSubExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFMultExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFDivExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFModExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFBoolAndExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFBoolOrExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFBoolNotExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFCompExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFConfigFetchExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFExponentExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return null;
-	}
-
-	@NotNull
-	@Override
 	public ValueType visit(@NotNull SQFLiteralExpression expr, @NotNull CommandDescriptorCluster cluster) {
 		if (expr.getVar() != null) {
 			return _VARIABLE;
@@ -273,7 +207,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		String commandName;
 		CommandDescriptor descriptor;
 		{
-			descriptor = getDescriptor(exprOperator, cluster);
+			descriptor = getDescriptorForOperator(exprOperator, cluster);
 			commandName = descriptor.getCommandName();
 		}
 
@@ -284,7 +218,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			if (block == null) {
 				return (ValueType) expr.accept(this, cluster);
 			}
-			return BaseType.CODE;
+			return new CodeType(fullyVisitCodeBlockScope(block, cluster));
 		};
 
 		if (prefixPart != null) {
@@ -374,7 +308,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				boolean consumeMoreCommands = false;
 				if (peekFirst.isOperatorPart()) {
 					SQFExpressionOperator peekExprOperator = peekFirst.getOperator();
-					CommandDescriptor d = getDescriptor(peekExprOperator, cluster);
+					CommandDescriptor d = getDescriptorForOperator(peekExprOperator, cluster);
 					for (CommandSyntax syntax1 : d.getSyntaxList()) {
 						if (syntax1.getPrefixParam() != null) {
 							if (syntax1.getPrefixParam().containsType(retType)) {
@@ -430,39 +364,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFCodeBlockExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		SQFLocalScope scope = expr.getBlock().getScope();
-		if (scope != null) {
-			scope.accept(this, cluster);
-		}
-		//we return Code because it is a literal, like 1 or 10. When commands take them as arguments,
-		// they are responsible for executing the code and getting the returned value.
-		return BaseType.CODE;
-	}
-
-	@NotNull
-	@Override
-	public ValueType visit(@NotNull SQFSignedExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		SQFExpression expr1 = expr.getExpr();
-		ValueType type = (ValueType) expr1.accept(this, cluster);
-		switch (expr.getSign()) {
-			case Plus: {
-				if (type.isArray()) {
-					return BaseType.ARRAY;
-				}
-				if (type.isHardEqual(NUMBER)) {
-					return BaseType.NUMBER;
-				}
-				assertIsType(type, new ValueType[]{BaseType.NUMBER, ValueType.BaseType.ARRAY}, expr1);
-				return BaseType._ERROR;
-			}
-			case Minus: {
-				assertIsType(type, BaseType.NUMBER, expr1);
-				return ValueType.BaseType.NUMBER;
-			}
-			default: {
-				throw new IllegalStateException("unhandled sign:" + expr.getSign());
-			}
-		}
+		return new CodeType(fullyVisitCodeBlockScope(expr.getBlock(), cluster));
 	}
 
 	/**
@@ -483,23 +385,18 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	}
 
 	@NotNull
-	public CommandDescriptor getDescriptor(@NotNull SQFExpressionOperator operator, @NotNull CommandDescriptorCluster cluster) {
+	public CommandDescriptor getDescriptorForOperator(@NotNull SQFExpressionOperator operator, @NotNull CommandDescriptorCluster cluster) {
 		CommandDescriptor descriptor;
 		SQFCommand command = operator.getCmd();
 		if (command != null) {
 			String commandName = command.getCommandName();
-			{ //get the descriptor
-				descriptor = cluster.get(commandName);
-			}
+			descriptor = cluster.get(commandName);
 			if (descriptor == null) {
 				throw new IllegalStateException("descriptor doesn't exist for command " + commandName);
 			}
 		} else {
 			IElementType operatorType = operator.getOperatorType();
-			if (operatorType == null) {
-				throw new IllegalStateException("SQFExpressionOperator should have a command or operator. Has neither");
-			}
-			descriptor = OperatorCommandDescriptors.get(operatorType);
+			descriptor = ArithOperatorCommandDescriptors.get(operatorType);
 			if (descriptor == null) {
 				throw new IllegalStateException("operator " + operatorType + " doesn't have a command descriptor");
 			}

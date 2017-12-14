@@ -7,7 +7,9 @@
 		<param type='BOOLEAN' name='l' optional='f' order='0'/>
 		<param type='BOOLEAN' name='r' optional='f' order='1'>
 			<alt-types>
-				<t type="CODE"/>
+				<t type="CODE">
+					<code-handler t="BOOLEAN"/>
+				</t>
 			</alt-types>
 		</param>
 	</syntax>

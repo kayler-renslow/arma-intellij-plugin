@@ -10,10 +10,13 @@ import java.util.Random;
 import java.util.concurrent.*;
 
 /**
- * Used for caching and loading SQF command syntax's ({@link CommandSyntax}) from their xml files
+ * Used for caching and loading SQF command syntax's ({@link CommandSyntax}) from their xml files. This class
+ * also features concurrent access and XML loading. It is recommend to not have a lot of instances of this class
+ * to save memory and get optimal concurrency.
  *
  * @author Kayler
  * @since 11/13/2017
+ * @see com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSyntaxHelper#getDescriptor(String)
  */
 public class CommandDescriptorPool {
 	private final DescriptorWrapper[] tallyCache = new DescriptorWrapper[30];

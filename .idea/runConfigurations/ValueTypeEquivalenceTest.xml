@@ -2,7 +2,7 @@
   <configuration default="false" name="ValueTypeEquivalenceTest" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
       <pattern>
-        <option name="PATTERN" value="com.kaylerrenslow.armaplugin.lang.sqf.psi.*" />
+        <option name="PATTERN" value="com.kaylerrenslow.armaplugin.lang.sqf.psi.OperatorCommandDescriptors" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>

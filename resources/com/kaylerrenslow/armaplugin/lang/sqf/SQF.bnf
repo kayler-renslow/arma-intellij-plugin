@@ -59,9 +59,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
 //expression
     expression ::= command_expression
 
-                 // keep below command expression, otherwise the command may not be
-                 // matched since a command can have a unary expression as an argument
-                | signed_expression
+                // | signed_expression //we don't need signed_expression here because it is handled by command_expression
 
                 | literal_expression
                 | code_block_expression
@@ -69,7 +67,11 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
 
     code_block_expression ::= code_block {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCodeBlockExpression"}
 
-    signed_expression ::= (PLUS | MINUS) expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSignedExpression"}
+    // we need signed expression because we can do something like +array command,
+    // but the grammar generator complains about left recursion if we did expression? command expression?.
+    // We are also treating this expression as a command_expression
+    signed_expression ::= plus_or_minus_expresion_operator_ command_after {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSignedExpression"}
+    private plus_or_minus_expresion_operator_ ::= (PLUS | MINUS) {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExpressionOperator"}
 
     literal_expression ::= string
                         | variable
@@ -89,7 +91,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
         //The prefix and postfix arguments of commands is inconsistent.
         //The type checker will have to handle if command_before or command_after is a prefix argument,
         //postfix argument, or is an argument of the child/parent command. (I know. It's weird.)
-        command_before ::= code_block_expression | signed_expression | paren_expression | literal_expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
+        command_before ::= code_block_expression | paren_expression | signed_expression | literal_expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
 
         command_after ::= expression {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommandArgument"}
     //end command expression
@@ -108,7 +110,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
                             | PLUS| MINUS | ASTERISK | FSLASH | PERC | CARET
                             | AMPAMP | BARBAR | EXCL
                             | EQEQ | NE | LT | LE | GT | GE
-                            | FSLASH | GTGT
+                            | GTGT
                             {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExpressionOperator"}
 
 //values
