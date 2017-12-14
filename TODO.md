@@ -10,3 +10,5 @@
 * in the future, the type/syntax checker should be able to detect when a Cfg* entry is needed and search description.ext for the classnames
 
 * **For caching command syntaxes, use the optimal cpu memory model we did in OS class**
+* We need to cache macros from preprocessed header files. What we should do instead of storing the preprocessed config files is store the de-binarized versions.
+then the plugin can cache the preprocessed versions in a temp folder and store the macro definitions as well. then we can have a "re-process" button and it will re-preprocess.

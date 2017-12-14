@@ -527,6 +527,17 @@ public abstract class ValueType {
 				return null;
 			}
 		}
+
+		@Override
+		public boolean isHardEqual(@NotNull ValueType other) {
+			if (this != CODE) {
+				return super.isHardEqual(other);
+			}
+			if (other instanceof CodeType) {
+				return true;
+			}
+			return super.isHardEqual(other);
+		}
 	}
 
 }

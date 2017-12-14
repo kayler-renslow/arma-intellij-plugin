@@ -110,8 +110,7 @@ class SQFCommandSyntaxXMLLoader {
 		ValueType dataType;
 		String desc;
 
-		String type = returnValueElement.getAttribute("type");
-		dataType = BaseType.valueOf(type);
+		dataType = getTypeFromElementAttribute(returnValueElement, "type");
 		desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(returnValueElement) : "";
 
 		ReturnValueHolder returnValue = new ReturnValueHolder(dataType == null ? BaseType._ERROR : dataType, desc);
@@ -163,13 +162,12 @@ class SQFCommandSyntaxXMLLoader {
 		String paramName, desc;
 		boolean optional;
 
-		String type = paramElement.getAttribute("type");
-		dataType = BaseType.valueOf(type);
+		dataType = getTypeFromElementAttribute(paramElement, "type");
 		paramName = paramElement.getAttribute("name");
 		optional = valueOfTF(paramElement.getAttribute("optional"));
 		desc = getCommandDescriptions ? XmlUtil.getImmediateTextContent(paramElement) : "";
 
-		Param p = new Param(paramName, dataType == null ? BaseType._ERROR : dataType, desc, optional);
+		Param p = new Param(paramName, BaseType._ERROR, desc, optional);
 		addAltTypes(paramElement, p.getType().getPolymorphicTypes());
 
 		//get literals
@@ -186,8 +184,8 @@ class SQFCommandSyntaxXMLLoader {
 		for (Element altTypeElement : altTypesElements) {
 			List<Element> tElements = XmlUtil.getChildElementsWithTagName(altTypeElement, "t");
 			for (Element tElement : tElements) {
-				String altType = tElement.getAttribute("type");
-				alternateDataTypes.add(BaseType.valueOf(altType));
+				ValueType t = getTypeFromElementAttribute(tElement, "type");
+				alternateDataTypes.add(t);
 			}
 		}
 	}
@@ -227,6 +225,32 @@ class SQFCommandSyntaxXMLLoader {
 		return tf.equalsIgnoreCase("t") || tf.equalsIgnoreCase("true");
 	}
 
+	/**
+	 * Gets a {@link ValueType} from an Element's attribute. This can either return a {@link BaseType} or a {@link CodeType}
+	 * if the element has a "code-handler" child tag.
+	 *
+	 * @param ele                   element that contains a type
+	 * @param attributeNameWithType the attribute name that to get a type from
+	 * @return the {@link BaseType#valueOf(String)} of the attribute, or {@link BaseType#_ERROR} if the type was invalid.
+	 * If the {@link BaseType#valueOf(String)} returns a {@link BaseType#CODE} and a "code-handler" tag is present,
+	 * a {@link CodeType} will be returned. Note that if the type in the "code-handler" can't be determined, it will have a {@link BaseType#_ERROR}
+	 */
+	@NotNull
+	private static ValueType getTypeFromElementAttribute(@NotNull Element ele, @NotNull String attributeNameWithType) {
+		String typeAsString = ele.getAttribute(attributeNameWithType);
+		ValueType type = BaseType.valueOf(typeAsString);
+		if (type == null) {
+			return BaseType._ERROR;
+		}
+		if (type != BaseType.CODE) {
+			return type;
+		}
+		List<Element> codeHandlers = XmlUtil.getChildElementsWithTagName(ele, "code-handler");
+		if (codeHandlers.isEmpty()) {
+			return type;
+		}
+		return new CodeType(getTypeFromElementAttribute(codeHandlers.get(0), "t"));
+	}
 
 	private static final ReturnValueHolder PLACEHOLDER_RETURN_VALUE = new ReturnValueHolder(BaseType.ANYTHING, "PLACEHOLDER");
 	private static final Param PLACEHOLDER_PARAM = new Param("PLACEHOLDER", BaseType.ANYTHING, "", true);

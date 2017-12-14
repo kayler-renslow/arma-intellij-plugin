@@ -2,7 +2,7 @@
 <command name='&amp;&amp;' version='' game='' format='1'>
 	<syntax>
 		<return>
-			<value type='BOOLEAN' order='0'></value>
+			<value type='BOOLEAN' order='0'/>
 		</return>
 		<param type='BOOLEAN' name='l' optional='f' order='0'/>
 		<param type='BOOLEAN' name='r' optional='f' order='1'>

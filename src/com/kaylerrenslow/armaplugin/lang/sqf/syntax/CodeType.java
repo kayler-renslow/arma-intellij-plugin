@@ -1,13 +1,15 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 
-import com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.BaseType;
+import com.kaylerrenslow.armaplugin.util.EmptyList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 /**
- * A {@link ValueType} that is equivalent to {@link BaseType#CODE}, but can also specify another {@link ValueType}
+ * A {@link ValueType} that is hard equal to {@link BaseType#CODE} and {@link BaseType#CODE} is hard equal to this (mathematical symmetric property),
+ * but can also specify another {@link ValueType}
  * that the {@link BaseType#CODE} should return. For example, {0} is <code>new CodeType({@link BaseType#NUMBER})</code>
  * and {{}} can be either <code>new CodeType({@link BaseType#CODE})</code> or <code>new CodeType(new CodeType({@link BaseType#NOTHING}))</code>
  *
@@ -18,16 +20,17 @@ public class CodeType extends ValueType {
 
 	private final ValueType returnType;
 	private final ExpandedValueType expandedValueType;
+	private final List<ValueType> polymorphTypes = new ArrayList<>();
 
 	public CodeType(@NotNull ValueType returnType) {
 		this.returnType = returnType;
-		expandedValueType = new ExpandedValueType(false, this);
+		expandedValueType = new ExpandedValueType(false, polymorphTypes, this);
 	}
 
 	@NotNull
 	@Override
 	public String getDisplayName() {
-		return "{" + returnType.getDisplayName()+ "}";
+		return "{" + returnType.getDisplayName() + "}";
 	}
 
 	@Override
@@ -41,10 +44,14 @@ public class CodeType extends ValueType {
 		return expandedValueType;
 	}
 
+	/**
+	 * NOTE: DO NOT REMOVE {@link BaseType#CODE} from this list.
+	 * It will break the mathematical symmetric property for {@link BaseType#CODE} being hard equal to this!
+	 */
 	@NotNull
 	@Override
 	public List<ValueType> getPolymorphicTypes() {
-		return Collections.emptyList();
+		return polymorphTypes;
 	}
 
 	@NotNull
@@ -58,11 +65,12 @@ public class CodeType extends ValueType {
 		return returnType;
 	}
 
+
 	/**
 	 * Does the following checks in the following order:
 	 * <ol>
-	 *     <li>If t is an instance of {@link CodeType}, will return true if both {@link #getReturnType()} are hard equal</li>
-	 *     <li>If t is hard equal to {@link BaseType#CODE}</li>
+	 * <li>If t is an instance of {@link CodeType}, will return true if and only if both {@link #getReturnType()} are hard equal</li>
+	 * <li>If t is hard equal to {@link BaseType#CODE}</li>
 	 * </ol>
 	 */
 	@Override
@@ -76,4 +84,5 @@ public class CodeType extends ValueType {
 		}
 		return false;
 	}
+
 }

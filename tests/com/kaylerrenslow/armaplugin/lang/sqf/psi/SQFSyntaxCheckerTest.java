@@ -469,6 +469,8 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----START signed Expression----
 	public void testSignExpression_valid() throws Exception {
+		assertNoProblems("1+ +1");
+		assertNoProblems("[]+ +[]");
 		assertNoProblems("+1");
 		assertNoProblems("+1.5");
 		assertNoProblems("+1e1");

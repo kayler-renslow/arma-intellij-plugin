@@ -17,6 +17,10 @@ public class ValueTypeEquivalenceTest {
 		assertEquals(true, typeEquivalent(BaseType.CODE, new ExpandedValueType(BaseType.CODE)));
 		assertEquals(true, typeEquivalent(new ExpandedValueType(BaseType.CODE), BaseType.CODE));
 		assertEquals(true, typeEquivalent(new ExpandedValueType(BaseType.CODE), new ExpandedValueType(BaseType.CODE)));
+
+		assertEquals(true, typeEquivalent(BaseType.CODE, new CodeType(BaseType.NAMESPACE)));
+		assertEquals(true, typeEquivalent(new CodeType(BaseType.NAMESPACE), BaseType.CODE));
+		assertEquals(true, typeEquivalent(new CodeType(BaseType.NAMESPACE), new CodeType(BaseType.NAMESPACE)));
 	}
 
 	@Test
@@ -36,6 +40,16 @@ public class ValueTypeEquivalenceTest {
 	}
 
 	@Test
+	public void typeNotEqual_code() throws Exception{
+		assertEquals(false, typeEquivalent(new CodeType(BaseType.NUMBER), new CodeType(BaseType.NAMESPACE)));
+		assertEquals(false, typeEquivalent(new CodeType(BaseType.NAMESPACE), new CodeType(BaseType.NUMBER)));
+		assertEquals(false, typeEquivalent(BaseType.NUMBER, new CodeType(BaseType.NUMBER)));
+		assertEquals(false, typeEquivalent(new CodeType(BaseType.NUMBER), BaseType.NUMBER));
+		assertEquals(false, typeEquivalent(BaseType.CODE, BaseType.NUMBER));
+		assertEquals(false, typeEquivalent(BaseType.NUMBER, BaseType.CODE));
+	}
+
+	@Test
 	public void typeNotEqual_number() throws Exception {
 		assertEquals(false, typeEquivalent(BaseType.NUMBER, new ExpandedValueType(BaseType.ARRAY)));
 		assertEquals(false, typeEquivalent(BaseType.NUMBER, new ExpandedValueType(BaseType.CONFIG)));
@@ -50,6 +64,7 @@ public class ValueTypeEquivalenceTest {
 		assertEquals(false, typeEquivalent(BaseType.OBJECT, new ExpandedValueType(BaseType.CODE)));
 		assertEquals(false, typeEquivalent(BaseType.OBJECT, new ExpandedValueType(BaseType.NUMBER)));
 	}
+
 
 	@Test
 	public void typeEqual_array_empty() throws Exception {

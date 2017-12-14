@@ -417,7 +417,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 */
 	private void notOfType(@NotNull ValueType[] expected, @NotNull ValueType got, @NotNull PsiElement gotPsiOwner) {
 		String expectedTypes = getExpectedArrayAsString(expected);
-		problems.registerProblem(gotPsiOwner, "Type(s) " + expectedTypes + " expected. Got " + got + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+		problems.registerProblem(gotPsiOwner, "Type(s) " + expectedTypes + " expected. Got "
+				+ got.getDisplayName() + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
 	}
 
 	/**
@@ -444,7 +445,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 		}
 		String expectedTypes = getExpectedArrayAsString(expected);
-		problems.registerProblem(checkPsiOwner, expectedTypes + " expected. Got " + check + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+		problems.registerProblem(checkPsiOwner, expectedTypes + " expected. Got "
+				+ check.getDisplayName() + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
 	}
 
 	@NotNull
@@ -485,7 +487,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		if (ValueType.typeEquivalent(expected, check)) {
 			return;
 		}
-		problems.registerProblem(checkPsiOwner, "Type " + expected + " expected. Got " + check + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
+		problems.registerProblem(checkPsiOwner, "Type " + expected.getDisplayName() + " expected. Got "
+				+ check.getDisplayName() + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
 	}
 
 	private static class CommandExpressionPart {
