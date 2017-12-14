@@ -156,7 +156,7 @@ public abstract class ValueType {
 		return true;
 	}
 
-	private static boolean isAnythingOrVariable(@NotNull ValueType type1, @NotNull ValueType type2) {
+	public static boolean isAnythingOrVariable(@NotNull ValueType type1, @NotNull ValueType type2) {
 		return type1.isAnythingOrVariable() || type2.isAnythingOrVariable();
 	}
 

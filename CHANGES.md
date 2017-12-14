@@ -5,9 +5,7 @@
 * 
 
 **Fixed**  
-* {+1.5} was thinking it was  {} + 1.5 and the } was a syntax error
-* If CodeType had a _VARIABLE or ANYTHING return type, it was assumed to not be equal to a CodeType that had any type (NUMBER, ANYTHING, CONFIG, etc)
-* Made CODE hardEqual to CodeType by overriding BaseType's isHardEqual method. We did this because putting CODE in polymorphic types was causing CodeTypes with different return types to be equal.
+*
 
 **Notes**
 * ArmaAddonsManager needs to finish ArmaAddonsIndexingCallback.java utilization by incrementing an addon's current work progress and total work progress

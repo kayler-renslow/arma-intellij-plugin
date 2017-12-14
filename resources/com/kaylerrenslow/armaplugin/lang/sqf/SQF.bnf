@@ -37,6 +37,7 @@ local_scope ::= items_  {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFLoc
 //items_ is a helper for file_scope and local_scope
 private items_ ::= (statement SEMICOLON)* statement?
 
+/*Do not pin=1 on L_CURLY_BRACE because {+1.5} will be thought of as {} + 1.5 and } marked as unwanted token*/
 code_block ::= L_CURLY_BRACE local_scope? R_CURLY_BRACE {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCodeBlock"}
 
 //a variable is a global variable or local variable

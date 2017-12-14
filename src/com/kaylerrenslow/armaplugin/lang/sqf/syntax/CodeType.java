@@ -84,7 +84,7 @@ public class CodeType extends ValueType {
 	public boolean isHardEqual(@NotNull ValueType t) {
 		if (t instanceof CodeType) {
 			CodeType other = (CodeType) t;
-			if (returnType.isAnythingOrVariable() || other.returnType.isAnythingOrVariable()) {
+			if(ValueType.isAnythingOrVariable(returnType, other.returnType)){
 				return true;
 			}
 			return returnType.isHardEqual(other.returnType);
