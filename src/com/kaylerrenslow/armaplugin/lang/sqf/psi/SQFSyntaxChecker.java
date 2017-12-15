@@ -204,12 +204,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		SQFExpressionOperator exprOperator = commandPart.getOperator();
-		String commandName;
-		CommandDescriptor descriptor;
-		{
-			descriptor = getDescriptorForOperator(exprOperator, cluster);
-			commandName = descriptor.getCommandName();
-		}
+		CommandDescriptor descriptor  = getDescriptorForOperator(exprOperator, cluster);;
+		String commandName = descriptor.getCommandName();
 
 		Function<CommandExpressionPart, ValueType> getTypeForPart = commandExpressionPart -> {
 			SQFCommandArgument arg = commandExpressionPart.getArgument();
@@ -227,13 +223,12 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			prefixType = previousCommandReturnType;
 		}
 
-		LinkedList<CommandExpressionPart> partsAfterGettingPeekNextPartType;
+		LinkedList<CommandExpressionPart> partsAfterGettingPeekNextPartType = new LinkedList<>();;
+		partsAfterGettingPeekNextPartType.addAll(parts);
 		int peekDepthBeforeGettingPeekNextPartType = peekPartDepth.count;
 		ValueType peekNextPartType = null;
 		{
 			CommandExpressionPart peekNextPart = parts.peekFirst();
-			partsAfterGettingPeekNextPartType = new LinkedList<>();
-			partsAfterGettingPeekNextPartType.addAll(parts);
 
 			if (peekNextPart != null) {
 				if (peekNextPart.isOperatorPart()) {
@@ -334,7 +329,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					}
 				}
 				if (consumeMoreCommands) {
-					getReturnTypeForCommand(parts, retType, new Counter(0), problems);
+					retType = getReturnTypeForCommand(parts, retType, new Counter(0), problems);
 				}
 			}
 			return retType;

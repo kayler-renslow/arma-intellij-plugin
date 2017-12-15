@@ -63,4 +63,11 @@
 		<param type='CONTROL' name='l' optional='f' order='0'/>
 		<param type='CONTROL' name='r' optional='f' order='1'/>
 	</syntax>
+	<syntax>
+		<return>
+			<value type='BOOLEAN' order='0'></value>
+		</return>
+		<param type='LOCATION' name='l' optional='f' order='0'/>
+		<param type='LOCATION' name='r' optional='f' order='1'/>
+	</syntax>
 </command>

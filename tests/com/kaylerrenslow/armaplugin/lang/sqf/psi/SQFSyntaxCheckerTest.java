@@ -314,7 +314,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		}
 
 		{ //location
-			assertEquals(ValueType.BaseType.LOCATION, getExitTypeForText("locationNull"));
+			assertEquals(BaseType.LOCATION, getExitTypeForText("locationNull"));
 			assertNoProblems("locationNull==locationNull");
 			assertNoProblems("locationNull!=locationNull");
 		}
@@ -583,10 +583,10 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	}
 
 	public void testCommandExpression_ifThen_valid() throws Exception {
-		assertExitTypeAndNoProblems("if true then {};", null, BaseType.IF);
-		assertExitTypeAndNoProblems("if true then {} else {};", null, ValueType.BaseType.IF);
-		assertExitTypeAndNoProblems("if true then [{},{}];", null, ValueType.BaseType.IF);
-		assertExitTypeAndNoProblems("if true then [{},{},{}];", null, ValueType.BaseType.IF);
+		assertExitTypeAndNoProblems("if true then {};", null, BaseType.ANYTHING);
+		assertExitTypeAndNoProblems("if true then {} else {};", null, BaseType.ARRAY);
+		assertExitTypeAndNoProblems("if true then [{},{}];", null, BaseType.ANYTHING);
+		assertExitTypeAndNoProblems("if true then [{},{},{}];", null, BaseType.ANYTHING);
 	}
 
 	public void testCommandExpression_ifThen_bad() throws Exception {
