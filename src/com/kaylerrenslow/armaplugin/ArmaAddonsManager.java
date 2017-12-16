@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin;
 import com.intellij.openapi.project.Project;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParseException;
+import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParseResult;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
 import com.kaylerrenslow.armaDialogCreator.util.XmlUtil;
 import com.kaylerrenslow.armaplugin.ArmaAddonsIndexingCallback.Step;
@@ -206,7 +207,7 @@ public class ArmaAddonsManager {
 				continue;
 			}
 
-			//reason for passing extractDirs instead of placing it in doWorkForAddonHelper
+			//reason for passing extractDirs instead of placing it in doAllWorkForAddonHelper
 			//is because the addon could be cancelled half way through pbo extraction and we want to make sure
 			//the data is cleaned up
 			final List<File> extractDirs = Collections.synchronizedList(new ArrayList<>());
@@ -214,7 +215,7 @@ public class ArmaAddonsManager {
 			forwardingThread.indexStartedForAddon(helper);
 			forwardingThread.log("INDEX STARTED for addon " + helper.getAddonDirName());
 
-			doWorkForAddonHelper(helper, refDir, armaTools, tempDir, forwardingThread, extractDirs);
+			doAllWorkForAddonHelper(helper, refDir, armaTools, tempDir, forwardingThread, extractDirs);
 
 			//delete extract directories to free up disk space for next addon extraction
 			forwardingThread.stepStart(helper, Step.Cleanup);
@@ -262,323 +263,23 @@ public class ArmaAddonsManager {
 		return addons;
 	}
 
-	private void doWorkForAddonHelper(@NotNull ArmaAddonHelper helper,
-									  @NotNull File refDir, @NotNull File armaTools, @NotNull File tempDir,
-									  @NotNull ForwardingThread forwardingThread,
-									  @NotNull List<File> extractDirs) throws Exception {
+	private void doAllWorkForAddonHelper(@NotNull ArmaAddonHelper helper,
+										 @NotNull File refDir, @NotNull File armaTools, @NotNull File tempDir,
+										 @NotNull ForwardingThread forwardingThread,
+										 @NotNull List<File> extractDirs) throws Exception {
 		ResourceBundle bundle = getBundle();
 
 		final List<File> debinarizedConfigs = Collections.synchronizedList(new ArrayList<>());
 
-		{//extract pbo's into temp directory
+		//extract pbo's into temp directory
+		if (extractPBOsForHelper(helper, armaTools, tempDir, forwardingThread, extractDirs)) return;
 
-			File addonsDir = null;
-			{ //locate the "addons" folder, which contains all the pbo files
-				File[] addonDirFiles = helper.getAddonDirectory().listFiles();
-				if (addonDirFiles == null) {
-					throw new IllegalStateException("addon directory isn't a directory: " + helper.getAddonDirectory());
-				}
-				for (File addonDirFile : addonDirFiles) {
-					if (!addonDirFile.getName().equalsIgnoreCase("addons")) {
-						continue;
-					}
-					addonsDir = addonDirFile;
-					break;
-				}
-				if (addonsDir == null) {
-					forwardingThread.warningMessage(helper,
-							String.format(
-									bundle.getString("couldnt-find-addons-dir-f"),
-									helper.getAddonDirectory().getAbsolutePath()
-							), null
-					);
-					return;
-				}
-			}
-			File[] pboFiles = addonsDir.listFiles((dir, name) -> name.endsWith(".pbo"));
-			if (pboFiles == null) {
-				forwardingThread.warningMessage(helper,
-						String.format(
-								bundle.getString("no-pbos-were-in-addons-dir-f"),
-								helper.getAddonDirectory().getAbsolutePath()
-						), null
-				);
-				return;
-			}
+		//de-binarize the configs and locate all sqf files
+		debinarizeConfigsForHelper(helper, armaTools, forwardingThread, extractDirs, debinarizedConfigs);
 
-			{ //print to log all pbo files marked for extraction
-				StringBuilder sb = new StringBuilder();
-				sb.append("All PBO's marked to extract:[\n");
-				for (File pboFile : pboFiles) {
-					sb.append('\t');
-					sb.append(pboFile.getAbsolutePath());
-					sb.append('\n');
-				}
-				sb.append(']');
-				forwardingThread.log(sb.toString());
-			}
+		//parse the configs
+		if (parseConfigsForHelper(helper, forwardingThread, debinarizedConfigs)) return;
 
-			//make it so each thread doesn't do more work than the other. Also, partition the data.
-			Arrays.sort(pboFiles, Comparator.comparingLong(File::length));
-			List<File> left = new ArrayList<>(pboFiles.length);
-			List<File> right = new ArrayList<>(pboFiles.length);
-			int leftCapacity = 0;
-			int rightCapacity = 0;
-			for (int i = pboFiles.length - 1; i >= 0; i--) {//iterate backwards since array is sorted A-Z
-				File file = pboFiles[i];
-				if (leftCapacity < rightCapacity) {
-					left.add(file);
-					leftCapacity += file.length();
-				} else {
-					right.add(file);
-					rightCapacity += file.length();
-				}
-			}
-
-
-			forwardingThread.stepStart(helper, Step.ExtractPBOs);
-
-			Function<List<File>, Void> extractPbos = pboFilesToExtract -> {
-				StringBuilder sb = new StringBuilder();
-				sb.append("Extracting PBO's on thread ").append(Thread.currentThread().getName()).append(": [\n");
-				for (File pboFile : pboFilesToExtract) {
-					sb.append('\t');
-					sb.append(pboFile.getName());
-					sb.append('\n');
-				}
-				sb.append(']');
-				forwardingThread.log(sb.toString());
-
-				for (File pboFile : pboFilesToExtract) {
-					if (helper.isCancelled()) {
-						return null;
-					}
-					File extractDir = new File(
-							tempDir.getAbsolutePath() + "/" + helper.getAddonDirName() +
-									"/" +
-									pboFile.getName().substring(0, pboFile.getName().length() - ".pbo".length())
-					);
-					boolean mkdirs = extractDir.mkdirs();
-					if (!mkdirs) {
-						forwardingThread.errorMessage(
-								helper, String.format(
-										bundle.getString("failed-to-create-temp-directory-f"),
-										extractDir.getAbsolutePath(),
-										helper.getAddonDirName()
-								), null
-						);
-						return null;
-					}
-
-					extractDirs.add(extractDir);
-					forwardingThread.log("Created extract directory: " + extractDir.getAbsolutePath());
-					boolean success = false;
-					Exception e = null;
-					try {
-						success = ArmaTools.extractPBO(
-								armaTools,
-								pboFile,
-								extractDir, 10 * 60 * 1000 /*10 minutes before suspend*/,
-								null, null
-						);
-						forwardingThread.message(helper,
-								String.format(
-										bundle.getString("extracted-pbo-f"),
-										pboFile.getName(),
-										helper.getAddonDirName()
-								)
-						);
-					} catch (IOException e1) {
-						e = e1;
-					}
-					if (!success) {
-						forwardingThread.errorMessage(helper,
-								String.format(
-										bundle.getString("couldnt-extract-pbo-f"),
-										pboFile.getName(), helper.getAddonDirName()
-								), e
-						);
-					}
-				}
-				return null;
-			};
-			ArmaToolsWorkerThread t1 = new ArmaToolsWorkerThread(() -> {
-				extractPbos.apply(left);
-			}, 1
-			);
-			ArmaToolsWorkerThread t2 = new ArmaToolsWorkerThread(() -> {
-				extractPbos.apply(right);
-			}, 2
-			);
-			t1.start();
-			t2.start();
-			t1.join();
-			t2.join();
-			forwardingThread.message(helper,
-					String.format(
-							bundle.getString("extracted-all-pbo-f"),
-							helper.getAddonDirName()
-					)
-			);
-			forwardingThread.stepFinish(helper, Step.ExtractPBOs);
-		}
-		{//de-binarize the configs and locate all sqf files
-			final String BINARIZED_CONFIG_NAME = "config.bin";
-			List<File> configBinFiles = new ArrayList<>();
-			{//locate all config.bin files
-				LinkedList<File> toVisit = new LinkedList<>();
-				toVisit.addAll(extractDirs);
-				while (!toVisit.isEmpty()) {
-					File visit = toVisit.removeFirst();
-					File[] children = visit.listFiles();
-					if (children != null) {
-						Collections.addAll(toVisit, children);
-					}
-					if (visit.getName().equalsIgnoreCase(BINARIZED_CONFIG_NAME)) {
-						configBinFiles.add(visit);
-					} else if (visit.getName().equalsIgnoreCase("config.cpp")) {
-						forwardingThread.log("Found pre-debinarized config for addon '"
-								+ helper.getAddonDirName() + "'. Added to parsed configs:"
-								+ visit.getAbsolutePath()
-						);
-						debinarizedConfigs.add(visit);
-					}
-				}
-			}
-
-			{ //print to log all config.bin files marked for debinarize
-				StringBuilder sb = new StringBuilder();
-				sb.append("All config.bin marked to debinarize:[\n");
-				for (File configBinFile : configBinFiles) {
-					sb.append('\t');
-					sb.append(configBinFile.getAbsolutePath());
-					sb.append('\n');
-				}
-				sb.append(']');
-				forwardingThread.log(sb.toString());
-			}
-
-			//make it so each thread doesn't do more work than the other. Also, partition the data.
-			configBinFiles.sort(Comparator.comparingLong(File::length));
-			List<File> left = new ArrayList<>(configBinFiles.size());
-			List<File> right = new ArrayList<>(configBinFiles.size());
-			int leftCapacity = 0;
-			int rightCapacity = 0;
-			for (int i = configBinFiles.size() - 1; i >= 0; i--) {//iterate backwards since array is sorted A-Z
-				File file = configBinFiles.get(i);
-				if (leftCapacity < rightCapacity) {
-					left.add(file);
-					leftCapacity += file.length();
-				} else {
-					right.add(file);
-					rightCapacity += file.length();
-				}
-			}
-
-			forwardingThread.stepStart(helper, Step.DeBinarizeConfigs);
-
-			Function<List<File>, Void> convertConfigBinFiles = configBinFilesToConvert -> {
-				StringBuilder sb = new StringBuilder();
-				sb.append("DeBinarizing config.bin files on thread ").append(Thread.currentThread().getName()).append(": [\n");
-				for (File configBinFile : configBinFilesToConvert) {
-					sb.append('\t');
-					sb.append(configBinFile.getAbsolutePath());
-					sb.append('\n');
-				}
-				sb.append(']');
-				forwardingThread.log(sb.toString());
-
-				for (File configBinFile : configBinFilesToConvert) {
-					if (helper.isCancelled()) {
-						return null;
-					}
-					String newPath = configBinFile.getParentFile().getAbsolutePath() + "/config.cpp";
-					File debinarizedFile = new File(newPath);
-					Exception e = null;
-					boolean success = false;
-					try {
-						success = ArmaTools.convertBinConfigToText(
-								armaTools,
-								configBinFile,
-								debinarizedFile,
-								10 * 1000 /*10 seconds*/, null, null
-						);
-					} catch (IOException e1) {
-						e = e1;
-					}
-					if (!success) {
-						forwardingThread.errorMessage(helper,
-								String.format(
-										bundle.getString("couldnt-debinarize-config-f"),
-										configBinFile.getAbsolutePath(), helper.getAddonDirName()
-								), e
-						);
-						continue;
-					}
-					debinarizedConfigs.add(debinarizedFile);
-					forwardingThread.message(helper,
-							String.format(
-									bundle.getString("debinarized-config-f"),
-									helper.getAddonDirName(), configBinFile.getAbsolutePath()
-							)
-					);
-				}
-				return null;
-			};
-			ArmaToolsWorkerThread t1 = new ArmaToolsWorkerThread(() -> {
-				convertConfigBinFiles.apply(left);
-			}, 1
-			);
-			ArmaToolsWorkerThread t2 = new ArmaToolsWorkerThread(() -> {
-				convertConfigBinFiles.apply(right);
-			}, 2
-			);
-			t1.start();
-			t2.start();
-			t1.join();
-			t2.join();
-			forwardingThread.message(
-					helper,
-					String.format(
-							bundle.getString("debinarized-all-config-f"),
-							helper.getAddonDirName()
-					)
-			);
-			forwardingThread.stepFinish(helper, Step.DeBinarizeConfigs);
-		}
-
-		{//parse the configs
-			forwardingThread.stepStart(helper, Step.ParseConfigs);
-			for (File configFile : debinarizedConfigs) {
-				if (helper.isCancelled()) {
-					return;
-				}
-				try {
-					HeaderFile headerFile = HeaderParser.parse(configFile, configFile.getParentFile());
-					helper.getParsedConfigs().add(headerFile);
-					forwardingThread.message(helper,
-							String.format(
-									bundle.getString("parsed-config-f"),
-									configFile.getAbsolutePath()
-							)
-					);
-				} catch (HeaderParseException e) {
-					forwardingThread.errorMessage(helper,
-							String.format(
-									bundle.getString("couldnt-parse-config-f"),
-									configFile.getAbsolutePath()
-							), e
-					);
-				}
-			}
-			forwardingThread.message(helper,
-					String.format(
-							bundle.getString("parsed-all-config-f"),
-							helper.getAddonDirName()
-					)
-			);
-			forwardingThread.stepFinish(helper, Step.ParseConfigs);
-		}
 
 		{//copy the files out of temp directory that we want to keep
 			//create folder in reference directory
@@ -624,6 +325,9 @@ public class ArmaAddonsManager {
 				File[] children = visit.listFiles();
 				if (children != null) {
 					for (File child : children) {
+						if (helper.isCancelled()) {
+							return;
+						}
 						if (child.isFile() && child.getName().endsWith(".sqf")
 								|| child.getName().endsWith(".cpp")
 								|| child.getName().endsWith(".h")
@@ -679,6 +383,365 @@ public class ArmaAddonsManager {
 			}
 			forwardingThread.stepFinish(helper, Step.SaveReferences);
 		}
+	}
+
+	/**
+	 * Detects all .pbo files in an addon directory and extracts them concurrently.
+	 *
+	 * @param helper           the helper to extract PBO's for
+	 * @param armaTools        Arma Tools directory
+	 * @param tempDir          temporary directory to extract PBO contents to
+	 * @param forwardingThread instance to use
+	 * @param extractDirs      thread safe list to add File instances to that were used to extract PBO's in.
+	 *                         These files are located in the tempDir
+	 * @return true if the extraction was successful, false if there was an error or extraction was cancelled
+	 */
+	private boolean extractPBOsForHelper(@NotNull ArmaAddonHelper helper, @NotNull File armaTools, @NotNull File tempDir,
+										 @NotNull ForwardingThread forwardingThread, @NotNull List<File> extractDirs) throws InterruptedException {
+		ResourceBundle bundle = getBundle();
+		File addonsDir = null;
+		{ //locate the "addons" folder, which contains all the pbo files
+			File[] addonDirFiles = helper.getAddonDirectory().listFiles();
+			if (addonDirFiles == null) {
+				throw new IllegalStateException("addon directory isn't a directory: " + helper.getAddonDirectory());
+			}
+			for (File addonDirFile : addonDirFiles) {
+				if (!addonDirFile.getName().equalsIgnoreCase("addons")) {
+					continue;
+				}
+				addonsDir = addonDirFile;
+				break;
+			}
+			if (addonsDir == null) {
+				forwardingThread.warningMessage(helper,
+						String.format(
+								bundle.getString("couldnt-find-addons-dir-f"),
+								helper.getAddonDirectory().getAbsolutePath()
+						), null
+				);
+				return false;
+			}
+		}
+		File[] pboFiles = addonsDir.listFiles((dir, name) -> name.endsWith(".pbo"));
+		if (pboFiles == null) {
+			forwardingThread.warningMessage(helper,
+					String.format(
+							bundle.getString("no-pbos-were-in-addons-dir-f"),
+							helper.getAddonDirectory().getAbsolutePath()
+					), null
+			);
+			return false;
+		}
+
+		{ //print to log all pbo files marked for extraction
+			StringBuilder sb = new StringBuilder();
+			sb.append("All PBO's marked to extract:[\n");
+			for (File pboFile : pboFiles) {
+				sb.append('\t');
+				sb.append(pboFile.getAbsolutePath());
+				sb.append('\n');
+			}
+			sb.append(']');
+			forwardingThread.log(sb.toString());
+		}
+
+		//make it so each thread doesn't do more work than the other. Also, partition the data.
+		Arrays.sort(pboFiles, Comparator.comparingLong(File::length));
+		List<File> left = new ArrayList<>(pboFiles.length);
+		List<File> right = new ArrayList<>(pboFiles.length);
+		int leftCapacity = 0;
+		int rightCapacity = 0;
+		for (int i = pboFiles.length - 1; i >= 0; i--) {//iterate backwards since array is sorted A-Z
+			File file = pboFiles[i];
+			if (leftCapacity < rightCapacity) {
+				left.add(file);
+				leftCapacity += file.length();
+			} else {
+				right.add(file);
+				rightCapacity += file.length();
+			}
+		}
+
+
+		forwardingThread.stepStart(helper, Step.ExtractPBOs);
+
+		Function<List<File>, Void> extractPbos = pboFilesToExtract -> {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Extracting PBO's on thread ").append(Thread.currentThread().getName()).append(": [\n");
+			for (File pboFile : pboFilesToExtract) {
+				sb.append('\t');
+				sb.append(pboFile.getName());
+				sb.append('\n');
+			}
+			sb.append(']');
+			forwardingThread.log(sb.toString());
+
+			for (File pboFile : pboFilesToExtract) {
+				if (helper.isCancelled()) {
+					return null;
+				}
+				File extractDir = new File(
+						tempDir.getAbsolutePath() + "/" + helper.getAddonDirName() +
+								"/" +
+								pboFile.getName().substring(0, pboFile.getName().length() - ".pbo".length())
+				);
+				boolean mkdirs = extractDir.mkdirs();
+				if (!mkdirs) {
+					forwardingThread.errorMessage(
+							helper, String.format(
+									bundle.getString("failed-to-create-temp-directory-f"),
+									extractDir.getAbsolutePath(),
+									helper.getAddonDirName()
+							), null
+					);
+					return null;
+				}
+
+				extractDirs.add(extractDir);
+				forwardingThread.log("Created extract directory: " + extractDir.getAbsolutePath());
+				boolean success = false;
+				Exception e = null;
+				try {
+					success = ArmaTools.extractPBO(
+							armaTools,
+							pboFile,
+							extractDir, 10 * 60 * 1000 /*10 minutes before suspend*/,
+							null, null
+					);
+					forwardingThread.message(helper,
+							String.format(
+									bundle.getString("extracted-pbo-f"),
+									pboFile.getName(),
+									helper.getAddonDirName()
+							)
+					);
+				} catch (IOException e1) {
+					e = e1;
+				}
+				if (!success) {
+					forwardingThread.errorMessage(helper,
+							String.format(
+									bundle.getString("couldnt-extract-pbo-f"),
+									pboFile.getName(), helper.getAddonDirName()
+							), e
+					);
+				}
+			}
+			return null;
+		};
+		ArmaToolsWorkerThread t1 = new ArmaToolsWorkerThread(() -> {
+			extractPbos.apply(left);
+		}, 1
+		);
+		ArmaToolsWorkerThread t2 = new ArmaToolsWorkerThread(() -> {
+			extractPbos.apply(right);
+		}, 2
+		);
+		t1.start();
+		t2.start();
+		t1.join();
+		t2.join();
+		if (helper.isCancelled()) {
+			return false;
+		}
+		forwardingThread.message(helper,
+				String.format(
+						bundle.getString("extracted-all-pbo-f"),
+						helper.getAddonDirName()
+				)
+		);
+		forwardingThread.stepFinish(helper, Step.ExtractPBOs);
+		return true;
+	}
+
+
+	/**
+	 * Detects all config.bin files in the provided extractDirs list. After all config.bin files have been located,
+	 * they are converted to config.cpp files with Arma Tools concurrently.
+	 * <p>
+	 * If a config.cpp file is also found while looking for config.bin files, it will automatically be added to
+	 * <code>debinarizedConfigs</code>.
+	 *
+	 * @param helper             the helper to convert config.bin files for
+	 * @param armaTools          the Arma Tools directory
+	 * @param forwardingThread   instance to use
+	 * @param extractDirs        list that should only be relevant to the provided {@link ArmaAddonHelper} instance and contains
+	 *                           all directories that may contain a config.bin file
+	 * @param debinarizedConfigs a thread safe list that all config.cpp files should be added to
+	 */
+	private void debinarizeConfigsForHelper(@NotNull ArmaAddonHelper helper, @NotNull File armaTools,
+											@NotNull ForwardingThread forwardingThread, @NotNull List<File> extractDirs,
+											@NotNull List<File> debinarizedConfigs) throws InterruptedException {
+		ResourceBundle bundle = getBundle();
+
+		final String BINARIZED_CONFIG_NAME = "config.bin";
+		List<File> configBinFiles = new ArrayList<>();
+		{//locate all config.bin files
+			LinkedList<File> toVisit = new LinkedList<>();
+			toVisit.addAll(extractDirs);
+			while (!toVisit.isEmpty()) {
+				File visit = toVisit.removeFirst();
+				File[] children = visit.listFiles();
+				if (children != null) {
+					Collections.addAll(toVisit, children);
+				}
+				if (visit.getName().equalsIgnoreCase(BINARIZED_CONFIG_NAME)) {
+					configBinFiles.add(visit);
+				} else if (visit.getName().equalsIgnoreCase("config.cpp")) {
+					forwardingThread.log("Found pre-debinarized config for addon '"
+							+ helper.getAddonDirName() + "'. Added to parsed configs:"
+							+ visit.getAbsolutePath()
+					);
+					debinarizedConfigs.add(visit);
+				}
+			}
+		}
+
+		{ //print to log all config.bin files marked for debinarize
+			StringBuilder sb = new StringBuilder();
+			sb.append("All config.bin marked to debinarize:[\n");
+			for (File configBinFile : configBinFiles) {
+				sb.append('\t');
+				sb.append(configBinFile.getAbsolutePath());
+				sb.append('\n');
+			}
+			sb.append(']');
+			forwardingThread.log(sb.toString());
+		}
+
+		//make it so each thread doesn't do more work than the other. Also, partition the data.
+		configBinFiles.sort(Comparator.comparingLong(File::length));
+		List<File> left = new ArrayList<>(configBinFiles.size());
+		List<File> right = new ArrayList<>(configBinFiles.size());
+		int leftCapacity = 0;
+		int rightCapacity = 0;
+		for (int i = configBinFiles.size() - 1; i >= 0; i--) {//iterate backwards since array is sorted A-Z
+			File file = configBinFiles.get(i);
+			if (leftCapacity < rightCapacity) {
+				left.add(file);
+				leftCapacity += file.length();
+			} else {
+				right.add(file);
+				rightCapacity += file.length();
+			}
+		}
+
+		forwardingThread.stepStart(helper, Step.DeBinarizeConfigs);
+
+		Function<List<File>, Void> convertConfigBinFiles = configBinFilesToConvert -> {
+			StringBuilder sb = new StringBuilder();
+			sb.append("DeBinarizing config.bin files on thread ").append(Thread.currentThread().getName()).append(": [\n");
+			for (File configBinFile : configBinFilesToConvert) {
+				sb.append('\t');
+				sb.append(configBinFile.getAbsolutePath());
+				sb.append('\n');
+			}
+			sb.append(']');
+			forwardingThread.log(sb.toString());
+
+			for (File configBinFile : configBinFilesToConvert) {
+				if (helper.isCancelled()) {
+					return null;
+				}
+				String newPath = configBinFile.getParentFile().getAbsolutePath() + "/config.cpp";
+				File debinarizedFile = new File(newPath);
+				Exception e = null;
+				boolean success = false;
+				try {
+					success = ArmaTools.convertBinConfigToText(
+							armaTools,
+							configBinFile,
+							debinarizedFile,
+							10 * 1000 /*10 seconds*/, null, null
+					);
+				} catch (IOException e1) {
+					e = e1;
+				}
+				if (!success) {
+					forwardingThread.errorMessage(helper,
+							String.format(
+									bundle.getString("couldnt-debinarize-config-f"),
+									configBinFile.getAbsolutePath(), helper.getAddonDirName()
+							), e
+					);
+					continue;
+				}
+				debinarizedConfigs.add(debinarizedFile);
+				forwardingThread.message(helper,
+						String.format(
+								bundle.getString("debinarized-config-f"),
+								helper.getAddonDirName(), configBinFile.getAbsolutePath()
+						)
+				);
+			}
+			return null;
+		};
+		ArmaToolsWorkerThread t1 = new ArmaToolsWorkerThread(() -> {
+			convertConfigBinFiles.apply(left);
+		}, 1
+		);
+		ArmaToolsWorkerThread t2 = new ArmaToolsWorkerThread(() -> {
+			convertConfigBinFiles.apply(right);
+		}, 2
+		);
+		t1.start();
+		t2.start();
+		t1.join();
+		t2.join();
+		forwardingThread.message(
+				helper,
+				String.format(
+						bundle.getString("debinarized-all-config-f"),
+						helper.getAddonDirName()
+				)
+		);
+		forwardingThread.stepFinish(helper, Step.DeBinarizeConfigs);
+	}
+
+	/**
+	 * Parses all de-binarized configs and stores them in the provided {@link ArmaAddonHelper} instance.
+	 * The parsing uses Arma Dialog Creator's PreProcessor and Parser.
+	 *
+	 * @param helper             helper to use
+	 * @param forwardingThread   instance to use
+	 * @param debinarizedConfigs list of de-binarized configs to preprocess and parse
+	 * @return true if the parse was completed successfully, false if there was an error or the parsing was cancelled
+	 */
+	private boolean parseConfigsForHelper(@NotNull ArmaAddonHelper helper, @NotNull ForwardingThread forwardingThread,
+										  @NotNull List<File> debinarizedConfigs) throws IOException {
+		ResourceBundle bundle = getBundle();
+
+		forwardingThread.stepStart(helper, Step.ParseConfigs);
+		for (File configFile : debinarizedConfigs) {
+			if (helper.isCancelled()) {
+				return false;
+			}
+			try {
+				HeaderParseResult parseResult = HeaderParser.parse(configFile, configFile.getParentFile());
+				helper.getParseResults().add(parseResult);
+				forwardingThread.message(helper,
+						String.format(
+								bundle.getString("parsed-config-f"),
+								configFile.getAbsolutePath()
+						)
+				);
+			} catch (HeaderParseException e) {
+				forwardingThread.errorMessage(helper,
+						String.format(
+								bundle.getString("couldnt-parse-config-f"),
+								configFile.getAbsolutePath()
+						), e
+				);
+			}
+		}
+		forwardingThread.message(helper,
+				String.format(
+						bundle.getString("parsed-all-config-f"),
+						helper.getAddonDirName()
+				)
+		);
+		forwardingThread.stepFinish(helper, Step.ParseConfigs);
+		return true;
 	}
 
 	private ResourceBundle getBundle() {
@@ -744,25 +807,25 @@ public class ArmaAddonsManager {
 		doc.getDocumentElement().normalize();
 
 		/*
-		* <?xml blah blah>
-		* <addons-cfg>
-		*     <roots>
-		*         <addons-root>D:\DATA\Steam\steamapps\common\Arma 3</addons-root>
-		*         <addons-root>$PROJECT_DIR$/addons</addons-root> <!-- There can be multiple addons roots-->
-		*     </roots>
-		*
-		*     <reference-dir>D:\DATA\Steam\steamapps\common\Arma 3\armaplugin</reference-dir> <!-- This is the place where addon's extract pbo contents are stored-->
-		*     <blacklist>
-		*         <addon>@Exile</addon> <!-- This refers to the directory name in addons-root-->
-		*     </blacklist>
-		*     <whitelist> <!-- If whitelist has no addons, everything will be used, except for blacklist's addons-->
-		*         <addon>@OPTRE</addon> <!-- This refers to the directory name in addons-root-->
-		*     </whitelist>
-		* </addons-cfg>
-		*
-		* MACROS:
-		* $PROJECT_DIR$: IntelliJ project directory
-		*/
+		 * <?xml blah blah>
+		 * <addons-cfg>
+		 *     <roots>
+		 *         <addons-root>D:\DATA\Steam\steamapps\common\Arma 3</addons-root>
+		 *         <addons-root>$PROJECT_DIR$/addons</addons-root> <!-- There can be multiple addons roots-->
+		 *     </roots>
+		 *
+		 *     <reference-dir>D:\DATA\Steam\steamapps\common\Arma 3\armaplugin</reference-dir> <!-- This is the place where addon's extract pbo contents are stored-->
+		 *     <blacklist>
+		 *         <addon>@Exile</addon> <!-- This refers to the directory name in addons-root-->
+		 *     </blacklist>
+		 *     <whitelist> <!-- If whitelist has no addons, everything will be used, except for blacklist's addons-->
+		 *         <addon>@OPTRE</addon> <!-- This refers to the directory name in addons-root-->
+		 *     </whitelist>
+		 * </addons-cfg>
+		 *
+		 * MACROS:
+		 * $PROJECT_DIR$: IntelliJ project directory
+		 */
 
 		List<String> blacklistedAddons = new ArrayList<>();
 		List<String> whitelistedAddons = new ArrayList<>();
@@ -832,10 +895,19 @@ public class ArmaAddonsManager {
 
 		private final List<HeaderFile> configFiles;
 		private final File addonDirectory;
+		private Map<String, String> defineMacros = new HashMap<>();
 
 		public ArmaAddonImpl(@NotNull ArmaAddonHelper helper) {
-			this.configFiles = Collections.unmodifiableList(helper.getParsedConfigs());
+			List<HeaderFile> parsedConfigs = new ArrayList<>(helper.getParseResults().size());
+			this.configFiles = Collections.unmodifiableList(parsedConfigs);
 			this.addonDirectory = helper.getAddonDirectory();
+
+			for (HeaderParseResult result : helper.getParseResults()) {
+				parsedConfigs.add(result.getFile());
+				result.getDefineMacros().forEach((name, value) -> {
+					defineMacros.put(name, value);
+				});
+			}
 		}
 
 		@NotNull
@@ -850,6 +922,12 @@ public class ArmaAddonsManager {
 			return addonDirectory;
 		}
 
+		@NotNull
+		@Override
+		public Map<String, String> getDefineMacros() {
+			return defineMacros;
+		}
+
 		@Override
 		public String toString() {
 			return "ArmaAddonImpl{" +
@@ -861,18 +939,13 @@ public class ArmaAddonsManager {
 
 	private static class ArmaAddonHelper implements ArmaAddonIndexingHandle {
 		private final File addonDirectory;
-		private final List<HeaderFile> parsedConfigs = new ArrayList<>();
 		private volatile double currentWorkProgress = 0;
 		private volatile double totalWorkProgress = 0;
 		private volatile boolean cancelled = false;
+		private final List<HeaderParseResult> parseResults = new ArrayList<>();
 
 		public ArmaAddonHelper(@NotNull File addonDirectory) {
 			this.addonDirectory = addonDirectory;
-		}
-
-		@NotNull
-		public List<HeaderFile> getParsedConfigs() {
-			return parsedConfigs;
 		}
 
 		@NotNull
@@ -917,6 +990,11 @@ public class ArmaAddonsManager {
 		@Override
 		public String getAddonName() {
 			return getAddonDirName();
+		}
+
+		@NotNull
+		public List<HeaderParseResult> getParseResults() {
+			return parseResults;
 		}
 	}
 
