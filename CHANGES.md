@@ -1,8 +1,8 @@
 **Added**  
-*  
+* implemented loading existing extracted pbo's in ArmaAddonsManager (untested)
 
 **Changed**  
-* refactored ArmaAddonsManager to be a bit more readable and easier to use
+* ArmaAddon - now we store where the cached information in the reference directory is.
 
 **Fixed**  
 *

@@ -15,9 +15,8 @@ import org.w3c.dom.Element;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.text.SimpleDateFormat;
@@ -215,7 +214,11 @@ public class ArmaAddonsManager {
 			forwardingThread.indexStartedForAddon(helper);
 			forwardingThread.log("INDEX STARTED for addon " + helper.getAddonDirName());
 
-			doAllWorkForAddonHelper(helper, refDir, armaTools, tempDir, forwardingThread, extractDirs);
+			boolean loadedFromFile = loadAddonFromReferenceDirectory(helper, forwardingThread, refDir);
+			if (!loadedFromFile) {
+				doAllWorkForAddonHelper(helper, refDir, armaTools, tempDir, forwardingThread, extractDirs);
+			}
+
 
 			//delete extract directories to free up disk space for next addon extraction
 			forwardingThread.stepStart(helper, Step.Cleanup);
@@ -263,6 +266,65 @@ public class ArmaAddonsManager {
 		return addons;
 	}
 
+	/**
+	 * Loads a {@link ArmaAddon} instance from existing files in the reference directory.
+	 *
+	 * @param helper the addon helper to retrieve existing files for
+	 * @param refDir the reference directory
+	 * @return if the the {@link ArmaAddonHelper} instance was loaded from the reference directory, or false if
+	 * it couldn't be loaded due to it being out of date or there is nothing to load for the helper in the reference directory
+	 */
+	private boolean loadAddonFromReferenceDirectory(@NotNull ArmaAddonHelper helper,
+													@NotNull ForwardingThread forwardingThread,
+													@NotNull File refDir) {
+		File[] files = refDir.listFiles((dir, name) -> {
+			return name.equals(helper.getAddonName());
+		});
+		if (files == null || files.length == 0) {
+			return false;
+		}
+		File addonDirectoryInRefDir = files[0];
+		if (!addonDirectoryInRefDir.isDirectory()) {
+			return false;
+		}
+		{ //check if the addon's cache in the reference directory is valid or not
+			files = addonDirectoryInRefDir.listFiles((dir, name) -> name.equals(".cacheproperties"));
+			if (files != null && files.length > 0) {
+				try {
+					Properties cacheProperties = new Properties();
+					cacheProperties.load(new InputStreamReader(new FileInputStream(files[0]), StandardCharsets.UTF_8));
+					String valid = cacheProperties.getProperty("valid");
+					if (valid.equals("false")) {
+						return false;
+					}
+				} catch (IOException ignore) {
+
+				}
+			}
+		}
+
+		//get all config.cpp files
+		final String CONFIG_NAME = "config.cpp";
+		List<File> configFiles = new ArrayList<>();
+		{//locate all config.bin files
+			LinkedList<File> toVisit = new LinkedList<>();
+			toVisit.add(addonDirectoryInRefDir);
+			while (!toVisit.isEmpty()) {
+				File visit = toVisit.removeFirst();
+				File[] children = visit.listFiles();
+				if (children != null) {
+					Collections.addAll(toVisit, children);
+				}
+				if (visit.getName().equalsIgnoreCase(CONFIG_NAME)) {
+					configFiles.add(visit);
+				}
+			}
+		}
+
+		parseConfigsForHelper(helper, forwardingThread, configFiles);
+		return true;
+	}
+
 	private void doAllWorkForAddonHelper(@NotNull ArmaAddonHelper helper,
 										 @NotNull File refDir, @NotNull File armaTools, @NotNull File tempDir,
 										 @NotNull ForwardingThread forwardingThread,
@@ -272,13 +334,19 @@ public class ArmaAddonsManager {
 		final List<File> debinarizedConfigs = Collections.synchronizedList(new ArrayList<>());
 
 		//extract pbo's into temp directory
-		if (extractPBOsForHelper(helper, armaTools, tempDir, forwardingThread, extractDirs)) return;
+		if (extractPBOsForHelper(helper, armaTools, tempDir, forwardingThread, extractDirs)) {
+			return;
+		}
 
 		//de-binarize the configs and locate all sqf files
-		debinarizeConfigsForHelper(helper, armaTools, forwardingThread, extractDirs, debinarizedConfigs);
+		if (debinarizeConfigsForHelper(helper, armaTools, forwardingThread, extractDirs, debinarizedConfigs)) {
+			return;
+		}
 
 		//parse the configs
-		if (parseConfigsForHelper(helper, forwardingThread, debinarizedConfigs)) return;
+		if (parseConfigsForHelper(helper, forwardingThread, debinarizedConfigs)) {
+			return;
+		}
 
 
 		{//copy the files out of temp directory that we want to keep
@@ -296,6 +364,7 @@ public class ArmaAddonsManager {
 				);
 				return;
 			}
+			helper.setAddonDirectoryInReferenceDirectory(destDir);
 
 			forwardingThread.stepStart(helper, Step.SaveReferences);
 
@@ -568,10 +637,12 @@ public class ArmaAddonsManager {
 	 * @param extractDirs        list that should only be relevant to the provided {@link ArmaAddonHelper} instance and contains
 	 *                           all directories that may contain a config.bin file
 	 * @param debinarizedConfigs a thread safe list that all config.cpp files should be added to
+	 * @return true if all configs were debinarized successfully, or false if an error occurred
+	 * or the helper was cancelled
 	 */
-	private void debinarizeConfigsForHelper(@NotNull ArmaAddonHelper helper, @NotNull File armaTools,
-											@NotNull ForwardingThread forwardingThread, @NotNull List<File> extractDirs,
-											@NotNull List<File> debinarizedConfigs) throws InterruptedException {
+	private boolean debinarizeConfigsForHelper(@NotNull ArmaAddonHelper helper, @NotNull File armaTools,
+											   @NotNull ForwardingThread forwardingThread, @NotNull List<File> extractDirs,
+											   @NotNull List<File> debinarizedConfigs) {
 		ResourceBundle bundle = getBundle();
 
 		final String BINARIZED_CONFIG_NAME = "config.bin";
@@ -686,8 +757,19 @@ public class ArmaAddonsManager {
 		);
 		t1.start();
 		t2.start();
-		t1.join();
-		t2.join();
+		try {
+			t1.join();
+		} catch (InterruptedException ignore) {
+
+		}
+		try {
+			t2.join();
+		} catch (InterruptedException ignore) {
+
+		}
+		if (helper.isCancelled()) {
+			return false;
+		}
 		forwardingThread.message(
 				helper,
 				String.format(
@@ -696,6 +778,7 @@ public class ArmaAddonsManager {
 				)
 		);
 		forwardingThread.stepFinish(helper, Step.DeBinarizeConfigs);
+		return true;
 	}
 
 	/**
@@ -708,7 +791,7 @@ public class ArmaAddonsManager {
 	 * @return true if the parse was completed successfully, false if there was an error or the parsing was cancelled
 	 */
 	private boolean parseConfigsForHelper(@NotNull ArmaAddonHelper helper, @NotNull ForwardingThread forwardingThread,
-										  @NotNull List<File> debinarizedConfigs) throws IOException {
+										  @NotNull List<File> debinarizedConfigs) {
 		ResourceBundle bundle = getBundle();
 
 		forwardingThread.stepStart(helper, Step.ParseConfigs);
@@ -725,7 +808,7 @@ public class ArmaAddonsManager {
 								configFile.getAbsolutePath()
 						)
 				);
-			} catch (HeaderParseException e) {
+			} catch (HeaderParseException | IOException e) {
 				forwardingThread.errorMessage(helper,
 						String.format(
 								bundle.getString("couldnt-parse-config-f"),
@@ -750,10 +833,6 @@ public class ArmaAddonsManager {
 
 	private static final ArmaAddonsManager instance = new ArmaAddonsManager();
 
-	@NotNull
-	public static ArmaAddonsManager getAddonsManagerInstance() {
-		return instance;
-	}
 
 	/**
 	 * @param directory the directory to delete
@@ -895,7 +974,8 @@ public class ArmaAddonsManager {
 
 		private final List<HeaderFile> configFiles;
 		private final File addonDirectory;
-		private Map<String, String> defineMacros = new HashMap<>();
+		private final Map<String, String> defineMacros = new HashMap<>();
+		private final File addonDirectoryInReferenceDirectory;
 
 		public ArmaAddonImpl(@NotNull ArmaAddonHelper helper) {
 			List<HeaderFile> parsedConfigs = new ArrayList<>(helper.getParseResults().size());
@@ -908,6 +988,7 @@ public class ArmaAddonsManager {
 					defineMacros.put(name, value);
 				});
 			}
+			this.addonDirectoryInReferenceDirectory = helper.getAddonDirectoryInReferenceDirectory();
 		}
 
 		@NotNull
@@ -920,6 +1001,12 @@ public class ArmaAddonsManager {
 		@Override
 		public File getAddonDirectory() {
 			return addonDirectory;
+		}
+
+		@NotNull
+		@Override
+		public File getAddonDirectoryInReferenceDirectory() {
+			return addonDirectoryInReferenceDirectory;
 		}
 
 		@NotNull
@@ -943,6 +1030,7 @@ public class ArmaAddonsManager {
 		private volatile double totalWorkProgress = 0;
 		private volatile boolean cancelled = false;
 		private final List<HeaderParseResult> parseResults = new ArrayList<>();
+		private File addonDirectoryInReferenceDirectory;
 
 		public ArmaAddonHelper(@NotNull File addonDirectory) {
 			this.addonDirectory = addonDirectory;
@@ -956,6 +1044,11 @@ public class ArmaAddonsManager {
 		@NotNull
 		public String getAddonDirName() {
 			return addonDirectory.getName();
+		}
+
+		@NotNull
+		public File getAddonDirectoryInReferenceDirectory() {
+			return addonDirectoryInReferenceDirectory;
 		}
 
 		@Override
@@ -995,6 +1088,10 @@ public class ArmaAddonsManager {
 		@NotNull
 		public List<HeaderParseResult> getParseResults() {
 			return parseResults;
+		}
+
+		public void setAddonDirectoryInReferenceDirectory(@NotNull File f) {
+			this.addonDirectoryInReferenceDirectory = f;
 		}
 	}
 

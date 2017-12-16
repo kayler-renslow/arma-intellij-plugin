@@ -20,10 +20,24 @@ public interface ArmaAddon {
 	List<HeaderFile> getConfigFiles();
 
 	/**
-	 * @return the folder with the "@" symbol prefixed
+	 * Get the the folder with the "@" symbol prefixed. This is not relative to the reference directory, rather,
+	 * it is relative to where the addon is installed on the user's computer.
+	 *
+	 * @return the addon folder
+	 * @see #getAddonDirectoryInReferenceDirectory()
 	 */
 	@NotNull
 	File getAddonDirectory();
+
+	/**
+	 * Get the the folder with the "@" symbol prefixed. Unlike {@link #getAddonDirectory()}, this file path is
+	 * relative to the reference directory.
+	 *
+	 * @return the addon folder
+	 * @see #getAddonDirectory()
+	 */
+	@NotNull
+	File getAddonDirectoryInReferenceDirectory();
 
 	/**
 	 * @return the name of the addon with the "@" symbol prefixed
