@@ -571,7 +571,6 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("parseText localize \"str_vsm_no_vehicle\";");
 		assertNoProblems("if(count _numArr == 0) exitWith{};");
 		//todo what if we split up the commands? Example: EVERYTHING_BEFORE_OR || EVERYTHING_AFTER_OR
-		//todo We need to test if 0 >= 1 + count [] is valid in Arma 3
 		assertNoProblems("if((_i + 1) >= count _numArr || (_i + 1) >= count _opNumArr) exitWith{};");
 		assertNoProblems("if(_numArr select _i > _opNumArr select _i) then {};");
 		assertNoProblems("_numArr select _i == _opNumArr select _i");

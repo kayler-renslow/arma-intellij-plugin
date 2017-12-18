@@ -8,34 +8,22 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.util.PsiTreeUtil;
 import static com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes.*;
-import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSignedExpression;
+import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExpressionOperator;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.*;
 
-public class SQFPsiSignedExpressionImpl extends SQFSignedExpression implements SQFPsiSignedExpression {
+public class SQFPsiPlusOrMinusExpresionOperatorImpl extends SQFExpressionOperator implements SQFPsiPlusOrMinusExpresionOperator {
 
-  public SQFPsiSignedExpressionImpl(ASTNode node) {
+  public SQFPsiPlusOrMinusExpresionOperatorImpl(ASTNode node) {
     super(node);
   }
 
   public void accept(@NotNull SQFPsiVisitor visitor) {
-    visitor.visitSignedExpression(this);
+    visitor.visitPlusOrMinusExpresionOperator(this);
   }
 
   public void accept(@NotNull PsiElementVisitor visitor) {
     if (visitor instanceof SQFPsiVisitor) accept((SQFPsiVisitor)visitor);
     else super.accept(visitor);
-  }
-
-  @Override
-  @NotNull
-  public SQFPsiCommandAfter getCommandAfter() {
-    return findNotNullChildByClass(SQFPsiCommandAfter.class);
-  }
-
-  @Override
-  @NotNull
-  public SQFPsiPlusOrMinusExpresionOperator getPlusOrMinusExpresionOperator() {
-    return findNotNullChildByClass(SQFPsiPlusOrMinusExpresionOperator.class);
   }
 
 }

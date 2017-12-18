@@ -80,6 +80,9 @@ public class SQFParser implements PsiParser, LightPsiParser {
     else if (t == PAREN_EXPRESSION) {
       r = paren_expression(b, 0);
     }
+    else if (t == PLUS_OR_MINUS_EXPRESION_OPERATOR) {
+      r = plus_or_minus_expresion_operator(b, 0);
+    }
     else if (t == PRIVATE_COMMAND) {
       r = private_command(b, 0);
     }
@@ -360,7 +363,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // command_expression
-  //                 // | signed_expression //we don't need signed_expression here because it is handled by command_expression
+  //                 | signed_expression //we don't need signed_expression here because it is handled by command_expression
   //                 | literal_expression
   //                 | code_block_expression
   //                 | paren_expression
@@ -369,6 +372,7 @@ public class SQFParser implements PsiParser, LightPsiParser {
     boolean r;
     Marker m = enter_section_(b, l, _COLLAPSE_, EXPRESSION, "<expression>");
     r = command_expression(b, l + 1);
+    if (!r) r = signed_expression(b, l + 1);
     if (!r) r = literal_expression(b, l + 1);
     if (!r) r = code_block_expression(b, l + 1);
     if (!r) r = paren_expression(b, l + 1);
@@ -542,14 +546,14 @@ public class SQFParser implements PsiParser, LightPsiParser {
 
   /* ********************************************************** */
   // PLUS | MINUS
-  static boolean plus_or_minus_expresion_operator_(PsiBuilder b, int l) {
-    if (!recursion_guard_(b, l, "plus_or_minus_expresion_operator_")) return false;
-    if (!nextTokenIs(b, "", MINUS, PLUS)) return false;
+  public static boolean plus_or_minus_expresion_operator(PsiBuilder b, int l) {
+    if (!recursion_guard_(b, l, "plus_or_minus_expresion_operator")) return false;
+    if (!nextTokenIs(b, "<plus or minus expresion operator>", MINUS, PLUS)) return false;
     boolean r;
-    Marker m = enter_section_(b);
+    Marker m = enter_section_(b, l, _NONE_, PLUS_OR_MINUS_EXPRESION_OPERATOR, "<plus or minus expresion operator>");
     r = consumeToken(b, PLUS);
     if (!r) r = consumeToken(b, MINUS);
-    exit_section_(b, m, null, r);
+    exit_section_(b, l, m, r, false, null);
     return r;
   }
 
@@ -581,13 +585,13 @@ public class SQFParser implements PsiParser, LightPsiParser {
   }
 
   /* ********************************************************** */
-  // plus_or_minus_expresion_operator_ command_after
+  // plus_or_minus_expresion_operator command_after
   public static boolean signed_expression(PsiBuilder b, int l) {
     if (!recursion_guard_(b, l, "signed_expression")) return false;
     if (!nextTokenIs(b, "<signed expression>", MINUS, PLUS)) return false;
     boolean r;
     Marker m = enter_section_(b, l, _NONE_, SIGNED_EXPRESSION, "<signed expression>");
-    r = plus_or_minus_expresion_operator_(b, l + 1);
+    r = plus_or_minus_expresion_operator(b, l + 1);
     r = r && command_after(b, l + 1);
     exit_section_(b, l, m, r, false, null);
     return r;

@@ -5,12 +5,6 @@ import java.util.List;
 import org.jetbrains.annotations.*;
 import com.intellij.psi.PsiElement;
 
-public interface SQFPsiSignedExpression extends SQFPsiExpression {
-
-  @NotNull
-  SQFPsiCommandAfter getCommandAfter();
-
-  @NotNull
-  SQFPsiPlusOrMinusExpresionOperator getPlusOrMinusExpresionOperator();
+public interface SQFPsiPlusOrMinusExpresionOperator extends PsiElement {
 
 }

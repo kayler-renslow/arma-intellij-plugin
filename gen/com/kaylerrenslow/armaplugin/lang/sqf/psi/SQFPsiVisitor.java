@@ -83,6 +83,10 @@ public class SQFPsiVisitor extends PsiElementVisitor {
     visitExpression(o);
   }
 
+  public void visitPlusOrMinusExpresionOperator(@NotNull SQFPsiPlusOrMinusExpresionOperator o) {
+    visitPsiElement(o);
+  }
+
   public void visitPrivateCommand(@NotNull SQFPsiPrivateCommand o) {
     visitCommand(o);
   }

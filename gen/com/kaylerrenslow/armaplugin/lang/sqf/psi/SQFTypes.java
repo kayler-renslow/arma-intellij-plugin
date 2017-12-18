@@ -27,6 +27,7 @@ public interface SQFTypes {
   IElementType MACRO_CALL = new SQFElementType("MACRO_CALL");
   IElementType NUMBER = new SQFElementType("NUMBER");
   IElementType PAREN_EXPRESSION = new SQFElementType("PAREN_EXPRESSION");
+  IElementType PLUS_OR_MINUS_EXPRESION_OPERATOR = new SQFElementType("PLUS_OR_MINUS_EXPRESION_OPERATOR");
   IElementType PRIVATE_COMMAND = new SQFElementType("PRIVATE_COMMAND");
   IElementType QUEST_STATEMENT = new SQFElementType("QUEST_STATEMENT");
   IElementType SIGNED_EXPRESSION = new SQFElementType("SIGNED_EXPRESSION");
@@ -126,6 +127,9 @@ public interface SQFTypes {
       }
       else if (type == PAREN_EXPRESSION) {
         return new SQFPsiParenExpressionImpl(node);
+      }
+      else if (type == PLUS_OR_MINUS_EXPRESION_OPERATOR) {
+        return new SQFPsiPlusOrMinusExpresionOperatorImpl(node);
       }
       else if (type == PRIVATE_COMMAND) {
         return new SQFPsiPrivateCommandImpl(node);

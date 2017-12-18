@@ -60,7 +60,7 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
 //expression
     expression ::= command_expression
 
-                // | signed_expression //we don't need signed_expression here because it is handled by command_expression
+                | signed_expression
 
                 | literal_expression
                 | code_block_expression
@@ -71,8 +71,8 @@ expression_statement::=expression  {mixin="com.kaylerrenslow.armaplugin.lang.sqf
     // we need signed expression because we can do something like +array command,
     // but the grammar generator complains about left recursion if we did expression? command expression?.
     // We are also treating this expression as a command_expression
-    signed_expression ::= plus_or_minus_expresion_operator_ command_after {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSignedExpression"}
-    private plus_or_minus_expresion_operator_ ::= (PLUS | MINUS) {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExpressionOperator"}
+    signed_expression ::= plus_or_minus_expression_operator command_after {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSignedExpression"}
+    plus_or_minus_expression_operator ::= (PLUS | MINUS) {mixin="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFExpressionOperator"}
 
     literal_expression ::= string
                         | variable
