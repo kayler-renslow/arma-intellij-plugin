@@ -15,17 +15,17 @@ import static com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.BaseType;
 public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----START Literal Expression----
-	public void testLiteralExpression_number() throws Exception {
+	public void testLiteralExpression_number() {
 		ValueType ret = getExitTypeForText("1");
 		assertEquals(ValueType.BaseType.NUMBER, ret);
 	}
 
-	public void testLiteralExpression_string() throws Exception {
+	public void testLiteralExpression_string() {
 		ValueType ret = getExitTypeForText("'hello'");
 		assertEquals(ValueType.BaseType.STRING, ret);
 	}
 
-	public void testLiteralExpression_array() throws Exception {
+	public void testLiteralExpression_array() {
 		ValueType ret = getExitTypeForText("[1,2,3]");
 
 		ValueType t = new ExpandedValueType(ValueType.BaseType.NUMBER, ValueType.BaseType.NUMBER, BaseType.NUMBER);
@@ -37,24 +37,24 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----START Paren Expression----
 
-	public void testParenExpression1() throws Exception {
+	public void testParenExpression1() {
 		ValueType ret = getExitTypeForText("(1)");
 		assertEquals(BaseType.NUMBER, ret);
 	}
 
-	public void testParenExpression2() throws Exception {
+	public void testParenExpression2() {
 		ValueType ret = getExitTypeForText("('hello')");
 		assertEquals(BaseType.STRING, ret);
 	}
 
-	public void testParenExpression3() throws Exception {
+	public void testParenExpression3() {
 		ValueType ret = getExitTypeForText("([1,2,3])");
 		ValueType t = new ExpandedValueType(ValueType.BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER);
 
 		assertEquals(t, ret);
 	}
 
-	public void testParenExpression4() throws Exception {
+	public void testParenExpression4() {
 		ValueType ret = getExitTypeForText("(1+1)");
 		assertEquals(BaseType.NUMBER, ret);
 	}
@@ -63,19 +63,19 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----START Add Expression----
 
-	public void testAddExpression_valid_number() throws Exception {
+	public void testAddExpression_valid_number() {
 		assertNoProblems("1+1");
 	}
 
-	public void testAddExpression_valid_string() throws Exception {
+	public void testAddExpression_valid_string() {
 		assertNoProblems("''+''");
 	}
 
-	public void testAddExpression_valid_array() throws Exception {
+	public void testAddExpression_valid_array() {
 		assertNoProblems("[]+[]");
 	}
 
-	public void testAddExpression_valid_variable() throws Exception {
+	public void testAddExpression_valid_variable() {
 		assertNoProblems("_var+_var");
 		assertNoProblems("1+_var");
 		assertNoProblems("[]+_var");
@@ -85,21 +85,17 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("_var+''");
 	}
 
-	public void testAddExpression_bad_numAndString() throws Exception {
+	public void testAddExpression_bad_numAndString() {
 		assertHasProblems("1e1+''");
 		assertHasProblems("''+1e1");
 	}
 
-	public void note() throws Exception {
-		throw new Exception("We need to remove Unary Expression because it will be confused in command expression");
-	}
-
-	public void testAddExpression_bad_numAndArray() throws Exception {
+	public void testAddExpression_bad_numAndArray() {
 		assertHasProblems("0.5+[]");
 		assertHasProblems("[]+0.5");
 	}
 
-	public void testAddExpression_bad_stringAndArray() throws Exception {
+	public void testAddExpression_bad_stringAndArray() {
 		assertHasProblems("'hi'+[]");
 		assertHasProblems("[]+'hello'");
 	}
@@ -108,15 +104,15 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----START Sub Expression----
 
-	public void testSubExpression_valid_number() throws Exception {
+	public void testSubExpression_valid_number() {
 		assertNoProblems("1-1");
 	}
 
-	public void testSubExpression_valid_array() throws Exception {
+	public void testSubExpression_valid_array() {
 		assertNoProblems("[]-[]");
 	}
 
-	public void testSubExpression_valid_variable() throws Exception {
+	public void testSubExpression_valid_variable() {
 		assertNoProblems("_var-_var");
 		assertNoProblems("1-_var");
 		assertNoProblems("[]-_var");
@@ -124,12 +120,12 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("_var-[]");
 	}
 
-	public void testSubExpression_bad_numAndString() throws Exception {
+	public void testSubExpression_bad_numAndString() {
 		assertHasProblems("1e1-''");
 		assertHasProblems("''-1e1");
 	}
 
-	public void testSubExpression_bad_numAndArray() throws Exception {
+	public void testSubExpression_bad_numAndArray() {
 		assertHasProblems("0.5-[]");
 		assertHasProblems("[]-0.5");
 	}
@@ -137,16 +133,16 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END Sub Expression----
 
 	//----START Mult Expression----
-	public void testMultExpression_valid() throws Exception {
+	public void testMultExpression_valid() {
 		assertNoProblems("0*1.5");
 	}
 
-	public void testMultExpression_bad() throws Exception {
+	public void testMultExpression_bad() {
 		assertHasProblems("0*[]");
 		assertHasProblems("[]*0");
 	}
 
-	public void testMultExpression_valid_variable() throws Exception {
+	public void testMultExpression_valid_variable() {
 		assertNoProblems("_var*_var");
 		assertNoProblems("1*_var");
 		assertNoProblems("_var*1");
@@ -154,16 +150,16 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END Mult Expression----
 
 	//----START Mod Expression----
-	public void testModExpression_valid() throws Exception {
+	public void testModExpression_valid() {
 		assertNoProblems("0%1.5");
 	}
 
-	public void testModExpression_bad() throws Exception {
+	public void testModExpression_bad() {
 		assertHasProblems("0%[]");
 		assertHasProblems("[]%0");
 	}
 
-	public void testModExpression_valid_variable() throws Exception {
+	public void testModExpression_valid_variable() {
 		assertNoProblems("_var%_var");
 		assertNoProblems("1%_var");
 		assertNoProblems("_var%1");
@@ -171,28 +167,28 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END Mod Expression----
 
 	//----START Div Expression----
-	public void testDivExpression_valid_number() throws Exception {
+	public void testDivExpression_valid_number() {
 		assertNoProblems("0/1.5");
 	}
 
-	public void testDivExpression_valid_config() throws Exception {
+	public void testDivExpression_valid_config() {
 		assertNoProblems("configFile/'CfgVehicles'");
 		assertNoProblems("_var/'test'");
 	}
 
-	public void testDivExpression_bad_config() throws Exception {
+	public void testDivExpression_bad_config() {
 		assertHasProblems("'test'/_var");
 		assertHasProblems("'test'/configFile");
 		assertHasProblems("0/configFile");
 		assertHasProblems("configFile/0");
 	}
 
-	public void testDivExpression_bad_number() throws Exception {
+	public void testDivExpression_bad_number() {
 		assertHasProblems("0/[]");
 		assertHasProblems("[]/0");
 	}
 
-	public void testDivExpression_valid_number_variable() throws Exception {
+	public void testDivExpression_valid_number_variable() {
 		assertNoProblems("_var/_var");
 		assertNoProblems("1/_var");
 		assertNoProblems("_var/1");
@@ -201,19 +197,19 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END Div Expression----
 
 	//----START Bool And Expression----
-	public void testBoolAndExpression_valid() throws Exception {
+	public void testBoolAndExpression_valid() {
 		assertNoProblems("true && true");
 		assertNoProblems("true && false");
 		assertNoProblems("false && {true}");
 	}
 
-	public void testBoolAndExpression_bad() throws Exception {
+	public void testBoolAndExpression_bad() {
 		assertHasProblems("true && 1");
 		assertHasProblems("true && []");
 		assertHasProblems("false && {5}");
 	}
 
-	public void testBoolAndExpression_valid_variable() throws Exception {
+	public void testBoolAndExpression_valid_variable() {
 		assertNoProblems("_var && _var");
 		assertNoProblems("_var && {_var}");
 		assertNoProblems("true && _var");
@@ -223,19 +219,19 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END Bool And Expression----
 
 	//----START Bool Or Expression----
-	public void testBoolOrExpression_valid() throws Exception {
+	public void testBoolOrExpression_valid() {
 		assertNoProblems("true || true");
 		assertNoProblems("true || false");
 		assertNoProblems("false || {true}");
 	}
 
-	public void testBoolOrExpression_bad() throws Exception {
+	public void testBoolOrExpression_bad() {
 		assertHasProblems("true || 1");
 		assertHasProblems("true || []");
 		assertHasProblems("false || {5}");
 	}
 
-	public void testBoolOrExpression_valid_variable() throws Exception {
+	public void testBoolOrExpression_valid_variable() {
 		assertNoProblems("_var || _var");
 		assertNoProblems("_var || {_var}");
 		assertNoProblems("true || _var");
@@ -244,7 +240,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END Bool Or Expression----
 
 	//----START Bool Not Expression----
-	public void testBoolNotExpression_valid() throws Exception {
+	public void testBoolNotExpression_valid() {
 		assertNoProblems("!true");
 		assertNoProblems("!(true || false)");
 		assertNoProblems("!(false || {true})");
@@ -252,7 +248,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("!_var");
 	}
 
-	public void testBoolNotExpression_bad() throws Exception {
+	public void testBoolNotExpression_bad() {
 		assertHasProblems("!1");
 		assertHasProblems("![]");
 		assertHasProblems("!{5}");
@@ -261,7 +257,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END Bool Not Expression----
 
 	//----START Comp Expression----
-	public void testCompExpression_valid() throws Exception {
+	public void testCompExpression_valid() {
 		assertNoProblems("1 < 1");
 		assertNoProblems("1 < 0.5");
 
@@ -327,7 +323,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	}
 
-	public void testCompExpression_bad() throws Exception {
+	public void testCompExpression_bad() {
 		assertHasProblems("1 < ''");
 		assertHasProblems("1 < []");
 		assertHasProblems("'' < []");
@@ -390,7 +386,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertHasProblems("true != _var");
 	}
 
-	public void testCompExpression_valid_variable() throws Exception {
+	public void testCompExpression_valid_variable() {
 		assertNoProblems("_var < _var");
 		assertNoProblems("1 < _var");
 		assertNoProblems("_var < 1");
@@ -422,7 +418,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END Comp Expression----
 
 	//----START config fetch Expression----
-	public void testConfigFetchExpression_valid() throws Exception {
+	public void testConfigFetchExpression_valid() {
 		assertNoProblems("configFile >> ''");
 		assertNoProblems("configFile >> '' >> ''");
 		assertNoProblems("configFile >> '' >> '' >> ''");
@@ -434,7 +430,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("_var >> _var");
 	}
 
-	public void testConfigFetchExpression_bad() throws Exception {
+	public void testConfigFetchExpression_bad() {
 		assertHasProblems("configFile >> 1");
 		assertHasProblems("configFile >> 1 >> 2");
 		assertHasProblems("1 >> '' >> ''");
@@ -443,7 +439,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END config fetch Expression----
 
 	//----START exponent Expression----
-	public void testExponentExpression_valid() throws Exception {
+	public void testExponentExpression_valid() {
 		assertNoProblems("1^1");
 		assertNoProblems("1^1^5");
 		assertNoProblems("1^1^5^7");
@@ -455,7 +451,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("_var^_var^_var^_var");
 	}
 
-	public void testExponentExpression_bad() throws Exception {
+	public void testExponentExpression_bad() {
 		assertHasProblems("1^1^''");
 		assertHasProblems("''^1^5");
 		assertHasProblems("''^1^5^''");
@@ -468,7 +464,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END exponent Expression----
 
 	//----START signed Expression----
-	public void testSignExpression_valid() throws Exception {
+	public void testSignExpression_valid() {
 		assertNoProblems("1+ +1");
 		assertNoProblems("[]+ +[]");
 		assertNoProblems("+1");
@@ -483,7 +479,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("-_var");
 	}
 
-	public void testSignExpression_bad() throws Exception {
+	public void testSignExpression_bad() {
 		assertHasProblems("+configFile");
 		assertHasProblems("+''");
 
@@ -493,7 +489,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END signed Expression----
 
 	//----START code block Expression----
-	public void testCodeBlockExpression() throws Exception {
+	public void testCodeBlockExpression() {
 		assertNoProblems("{1}");
 		assertNoProblems("{+1.5}");
 		assertNoProblems("{}");
@@ -506,7 +502,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END code block Expression----
 
 	//----START case statement----
-	public void testCaseStatement() throws Exception {
+	public void testCaseStatement() {
 		assertNoProblems("case 1;");
 		assertNoProblems("case 2:{};");
 		assertNoProblems("case '';");
@@ -527,7 +523,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END case statement----
 
 	//----START assignment statement----
-	public void testAssignmentStatement() throws Exception {
+	public void testAssignmentStatement() {
 		assertNoProblems("a = {};");
 		assertNoProblems("a={2};");
 		assertNoProblems("a = 1+1;");
@@ -546,7 +542,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 	//----END assignment statement----
 
 	//----START quest statement----
-	public void testQuestStatement_valid() throws Exception {
+	public void testQuestStatement_valid() {
 		assertNoProblems("? true : false;");
 		assertNoProblems("? true : {};");
 		assertNoProblems("? _var : 1+1;");
@@ -558,14 +554,14 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertEquals(BaseType.NOTHING, getExitTypeForText("? ;"));
 	}
 
-	public void testQuestStatement_bad() throws Exception {
+	public void testQuestStatement_bad() {
 		assertHasProblems("? 1 : false;");
 		assertHasProblems("? {} : false;");
 	}
 	//----END quest statement----
 
 	//----START command expression----
-	public void testCommandExpression_randomExpressions_valid() throws Exception {
+	public void testCommandExpression_randomExpressions_valid() {
 		assertNoProblems("_ctrl ctrlSetStructuredText parseText localize \"str_vsm_no_vehicle\";");
 		assertNoProblems("_ctrl ctrlSetStructuredText parseText '';");
 		assertNoProblems("parseText localize \"str_vsm_no_vehicle\";");
@@ -579,7 +575,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("for \"_i\" from 0 to 1 step -1 do {};");
 	}
 
-	public void testCommandExpression_githubReports_valid() throws Exception {
+	public void testCommandExpression_githubReports_valid() {
 		//all tests are from github issues page: https://github.com/kayler-renslow/arma-intellij-plugin/issues/
 
 		assertNoProblems("AAS_JIPplayer = not isServer && isNull player;");//55
@@ -590,18 +586,18 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("toLower(player getVariable ['LIB_Static_Weapon_Magazine', ''])"); //60
 	}
 
-	public void testCommandExpression_randomExpressions_bad() throws Exception {
+	public void testCommandExpression_randomExpressions_bad() {
 		assertHasProblems("createVehicle");
 	}
 
-	public void testCommandExpression_ifThen_valid() throws Exception {
+	public void testCommandExpression_ifThen_valid() {
 		assertExitTypeAndNoProblems("if true then {};", null, BaseType.ANYTHING);
 		assertExitTypeAndNoProblems("if true then {} else {};", null, BaseType.ARRAY);
 		assertExitTypeAndNoProblems("if true then [{},{}];", null, BaseType.ANYTHING);
 		assertExitTypeAndNoProblems("if true then [{},{},{}];", null, BaseType.ANYTHING);
 	}
 
-	public void testCommandExpression_ifThen_bad() throws Exception {
+	public void testCommandExpression_ifThen_bad() {
 		assertHasProblems("if 1 then {};");
 		assertHasProblems("if true then {} else;");
 		assertHasProblems("if true then [{}];");
@@ -612,13 +608,13 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertHasProblems("if true then;");
 	}
 
-	public void testCommandExpression_noArgsCommands_bad() throws Exception {
+	public void testCommandExpression_noArgsCommands_bad() {
 		assertHasProblems("true true;"); //need semicolon
 		assertHasProblems("true 1;"); //need semicolon
 
 	}
 
-	public void testCommandExpression_optionalParameters() throws Exception {
+	public void testCommandExpression_optionalParameters() {
 		//fake a command syntax to assert that the syntax xml isn't the creating false positives/negatives
 		CommandDescriptor d1 = new CommandDescriptor("getPos", Arrays.asList(
 				new CommandSyntax(
