@@ -1,15 +1,23 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <command name='-' version='' game='' format='1'>
+	<!-- Signed Expressions (+1 or +thing)-->
 	<syntax>
 		<return>
-			<value type='NUMBER' order='0'></value>
+			<value type='NUMBER' order='0'/>
+		</return>
+		<param type='NUMBER' name='r' optional='f' order='1'/>
+	</syntax>
+	<!-- Binary expressions (thing-thing)-->
+	<syntax>
+		<return>
+			<value type='NUMBER' order='0'/>
 		</return>
 		<param type='NUMBER' name='l' optional='f' order='0'/>
 		<param type='NUMBER' name='r' optional='f' order='1'/>
 	</syntax>
 	<syntax>
 		<return>
-			<value type='ARRAY' order='0'></value>
+			<value type='ARRAY' order='0'/>
 		</return>
 		<param type='ARRAY' name='l' optional='f' order='0'/>
 		<param type='ARRAY' name='r' optional='f' order='1'/>
