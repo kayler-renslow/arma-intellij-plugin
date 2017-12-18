@@ -60,6 +60,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		if (element == null) {
 			return null;
 		}
+		if (element.getNode() == null) {
+			return null;
+		}
 		List<String> lst = new ArrayList<>();
 		if (SQFParserDefinition.isCommand(element.getNode().getElementType()) || SQFStatic.isBisFunction(element.getText())) {
 			lst.add(SQFStatic.BIS_WIKI_URL_PREFIX + element.getText());
@@ -72,6 +75,9 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 	@Override
 	public String generateDoc(PsiElement element, @Nullable PsiElement originalElement) {
 		if (element == null) {
+			return null;
+		}
+		if (element.getNode() == null) {
 			return null;
 		}
 		if (element instanceof XmlTag) {

@@ -154,6 +154,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return (ValueType) expr1.accept(this, cluster);
 	}
 
+
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFCommandExpression expr, @NotNull CommandDescriptorCluster cluster) {
@@ -204,7 +205,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		SQFExpressionOperator exprOperator = commandPart.getOperator();
-		CommandDescriptor descriptor  = getDescriptorForOperator(exprOperator, cluster);;
+		CommandDescriptor descriptor = getDescriptorForOperator(exprOperator, cluster);
+		;
 		String commandName = descriptor.getCommandName();
 
 		Function<CommandExpressionPart, ValueType> getTypeForPart = commandExpressionPart -> {
@@ -223,7 +225,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			prefixType = previousCommandReturnType;
 		}
 
-		LinkedList<CommandExpressionPart> partsAfterGettingPeekNextPartType = new LinkedList<>();;
+		LinkedList<CommandExpressionPart> partsAfterGettingPeekNextPartType = new LinkedList<>();
+		;
 		partsAfterGettingPeekNextPartType.addAll(parts);
 		int peekDepthBeforeGettingPeekNextPartType = peekPartDepth.count;
 		ValueType peekNextPartType = null;
