@@ -579,6 +579,17 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("for \"_i\" from 0 to 1 step -1 do {};");
 	}
 
+	public void testCommandExpression_githubReports_valid() throws Exception {
+		//all tests are from github issues page: https://github.com/kayler-renslow/arma-intellij-plugin/issues/
+
+		assertNoProblems("AAS_JIPplayer = not isServer && isNull player;");//55
+		assertNoProblems("_ammoType = getText(configFile/'CfgMagazines'/_x/'ammo')"); //56
+		assertNoProblems("_target setPosASL [(eyePos _unit select 0) + 10 * sin _angle, (eyePos _unit select 1) + 10 * cos _angle, eyePos _unit select 2];"); //57
+		assertNoProblems("if((missionNameSpace getVariable ['LIB_Explosion_Effect_Intensity', 0]) <= 0) then {};");//58
+		assertNoProblems("_gun animate ['Rotation_Chassis', 1];");//59
+		assertNoProblems("toLower(player getVariable ['LIB_Static_Weapon_Magazine', ''])"); //60
+	}
+
 	public void testCommandExpression_randomExpressions_bad() throws Exception {
 		assertHasProblems("createVehicle");
 	}
