@@ -206,7 +206,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		SQFExpressionOperator exprOperator = commandPart.getOperator();
 		CommandDescriptor descriptor = getDescriptorForOperator(exprOperator, cluster);
-		;
+
 		String commandName = descriptor.getCommandName();
 
 		Function<CommandExpressionPart, ValueType> getTypeForPart = commandExpressionPart -> {
@@ -226,7 +226,6 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 
 		LinkedList<CommandExpressionPart> partsAfterGettingPeekNextPartType = new LinkedList<>();
-		;
 		partsAfterGettingPeekNextPartType.addAll(parts);
 		int peekDepthBeforeGettingPeekNextPartType = peekPartDepth.count;
 		ValueType peekNextPartType = null;
@@ -244,8 +243,34 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 							null
 					);
 				} else {
-					peekNextPartType = getTypeForPart.apply(peekNextPart);
-					partsAfterGettingPeekNextPartType.removeFirst();
+
+					IElementType operatorType = commandPart.getOperator().getOperatorType();
+					final boolean isForwardLooking = operatorType == SQFTypes.BARBAR
+							|| operatorType == SQFTypes.AMPAMP
+							|| operatorType == SQFTypes.EQEQ
+							|| operatorType == SQFTypes.NE
+							|| operatorType == SQFTypes.GT
+							|| operatorType == SQFTypes.GE
+							|| operatorType == SQFTypes.LT
+							|| operatorType == SQFTypes.LE;
+
+					//for some reason, in SQF, &&, ||, ==, !=, <, >, <=, >= don't consume
+					//just the next token, but rather, evaluates everything after the operator
+					//and then uses that evaluated type as the right hand side.
+					// For example, instead of true || 1 + count [] >= 0 throwing an error saying "true || 1" is invalid,
+					// it evaluates 1 + count [] to a number, passes it into >= left and side, and the boolean created from
+					// >= is passed into || operator
+					if (isForwardLooking && (peekNextPart.isOperatorPart() || parts.size() > 1)) {
+						peekNextPartType = getReturnTypeForCommand(
+								partsAfterGettingPeekNextPartType,
+								null,
+								peekPartDepth,
+								null
+						);
+					} else {
+						peekNextPartType = getTypeForPart.apply(peekNextPart);
+						partsAfterGettingPeekNextPartType.removeFirst();
+					}
 				}
 			}
 		}
