@@ -186,6 +186,7 @@ public class ExpandedValueType extends ValueType {
 				if (i != size - 1) {
 					sb.append(", ");
 				}
+				i++;
 			}
 			if (isUnbounded) {
 				sb.append("...");
@@ -228,6 +229,7 @@ public class ExpandedValueType extends ValueType {
 				if (i != size - 1) {
 					sb.append(",");
 				}
+				i++;
 			}
 			if (isUnbounded) {
 				sb.append("...");
