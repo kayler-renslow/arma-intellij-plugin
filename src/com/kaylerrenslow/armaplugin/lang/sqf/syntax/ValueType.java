@@ -287,6 +287,11 @@ public abstract class ValueType {
 		return obj == this || (obj instanceof ValueType && this.isHardEqual((ValueType) obj));
 	}
 
+	@Override
+	public String toString() {
+		return getType();
+	}
+
 	public static class BaseType extends ValueType {
 		public static final BaseType ANYTHING = new BaseType("ANYTHING", "Anything");
 		public static final BaseType ARRAY = new BaseType("ARRAY", "Array", new ExpandedValueType(true));

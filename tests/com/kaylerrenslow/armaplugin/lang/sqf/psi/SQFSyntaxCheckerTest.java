@@ -363,9 +363,12 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertHasProblems("locationNull==false");
 		assertHasProblems("(parseText '')==0");
 
+		//in SQF, you can't compare booleans with == and !=
 		assertHasProblems("false == true");
 		assertHasProblems("_var == true");
 		assertHasProblems("true == _var");
+		assertHasProblems("_var != true");
+		assertHasProblems("true != _var");
 
 		assertHasProblems("[] != []");
 		assertHasProblems("1 != []");
@@ -382,8 +385,6 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertHasProblems("locationNull!=false");
 		assertHasProblems("(parseText '')!=0");
 
-		assertHasProblems("_var != true");
-		assertHasProblems("true != _var");
 	}
 
 	public void testCompExpression_valid_variable() {
@@ -566,7 +567,6 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("_ctrl ctrlSetStructuredText parseText '';");
 		assertNoProblems("parseText localize \"str_vsm_no_vehicle\";");
 		assertNoProblems("if(count _numArr == 0) exitWith{};");
-		//todo what if we split up the commands? Example: EVERYTHING_BEFORE_OR || EVERYTHING_AFTER_OR
 		assertNoProblems("if((_i + 1) >= count _numArr || (_i + 1) >= count _opNumArr) exitWith{};");
 		assertNoProblems("if(_numArr select _i > _opNumArr select _i) then {};");
 		assertNoProblems("_numArr select _i == _opNumArr select _i");

@@ -224,7 +224,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			if (peekNextPart != null) {
 
 				if (peekNextPart.isOperatorPart()) {
-					if (isForwardLookingCommand(peekNextPart.getOperator().getOperatorType())) {
+					if (isForwardLookingCommand(peekNextPart.getOperator())) {
 						//forward looking commands are binary expressions, so there is no point in peeking ahead.
 						peekNextPartType = null;
 					} else {
@@ -238,8 +238,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 						);
 					}
 				} else {
-					final boolean isForwardLookingCommand = isForwardLookingCommand(commandPart.getOperator().getOperatorType());
-					if (isForwardLookingCommand && (peekNextPart.isOperatorPart() || parts.size() > 1)) {
+					final boolean isForwardLookingCommand = isForwardLookingCommand(commandPart.getOperator());
+					if (isForwardLookingCommand && parts.size() > 1) {
 						peekNextPartType = getReturnTypeForCommand(
 								partsAfterGettingPeekNextPartType,
 								null,
@@ -297,8 +297,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				for (int i = 0; !partsAfterGettingPeekNextPartType.isEmpty() && i < peekPartDepth.count; i++) {
 					partsAfterGettingPeekNextPartType.removeFirst();
 				}
-				parts = partsAfterGettingPeekNextPartType;
 				peekPartDepth.count++;
+				parts = partsAfterGettingPeekNextPartType;
 			} else {
 				peekPartDepth.count = peekDepthBeforeGettingPeekNextPartType;
 			}
@@ -336,7 +336,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					}
 				}
 				if (consumeMoreCommands) {
-					retType = getReturnTypeForCommand(parts, retType, new Counter(0), problems);
+					peekPartDepth.count = 0; //reset depth
+					retType = getReturnTypeForCommand(parts, retType, peekPartDepth, problems);
 				}
 			}
 			return retType;
@@ -376,7 +377,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * <p>
 	 * isForwardLooking is a simple check to see if the command is one of the operators that behaves this way.
 	 */
-	private boolean isForwardLookingCommand(@NotNull IElementType operatorType) {
+	private boolean isForwardLookingCommand(@NotNull SQFExpressionOperator operator) {
+		IElementType operatorType = operator.getOperatorType();
 		return operatorType == SQFTypes.BARBAR
 				|| operatorType == SQFTypes.AMPAMP
 				|| operatorType == SQFTypes.EQEQ
