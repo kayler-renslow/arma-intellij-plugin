@@ -49,6 +49,7 @@
 		<localInspection language="Arma.SQF"
 						 implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.inspections.SQFSyntaxAndTypeCheckingInspection"
 						 enabledByDefault="true" groupName="Arma SQF" hasStaticDescription="true" level="ERROR"/>
+		<colorSettingsPage implementation="com.kaylerrenslow.armaplugin.lang.sqf.psi.codestyle.SQFColorSettingsPage"/>
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Header Language -->
