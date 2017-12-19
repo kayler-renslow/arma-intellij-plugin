@@ -98,7 +98,7 @@ public class CommandDescriptor {
 	}
 
 	/**
-	 * @return true if the syntaxes for the command aren't exactly know and the current syntaxes are estimates
+	 * @return true if the syntaxes for the command aren't exactly known and the current syntaxes are estimates
 	 */
 	public boolean isUncertain() {
 		return uncertain;
@@ -111,5 +111,14 @@ public class CommandDescriptor {
 	@Override
 	public int hashCode() {
 		return commandName.hashCode();
+	}
+
+	@Override
+	public String toString() {
+		return "CommandDescriptor{" +
+				"commandName='" + commandName + '\'' +
+				", deprecated=" + deprecated +
+				", uncertain=" + uncertain +
+				'}';
 	}
 }

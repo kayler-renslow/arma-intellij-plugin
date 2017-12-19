@@ -442,7 +442,7 @@ public abstract class ValueType {
 		 * This is for Arma Intellij Plugin to signify a variable is being used
 		 * and that the type is indeterminate with static type checking.
 		 */
-		public static final BaseType _VARIABLE = new BaseType("_VARIABLE", "`VARIABLE`");
+		public static final BaseType _VARIABLE = new BaseType("_VARIABLE", "VARIABLE");
 		/**
 		 * Not an actual Arma 3 data type.
 		 * This is for Arma Intellij Plugin to signify a type couldn't be determined because of an error.

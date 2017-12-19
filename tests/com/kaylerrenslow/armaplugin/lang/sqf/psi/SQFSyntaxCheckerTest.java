@@ -584,6 +584,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("if((missionNameSpace getVariable ['LIB_Explosion_Effect_Intensity', 0]) <= 0) then {};");//58
 		assertNoProblems("_gun animate ['Rotation_Chassis', 1];");//59
 		assertNoProblems("toLower(player getVariable ['LIB_Static_Weapon_Magazine', ''])"); //60
+		assertNoProblems("diag_log format['***Magazine found in player's backpack']");//61
 	}
 
 	public void testCommandExpression_randomExpressions_bad() {

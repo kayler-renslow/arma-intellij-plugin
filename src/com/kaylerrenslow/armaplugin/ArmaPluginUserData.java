@@ -11,6 +11,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.xml.XmlFile;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
+import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParseResult;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderParser;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import com.kaylerrenslow.armaplugin.settings.ArmaPluginApplicationSettings;
@@ -68,11 +69,11 @@ public class ArmaPluginUserData {
 			List<HeaderFile> parsedFiles = new ArrayList<>();
 			for (VirtualFile configVirtualFile : configVirtualFiles) {
 				try {
-					HeaderFile file = HeaderParser.parse(
+					HeaderParseResult result = HeaderParser.parse(
 							new VirtualFileHeaderFileTextProvider(configVirtualFile, elementFromModule.getProject()),
 							new File(imlDir)
 					);
-					parsedFiles.add(file);
+					parsedFiles.add(result.getFile());
 				} catch (Exception e) {
 					System.out.println("Header Parse Exception:" + e.getMessage());
 					Notifications.Bus.notify(new HeaderFileParseErrorNotification(e));

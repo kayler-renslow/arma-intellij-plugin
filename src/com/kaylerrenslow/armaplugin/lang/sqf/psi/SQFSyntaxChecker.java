@@ -10,7 +10,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Function;
 
 import static com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.BaseType.*;
 
@@ -209,18 +208,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		String commandName = descriptor.getCommandName();
 
-		Function<CommandExpressionPart, ValueType> getTypeForPart = commandExpressionPart -> {
-			SQFCommandArgument arg = commandExpressionPart.getArgument();
-			SQFExpression expr = arg.getExpr();
-			SQFCodeBlock block = arg.getBlock();
-			if (block == null) {
-				return (ValueType) expr.accept(this, cluster);
-			}
-			return new CodeType(fullyVisitCodeBlockScope(block, cluster));
-		};
-
 		if (prefixPart != null) {
-			prefixType = getTypeForPart.apply(prefixPart);
+			prefixType = getValueTypeForPart(prefixPart);
 		} else {
 			prefixType = previousCommandReturnType;
 		}
@@ -233,34 +222,24 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			CommandExpressionPart peekNextPart = parts.peekFirst();
 
 			if (peekNextPart != null) {
+
 				if (peekNextPart.isOperatorPart()) {
-					//pass null to problems reporter because we are TESTING to see if
-					//the peeked next part COULD work. If there was problems, we can just ignore it.
-					peekNextPartType = getReturnTypeForCommand(
-							partsAfterGettingPeekNextPartType,
-							null,
-							peekPartDepth,
-							null
-					);
+					if (isForwardLookingCommand(peekNextPart.getOperator().getOperatorType())) {
+						//forward looking commands are binary expressions, so there is no point in peeking ahead.
+						peekNextPartType = null;
+					} else {
+						//pass null to problems reporter because we are TESTING to see if
+						//the peeked next part COULD work. If there was problems, we can just ignore it.
+						peekNextPartType = getReturnTypeForCommand(
+								partsAfterGettingPeekNextPartType,
+								null,
+								peekPartDepth,
+								null
+						);
+					}
 				} else {
-
-					IElementType operatorType = commandPart.getOperator().getOperatorType();
-					final boolean isForwardLooking = operatorType == SQFTypes.BARBAR
-							|| operatorType == SQFTypes.AMPAMP
-							|| operatorType == SQFTypes.EQEQ
-							|| operatorType == SQFTypes.NE
-							|| operatorType == SQFTypes.GT
-							|| operatorType == SQFTypes.GE
-							|| operatorType == SQFTypes.LT
-							|| operatorType == SQFTypes.LE;
-
-					//for some reason, in SQF, &&, ||, ==, !=, <, >, <=, >= don't consume
-					//just the next token, but rather, evaluates everything after the operator
-					//and then uses that evaluated type as the right hand side.
-					// For example, instead of true || 1 + count [] >= 0 throwing an error saying "true || 1" is invalid,
-					// it evaluates 1 + count [] to a number, passes it into >= left and side, and the boolean created from
-					// >= is passed into || operator
-					if (isForwardLooking && (peekNextPart.isOperatorPart() || parts.size() > 1)) {
+					final boolean isForwardLookingCommand = isForwardLookingCommand(commandPart.getOperator().getOperatorType());
+					if (isForwardLookingCommand && (peekNextPart.isOperatorPart() || parts.size() > 1)) {
 						peekNextPartType = getReturnTypeForCommand(
 								partsAfterGettingPeekNextPartType,
 								null,
@@ -268,7 +247,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 								null
 						);
 					} else {
-						peekNextPartType = getTypeForPart.apply(peekNextPart);
+						peekNextPartType = getValueTypeForPart(peekNextPart);
 						partsAfterGettingPeekNextPartType.removeFirst();
 					}
 				}
@@ -382,6 +361,41 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 		}
 		return BaseType._ERROR;
+	}
+
+	/**
+	 * For some reason, in SQF, &&, ||, ==, !=, <, >, <=, >= don't consume
+	 * just the next token, but rather, evaluates everything after the operator
+	 * and then uses that evaluated type as the right hand side.
+	 * For example, instead of true || 1 + count [] >= 0 throwing an error saying "true || 1" is invalid,
+	 * it evaluates 1 + count [] to a number, passes it into >= left and side, and the boolean created from
+	 * >= is passed into || operator.
+	 * <p>
+	 * This forward looking behavior also is present for the left operand. not isServer && !isNull player
+	 * will evaluate "not isServer" completely, then "!isNull player", then combine both results in &&.
+	 * <p>
+	 * isForwardLooking is a simple check to see if the command is one of the operators that behaves this way.
+	 */
+	private boolean isForwardLookingCommand(@NotNull IElementType operatorType) {
+		return operatorType == SQFTypes.BARBAR
+				|| operatorType == SQFTypes.AMPAMP
+				|| operatorType == SQFTypes.EQEQ
+				|| operatorType == SQFTypes.NE
+				|| operatorType == SQFTypes.GT
+				|| operatorType == SQFTypes.GE
+				|| operatorType == SQFTypes.LT
+				|| operatorType == SQFTypes.LE;
+	}
+
+	@NotNull
+	private ValueType getValueTypeForPart(CommandExpressionPart commandExpressionPart) {
+		SQFCommandArgument arg = commandExpressionPart.getArgument();
+		SQFExpression expr = arg.getExpr();
+		SQFCodeBlock block = arg.getBlock();
+		if (block == null) {
+			return (ValueType) expr.accept(this, cluster);
+		}
+		return new CodeType(fullyVisitCodeBlockScope(block, cluster));
 	}
 
 	@NotNull
