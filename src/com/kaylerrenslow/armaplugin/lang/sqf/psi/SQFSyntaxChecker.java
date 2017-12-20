@@ -180,14 +180,53 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 		}
 
-		return getReturnTypeForCommand(parts, null, new Counter(0), problems);
+		return getReturnTypeForCommand(
+				parts,
+				null,
+				new Counter(0),
+				problems, new LinkedList<>(),
+				new Counter(0)
+		);
 	}
 
+	/**
+	 * Gets a returned {@link ValueType} for a {@link SQFCommandExpression} that is broken up into a list of {@link CommandExpressionPart} instances.
+	 * <p>
+	 * This method recursively calls itself to syntax and type check command expressions. This method will also
+	 * report problems to the specified {@link ProblemsHolder}. Since some commands require a right type (postfix type)
+	 * and some commands can be chained (for example, "hint format ['']" is a chain of commands), the right type
+	 * may be determined by recursively calling this method without error reporting (this is called peeking).
+	 * <p>
+	 * An example of peeking is with "hint format ['']". The first command is hint, but its right type (postfix type)
+	 * requires a {@link BaseType#STRING}. It checks the next part, which is the format command. It then
+	 * invokes this method with format being the starting command part. Then, format notices that the next type
+	 * is not a command. If you look at the SQF grammar file, an array is contained in a {@link SQFLiteralExpression},
+	 * so this method will call {@link SQFLiteralExpression#accept(SQFSyntaxVisitor, CommandDescriptorCluster)}
+	 * to get the correct {@link ValueType}. From this point, format [''] will then return a {@link BaseType#STRING}
+	 * and then pass it into hint.
+	 * <p>
+	 * Sometimes when peeking, there is no alternative option. But because the {@link ProblemsHolder} is passed as null
+	 * when peeking, all potential problems ({@link PotentialProblem} instances that were created as a result of peeking)
+	 * are stored in a list and then are subsequently reported to the {@link ProblemsHolder}. You can think of {@link PotentialProblem}
+	 * as a future problem report when a peek fails. But when a peek succeeds, no {@link PotentialProblem} instances should be reported.
+	 * Also, if a peek succeeds, all {@link PotentialProblem} instances created from the peek need to be removed.
+	 *
+	 * @param parts                     all parts
+	 * @param previousCommandReturnType the returned value of a previous recursive call,
+	 *                                  or null if the type hasn't been determined (peeking commands)
+	 * @param peekPartDepth             the current peeking count (>= 0, 0 means not peeking)
+	 * @param problems                  problems
+	 * @param potentialProblems         potential problems from peeking
+	 * @param reportCount               how many problems have been reported (>= 0)
+	 * @return the last command's returned {@link ValueType}
+	 */
 	@NotNull
 	private ValueType getReturnTypeForCommand(@NotNull LinkedList<CommandExpressionPart> parts,
 											  @Nullable ValueType previousCommandReturnType,
 											  @NotNull Counter peekPartDepth,
-											  @Nullable ProblemsHolder problems) {
+											  @Nullable ProblemsHolder problems,
+											  @NotNull LinkedList<PotentialProblem> potentialProblems,
+											  @NotNull Counter reportCount) {
 
 		ValueType prefixType = null;
 
@@ -234,7 +273,9 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 								partsAfterGettingPeekNextPartType,
 								null,
 								peekPartDepth,
-								null
+								null,
+								potentialProblems,
+								reportCount
 						);
 					}
 				} else {
@@ -244,7 +285,9 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 								partsAfterGettingPeekNextPartType,
 								null,
 								peekPartDepth,
-								null
+								null,
+								potentialProblems,
+								reportCount
 						);
 					} else {
 						peekNextPartType = getValueTypeForPart(peekNextPart);
@@ -299,6 +342,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				}
 				peekPartDepth.count++;
 				parts = partsAfterGettingPeekNextPartType;
+				//remove all potential problems resulted from the peek
+				potentialProblems.clear();
 			} else {
 				peekPartDepth.count = peekDepthBeforeGettingPeekNextPartType;
 			}
@@ -325,42 +370,63 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 						}
 					}
 				} else {
+					//todo what about handling forward looking commands here?
 					expectedSemicolon = true;
 				}
 				if (expectedSemicolon) {
-					if (problems != null) {
+					if (problems != null && reportCount.count <= 0) {
 						problems.registerProblem(
 								parts.getFirst().getPsiElement(), "Expected ;",
 								ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 						);
+						reportCount.count++;
 					}
 				}
 				if (consumeMoreCommands) {
 					peekPartDepth.count = 0; //reset depth
-					retType = getReturnTypeForCommand(parts, retType, peekPartDepth, problems);
+					retType = getReturnTypeForCommand(parts, retType, peekPartDepth, problems, potentialProblems, reportCount);
 				}
 			}
 			return retType;
 		}
-		if (problems != null) {
-			if (peekNextPartType == null) {
-				problems.registerProblem(
-						exprOperator,
-						"No syntax for '" +
-								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
-								+ commandName + "'",
-						ProblemHighlightType.GENERIC_ERROR_OR_WARNING
-				);
+
+		PotentialProblem problem;
+
+		if (peekNextPartType == null) {
+			problem = new PotentialProblem(
+					exprOperator,
+					"No syntax for '" +
+							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
+							+ commandName + "'",
+					ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+			);
+		} else {
+			problem = new PotentialProblem(
+					exprOperator,
+					"No syntax for '" +
+							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
+							+ commandName + " " + peekNextPartType.getDisplayName() + "'",
+					ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+			);
+		}
+
+		if (reportCount.count <= 0) {
+			if (problems != null) {
+				if (potentialProblems.isEmpty()) {
+					reportCount.count++;
+					problems.registerProblem(problem.getErrorElement(), problem.getMessage(), problem.getHighlightType());
+				} else {
+					//report only the oldest potential problem
+					PotentialProblem actualProblem = potentialProblems.getFirst();
+					problems.registerProblem(actualProblem.getErrorElement(), actualProblem.getMessage(), actualProblem.getHighlightType());
+					reportCount.count++;
+					potentialProblems.clear();
+				}
 			} else {
-				problems.registerProblem(
-						exprOperator,
-						"No syntax for '" +
-								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
-								+ commandName + " " + peekNextPartType.getDisplayName() + "'",
-						ProblemHighlightType.GENERIC_ERROR_OR_WARNING
-				);
+				potentialProblems.add(problem);
 			}
 		}
+
 		return BaseType._ERROR;
 	}
 
@@ -594,4 +660,33 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		}
 	}
 
+	private static class PotentialProblem {
+		@NotNull
+		private final PsiElement errorElement;
+		@NotNull
+		private final String message;
+		@NotNull
+		private final ProblemHighlightType highlightType;
+
+		public PotentialProblem(@NotNull PsiElement errorElement, @NotNull String message, @NotNull ProblemHighlightType highlightType) {
+			this.errorElement = errorElement;
+			this.message = message;
+			this.highlightType = highlightType;
+		}
+
+		@NotNull
+		public PsiElement getErrorElement() {
+			return errorElement;
+		}
+
+		@NotNull
+		public String getMessage() {
+			return message;
+		}
+
+		@NotNull
+		public ProblemHighlightType getHighlightType() {
+			return highlightType;
+		}
+	}
 }

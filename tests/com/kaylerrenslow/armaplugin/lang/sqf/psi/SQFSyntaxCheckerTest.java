@@ -563,6 +563,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----START command expression----
 	public void testCommandExpression_randomExpressions_valid() {
+		assertNoProblems("if(_numArr select _i < 0 && count _numArr > 1) then{};");
 		assertNoProblems("_ctrl ctrlSetStructuredText parseText localize \"str_vsm_no_vehicle\";");
 		assertNoProblems("_ctrl ctrlSetStructuredText parseText '';");
 		assertNoProblems("parseText localize \"str_vsm_no_vehicle\";");
@@ -573,7 +574,6 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 		assertNoProblems("[_mhq, [_deployLabel, { [_this select 0] call MHQ_fnc_mhqDeployAction; }, [], 6, false, false, \"\", \"(speed (vehicle _target)) < 1 && (getPosATL _target) select 2 < 2\"]] remoteExec [\"addAction\", 0, true]");
 		assertNoProblems("for \"_i\" from 0 to 1 do {};");
 		assertNoProblems("for \"_i\" from 0 to 1 step -1 do {};");
-		assertNoProblems("if(_numArr select _i < 0 && count _numArr > 1) then{};");
 		assertNoProblems("if(_numArr select _i == 0 && _i != 0) then{};");
 		assertNoProblems("for [{_i = 0}, {_i < count _numArr - 1}, {_i = _i + 1}] do{};");
 	}
