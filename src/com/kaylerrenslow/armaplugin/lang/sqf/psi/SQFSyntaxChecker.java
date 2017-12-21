@@ -184,8 +184,9 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		return getReturnTypeForCommand(
 				parts,
 				null,
-				new Counter(0),
-				problems, new LinkedList<>(),
+				new LinkedList<>(),
+				problems,
+				new LinkedList<>(),
 				new Counter(0)
 		);
 	}
@@ -215,7 +216,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * @param parts                     all parts
 	 * @param previousCommandReturnType the returned value of a previous recursive call,
 	 *                                  or null if the type hasn't been determined (peeking commands)
-	 * @param peekPartDepth             the current peeking count (>= 0, 0 means not peeking)
+	 * @param removedParts              all parts removed from the current invocation (requires a new list for each recursive call).
+	 *                                  These parts will be added back if a peek wasn't used or a peek failed.
 	 * @param problems                  problems
 	 * @param potentialProblems         potential problems from peeking
 	 * @param reportCount               how many problems have been reported (>= 0)
@@ -224,17 +226,17 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@NotNull
 	private ValueType getReturnTypeForCommand(@NotNull LinkedList<CommandExpressionPart> parts,
 											  @Nullable ValueType previousCommandReturnType,
-											  @NotNull Counter peekPartDepth,
+											  @NotNull LinkedList<CommandExpressionPart> removedParts,
 											  @Nullable ProblemsHolder problems,
 											  @NotNull LinkedList<PotentialProblem> potentialProblems,
 											  @NotNull Counter reportCount) {
-
 		ValueType prefixType = null;
-
 		CommandExpressionPart prefixPart = parts.removeFirst();
+		removedParts.push(prefixPart);
 		CommandExpressionPart commandPart = null;
 		if (!prefixPart.isOperatorPart()) {
 			commandPart = parts.removeFirst();
+			removedParts.push(commandPart);
 			if (!commandPart.isOperatorPart()) {
 				throw new IllegalStateException("expected command part");
 			}
@@ -245,7 +247,6 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		SQFExpressionOperator exprOperator = commandPart.getOperator();
 		CommandDescriptor descriptor = getDescriptorForOperator(exprOperator, cluster);
-
 		String commandName = descriptor.getCommandName();
 
 		if (prefixPart != null) {
@@ -254,40 +255,37 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			prefixType = previousCommandReturnType;
 		}
 
-		LinkedList<CommandExpressionPart> partsAfterPeek = new LinkedList<>();
-		partsAfterPeek.addAll(parts);
-		int peekDepthBeforeGettingPeekNextPartType = peekPartDepth.count;
-		ValueType peekNextPartType = null;
-		{
-			CommandExpressionPart peekNextPart = parts.peekFirst();
+		ValueType peekType = null;
 
-			if (peekNextPart != null) {
+		CommandExpressionPart peekPart = parts.peekFirst();
 
-				if (peekNextPart.isOperatorPart()) {
-					if (isForwardLookingCommand(peekNextPart.getOperator())) {
-						//forward looking commands are binary expressions, so there is no point in peeking ahead.
-						peekNextPartType = null;
-					} else {
-						//pass null to problems reporter because we are TESTING to see if
-						//the peeked next part COULD work. If there was problems, we can just ignore it.
-						peekNextPartType = getReturnTypeForCommand(
-								partsAfterPeek,
-								null,
-								peekPartDepth,
-								null,
-								potentialProblems,
-								reportCount
-						);
-					}
+		if (peekPart != null) {
+
+			if (peekPart.isOperatorPart()) {
+				if (isForwardLookingCommand(peekPart.getOperator())) {
+					//forward looking commands are binary expressions, so there is no point in peeking ahead.
+					peekType = null;
 				} else {
-					final boolean isForwardLookingCommand = isForwardLookingCommand(commandPart.getOperator());
-					if (isForwardLookingCommand && parts.size() > 1) {
-						int numForwardLookers = 0;
-						for (CommandExpressionPart part : partsAfterPeek) {
-							if (part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
-								numForwardLookers++;
-							}
+					//pass null to problems reporter because we are TESTING to see if
+					//the peeked next part COULD work. If there was problems, we can just ignore it.
+					peekType = getReturnTypeForCommand(
+							parts,
+							null,
+							new LinkedList<>(),
+							null,
+							potentialProblems,
+							reportCount
+					);
+				}
+			} else {
+				final boolean isForwardLookingCommand = isForwardLookingCommand(commandPart.getOperator());
+				if (isForwardLookingCommand && parts.size() > 1) {
+					int numForwardLookers = 0;
+					for (CommandExpressionPart part : parts) {
+						if (part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
+							numForwardLookers++;
 						}
+					}
 						/*If there is an even number of forward looking operators, we want to remove all the ones
 						  past the current one. If there is an odd number, then we keep them.
 
@@ -296,44 +294,47 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 						  which is NUMBER || BOOLEAN and is invalid. Notice that also if we forward peeked at 1 < 2, there are
 						  an even number of forward looking commands ( || and > ). So, after we have evaluated 1 < 2,
 						  we are then on the || command. We already have BOOLEAN as left hand side for  || and there is
-						  an odd number of forward looking commands left, so we evaluate everything after || (which is 2 > 3).
+						  an odd number of forward looking commands after ||, so we evaluate everything after || (which is 2 > 3).
 						  So, 2 > 3 results in BOOLEAN and we have BOOLEAN || BOOLEAN, which is valid.
 						*/
-						if (numForwardLookers % 2 == 0) {
-							boolean trim = false;
-							Iterator<CommandExpressionPart> iter = partsAfterPeek.iterator();
-							while (iter.hasNext()) {
-								CommandExpressionPart part = iter.next();
-								if (trim || part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
-									trim = true;
-									iter.remove();
-								}
+					if (numForwardLookers % 2 == 0) {
+						boolean trim = false;
+						Iterator<CommandExpressionPart> iter = parts.iterator();
+						while (iter.hasNext()) {
+							CommandExpressionPart part = iter.next();
+							if (trim || part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
+								trim = true;
+								iter.remove();
+								removedParts.push(part);
 							}
 						}
-						if (partsAfterPeek.getFirst().isArgumentPart() && partsAfterPeek.size() == 1) {
-							// After we remove all forward looking commands, there may only be an argument part left
-							peekNextPartType = getValueTypeForPart(partsAfterPeek.getFirst());
-							partsAfterPeek.removeFirst();
-						} else {
-							peekNextPartType = getReturnTypeForCommand(
-									partsAfterPeek,
-									null,
-									peekPartDepth,
-									null,
-									potentialProblems,
-									reportCount
-							);
-						}
-					} else {
-						peekNextPartType = getValueTypeForPart(peekNextPart);
-						partsAfterPeek.removeFirst();
 					}
+					if (parts.getFirst().isArgumentPart() && parts.size() == 1) {
+						// After we remove all forward looking commands, there may only be an argument part left
+						peekType = getValueTypeForPart(parts.getFirst());
+						removedParts.push(parts.removeFirst());
+					} else {
+						peekType = getReturnTypeForCommand(
+								parts,
+								null,
+								new LinkedList<>(),
+								null,
+								potentialProblems,
+								reportCount
+						);
+					}
+				} else {
+					peekType = getValueTypeForPart(peekPart);
+					removedParts.push(parts.removeFirst());
 				}
 			}
 		}
 
+
 		//find syntaxes with matching prefix and postfix value types
-		boolean usingPeekedNextPart = false;
+		CommandSyntax matchedSyntax = null;
+		boolean usedPeekType = false;
+		boolean keepPartsRemoved = false;
 		for (CommandSyntax syntax : descriptor.getSyntaxList()) {
 			Param prefixParam = syntax.getPrefixParam();
 			Param postfixParam = syntax.getPostfixParam();
@@ -342,52 +343,61 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					continue;
 				}
 			} else {
-				if (!prefixParam.isOptional()) {
-					if (prefixType == null) {
+				if (prefixType == null) {
+					if (!prefixParam.isOptional()) {
+						continue;
+					}
+				} else {
+					if (!prefixParam.containsType(prefixType)) {
 						continue;
 					}
 				}
-				if (prefixType != null && !prefixParam.containsType(prefixType)) {
-					continue;
-				}
 			}
+
 			if (postfixParam == null) {
-				usingPeekedNextPart = false;
+				usedPeekType = false;
+				matchedSyntax = syntax;
+				keepPartsRemoved = true;
+				break;
 			} else {
-				if (peekNextPartType != null && peekNextPartType.isHardEqual(_ERROR)) {
-					continue;
-				}
-				if (!postfixParam.isOptional()) {
-					if (peekNextPartType == null) {
+				if (peekType == null) {
+					if (!postfixParam.isOptional()) {
 						continue;
 					}
+					keepPartsRemoved = true;
+					matchedSyntax = syntax;
+					break;
+				} else {
+					if (peekType.isHardEqual(_ERROR)) {
+						continue;
+					}
+					if (!postfixParam.containsType(peekType)) {
+						continue;
+					}
+					usedPeekType = true;
+					matchedSyntax = syntax;
+					break;
 				}
-				if (peekNextPartType != null && !postfixParam.containsType(peekNextPartType)) {
-					continue;
-				}
-				usingPeekedNextPart = true;
 			}
+		}
 
-			if (usingPeekedNextPart) {
-				//since parts is duplicated for each recursive call, we need to make sure
-				//we consume the same amount of parts as the previous recursive call
-				//for cases like parseText localize ''
-				for (int i = 0; !partsAfterPeek.isEmpty() && i < peekPartDepth.count; i++) {
-					partsAfterPeek.removeFirst();
-				}
-				peekPartDepth.count++;
-				parts = partsAfterPeek;
-				//remove all potential problems resulted from the peek
-				potentialProblems.clear();
-			} else {
-				peekPartDepth.count = peekDepthBeforeGettingPeekNextPartType;
+		if (!usedPeekType && !keepPartsRemoved) {
+			while (!removedParts.isEmpty()) {
+				parts.push(removedParts.pop());
 			}
+		}
 
-			ValueType retType = syntax.getReturnValue().getType();
+		if (matchedSyntax != null) {
+			//remove all potential problems resulted from the peek
+			potentialProblems.clear();
+
+			ValueType retType = matchedSyntax.getReturnValue().getType();
+
 			if (!parts.isEmpty()) {
-				CommandExpressionPart peekFirst = parts.peekFirst();
 				boolean expectedSemicolon = false;
 				boolean consumeMoreCommands = false;
+				CommandExpressionPart peekFirst = parts.peekFirst();
+
 				if (peekFirst.isOperatorPart()) {
 					SQFExpressionOperator peekExprOperator = peekFirst.getOperator();
 					CommandDescriptor d = getDescriptorForOperator(peekExprOperator, cluster);
@@ -417,51 +427,63 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					}
 				}
 				if (consumeMoreCommands) {
-					peekPartDepth.count = 0; //reset depth
-					retType = getReturnTypeForCommand(parts, retType, peekPartDepth, problems, potentialProblems, reportCount);
-				}
-			}
-			return retType;
-		}
-
-		PotentialProblem problem;
-
-		if (peekNextPartType == null) {
-			problem = new PotentialProblem(
-					exprOperator,
-					"No syntax for '" +
-							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
-							+ commandName + "'",
-					ProblemHighlightType.GENERIC_ERROR_OR_WARNING
-			);
-		} else {
-			problem = new PotentialProblem(
-					exprOperator,
-					"No syntax for '" +
-							(prefixType == null ? "" : prefixType.getDisplayName() + " ")
-							+ commandName + " " + peekNextPartType.getDisplayName() + "'",
-					ProblemHighlightType.GENERIC_ERROR_OR_WARNING
-			);
-		}
-
-		if (reportCount.count <= 0) {
-			if (problems != null) {
-				if (potentialProblems.isEmpty()) {
-					reportCount.count++;
-					problems.registerProblem(problem.getErrorElement(), problem.getMessage(), problem.getHighlightType());
-				} else {
-					//report only the oldest potential problem
-					PotentialProblem actualProblem = potentialProblems.getFirst();
-					problems.registerProblem(actualProblem.getErrorElement(), actualProblem.getMessage(), actualProblem.getHighlightType());
-					reportCount.count++;
-					potentialProblems.clear();
+					retType = getReturnTypeForCommand(parts, retType, removedParts, problems, potentialProblems, reportCount);
 				}
 			} else {
-				potentialProblems.add(problem);
+				if (peekType != null && !usedPeekType) {
+					if (problems != null && reportCount.count <= 0) {
+						problems.registerProblem(peekPart.getPsiElement(),
+								"Expected ;",
+								ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+						);
+						reportCount.count++;
+					}
+				}
 			}
+
+			return retType;
+		} else {
+
+			PotentialProblem problem;
+
+			if (peekType == null) {
+				problem = new PotentialProblem(
+						exprOperator,
+						"No syntax for '" +
+								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
+								+ commandName + "'",
+						ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+				);
+			} else {
+				problem = new PotentialProblem(
+						exprOperator,
+						"No syntax for '" +
+								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
+								+ commandName + " " + peekType.getDisplayName() + "'",
+						ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+				);
+			}
+
+			if (reportCount.count <= 0) {
+				if (problems != null) {
+					if (potentialProblems.isEmpty()) {
+						reportCount.count++;
+						problems.registerProblem(problem.getErrorElement(), problem.getMessage(), problem.getHighlightType());
+					} else {
+						//report only the oldest potential problem
+						PotentialProblem actualProblem = potentialProblems.getFirst();
+						problems.registerProblem(actualProblem.getErrorElement(), actualProblem.getMessage(), actualProblem.getHighlightType());
+						reportCount.count++;
+						potentialProblems.clear();
+					}
+				} else {
+					potentialProblems.add(problem);
+				}
+			}
+
+			return BaseType._ERROR;
 		}
 
-		return BaseType._ERROR;
 	}
 
 	/**
