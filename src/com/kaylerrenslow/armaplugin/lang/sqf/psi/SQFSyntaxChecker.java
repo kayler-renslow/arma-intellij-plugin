@@ -286,17 +286,17 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 							numForwardLookers++;
 						}
 					}
-						/*If there is an even number of forward looking operators, we want to remove all the ones
-						  past the current one. If there is an odd number, then we keep them.
+					/*If there is an even number of forward looking operators, we want to remove all the ones
+					  past the current one. If there is an odd number, then we keep them.
 
-						  Example case of where this would happen is with "1 < 2 || 2 > 3".
-						  When we are at 1<2, we don't want to forward peek because that would result with 2 || 2 > 3,
-						  which is NUMBER || BOOLEAN and is invalid. Notice that also if we forward peeked at 1 < 2, there are
-						  an even number of forward looking commands ( || and > ). So, after we have evaluated 1 < 2,
-						  we are then on the || command. We already have BOOLEAN as left hand side for  || and there is
-						  an odd number of forward looking commands after ||, so we evaluate everything after || (which is 2 > 3).
-						  So, 2 > 3 results in BOOLEAN and we have BOOLEAN || BOOLEAN, which is valid.
-						*/
+					  Example case of where this would happen is with "1 < 2 || 2 > 3".
+					  When we are at 1<2, we don't want to forward peek because that would result with 2 || 2 > 3,
+					  which is NUMBER || BOOLEAN and is invalid. Notice that also if we forward peeked at 1 < 2, there are
+					  an even number of forward looking commands ( || and > ). So, after we have evaluated 1 < 2,
+					  we are then on the || command. We already have BOOLEAN as left hand side for  || and there is
+					  an odd number of forward looking commands after ||, so we evaluate everything after || (which is 2 > 3).
+					  So, 2 > 3 results in BOOLEAN and we have BOOLEAN || BOOLEAN, which is valid.
+					*/
 					if (numForwardLookers % 2 == 0) {
 						boolean trim = false;
 						Iterator<CommandExpressionPart> iter = parts.iterator();
