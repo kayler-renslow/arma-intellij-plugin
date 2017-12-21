@@ -71,7 +71,17 @@ public class SQFCommandReference implements PsiPolyVariantReference {
 
 	@Override
 	public boolean isReferenceTo(PsiElement element) {
-		return element == command || targets.contains(element);
+		if (element == command) {
+			return true;
+		}
+		if (targets.contains(element)) {
+			return true;
+		}
+		if (element instanceof SQFCommand) {
+			SQFCommand other = (SQFCommand) element;
+			return this.command.commandNameEquals(other.getCommandName());
+		}
+		return false;
 	}
 
 	@NotNull

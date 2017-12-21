@@ -5,9 +5,8 @@ import com.intellij.lang.ASTNode;
 import com.intellij.navigation.ItemPresentation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
-import com.intellij.psi.PsiNamedElement;
+import com.intellij.psi.PsiNameIdentifierOwner;
 import com.intellij.psi.PsiReference;
-import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import com.intellij.util.IncorrectOperationException;
 import com.kaylerrenslow.armaDialogCreator.util.Reference;
 import com.kaylerrenslow.armaplugin.lang.PsiUtil;
@@ -18,14 +17,16 @@ import com.kaylerrenslow.armaplugin.lang.sqf.presentation.SQFFunctionItemPresent
 import com.kaylerrenslow.armaplugin.lang.sqf.presentation.SQFVariableItemPresentation;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.reference.SQFVariableReference;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * @author Kayler
  * @since 05/23/2017
  */
-public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement {
+public class SQFVariable extends ASTWrapperPsiElement implements PsiNameIdentifierOwner {
 	public SQFVariable(@NotNull ASTNode node) {
 		super(node);
 	}
@@ -43,20 +44,28 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 	@NotNull
 	@Override
 	public PsiReference[] getReferences() {
-		List<SQFVariableReference> currentFileRefs = SQFScope.getVariableReferencesFor(this);
-		PsiReference[] refsFromProviders = ReferenceProvidersRegistry.getReferencesFromProviders(this);
-		if (currentFileRefs.size() == 0 && refsFromProviders.length == 0) {
+		SQFFile sqfFile = (SQFFile) getContainingFile();
+		if (sqfFile == null) {
 			return PsiReference.EMPTY_ARRAY;
 		}
-		PsiReference[] refsAsArray = new PsiReference[currentFileRefs.size() + refsFromProviders.length];
-		int i = 0;
-		for (; i < currentFileRefs.size(); i++) {
-			refsAsArray[i] = currentFileRefs.get(i);
+		List<SQFVariable> vars = new ArrayList<>();
+		PsiUtil.traverseBreadthFirstSearch(sqfFile.getNode(), astNode -> {
+			PsiElement nodeAsElement = astNode.getPsi();
+			if (nodeAsElement instanceof SQFVariable) {
+				SQFVariable var = (SQFVariable) nodeAsElement;
+				if (var.isLocal()) {
+					return false;
+				}
+				if (SQFVariableName.nameEquals(var.getVarName(), getVarName())) {
+					vars.add(var);
+				}
+			}
+			return false;
+		});
+		if (vars.isEmpty()) {
+			return PsiReference.EMPTY_ARRAY;
 		}
-		for (int j = 0; j < refsFromProviders.length; i++, j++) {
-			refsAsArray[i] = refsFromProviders[j];
-		}
-		return refsAsArray;
+		return new PsiReference[]{new SQFVariableReference.IdentifierReference(this, vars)};
 	}
 
 	@Override
@@ -128,5 +137,11 @@ public class SQFVariable extends ASTWrapperPsiElement implements PsiNamedElement
 			}
 		}
 		return new SQFVariableItemPresentation(this);
+	}
+
+	@Nullable
+	@Override
+	public PsiElement getNameIdentifier() {
+		return this;
 	}
 }

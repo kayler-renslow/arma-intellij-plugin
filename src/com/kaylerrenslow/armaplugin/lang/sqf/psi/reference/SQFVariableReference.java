@@ -80,7 +80,18 @@ public abstract class SQFVariableReference implements PsiReference {
 
 		@Override
 		public boolean isReferenceTo(PsiElement element) {
-			return element == variable || targets.contains(element);
+			if (element == variable) {
+				return true;
+			}
+			if (element instanceof SQFVariable) {
+				SQFVariable other = (SQFVariable) element;
+				if (other.isLocal()) {
+					return targets.contains(other);
+				} else {
+					return SQFVariableName.nameEquals(variable.getVarName(), other.getVarName());
+				}
+			}
+			return false;
 		}
 
 		@NotNull
