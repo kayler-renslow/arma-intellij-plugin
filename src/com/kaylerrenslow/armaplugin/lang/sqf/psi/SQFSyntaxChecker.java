@@ -8,6 +8,7 @@ import com.kaylerrenslow.armaplugin.lang.sqf.syntax.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -253,8 +254,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			prefixType = previousCommandReturnType;
 		}
 
-		LinkedList<CommandExpressionPart> partsAfterGettingPeekNextPartType = new LinkedList<>();
-		partsAfterGettingPeekNextPartType.addAll(parts);
+		LinkedList<CommandExpressionPart> partsAfterPeek = new LinkedList<>();
+		partsAfterPeek.addAll(parts);
 		int peekDepthBeforeGettingPeekNextPartType = peekPartDepth.count;
 		ValueType peekNextPartType = null;
 		{
@@ -270,7 +271,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 						//pass null to problems reporter because we are TESTING to see if
 						//the peeked next part COULD work. If there was problems, we can just ignore it.
 						peekNextPartType = getReturnTypeForCommand(
-								partsAfterGettingPeekNextPartType,
+								partsAfterPeek,
 								null,
 								peekPartDepth,
 								null,
@@ -281,17 +282,51 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				} else {
 					final boolean isForwardLookingCommand = isForwardLookingCommand(commandPart.getOperator());
 					if (isForwardLookingCommand && parts.size() > 1) {
-						peekNextPartType = getReturnTypeForCommand(
-								partsAfterGettingPeekNextPartType,
-								null,
-								peekPartDepth,
-								null,
-								potentialProblems,
-								reportCount
-						);
+						int numForwardLookers = 0;
+						for (CommandExpressionPart part : partsAfterPeek) {
+							if (part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
+								numForwardLookers++;
+							}
+						}
+						/*If there is an even number of forward looking operators, we want to remove all the ones
+						  past the current one. If there is an odd number, then we keep them.
+
+						  Example case of where this would happen is with "1 < 2 || 2 > 3".
+						  When we are at 1<2, we don't want to forward peek because that would result with 2 || 2 > 3,
+						  which is NUMBER || BOOLEAN and is invalid. Notice that also if we forward peeked at 1 < 2, there are
+						  an even number of forward looking commands ( || and > ). So, after we have evaluated 1 < 2,
+						  we are then on the || command. We already have BOOLEAN as left hand side for  || and there is
+						  an odd number of forward looking commands left, so we evaluate everything after || (which is 2 > 3).
+						  So, 2 > 3 results in BOOLEAN and we have BOOLEAN || BOOLEAN, which is valid.
+						*/
+						if (numForwardLookers % 2 == 0) {
+							boolean trim = false;
+							Iterator<CommandExpressionPart> iter = partsAfterPeek.iterator();
+							while (iter.hasNext()) {
+								CommandExpressionPart part = iter.next();
+								if (trim || part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
+									trim = true;
+									iter.remove();
+								}
+							}
+						}
+						if (partsAfterPeek.getFirst().isArgumentPart() && partsAfterPeek.size() == 1) {
+							// After we remove all forward looking commands, there may only be an argument part left
+							peekNextPartType = getValueTypeForPart(partsAfterPeek.getFirst());
+							partsAfterPeek.removeFirst();
+						} else {
+							peekNextPartType = getReturnTypeForCommand(
+									partsAfterPeek,
+									null,
+									peekPartDepth,
+									null,
+									potentialProblems,
+									reportCount
+							);
+						}
 					} else {
 						peekNextPartType = getValueTypeForPart(peekNextPart);
-						partsAfterGettingPeekNextPartType.removeFirst();
+						partsAfterPeek.removeFirst();
 					}
 				}
 			}
@@ -337,11 +372,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				//since parts is duplicated for each recursive call, we need to make sure
 				//we consume the same amount of parts as the previous recursive call
 				//for cases like parseText localize ''
-				for (int i = 0; !partsAfterGettingPeekNextPartType.isEmpty() && i < peekPartDepth.count; i++) {
-					partsAfterGettingPeekNextPartType.removeFirst();
+				for (int i = 0; !partsAfterPeek.isEmpty() && i < peekPartDepth.count; i++) {
+					partsAfterPeek.removeFirst();
 				}
 				peekPartDepth.count++;
-				parts = partsAfterGettingPeekNextPartType;
+				parts = partsAfterPeek;
 				//remove all potential problems resulted from the peek
 				potentialProblems.clear();
 			} else {
@@ -370,7 +405,6 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 						}
 					}
 				} else {
-					//todo what about handling forward looking commands here?
 					expectedSemicolon = true;
 				}
 				if (expectedSemicolon) {
@@ -437,6 +471,9 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * For example, instead of true || 1 + count [] >= 0 throwing an error saying "true || 1" is invalid,
 	 * it evaluates 1 + count [] to a number, passes it into >= left and side, and the boolean created from
 	 * >= is passed into || operator.
+	 * <p>
+	 * Another example of forward looking is with "2 < 1 + count []" will return false
+	 * without errors and "2 < 1 + count [1,1,1]" will return true without errors.
 	 * <p>
 	 * This forward looking behavior also is present for the left operand. not isServer && !isNull player
 	 * will evaluate "not isServer" completely, then "!isNull player", then combine both results in &&.
