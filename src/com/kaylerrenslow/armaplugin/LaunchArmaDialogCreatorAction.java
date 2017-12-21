@@ -2,7 +2,6 @@ package com.kaylerrenslow.armaplugin;
 
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
-import com.kaylerrenslow.armaDialogCreator.main.ArmaDialogCreator;
 
 /**
  * @author Kayler
@@ -12,10 +11,17 @@ public class LaunchArmaDialogCreatorAction extends AnAction {
 
 	@Override
 	public void actionPerformed(AnActionEvent e) {
-		try {
-			ArmaDialogCreator.main(new String[]{});
-		} catch (Exception ex) {
-			ex.printStackTrace();
-		}
+		//todo this doesn't work
+//		try {
+//			IdeaPluginDescriptor plugin = PluginManager.getPlugin(PluginId.getId("com.kaylerrenslow.plugin.armaplugin.id"));
+//			if(plugin == null){
+//				throw new IllegalStateException("couldn't find Arma IntelliJ Plugin despite running it's code! :O");
+//			}
+//			String adcJarDir = plugin.getPath() + "/lib/";
+//			Process process = Runtime.getRuntime().exec("java -jar adc.jar", new String[]{}, new File(adcJarDir));
+//			process.waitFor();
+//		} catch (Exception ex) {
+//			ex.printStackTrace();
+//		}
 	}
 }
