@@ -187,7 +187,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				new LinkedList<>(),
 				problems,
 				new LinkedList<>(),
-				new Counter(0)
+				new Counter(0),
+				false
 		);
 	}
 
@@ -221,6 +222,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * @param problems                  problems
 	 * @param potentialProblems         potential problems from peeking
 	 * @param reportCount               how many problems have been reported (>= 0)
+	 * @param isPeeking                 true if this invocation being called during a peek, false if it isn't
 	 * @return the last command's returned {@link ValueType}
 	 */
 	@NotNull
@@ -229,7 +231,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 											  @NotNull LinkedList<CommandExpressionPart> removedParts,
 											  @Nullable ProblemsHolder problems,
 											  @NotNull LinkedList<PotentialProblem> potentialProblems,
-											  @NotNull Counter reportCount) {
+											  @NotNull Counter reportCount,
+											  boolean isPeeking) {
 		ValueType prefixType = null;
 		CommandExpressionPart prefixPart = parts.removeFirst();
 		removedParts.push(prefixPart);
@@ -255,81 +258,8 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			prefixType = previousCommandReturnType;
 		}
 
-		ValueType peekType = null;
-
 		CommandExpressionPart peekPart = parts.peekFirst();
-
-		if (peekPart != null) {
-
-			if (peekPart.isOperatorPart()) {
-				if (isForwardLookingCommand(peekPart.getOperator())) {
-					//forward looking commands are binary expressions, so there is no point in peeking ahead.
-					peekType = null;
-				} else {
-					//pass null to problems reporter because we are TESTING to see if
-					//the peeked next part COULD work. If there was problems, we can just ignore it.
-					peekType = getReturnTypeForCommand(
-							parts,
-							null,
-							new LinkedList<>(),
-							null,
-							potentialProblems,
-							reportCount
-					);
-				}
-			} else {
-				final boolean isForwardLookingCommand = isForwardLookingCommand(commandPart.getOperator());
-				if (isForwardLookingCommand && parts.size() > 1) {
-					int numForwardLookers = 0;
-					for (CommandExpressionPart part : parts) {
-						if (part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
-							numForwardLookers++;
-						}
-					}
-					/*If there is an even number of forward looking operators, we want to remove all the ones
-					  past the current one. If there is an odd number, then we keep them.
-
-					  Example case of where this would happen is with "1 < 2 || 2 > 3".
-					  When we are at 1<2, we don't want to forward peek because that would result with 2 || 2 > 3,
-					  which is NUMBER || BOOLEAN and is invalid. Notice that also if we forward peeked at 1 < 2, there are
-					  an even number of forward looking commands ( || and > ). So, after we have evaluated 1 < 2,
-					  we are then on the || command. We already have BOOLEAN as left hand side for  || and there is
-					  an odd number of forward looking commands after ||, so we evaluate everything after || (which is 2 > 3).
-					  So, 2 > 3 results in BOOLEAN and we have BOOLEAN || BOOLEAN, which is valid.
-					*/
-					if (numForwardLookers % 2 == 0) {
-						boolean trim = false;
-						Iterator<CommandExpressionPart> iter = parts.iterator();
-						while (iter.hasNext()) {
-							CommandExpressionPart part = iter.next();
-							if (trim || part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
-								trim = true;
-								iter.remove();
-								removedParts.push(part);
-							}
-						}
-					}
-					if (parts.getFirst().isArgumentPart() && parts.size() == 1) {
-						// After we remove all forward looking commands, there may only be an argument part left
-						peekType = getValueTypeForPart(parts.getFirst());
-						removedParts.push(parts.removeFirst());
-					} else {
-						peekType = getReturnTypeForCommand(
-								parts,
-								null,
-								new LinkedList<>(),
-								null,
-								potentialProblems,
-								reportCount
-						);
-					}
-				} else {
-					peekType = getValueTypeForPart(peekPart);
-					removedParts.push(parts.removeFirst());
-				}
-			}
-		}
-
+		ValueType peekType = null;
 
 		//find syntaxes with matching prefix and postfix value types
 		CommandSyntax matchedSyntax = null;
@@ -355,16 +285,20 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 
 			if (postfixParam == null) {
-				usedPeekType = false;
 				matchedSyntax = syntax;
+				usedPeekType = false;
 				keepPartsRemoved = true;
 				break;
 			} else {
+				if (peekType == null) {
+					peekType = getPeekType(parts, removedParts, potentialProblems, reportCount, commandPart);
+				}
 				if (peekType == null) {
 					if (!postfixParam.isOptional()) {
 						continue;
 					}
 					keepPartsRemoved = true;
+					usedPeekType = false;
 					matchedSyntax = syntax;
 					break;
 				} else {
@@ -374,13 +308,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					if (!postfixParam.containsType(peekType)) {
 						continue;
 					}
-					usedPeekType = true;
 					matchedSyntax = syntax;
+					usedPeekType = true;
+					keepPartsRemoved = true;
 					break;
 				}
 			}
 		}
-
 		if (!usedPeekType && !keepPartsRemoved) {
 			while (!removedParts.isEmpty()) {
 				parts.push(removedParts.pop());
@@ -392,6 +326,10 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			potentialProblems.clear();
 
 			ValueType retType = matchedSyntax.getReturnValue().getType();
+
+			if (isPeeking) {
+				return retType;
+			}
 
 			if (!parts.isEmpty()) {
 				boolean expectedSemicolon = false;
@@ -427,7 +365,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					}
 				}
 				if (consumeMoreCommands) {
-					retType = getReturnTypeForCommand(parts, retType, removedParts, problems, potentialProblems, reportCount);
+					retType = getReturnTypeForCommand(parts, retType, removedParts, problems, potentialProblems, reportCount, false);
 				}
 			} else {
 				if (peekType != null && !usedPeekType) {
@@ -443,17 +381,22 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 			return retType;
 		} else {
-
 			PotentialProblem problem;
 
 			if (peekType == null) {
-				problem = new PotentialProblem(
-						exprOperator,
-						"No syntax for '" +
-								(prefixType == null ? "" : prefixType.getDisplayName() + " ")
-								+ commandName + "'",
-						ProblemHighlightType.GENERIC_ERROR_OR_WARNING
-				);
+				if (prefixType == null) {
+					problem = new PotentialProblem(
+							exprOperator,
+							"No syntax for " + commandName + " when left parameter is absent.",
+							ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+					);
+				} else {
+					problem = new PotentialProblem(
+							exprOperator,
+							"No syntax for " + commandName + " where " + prefixType.getDisplayName() + " is left parameter.",
+							ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+					);
+				}
 			} else {
 				problem = new PotentialProblem(
 						exprOperator,
@@ -482,6 +425,88 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 
 			return BaseType._ERROR;
+		}
+
+	}
+
+	@Nullable
+	private ValueType getPeekType(@NotNull LinkedList<CommandExpressionPart> parts,
+								  @NotNull LinkedList<CommandExpressionPart> removedParts,
+								  @NotNull LinkedList<PotentialProblem> potentialProblems,
+								  @NotNull Counter reportCount,
+								  @NotNull CommandExpressionPart commandPart) {
+		CommandExpressionPart peekPart = parts.peekFirst();
+		if (peekPart == null) {
+			return null;
+		}
+		if (peekPart.isOperatorPart()) {
+			if (isForwardLookingCommand(peekPart.getOperator())) {
+				//forward looking commands are binary expressions, so there is no point in peeking ahead.
+				return null;
+			} else {
+				//pass null to problems reporter because we are TESTING to see if
+				//the peeked next part COULD work. If there was problems, we can just ignore it.
+				return getReturnTypeForCommand(
+						parts,
+						null,
+						new LinkedList<>(),
+						null,
+						potentialProblems,
+						reportCount,
+						true
+				);
+			}
+		}
+		final boolean isForwardLookingCommand = isForwardLookingCommand(commandPart.getOperator());
+		if (isForwardLookingCommand && parts.size() > 1) {
+			int numForwardLookers = 0;
+			for (CommandExpressionPart part : parts) {
+				if (part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
+					numForwardLookers++;
+				}
+			}
+			/*If there is an even number of forward looking operators, we want to remove all the ones
+			  past the current one. If there is an odd number, then we keep them.
+
+			  Example case of where this would happen is with "1 < 2 || 2 > 3".
+			  When we are at 1<2, we don't want to forward peek because that would result with 2 || 2 > 3,
+			  which is NUMBER || BOOLEAN and is invalid. Notice that also if we forward peeked at 1 < 2, there are
+			  an even number of forward looking commands ( || and > ). So, after we have evaluated 1 < 2,
+			  we are then on the || command. We already have BOOLEAN as left hand side for  || and there is
+			  an odd number of forward looking commands after ||, so we evaluate everything after || (which is 2 > 3).
+			  So, 2 > 3 results in BOOLEAN and we have BOOLEAN || BOOLEAN, which is valid.
+			*/
+			if (numForwardLookers % 2 == 0) {
+				boolean trim = false;
+				Iterator<CommandExpressionPart> iter = parts.iterator();
+				while (iter.hasNext()) {
+					CommandExpressionPart part = iter.next();
+					if (trim || part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
+						trim = true;
+						iter.remove();
+						removedParts.push(part);
+					}
+				}
+			}
+			if (parts.getFirst().isArgumentPart() && parts.size() == 1) {
+				// After we remove all forward looking commands, there may only be an argument part left
+				CommandExpressionPart first = parts.removeFirst();
+				removedParts.push(first);
+				return getValueTypeForPart(first);
+			} else {
+				return getReturnTypeForCommand(
+						parts,
+						null,
+						new LinkedList<>(),
+						null,
+						potentialProblems,
+						reportCount,
+						true
+				);
+			}
+		} else {
+			removedParts.push(parts.removeFirst());
+			return getValueTypeForPart(peekPart);
 		}
 
 	}
