@@ -8,8 +8,10 @@ import com.kaylerrenslow.armaplugin.lang.sqf.syntax.*;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import static com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.BaseType.*;
 
@@ -157,22 +159,25 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFCommandExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		LinkedList<CommandExpressionPart> parts = new LinkedList<>();
+		LinkedList<PotentialProblem> potentialProblems = new LinkedList<>();
+		Counter reportCounter = new Counter(0);
+
+		LinkedList<ExprPart> parts = new LinkedList<>();
 		SQFCommandExpression cursor = expr;
 		while (true) {
 			SQFExpressionOperator op = cursor.getExprOperator();
 			SQFCommandArgument pre = cursor.getPrefixArgument();
 			SQFCommandArgument post = cursor.getPostfixArgument();
 			if (pre != null) {
-				parts.add(new CommandExpressionPart(pre));
+				parts.add(new ExprPart(new CommandArgumentPart(pre)));
 			}
-			parts.add(new CommandExpressionPart(op));
+			parts.add(new ExprPart(op));
 			if (post != null) {
 				SQFExpression postExpr = post.getExpr();
 				if (postExpr instanceof SQFCommandExpression) {
 					cursor = (SQFCommandExpression) postExpr;
 				} else {
-					parts.add(new CommandExpressionPart(post));
+					parts.add(new ExprPart(new CommandArgumentPart(post)));
 					break;
 				}
 			} else {
@@ -180,18 +185,95 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 		}
 
+		LinkedList<ExprPart> groupedParts = groupTheParts(potentialProblems, reportCounter, parts);
+
+		System.out.println("SQFSyntaxChecker.visit parts=" + parts);
+		System.out.println("SQFSyntaxChecker.visit groupedParts=" + groupedParts);
+
 		return getReturnTypeForCommand(
-				parts,
+				groupedParts,
 				null,
 				problems,
-				new LinkedList<>(),
-				new Counter(0),
+				potentialProblems,
+				reportCounter,
 				false
 		);
 	}
 
 	/**
-	 * Gets a returned {@link ValueType} for a {@link SQFCommandExpression} that is broken up into a list of {@link CommandExpressionPart} instances.
+	 * This method is for grouping parts on the right hand side of forward looking commands ({@link #isForwardLookingCommand(SQFExpressionOperator)}).
+	 * This is done by adding everything left of the forward looking command as well as the command itself to a list
+	 * and then grouping everything after it on the right. The grouping makes the right hand side evaluate like
+	 * the right hand side was enclosed in parenthesis. For example, "(_i + 1) >= count _numArr || (_i + 1) >= count _opNumArr" is evaluated like
+	 * "((_i + 1) >= count _numArr) || ((_i + 1) >= count _opNumArr)"
+	 *
+	 * @param potentialProblems
+	 * @param reportCounter
+	 * @param parts
+	 * @return
+	 */
+	@NotNull
+	private LinkedList<ExprPart> groupTheParts(@NotNull LinkedList<PotentialProblem> potentialProblems,
+											   @NotNull Counter reportCounter, @NotNull LinkedList<ExprPart> parts) {
+		LinkedList<ExprPart> groupedParts = new LinkedList<>();
+		ArrayList<Integer> forwardOperatorIndices = new ArrayList<>();
+		int lastForwardOperatorIndex = -1;
+		{
+			int i = 0;
+			for (ExprPart part : parts) {
+				if (part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
+					forwardOperatorIndices.add(i);
+					lastForwardOperatorIndex = i;
+				}
+				i++;
+			}
+		}
+
+		if (forwardOperatorIndices.size() == 0) {
+			//no required grouping to do
+			return parts;
+		}
+		LinkedList<ExprPart> lastGroup = new LinkedList<>();
+		LinkedList<ExprPart> currentGroup;
+		int lastIndex = -1;
+		int forwardOperatorConsumeCount = 0;
+		for (int forwardOpIndex : forwardOperatorIndices) {
+			int addIndex = lastIndex + 1;
+			currentGroup = forwardOperatorConsumeCount == 1 ? lastGroup : new LinkedList<>();
+			ListIterator<ExprPart> iter = parts.listIterator(addIndex);
+			while (iter.hasNext() && addIndex < forwardOpIndex) {
+				currentGroup.add(iter.next());
+				addIndex++;
+			}
+
+			if (forwardOperatorConsumeCount == 1) {
+				forwardOperatorConsumeCount = 0;
+				groupedParts.add(new ExprPart(new ExprPartsGroupArgument(currentGroup, problems, potentialProblems, reportCounter)));
+			} else {
+				currentGroup.add(iter.next()); //add the operator
+				lastGroup = currentGroup;
+				forwardOperatorConsumeCount++;
+			}
+			lastIndex = addIndex;
+		}
+
+		//add remaining parts as a group
+		if (lastIndex < parts.size()) {
+			groupedParts.add(parts.get(lastIndex));
+			currentGroup = new LinkedList<>();
+			ListIterator<ExprPart> iter = parts.listIterator(lastIndex + 1);
+			while (iter.hasNext()) {
+				currentGroup.add(iter.next());
+			}
+			ExprPartsGroupArgument group = new ExprPartsGroupArgument(currentGroup, problems, potentialProblems, reportCounter);
+			groupedParts.add(new ExprPart(group));
+		}
+
+		return groupedParts;
+	}
+
+	/**
+	 * Gets a returned {@link ValueType} for a {@link SQFCommandExpression} that is broken up into a list of {@link ExprPart} instances.
 	 * <p>
 	 * This method recursively calls itself to syntax and type check command expressions. This method will also
 	 * report problems to the specified {@link ProblemsHolder}. Since some commands require a right type (postfix type)
@@ -223,7 +305,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * @return the last command's returned {@link ValueType}
 	 */
 	@NotNull
-	private ValueType getReturnTypeForCommand(@NotNull LinkedList<CommandExpressionPart> parts,
+	private ValueType getReturnTypeForCommand(@NotNull LinkedList<ExprPart> parts,
 											  @Nullable ValueType previousCommandReturnType,
 											  @NotNull ProblemsHolder problems,
 											  @NotNull LinkedList<PotentialProblem> potentialProblems,
@@ -233,12 +315,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		//All parts removed from the current invocation (requires a new list for each recursive call).
 		//These parts will be added back if a peek wasn't used or a peek failed.
-		LinkedList<CommandExpressionPart> removedParts = new LinkedList<>();
+		LinkedList<ExprPart> removedParts = new LinkedList<>();
 
 		ValueType prefixType = null;
-		CommandExpressionPart prefixPart = parts.removeFirst();
+		ExprPart prefixPart = parts.removeFirst();
 		removedParts.push(prefixPart);
-		CommandExpressionPart commandPart = null;
+		ExprPart commandPart = null;
+
 		if (!prefixPart.isOperatorPart()) {
 			commandPart = parts.removeFirst();
 			removedParts.push(commandPart);
@@ -255,13 +338,27 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		String commandName = descriptor.getCommandName();
 
 		if (prefixPart != null) {
-			prefixType = getValueTypeForPart(prefixPart);
+			prefixType = prefixPart.getArgument().getType(this, isPeeking, cluster);
 		} else {
 			prefixType = previousCommandReturnType;
 		}
 
-		CommandExpressionPart peekPart = parts.peekFirst();
+		ExprPart peekPart = parts.peekFirst();
 		ValueType peekType = null;
+
+		//if there are more parts to consume and there is at least 1 syntax that accepts a postfix param,
+		//there must be a peek
+		boolean requirePeek = false;
+		{
+
+			for (CommandSyntax syntax : descriptor.getSyntaxList()) {
+				if (syntax.getPostfixParam() != null) {
+					requirePeek = true;
+					break;
+				}
+			}
+			requirePeek = requirePeek && !parts.isEmpty();
+		}
 
 		//find syntaxes with matching prefix and postfix value types
 		CommandSyntax matchedSyntax = null;
@@ -287,10 +384,12 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 
 			if (postfixParam == null) {
-				matchedSyntax = syntax;
-				usedPeekType = false;
-				keepPartsRemoved = true;
-				break;
+				if (!requirePeek) {
+					matchedSyntax = syntax;
+					usedPeekType = false;
+					keepPartsRemoved = true;
+					break;
+				}
 			} else {
 				if (peekType == null) {
 					peekType = getPeekType(parts, removedParts, problems, potentialProblems, reportCount);
@@ -325,7 +424,14 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		if (matchedSyntax != null) {
 			potentialProblems.clear();
-			ValueType retType = matchedSyntax.getReturnValue().getType();
+			ValueType retType;
+
+			//If either the left type or right type is variable, we must return variable.
+			if ((prefixType != null && prefixType.isHardEqual(BaseType._VARIABLE)) || (peekType != null && peekType.isHardEqual(BaseType._VARIABLE))) {
+				retType = BaseType._VARIABLE;
+			} else {
+				retType = matchedSyntax.getReturnValue().getType();
+			}
 
 			if (isPeeking) {
 				return retType;
@@ -346,7 +452,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 			boolean expectedSemicolon = false;
 			boolean consumeMoreCommands = false;
-			CommandExpressionPart peekFirst = parts.peekFirst();
+			ExprPart peekFirst = parts.peekFirst();
 
 			if (peekFirst.isOperatorPart()) {
 				SQFExpressionOperator peekExprOperator = peekFirst.getOperator();
@@ -388,13 +494,13 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				if (prefixType == null) {
 					problem = new PotentialProblem(
 							exprOperator,
-							"No syntax for " + commandName + " when left parameter is absent.",
+							"No syntax for '" + commandName + "' when left parameter is absent.",
 							ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 					);
 				} else {
 					problem = new PotentialProblem(
 							exprOperator,
-							"No syntax for " + commandName + " where " + prefixType.getDisplayName() + " is left parameter.",
+							"No syntax for '" + commandName + "' where " + prefixType.getDisplayName() + " is left parameter.",
 							ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 					);
 				}
@@ -431,12 +537,12 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	}
 
 	@Nullable
-	private ValueType getPeekType(@NotNull LinkedList<CommandExpressionPart> parts,
-								  @NotNull LinkedList<CommandExpressionPart> removedParts,
+	private ValueType getPeekType(@NotNull LinkedList<ExprPart> parts,
+								  @NotNull LinkedList<ExprPart> removedParts,
 								  @NotNull ProblemsHolder problems,
 								  @NotNull LinkedList<PotentialProblem> potentialProblems,
 								  @NotNull Counter reportCount) {
-		CommandExpressionPart peekPart = parts.peekFirst();
+		ExprPart peekPart = parts.peekFirst();
 		if (peekPart == null) {
 			return null;
 		}
@@ -451,7 +557,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			);
 		} else {
 			removedParts.push(parts.removeFirst());
-			return getValueTypeForPart(peekPart);
+			return peekPart.getArgument().getType(this, true, cluster);
 		}
 	}
 
@@ -483,21 +589,11 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				|| operatorType == SQFTypes.LE;
 	}
 
-	@NotNull
-	private ValueType getValueTypeForPart(CommandExpressionPart commandExpressionPart) {
-		SQFCommandArgument arg = commandExpressionPart.getArgument();
-		SQFExpression expr = arg.getExpr();
-		SQFCodeBlock block = arg.getBlock();
-		if (block == null) {
-			return (ValueType) expr.accept(this, cluster);
-		}
-		return new CodeType(fullyVisitCodeBlockScope(block, cluster));
-	}
 
 	@NotNull
 	@Override
 	public ValueType visit(@NotNull SQFCodeBlockExpression expr, @NotNull CommandDescriptorCluster cluster) {
-		return new CodeType(fullyVisitCodeBlockScope(expr.getBlock(), cluster));
+		return new CodeType(fullyVisitCodeBlockScope(this, expr.getBlock(), cluster));
 	}
 
 	/**
@@ -509,10 +605,10 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * or {@link BaseType#NOTHING} if there was no statements
 	 */
 	@NotNull
-	private ValueType fullyVisitCodeBlockScope(@NotNull SQFCodeBlock block, @NotNull CommandDescriptorCluster cluster) {
+	private static ValueType fullyVisitCodeBlockScope(@NotNull SQFSyntaxVisitor visitor, @NotNull SQFCodeBlock block, @NotNull CommandDescriptorCluster cluster) {
 		SQFLocalScope scope = block.getScope();
 		if (scope != null) {
-			return (ValueType) scope.accept(this, cluster);
+			return (ValueType) scope.accept(visitor, cluster);
 		}
 		return ValueType.BaseType.NOTHING;
 	}
@@ -624,18 +720,118 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				+ check.getDisplayName() + ".", ProblemHighlightType.GENERIC_ERROR_OR_WARNING);
 	}
 
-	private static class CommandExpressionPart {
-		@Nullable
+	private interface ArgumentPart {
+		@NotNull
+		PsiElement getPsiElement();
+
+		@NotNull
+		ValueType getType(@NotNull SQFSyntaxChecker checker, boolean isPeeking, @NotNull CommandDescriptorCluster cluster);
+	}
+
+	private static class CommandArgumentPart implements ArgumentPart {
+
+		@NotNull
 		private final SQFCommandArgument argument;
+
+		public CommandArgumentPart(@NotNull SQFCommandArgument argument) {
+			this.argument = argument;
+		}
+
+		@NotNull
+		@Override
+		public PsiElement getPsiElement() {
+			return argument;
+		}
+
+		@NotNull
+		public SQFCommandArgument getArgument() {
+			return argument;
+		}
+
+		@NotNull
+		@Override
+		public ValueType getType(@NotNull SQFSyntaxChecker checker, boolean isPeeking, @NotNull CommandDescriptorCluster cluster) {
+			SQFExpression expr = argument.getExpr();
+			SQFCodeBlock block = argument.getBlock();
+			if (block == null) {
+				return (ValueType) expr.accept(checker, cluster);
+			}
+			return new CodeType(fullyVisitCodeBlockScope(checker, block, cluster));
+		}
+
+		@Override
+		public String toString() {
+			return argument.getText();
+		}
+	}
+
+	private static class ExprPartsGroupArgument implements ArgumentPart {
+		@NotNull
+		private final LinkedList<ExprPart> parts;
+		@NotNull
+		private final ProblemsHolder problems;
+		@NotNull
+		private final LinkedList<PotentialProblem> potentialProblems;
+		@NotNull
+		private final Counter reportCounter;
+
+		public ExprPartsGroupArgument(@NotNull LinkedList<ExprPart> parts, @NotNull ProblemsHolder problems,
+									  @NotNull LinkedList<PotentialProblem> potentialProblems,
+									  @NotNull Counter reportCounter) {
+			this.reportCounter = reportCounter;
+			if (parts.isEmpty()) {
+				throw new IllegalStateException("parts is empty");
+			}
+			this.parts = parts;
+			this.problems = problems;
+			this.potentialProblems = potentialProblems;
+		}
+
+		@NotNull
+		public List<ExprPart> getParts() {
+			return parts;
+		}
+
+		@NotNull
+		@Override
+		public PsiElement getPsiElement() {
+			return parts.get(0).getPsiElement();
+		}
+
+		@NotNull
+		@Override
+		public ValueType getType(@NotNull SQFSyntaxChecker checker, boolean isPeeking, @NotNull CommandDescriptorCluster cluster) {
+			if (parts.size() == 1 && parts.getFirst().isArgumentPart()) {
+				return parts.getFirst().getArgument().getType(checker, isPeeking, cluster);
+			}
+			return checker.getReturnTypeForCommand(parts, null, problems, potentialProblems, reportCounter, isPeeking);
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder sb = new StringBuilder();
+			for (ExprPart part : parts) {
+				sb.append(part.toString());
+				if (part != parts.getLast()) {
+					sb.append(' ');
+				}
+			}
+			return "```" + sb.toString() + "```";
+		}
+	}
+
+	private static class ExprPart {
+		@Nullable
+		private final ArgumentPart argument;
 		@Nullable
 		private final SQFExpressionOperator operator;
 
-		public CommandExpressionPart(@NotNull SQFExpressionOperator operator) {
+		public ExprPart(@NotNull SQFExpressionOperator operator) {
 			this.operator = operator;
 			this.argument = null;
 		}
 
-		public CommandExpressionPart(@NotNull SQFCommandArgument argument) {
+		public ExprPart(@NotNull ArgumentPart argument) {
 			this.operator = null;
 			this.argument = argument;
 		}
@@ -650,15 +846,15 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		@NotNull
 		public SQFExpressionOperator getOperator() {
-			if (!isOperatorPart()) {
+			if (operator == null) {
 				throw new IllegalStateException("can't get operator on a non-operator part");
 			}
 			return operator;
 		}
 
 		@NotNull
-		public SQFCommandArgument getArgument() {
-			if (!isArgumentPart()) {
+		public ArgumentPart getArgument() {
+			if (argument == null) {
 				throw new IllegalStateException("can't get command on a non-argument part");
 			}
 			return argument;
@@ -666,12 +862,16 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		@NotNull
 		public PsiElement getPsiElement() {
-			return isArgumentPart() ? argument : operator;
+			PsiElement psiElement = argument != null ? argument.getPsiElement() : operator;
+			if (psiElement == null) {
+				throw new IllegalStateException("arguemnt and operator are both null");
+			}
+			return psiElement;
 		}
 
 		@Override
 		public String toString() {
-			return getPsiElement().getText();
+			return operator != null ? operator.getText() : argument.toString();
 		}
 	}
 
