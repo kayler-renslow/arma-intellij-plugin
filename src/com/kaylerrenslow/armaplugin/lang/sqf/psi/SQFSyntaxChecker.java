@@ -494,7 +494,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				if (prefixType == null) {
 					problem = new PotentialProblem(
 							exprOperator,
-							"No syntax for '" + commandName + "' when left parameter is absent.",
+							"No syntax for '" + commandName + "'",
 							ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 					);
 				} else {
@@ -507,7 +507,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 					} else {
 						problem = new PotentialProblem(
 								exprOperator,
-								"No syntax for '" + commandName + "' where " + prefixType.getDisplayName() + " is left parameter.",
+								"No syntax for '" + prefixType.getDisplayName() + " " + commandName + "'",
 								ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 						);
 					}
@@ -570,7 +570,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	}
 
 	/**
-	 * For some reason, in SQF, &&, ||, ==, !=, <, >, <=, >= don't consume
+	 * For some reason, in SQF, &&, ||, ==, !=, <, >, <=, >=, and commands "and" and "or" don't consume
 	 * just the next token, but rather, evaluates everything after the operator
 	 * and then uses that evaluated type as the right hand side.
 	 * For example, instead of true || 1 + count [] >= 0 throwing an error saying "true || 1" is invalid,
@@ -594,7 +594,9 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				|| operatorType == SQFTypes.GT
 				|| operatorType == SQFTypes.GE
 				|| operatorType == SQFTypes.LT
-				|| operatorType == SQFTypes.LE;
+				|| operatorType == SQFTypes.LE
+				|| operator.getText().equalsIgnoreCase("and")
+				|| operator.getText().equalsIgnoreCase("or");
 	}
 
 

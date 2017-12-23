@@ -565,6 +565,18 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----START command expression----
 	public void testCommandExpression_randomExpressions_valid() {
+		assertNoProblems("for '_n' from 0 to (round ((((_Power/5) max 10)+((round (random (_Power*5))) min 20))*((diag_fps/60) min 1) / ((viewDistance/(viewDistance-((positionCameraToWorld [0,0,0]) distance _Position))) max 1))) step 1 do {};");
+		assertNoProblems("while {isNull assignedTarget _unit and (behaviour (effectiveCommander _unit) in ['COMBAT', 'AWARE', 'STEALTH']) and _ec == effectiveCommander _unit} do{};");
+		assertNoProblems("if (abs _diff > _th and currentCommand _tank != 'MOVE' and speed _tank < 1) then {};");
+		assertNoProblems("if (_x and _unit_wep select _j) then {};");
+		assertNoProblems("if (_dir_y == 0 and _dir_x == 0) then{};");
+		assertNoProblems("if (_ap_round != '' and _has_cannon) then{};");
+		assertNoProblems("if (time - _last_hvinf > 2) then{};");
+		assertNoProblems("if(_default_mag == _he_round and _has_he and _dist_aimed > 300) then {};");
+		assertNoProblems("if((!(isNull commander _arty) && gunner _arty == _caller && isPlayer (commander _arty))) then {};");
+		assertNoProblems("if ((_vehicle getVariable ['LIB_ARTY_AI_DIR', true]) && {!isPlayer (gunner _vehicle)} && {!isPlayer(commander _vehicle)}) then{};");
+		assertNoProblems("for '_i' from 0 to _getCargo - 1 do {};");
+		assertNoProblems("while {(getDammage _gun) < 0.7 && (_gun getVariable 'LIB_ARTY_MOVING_TOWING')} do{};");
 		assertNoProblems("if(!(_x in _LIB_vehicles) && {!(_x getVariable ['LIB_CHECK_VEHICLE', false])} && {(_x isKindOf 'LIB_tank_base')}) then{};");
 		assertNoProblems("setViewDistance (viewDistance + (_logic getVariable ['DISTANCE', (viewDistance * 2)]));");
 		assertNoProblems("vehicle player isKindOf 'Plane'");
