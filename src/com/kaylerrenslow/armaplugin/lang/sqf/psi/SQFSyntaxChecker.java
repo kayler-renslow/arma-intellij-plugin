@@ -11,7 +11,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import static com.kaylerrenslow.armaplugin.lang.sqf.syntax.ValueType.BaseType.*;
 
@@ -187,9 +186,6 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 
 		LinkedList<ExprPart> groupedParts = groupTheParts(potentialProblems, reportCounter, parts);
 
-		System.out.println("SQFSyntaxChecker.visit parts=" + parts);
-		System.out.println("SQFSyntaxChecker.visit groupedParts=" + groupedParts);
-
 		return getReturnTypeForCommand(
 				groupedParts,
 				null,
@@ -207,68 +203,68 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 	 * the right hand side was enclosed in parenthesis. For example, "(_i + 1) >= count _numArr || (_i + 1) >= count _opNumArr" is evaluated like
 	 * "((_i + 1) >= count _numArr) || ((_i + 1) >= count _opNumArr)"
 	 *
-	 * @param potentialProblems
-	 * @param reportCounter
-	 * @param parts
-	 * @return
+	 * @param potentialProblems a list that will be shared across all fake groups.
+	 * @param reportCounter     report counter that will be shared across all fake groups
+	 * @param parts             parts to make a group of
+	 * @return the grouped parts, or will just return parts if there is 1 or less forward looking operators
 	 */
 	@NotNull
 	private LinkedList<ExprPart> groupTheParts(@NotNull LinkedList<PotentialProblem> potentialProblems,
 											   @NotNull Counter reportCounter, @NotNull LinkedList<ExprPart> parts) {
+		final int initialPartsSize = parts.size();
 		LinkedList<ExprPart> groupedParts = new LinkedList<>();
-		ArrayList<Integer> forwardOperatorIndices = new ArrayList<>();
-		int lastForwardOperatorIndex = -1;
+		ArrayList<Integer> forwardLookingOpIndices = new ArrayList<>();
 		{
 			int i = 0;
 			for (ExprPart part : parts) {
 				if (part.isOperatorPart() && isForwardLookingCommand(part.getOperator())) {
-					forwardOperatorIndices.add(i);
-					lastForwardOperatorIndex = i;
+					forwardLookingOpIndices.add(i);
 				}
 				i++;
 			}
 		}
 
-		if (forwardOperatorIndices.size() == 0) {
-			//no required grouping to do
+		if (forwardLookingOpIndices.size() <= 1) {
 			return parts;
 		}
-		LinkedList<ExprPart> lastGroup = new LinkedList<>();
-		LinkedList<ExprPart> currentGroup;
-		int lastIndex = -1;
-		int forwardOperatorConsumeCount = 0;
-		for (int forwardOpIndex : forwardOperatorIndices) {
-			int addIndex = lastIndex + 1;
-			currentGroup = forwardOperatorConsumeCount == 1 ? lastGroup : new LinkedList<>();
-			ListIterator<ExprPart> iter = parts.listIterator(addIndex);
-			while (iter.hasNext() && addIndex < forwardOpIndex) {
-				currentGroup.add(iter.next());
-				addIndex++;
-			}
+		LinkedList<ExprPart> currentGroup = new LinkedList<>();
+		final int STATE_START_BINARY = 0;
+		final int STATE_FINISHED_BINARY = 1;
+		int state = STATE_START_BINARY;
+		int partsIndex = 0;
+		int endIndexCount = 0;
+		for (int forwardLookingOpIndex : forwardLookingOpIndices) {
+			switch (state) {
+				case STATE_START_BINARY: {
+					for (; partsIndex < forwardLookingOpIndex; partsIndex++) {
+						currentGroup.add(parts.removeFirst());
+					}
 
-			if (forwardOperatorConsumeCount == 1) {
-				forwardOperatorConsumeCount = 0;
-				groupedParts.add(new ExprPart(new ExprPartsGroupArgument(currentGroup, problems, potentialProblems, reportCounter)));
-			} else {
-				currentGroup.add(iter.next()); //add the operator
-				lastGroup = currentGroup;
-				forwardOperatorConsumeCount++;
+					ExprPart operatorPart = parts.removeFirst();
+					currentGroup.add(operatorPart);
+					partsIndex++;
+
+					final int endGroupIndex = endIndexCount + 1 >= forwardLookingOpIndices.size() ? initialPartsSize : forwardLookingOpIndices.get(endIndexCount + 1);
+
+					for (; partsIndex < endGroupIndex; partsIndex++) {
+						currentGroup.add(parts.removeFirst());
+					}
+
+					ExprPart part = new ExprPart(new ExprPartsGroupArgument(currentGroup, problems, potentialProblems, reportCounter));
+					groupedParts.add(part);
+					state = STATE_FINISHED_BINARY;
+					currentGroup = new LinkedList<>();
+					break;
+				}
+				case STATE_FINISHED_BINARY: {
+					groupedParts.add(parts.removeFirst());
+					partsIndex++;
+					state = STATE_START_BINARY;
+					break;
+				}
 			}
-			lastIndex = addIndex;
+			endIndexCount++;
 		}
-
-		//add remaining parts as a group
-		if (lastIndex < parts.size()) {
-			groupedParts.add(parts.get(lastIndex));
-			currentGroup = new LinkedList<>();
-			ListIterator<ExprPart> iter = parts.listIterator(lastIndex + 1);
-			while (iter.hasNext()) {
-				currentGroup.add(iter.next());
-			}
-			ExprPartsGroupArgument group = new ExprPartsGroupArgument(currentGroup, problems, potentialProblems, reportCounter);
-			groupedParts.add(new ExprPart(group));
-		}
-
 		return groupedParts;
 	}
 
@@ -350,14 +346,12 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 		//there must be a peek
 		boolean requirePeek = false;
 		{
-
 			for (CommandSyntax syntax : descriptor.getSyntaxList()) {
 				if (syntax.getPostfixParam() != null) {
 					requirePeek = true;
 					break;
 				}
 			}
-			requirePeek = requirePeek && !parts.isEmpty();
 		}
 
 		//find syntaxes with matching prefix and postfix value types
@@ -498,11 +492,19 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 							ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 					);
 				} else {
-					problem = new PotentialProblem(
-							exprOperator,
-							"No syntax for '" + commandName + "' where " + prefixType.getDisplayName() + " is left parameter.",
-							ProblemHighlightType.GENERIC_ERROR_OR_WARNING
-					);
+					if (requirePeek) {
+						problem = new PotentialProblem(
+								exprOperator,
+								"No syntax for '" + prefixType.getDisplayName() + " " + commandName + "'",
+								ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+						);
+					} else {
+						problem = new PotentialProblem(
+								exprOperator,
+								"No syntax for '" + commandName + "' where " + prefixType.getDisplayName() + " is left parameter.",
+								ProblemHighlightType.GENERIC_ERROR_OR_WARNING
+						);
+					}
 				}
 			} else {
 				problem = new PotentialProblem(
