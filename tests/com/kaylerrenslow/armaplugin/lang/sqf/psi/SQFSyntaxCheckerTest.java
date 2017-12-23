@@ -565,9 +565,9 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----START command expression----
 	public void testCommandExpression_randomExpressions_valid() {
-//		assertNoProblems("if(!(_x in _LIB_vehicles) && {!(_x getVariable ['LIB_CHECK_VEHICLE', false])} && {(_x isKindOf 'LIB_tank_base')}) then{};");
-//		assertNoProblems("setViewDistance (viewDistance + (_logic getVariable ['DISTANCE', (viewDistance * 2)]));");
-//		assertNoProblems("vehicle player isKindOf 'Plane'");
+		assertNoProblems("if(!(_x in _LIB_vehicles) && {!(_x getVariable ['LIB_CHECK_VEHICLE', false])} && {(_x isKindOf 'LIB_tank_base')}) then{};");
+		assertNoProblems("setViewDistance (viewDistance + (_logic getVariable ['DISTANCE', (viewDistance * 2)]));");
+		assertNoProblems("vehicle player isKindOf 'Plane'");
 		assertNoProblems("if(_numArr select _i < 0 && count _numArr > 1) then{};");
 		assertNoProblems("_ctrl ctrlSetStructuredText parseText localize \"str_vsm_no_vehicle\";");
 		assertNoProblems("_ctrl ctrlSetStructuredText parseText '';");
