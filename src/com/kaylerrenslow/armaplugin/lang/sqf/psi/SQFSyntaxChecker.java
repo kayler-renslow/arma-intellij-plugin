@@ -265,6 +265,12 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 			}
 			endIndexCount++;
 		}
+		if (state == STATE_START_BINARY) {
+			LinkedList<ExprPart> remainderPartsGroup = new LinkedList<>();
+			remainderPartsGroup.addAll(parts);
+			ExprPart part = new ExprPart(new ExprPartsGroupArgument(remainderPartsGroup, problems, potentialProblems, reportCounter));
+			groupedParts.add(part);
+		}
 		return groupedParts;
 	}
 
