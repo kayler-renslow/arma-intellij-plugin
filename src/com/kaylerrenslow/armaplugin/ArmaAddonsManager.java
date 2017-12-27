@@ -40,9 +40,9 @@ public class ArmaAddonsManager {
 	 * @return a read-only list containing all addons
 	 */
 	@NotNull
-	public List<ArmaAddon> getAddons() {
+	public static List<ArmaAddon> getAddons() {
 		synchronized (instance) {
-			return addonsReadOnly;
+			return instance.addonsReadOnly;
 		}
 	}
 

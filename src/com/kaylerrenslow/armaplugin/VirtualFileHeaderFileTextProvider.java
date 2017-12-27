@@ -10,8 +10,13 @@ import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFileTextProvider;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -83,6 +88,42 @@ public class VirtualFileHeaderFileTextProvider implements HeaderFileTextProvider
 			}
 
 			resolvedFile = rootDirectory.findFileByRelativePath(path);
+
+			if (resolvedFile == null) {
+				VirtualFile addonsDir = rootDirectory.findFileByRelativePath("Addons");
+				if (addonsDir == null) {
+					addonsDir = rootDirectory.findFileByRelativePath("addons");
+				}
+				if (addonsDir != null) {
+					resolvedFile = addonsDir.findFileByRelativePath(path);
+				}
+			}
+			if (resolvedFile == null) {
+				Path pathAsPathObj = null;
+				try {
+					pathAsPathObj = Paths.get(path);
+				} catch (InvalidPathException ignore) {
+				}
+				if (pathAsPathObj == null) {
+					return null;
+				}
+				List<ArmaAddon> addons = ArmaAddonsManager.getAddons();
+				for (ArmaAddon addon : addons) {
+					File parentFile = addon.getAddonDirectoryInReferenceDirectory().getParentFile();
+					if (parentFile == null) {
+						continue;
+					}
+					Path resolved = parentFile.toPath().resolve(pathAsPathObj);
+					if (resolved == null) {
+						continue;
+					}
+					File file = resolved.toFile();
+					if (!file.exists()) {
+						continue;
+					}
+					new HeaderFileTextProvider.BasicFileInput(file);
+				}
+			}
 		} else {
 			VirtualFile virtualFile = this.virtualFile.getParent();
 			if (virtualFile == null) {
