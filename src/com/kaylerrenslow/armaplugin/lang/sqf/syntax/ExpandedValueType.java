@@ -177,9 +177,10 @@ public class ExpandedValueType extends ValueType {
 			sb.append("[");
 			int i = 0;
 			final int size = getValueTypes().size();
+			final int indexWhereOptionalValuesStart = size - numOptionalValues;
 			for (ValueType t : getValueTypes()) {
 				sb.append(t.getDisplayName());
-				if (size - i >= numOptionalValues) {
+				if (i >= indexWhereOptionalValuesStart) {
 					//is optional param
 					sb.append("?");
 				}

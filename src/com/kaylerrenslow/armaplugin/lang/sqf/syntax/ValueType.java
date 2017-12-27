@@ -346,9 +346,11 @@ public abstract class ValueType {
 		public static final BaseType POSITION = new BaseType("POSITION", "Position", new Function<Void, ExpandedValueType>() {
 			@Override
 			public ExpandedValueType apply(Void aVoid) {
-				return new ExpandedValueType(false,
+				ExpandedValueType etype = new ExpandedValueType(false,
 						BaseType.NUMBER, BaseType.NUMBER, BaseType.NUMBER
 				);
+				etype.setNumOptionalValues(1);
+				return etype;
 			}
 		});
 		public static final BaseType POSITION_2D = new BaseType("POSITION_2D", "Position2D", new Function<Void, ExpandedValueType>() {

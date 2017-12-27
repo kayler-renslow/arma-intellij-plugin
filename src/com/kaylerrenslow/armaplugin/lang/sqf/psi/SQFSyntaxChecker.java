@@ -494,7 +494,7 @@ public class SQFSyntaxChecker implements SQFSyntaxVisitor<ValueType> {
 				if (prefixType == null) {
 					problem = new PotentialProblem(
 							exprOperator,
-							"No syntax for '" + commandName + "'",
+							"No syntax for '" + commandName + "' with left argument absent.",
 							ProblemHighlightType.GENERIC_ERROR_OR_WARNING
 					);
 				} else {
