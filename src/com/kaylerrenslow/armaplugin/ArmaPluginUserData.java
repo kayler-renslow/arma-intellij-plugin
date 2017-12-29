@@ -100,14 +100,34 @@ public class ArmaPluginUserData {
 		return moduleData.getConfigHeaderFiles();
 	}
 
+	/**
+	 * Performs same operations as {@link #getAllConfigFunctions(Module)},
+	 * however, this first gets a {@link Module} instance for the provided {@link PsiElement}.
+	 */
 	@Nullable
 	public List<HeaderConfigFunction> getAllConfigFunctions(@NotNull PsiElement elementFromModule) {
 		ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
 		if (moduleData == null) {
 			return null;
 		}
+		return doGetHeaderConfigFunctions(moduleData);
+	}
+
+	/**
+	 * Gets all CfgFunctions functions from the given Module.
+	 *
+	 * @return null if the functions couldn't be retrieved (parse error or some other problem), or the list of functions
+	 */
+	@Nullable
+	public List<HeaderConfigFunction> getAllConfigFunctions(@NotNull Module module) {
+		ArmaPluginModuleData moduleData = getModuleData(module);
+		return doGetHeaderConfigFunctions(moduleData);
+	}
+
+	@Nullable
+	private List<HeaderConfigFunction> doGetHeaderConfigFunctions(@NotNull ArmaPluginModuleData moduleData) {
 		if (moduleData.getConfigHeaderFiles().isEmpty() || moduleData.shouldReparseConfigHeaderFiles()) {
-			parseAndGetConfigHeaderFiles(elementFromModule);
+			doParseAndGetConfigHeaderFiles(moduleData);
 		}
 		return moduleData.getAllConfigFunctions();
 	}
