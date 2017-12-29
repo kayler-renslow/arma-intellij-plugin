@@ -10,6 +10,7 @@
       <sourceFolder url="file://$MODULE_DIR$/raw_doc" type="java-resource" relativeOutputPath="com.kaylerrenslow.armaplugin.lang.sqf.raw_doc" />
       <sourceFolder url="file://$MODULE_DIR$/syntax" type="java-resource" relativeOutputPath="com.kaylerrenslow.armaplugin.lang.sqf.syntax" />
       <sourceFolder url="file://$MODULE_DIR$/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/test_files" isTestSource="true" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

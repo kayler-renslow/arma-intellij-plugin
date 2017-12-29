@@ -121,7 +121,7 @@ public class VirtualFileHeaderFileTextProvider implements HeaderFileTextProvider
 					if (!file.exists()) {
 						continue;
 					}
-					new HeaderFileTextProvider.BasicFileInput(file);
+					return new HeaderFileTextProvider.BasicFileInput(file);
 				}
 			}
 		} else {

@@ -1,8 +1,8 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="SQFSyntaxCheckerTest" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
+  <configuration default="false" name="ArmaAddonsIntegrationTests" type="JUnit" factoryName="JUnit" nameIsGenerated="true">
     <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea">
       <pattern>
-        <option name="PATTERN" value="com.kaylerrenslow.armaplugin.lang.sqf.psi.OperatorCommandDescriptors" />
+        <option name="PATTERN" value="com.kaylerrenslow.armaplugin.lang.sqf.psi.*" />
         <option name="ENABLED" value="true" />
       </pattern>
     </extension>
@@ -10,7 +10,7 @@
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
     <option name="ALTERNATIVE_JRE_PATH" />
     <option name="PACKAGE_NAME" value="com.kaylerrenslow.armaplugin.lang.sqf.psi" />
-    <option name="MAIN_CLASS_NAME" value="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFSyntaxCheckerTest" />
+    <option name="MAIN_CLASS_NAME" value="com.kaylerrenslow.armaplugin.lang.sqf.psi.ArmaAddonsIntegrationTests" />
     <option name="METHOD_NAME" value="" />
     <option name="TEST_OBJECT" value="class" />
     <option name="VM_PARAMETERS" value="-ea -Xbootclasspath/p:../out/classes/production/boot -XX:+HeapDumpOnOutOfMemoryError -Xmx512m -XX:MaxPermSize=320m -Didea.system.path=../test-system -Didea.home.path=../ -Didea.config.path=../test-config -Didea.test.group=ALL_EXCLUDE_DEFINED " />

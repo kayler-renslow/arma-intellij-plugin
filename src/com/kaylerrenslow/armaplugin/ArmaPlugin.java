@@ -32,15 +32,21 @@ public class ArmaPlugin {
 	 */
 	@Nullable
 	public static String getPathToTempDirectory(@NotNull Module module) {
+		final String tempFolder = "/armaplugin-temp";
+
 		//find a place to save parse data
 		VirtualFile imlVirtFile = module.getModuleFile();
 		if (imlVirtFile == null) {
-			return null;
+			String projectBasePath = module.getProject().getBasePath();
+			if (projectBasePath == null) {
+				return null;
+			}
+			return projectBasePath + tempFolder;
 		}
 		VirtualFile imlDir = imlVirtFile.getParent();
 		if (imlDir == null) {
 			return null;
 		}
-		return imlDir.getPath() + "/armaplugin-temp";
+		return imlDir.getPath() + tempFolder;
 	}
 }

@@ -17,7 +17,7 @@ import java.util.List;
  * @author Kayler
  * @since 09/08/2017
  */
-public class ArmaPluginModuleData {
+class ArmaPluginModuleData {
 	private List<HeaderFile> configHeaderFiles = Collections.emptyList();
 	private boolean reparseConfigHeaderFiles = true;
 	private final Module module;

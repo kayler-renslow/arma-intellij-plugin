@@ -38,6 +38,21 @@ public class ArmaPluginUserData {
 
 	private final Map<Module, ArmaPluginModuleData> moduleMap = new IdentityHashMap<>();
 
+
+	/**
+	 * Invokes {@link #parseAndGetConfigHeaderFiles(Module)} by first getting a {@link Module} instance for the given PsiElement.
+	 *
+	 * @return the root config file, or an empty list if couldn't locate a {@link Module} or couldn't be parsed
+	 */
+	@NotNull
+	public List<HeaderFile> parseAndGetConfigHeaderFiles(@NotNull PsiElement elementFromModule) {
+		ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
+		if (moduleData == null) {
+			return Collections.emptyList();
+		}
+		return doParseAndGetConfigHeaderFiles(moduleData);
+	}
+
 	/**
 	 * Get a list of {@link HeaderFile} instances. It will be either a single description.ext (for missions)
 	 * or multiple config.cpp (for addons/mods).
@@ -46,59 +61,55 @@ public class ArmaPluginUserData {
 	 * @return the root config file, or an empty list if couldn't locate a {@link Module} or couldn't be parsed
 	 */
 	@NotNull
-	public List<HeaderFile> parseAndGetConfigHeaderFiles(@NotNull PsiElement elementFromModule) {
-		synchronized (this) {
-			ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
-			if (moduleData == null) {
-				return Collections.emptyList();
-			}
-			if (!moduleData.shouldReparseConfigHeaderFiles() && moduleData.getConfigHeaderFiles() != null) {
-				return moduleData.getConfigHeaderFiles();
-			}
+	public List<HeaderFile> parseAndGetConfigHeaderFiles(@NotNull Module module) {
+		return doParseAndGetConfigHeaderFiles(getModuleData(module));
+	}
 
-			//find a place to save parse data
-			String imlDir = ArmaPlugin.getPathToTempDirectory(moduleData.getModule());
-			if (imlDir == null) {
-				return Collections.emptyList();
-			}
-			List<VirtualFile> configVirtualFiles = ArmaPluginUtil.getConfigVirtualFiles(elementFromModule);
-			if (configVirtualFiles.isEmpty()) {
-				return Collections.emptyList();
-			}
-
-			List<HeaderFile> parsedFiles = new ArrayList<>();
-			for (VirtualFile configVirtualFile : configVirtualFiles) {
-				try {
-					HeaderParseResult result = HeaderParser.parse(
-							new VirtualFileHeaderFileTextProvider(configVirtualFile, elementFromModule.getProject()),
-							new File(imlDir)
-					);
-					parsedFiles.add(result.getFile());
-				} catch (Exception e) {
-					System.out.println("Header Parse Exception:" + e.getMessage());
-					Notifications.Bus.notify(new HeaderFileParseErrorNotification(e));
-				}
-			}
-
-			moduleData.setConfigHeaderFiles(parsedFiles);
-			moduleData.setReparseConfigHeaderFiles(false);
-
+	@NotNull
+	private List<HeaderFile> doParseAndGetConfigHeaderFiles(@NotNull ArmaPluginModuleData moduleData) {
+		if (!moduleData.shouldReparseConfigHeaderFiles()) {
 			return moduleData.getConfigHeaderFiles();
 		}
+		//find a place to save parse data
+		String imlDir = ArmaPlugin.getPathToTempDirectory(moduleData.getModule());
+		if (imlDir == null) {
+			return Collections.emptyList();
+		}
+		List<VirtualFile> configVirtualFiles = ArmaPluginUtil.getConfigVirtualFiles(moduleData.getModule());
+		if (configVirtualFiles.isEmpty()) {
+			return Collections.emptyList();
+		}
+
+		List<HeaderFile> parsedFiles = new ArrayList<>();
+		for (VirtualFile configVirtualFile : configVirtualFiles) {
+			try {
+				HeaderParseResult result = HeaderParser.parse(
+						new VirtualFileHeaderFileTextProvider(configVirtualFile, moduleData.getModule().getProject()),
+						new File(imlDir)
+				);
+				parsedFiles.add(result.getFile());
+			} catch (Exception e) {
+				System.out.println("Header Parse Exception:" + e.getMessage());
+				Notifications.Bus.notify(new HeaderFileParseErrorNotification(e));
+			}
+		}
+
+		moduleData.setConfigHeaderFiles(parsedFiles);
+		moduleData.setReparseConfigHeaderFiles(false);
+
+		return moduleData.getConfigHeaderFiles();
 	}
 
 	@Nullable
 	public List<HeaderConfigFunction> getAllConfigFunctions(@NotNull PsiElement elementFromModule) {
-		synchronized (this) {
-			ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
-			if (moduleData == null) {
-				return null;
-			}
-			if (moduleData.getConfigHeaderFiles().isEmpty() || moduleData.shouldReparseConfigHeaderFiles()) {
-				parseAndGetConfigHeaderFiles(elementFromModule);
-			}
-			return moduleData.getAllConfigFunctions();
+		ArmaPluginModuleData moduleData = getModuleData(elementFromModule);
+		if (moduleData == null) {
+			return null;
 		}
+		if (moduleData.getConfigHeaderFiles().isEmpty() || moduleData.shouldReparseConfigHeaderFiles()) {
+			parseAndGetConfigHeaderFiles(elementFromModule);
+		}
+		return moduleData.getAllConfigFunctions();
 	}
 
 	@Nullable
@@ -107,6 +118,11 @@ public class ArmaPluginUserData {
 		if (module == null) {
 			return null;
 		}
+		return getModuleData(module);
+	}
+
+	@NotNull
+	private ArmaPluginModuleData getModuleData(@NotNull Module module) {
 		return moduleMap.computeIfAbsent(module, module1 -> {
 			return new ArmaPluginModuleData(module);
 		});
@@ -118,16 +134,14 @@ public class ArmaPluginUserData {
 	 * {@link HeaderFile} is no longer valid and it should reparse.
 	 */
 	public void reparseConfigs(@NotNull PsiFile fileFromModule) {
-		synchronized (this) {
-			Module module = ModuleUtil.findModuleForPsiElement(fileFromModule);
-			if (module == null) {
-				return;
-			}
-			ArmaPluginModuleData moduleData = moduleMap.computeIfAbsent(module, module1 -> {
-				return new ArmaPluginModuleData(module);
-			});
-			moduleData.setReparseConfigHeaderFiles(true);
+		Module module = ModuleUtil.findModuleForPsiElement(fileFromModule);
+		if (module == null) {
+			return;
 		}
+		ArmaPluginModuleData moduleData = moduleMap.computeIfAbsent(module, module1 -> {
+			return new ArmaPluginModuleData(module);
+		});
+		moduleData.setReparseConfigHeaderFiles(true);
 	}
 
 	/**
@@ -158,30 +172,28 @@ public class ArmaPluginUserData {
 
 	@Nullable
 	public XmlFile getStringTableXml(@NotNull PsiElement elementFromModule) {
-		synchronized (this) {
-			Module module = ModuleUtil.findModuleForPsiElement(elementFromModule);
-			if (module == null) {
+		Module module = ModuleUtil.findModuleForPsiElement(elementFromModule);
+		if (module == null) {
+			return null;
+		}
+		ArmaPluginModuleData data = moduleMap.computeIfAbsent(module, module1 -> {
+			return new ArmaPluginModuleData(module);
+		});
+		XmlFile f = data.getStringTableXmlFile();
+		if (f == null) {
+			VirtualFile virtFile = ArmaPluginUtil.getStringTableXmlFile(module);
+			if (virtFile == null) {
 				return null;
 			}
-			ArmaPluginModuleData data = moduleMap.computeIfAbsent(module, module1 -> {
-				return new ArmaPluginModuleData(module);
-			});
-			XmlFile f = data.getStringTableXmlFile();
-			if (f == null) {
-				VirtualFile virtFile = ArmaPluginUtil.getStringTableXmlFile(module);
-				if (virtFile == null) {
-					return null;
-				}
-				XmlFile file = (XmlFile) PsiManager.getInstance(elementFromModule.getProject()).findFile(virtFile);
-				data.setStringTableXmlFile(file);
-				return file;
-			} else {
-				if (!f.getVirtualFile().exists()) {
-					data.setStringTableXmlFile(null);
-					return null;
-				}
-				return f;
+			XmlFile file = (XmlFile) PsiManager.getInstance(elementFromModule.getProject()).findFile(virtFile);
+			data.setStringTableXmlFile(file);
+			return file;
+		} else {
+			if (!f.getVirtualFile().exists()) {
+				data.setStringTableXmlFile(null);
+				return null;
 			}
+			return f;
 		}
 	}
 
