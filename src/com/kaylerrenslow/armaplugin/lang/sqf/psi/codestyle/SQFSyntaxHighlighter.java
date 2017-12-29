@@ -32,6 +32,7 @@ public class SQFSyntaxHighlighter extends SyntaxHighlighterBase {
 	public static final TextAttributesKey MAGIC_VAR = createTextAttributesKey("ARMA_SQF_MAGIC_VARIABLE");
 	public static final TextAttributesKey COMMAND = createTextAttributesKey("ARMA_SQF_COMMAND");
 	public static final TextAttributesKey OPERATOR = createTextAttributesKey("ARMA_SQF_OPERATOR", DefaultLanguageHighlighterColors.OPERATION_SIGN);
+	public static final TextAttributesKey CONTROL_STRUCTURE_COMMAND = createTextAttributesKey("ARMA_SQF_CONTROL_STRUCTURE_COMMAND", DefaultLanguageHighlighterColors.KEYWORD);
 
 	public static final TextAttributesKey STRING = createTextAttributesKey("ARMA_SQF_STRING", DefaultLanguageHighlighterColors.STRING);
 	public static final TextAttributesKey NUM = createTextAttributesKey("ARMA_SQF_NUM", DefaultLanguageHighlighterColors.NUMBER);

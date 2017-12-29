@@ -6,14 +6,6 @@
 	See SQFSyntaxHighlighter for example use cases.
 	-->
 
-	<!-- Shared -->
-	<option name="ARMA_BAD_WORD">
-		<value>
-			<option name="EFFECT_TYPE" value="2"/>
-			<option name="EFFECT_COLOR" value="FF0000"/>
-		</value>
-	</option>
-
 	<!-- SQF -->
 	<option name="ARMA_SQF_COMMAND">
 		<value>
@@ -22,8 +14,7 @@
 	</option>
 	<option name="ARMA_SQF_MAGIC_VARIABLE">
 		<value>
-			<option name="FOREGROUND" value="FF4A00"/>
-			<option name="FONT_TYPE" value="2"/>
+			<option name="FOREGROUND" value="FF00ED"/>
 		</value>
 	</option>
 

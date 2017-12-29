@@ -50,6 +50,8 @@
 						 implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.inspections.SQFSyntaxAndTypeCheckingInspection"
 						 enabledByDefault="true" groupName="Arma SQF" hasStaticDescription="true" level="ERROR"/>
 		<colorSettingsPage implementation="com.kaylerrenslow.armaplugin.lang.sqf.psi.codestyle.SQFColorSettingsPage"/>
+		<annotator language="Arma.SQF"
+				   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.SQFControlStructureCommandAnnotator"/>
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Header Language -->

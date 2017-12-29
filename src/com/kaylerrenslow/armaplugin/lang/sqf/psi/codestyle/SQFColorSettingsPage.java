@@ -24,6 +24,7 @@ public class SQFColorSettingsPage implements ColorSettingsPage {
 		// Things placed in map can be referenced in sample code.
 		// Example: <magicVariable>_x</magicVariable> will give _x SQFSyntaxHighligher.MAGIC_VAR highlighting
 		map.put("magicVariable", SQFSyntaxHighlighter.MAGIC_VAR);
+		map.put("controlStructureCommand", SQFSyntaxHighlighter.CONTROL_STRUCTURE_COMMAND);
 	}
 
 	private static final AttributesDescriptor[] ATTR_DESCRIPTORS = new AttributesDescriptor[]{
@@ -69,7 +70,7 @@ public class SQFColorSettingsPage implements ColorSettingsPage {
 				"    _localVariable = 'single quote string';\n" +
 				"    meaningOfLife = 42;\n" +
 				"\n" +
-				"    if (1==1 and 2==2 && 42==42) then {\n" +
+				"    <controlStructureCommand>if</controlStructureCommand> (1==1 and 2==2 && 42==42) then {\n" +
 				"        hint \"42 is equal to 42\";\n" +
 				"        _arr = [2e2, 3.1415926535, missionConfigFile];\n" +
 				"    };\n" +
@@ -78,11 +79,11 @@ public class SQFColorSettingsPage implements ColorSettingsPage {
 				"\n" +
 				"    {\n" +
 				"        <magicVariable>_x</magicVariable> setDamage 1;\n" +
-				"    } forEach units group player;\n" +
+				"    } <controlStructureCommand>forEach</controlStructureCommand> units group player;\n" +
 				"\n" +
-				"    switch (meaningOfLife) do {\n" +
-				"        case 42: { hint \"meaning of life is good\"; };\n" +
-				"        default { hint \"meaning of life is wrong\"; };\n" +
+				"    <controlStructureCommand>switch</controlStructureCommand> (meaningOfLife) <controlStructureCommand>do</controlStructureCommand> {\n" +
+				"        <controlStructureCommand>case</controlStructureCommand> 42: { hint \"meaning of life is good\"; };\n" +
+				"        <controlStructureCommand>default</controlStructureCommand> { hint \"meaning of life is wrong\"; };\n" +
 				"    };\n" +
 				"\n" +
 				"};";
