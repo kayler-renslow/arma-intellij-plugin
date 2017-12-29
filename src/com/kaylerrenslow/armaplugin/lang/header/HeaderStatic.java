@@ -20,6 +20,6 @@ public class HeaderStatic {
 	 */
 	@NotNull
 	public static ResourceBundle getHeaderBundle() {
-		return ResourceBundle.getBundle("com.kaylerrenslow.armaplugin.SQFBundle");
+		return ResourceBundle.getBundle("com.kaylerrenslow.armaplugin.HeaderBundle");
 	}
 }

@@ -1,0 +1,1 @@
+class ClassIncludedFromHeaderFile_h;

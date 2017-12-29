@@ -50,8 +50,8 @@ class ArmaPluginModuleData {
 		for (HeaderFile file : configHeaderFiles) {
 			try {
 				functions.addAll(HeaderConfigFunctionUtil.getAllConfigFunctionsFromRootConfig(HeaderConfigFunctionUtil.getCfgFunctions(file)));
-			} catch (ConfigClassNotDefinedException e) {
-				e.printStackTrace();
+			} catch (ConfigClassNotDefinedException ignore) {
+//				e.printStackTrace();
 			}
 		}
 		this.functions = Collections.unmodifiableList(functions);

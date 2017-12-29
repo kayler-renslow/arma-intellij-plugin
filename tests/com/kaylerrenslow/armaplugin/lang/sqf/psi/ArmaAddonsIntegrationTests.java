@@ -25,9 +25,11 @@ public class ArmaAddonsIntegrationTests extends SQFSyntaxCheckerTestHelper {
 
 		final String pathPrefix = pathToTestFiles + "test_files/addonTests/moduleWithAddonsFolder/";
 
+		final String pboPathPrefix = "Addons/fake_extracted_pbo/";
 		String[] filesToCopy = {
-				"Addons/fake_extracted_pbo/config.cpp",
-				"Addons/fake_extracted_pbo/fn_myFunction.sqf"
+				pboPathPrefix + "config.cpp",
+				pboPathPrefix + "fn_myFunction.sqf",
+				pboPathPrefix + "directory/config.cpp"
 		};
 
 		for (String file : filesToCopy) {
@@ -36,6 +38,7 @@ public class ArmaAddonsIntegrationTests extends SQFSyntaxCheckerTestHelper {
 
 		Module module = myFixture.getModule();
 		List<HeaderFile> headerFiles = ArmaPluginUserData.getInstance().parseAndGetConfigHeaderFiles(module);
+
 		System.out.println("ArmaAddonsIntegrationTests.testInclude_moduleWithAddonsFolder headerFiles=" + headerFiles);
 	}
 
