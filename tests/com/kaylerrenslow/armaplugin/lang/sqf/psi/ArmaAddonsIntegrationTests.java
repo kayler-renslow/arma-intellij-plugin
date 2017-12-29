@@ -56,7 +56,6 @@ public class ArmaAddonsIntegrationTests extends SQFSyntaxCheckerTestHelper {
 
 		assertEquals("There should be 4 config.cpp files detected and parsed.", 4, headerFiles.size());
 
-
 		List<HeaderConfigFunction> allConfigFunctions = userData.getAllConfigFunctions(module);
 		assertNotNull("The functions should have been retrieved successfully and not be null.", allConfigFunctions);
 
@@ -74,7 +73,7 @@ public class ArmaAddonsIntegrationTests extends SQFSyntaxCheckerTestHelper {
 				}
 			}
 			if (!found) {
-				fail("Expected " + expectFunc + " to exist.");
+				fail("Expected " + expectFunc + " to exist in CfgFunctions.");
 			}
 		}
 
