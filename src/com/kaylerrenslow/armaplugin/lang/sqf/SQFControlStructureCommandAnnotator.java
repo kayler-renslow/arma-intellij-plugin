@@ -28,6 +28,7 @@ public class SQFControlStructureCommandAnnotator implements Annotator {
 			case "switch": //fall
 			case "case": //fall
 			case "default": //fall
+			case "while"://fall
 			case "do": {
 				Annotation annotation = holder.createInfoAnnotation(command, "");
 				annotation.setTextAttributes(SQFSyntaxHighlighter.CONTROL_STRUCTURE_COMMAND);
