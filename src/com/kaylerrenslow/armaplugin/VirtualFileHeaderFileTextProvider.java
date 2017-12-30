@@ -3,10 +3,12 @@ package com.kaylerrenslow.armaplugin;
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFileTextProvider;
+import com.kaylerrenslow.armaplugin.settings.ArmaPluginProjectSettings;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,37 +69,27 @@ public class VirtualFileHeaderFileTextProvider implements HeaderFileTextProvider
 	@Override
 	@Nullable
 	public HeaderFileTextProvider resolvePath(@NotNull String path) {
-		VirtualFile resolvedFile;
+		VirtualFile resolvedFile = null;
 		path = path.replaceAll("\\\\", "/");
 		if (path.startsWith("/")) {
-			Module module = ModuleUtil.findModuleForFile(this.virtualFile, project);
-			if (module == null) {
-				return null;
-			}
 			path = path.substring(1); //remove \
-			VirtualFile rootDirectory;
-			{
-				VirtualFile imlFile = module.getModuleFile();
-				if (imlFile == null) {
-					return null;
-				}
-				rootDirectory = imlFile.getParent();
-				if (rootDirectory == null) {
-					return null;
+			String addonPrefix = ArmaPluginProjectSettings.getInstance(this.project).getState().addonPrefixName;
+			if (addonPrefix != null) {
+				if (path.startsWith(addonPrefix + "/")) {
+					path = path.substring((addonPrefix + "/").length());
+					Module module = ModuleUtil.findModuleForFile(this.virtualFile, project);
+					if (module == null) {
+						return null;
+					}
+					VirtualFile srcRoot = ProjectFileIndex.getInstance(project).getSourceRootForFile(this.virtualFile);
+					if (srcRoot == null) {
+						return null;
+					}
+
+					resolvedFile = srcRoot.findFileByRelativePath(path);
 				}
 			}
 
-			resolvedFile = rootDirectory.findFileByRelativePath(path);
-
-			if (resolvedFile == null) {
-				VirtualFile addonsDir = rootDirectory.findFileByRelativePath("Addons");
-				if (addonsDir == null) {
-					addonsDir = rootDirectory.findFileByRelativePath("addons");
-				}
-				if (addonsDir != null) {
-					resolvedFile = addonsDir.findFileByRelativePath(path);
-				}
-			}
 			if (resolvedFile == null) {
 				Path pathAsPathObj = null;
 				try {

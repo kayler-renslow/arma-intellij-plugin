@@ -1,10 +1,12 @@
 package com.kaylerrenslow.armaplugin.lang.sqf.psi;
 
 import com.intellij.openapi.module.Module;
+import com.intellij.testFramework.fixtures.LightCodeInsightFixtureTestCase;
 import com.kaylerrenslow.armaDialogCreator.arma.header.HeaderFile;
 import com.kaylerrenslow.armaplugin.ArmaPluginUserData;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderConfigFunction;
 import com.kaylerrenslow.armaplugin.lang.sqf.SQFVariableName;
+import com.kaylerrenslow.armaplugin.settings.ArmaPluginProjectSettings;
 
 import java.io.File;
 import java.util.List;
@@ -18,7 +20,14 @@ import java.util.List;
  * @author Kayler
  * @since 12/28/2017
  */
-public class ArmaAddonsIntegrationTests extends SQFSyntaxCheckerTestHelper {
+public class ArmaAddonsIntegrationTests extends LightCodeInsightFixtureTestCase {
+
+	@Override
+	public void setUp() throws Exception {
+		super.setUp();
+		ArmaPluginProjectSettings.getInstance(myFixture.getProject()).getState().addonPrefixName = "TEST";
+	}
+
 	/**
 	 * The starting path to where the test_files directory is contained in.
 	 * This should be where Arma IntelliJ Plugin project directory is.
@@ -28,12 +37,12 @@ public class ArmaAddonsIntegrationTests extends SQFSyntaxCheckerTestHelper {
 	 */
 	private final String pathToTestFiles = new File("").getAbsolutePath() + "/";
 
-	public void test_moduleWithAddonsFolder() {
+	public void test_addonsProject() {
 
-		final String pathPrefix = pathToTestFiles + "test_files/addonTests/moduleWithAddonsFolder/";
+		final String pathPrefix = pathToTestFiles + "test_files/addonTests/addonsProject/";
 
-		String pboPathPrefix1 = "Addons/fake_extracted_pbo/";
-		String pboPathPrefix2 = "Addons/fake_extracted_pbo2/";
+		String pboPathPrefix1 = "fake_extracted_pbo/";
+		String pboPathPrefix2 = "fake_extracted_pbo2/";
 		String[] filesToCopy = {
 				pboPathPrefix1 + "config.cpp",
 				pboPathPrefix1 + "fn_myFunction.sqf",
@@ -50,6 +59,7 @@ public class ArmaAddonsIntegrationTests extends SQFSyntaxCheckerTestHelper {
 			myFixture.copyFileToProject(pathPrefix + file, file);
 		}
 
+
 		Module module = myFixture.getModule();
 		ArmaPluginUserData userData = ArmaPluginUserData.getInstance();
 		List<HeaderFile> headerFiles = userData.parseAndGetConfigHeaderFiles(module);
@@ -61,7 +71,8 @@ public class ArmaAddonsIntegrationTests extends SQFSyntaxCheckerTestHelper {
 
 		final String[] expectedConfigFunctionsToBeFound = {
 				"tag_fnc_MyFunction",
-				"tag_fnc_MyFunctionNumeroDos"
+				"tag_fnc_MyFunctionNumeroDos",
+				"tag_fnc_ClassIncludedFromHeaderFile_hButFromSecondPbo"
 		};
 		assertEquals("Expected this many config functions. ", expectedConfigFunctionsToBeFound.length, allConfigFunctions.size());
 		for (String expectFunc : expectedConfigFunctionsToBeFound) {

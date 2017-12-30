@@ -89,7 +89,7 @@ public class ArmaPluginUserData {
 				);
 				parsedFiles.add(result.getFile());
 			} catch (Exception e) {
-				System.out.println("Header Parse Exception:" + e.getMessage());
+				System.out.println("Header Parse Exception: " + e.getMessage());
 				Notifications.Bus.notify(new HeaderFileParseErrorNotification(e));
 			}
 		}
