@@ -1,7 +1,5 @@
 package com.kaylerrenslow.armaplugin;
 
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -71,61 +69,60 @@ public class VirtualFileHeaderFileTextProvider implements HeaderFileTextProvider
 	public HeaderFileTextProvider resolvePath(@NotNull String path) {
 		VirtualFile resolvedFile = null;
 		path = path.replaceAll("\\\\", "/");
-		if (path.startsWith("/")) {
-			path = path.substring(1); //remove \
-			String addonPrefix = ArmaPluginProjectSettings.getInstance(this.project).getState().addonPrefixName;
-			if (addonPrefix != null) {
-				if (path.startsWith(addonPrefix + "/")) {
-					path = path.substring((addonPrefix + "/").length());
-					Module module = ModuleUtil.findModuleForFile(this.virtualFile, project);
-					if (module == null) {
-						return null;
-					}
-					VirtualFile srcRoot = ProjectFileIndex.getInstance(project).getSourceRootForFile(this.virtualFile);
-					if (srcRoot == null) {
-						return null;
-					}
-
-					resolvedFile = srcRoot.findFileByRelativePath(path);
-				}
-			}
-
-			if (resolvedFile == null) {
-				Path pathAsPathObj = null;
-				try {
-					pathAsPathObj = Paths.get(path);
-				} catch (InvalidPathException ignore) {
-				}
-				if (pathAsPathObj == null) {
-					return null;
-				}
-				List<ArmaAddon> addons = ArmaAddonsManager.getAddons();
-				for (ArmaAddon addon : addons) {
-					File parentFile = addon.getAddonDirectoryInReferenceDirectory().getParentFile();
-					if (parentFile == null) {
-						continue;
-					}
-					Path resolved = parentFile.toPath().resolve(pathAsPathObj);
-					if (resolved == null) {
-						continue;
-					}
-					File file = resolved.toFile();
-					if (!file.exists()) {
-						continue;
-					}
-					return new HeaderFileTextProvider.BasicFileInput(file);
-				}
-			}
-		} else {
-			VirtualFile virtualFile = this.virtualFile.getParent();
-			if (virtualFile == null) {
+		if (!path.startsWith("/")) {
+			VirtualFile srcRoot = ProjectFileIndex.getInstance(project).getSourceRootForFile(this.virtualFile);
+			if (srcRoot == null) {
 				return null;
 			}
-			resolvedFile = virtualFile.findFileByRelativePath(path);
+
+			resolvedFile = srcRoot.findFileByRelativePath(path);
+			if (resolvedFile == null) {
+				return null;
+			}
+			return new VirtualFileHeaderFileTextProvider(resolvedFile, project);
 		}
-		if (resolvedFile == null) {
+
+		path = path.substring(1); //remove \
+		String addonPrefix = ArmaPluginProjectSettings.getInstance(this.project).getState().addonPrefixName;
+		if (addonPrefix != null) {
+			if (path.startsWith(addonPrefix + "/")) {
+				path = path.substring((addonPrefix + "/").length());
+				VirtualFile srcRoot = ProjectFileIndex.getInstance(project).getSourceRootForFile(this.virtualFile);
+				if (srcRoot == null) {
+					return null;
+				}
+
+				resolvedFile = srcRoot.findFileByRelativePath(path);
+				if (resolvedFile != null) {
+					return new VirtualFileHeaderFileTextProvider(resolvedFile, project);
+				}
+			}
+		}
+
+		Path pathAsPathObj = null;
+		try {
+			pathAsPathObj = Paths.get(path);
+		} catch (InvalidPathException ignore) {
+		}
+		if (pathAsPathObj == null) {
 			return null;
 		}
-		return new VirtualFileHeaderFileTextProvider(resolvedFile, project);
+		List<ArmaAddon> addons = ArmaAddonsManager.getAddons();
+		for (ArmaAddon addon : addons) {
+			File parentFile = addon.getAddonDirectoryInReferenceDirectory().getParentFile();
+			if (parentFile == null) {
+				continue;
+			}
+			Path resolved = parentFile.toPath().resolve(pathAsPathObj);
+			if (resolved == null) {
+				continue;
+			}
+			File file = resolved.toFile();
+			if (!file.exists()) {
+				continue;
+			}
+			return new HeaderFileTextProvider.BasicFileInput(file);
+		}
+		return null;
 	}
 }
