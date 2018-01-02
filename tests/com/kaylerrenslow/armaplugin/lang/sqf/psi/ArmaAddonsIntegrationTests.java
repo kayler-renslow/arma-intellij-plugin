@@ -59,7 +59,6 @@ public class ArmaAddonsIntegrationTests extends LightCodeInsightFixtureTestCase 
 			myFixture.copyFileToProject(pathPrefix + file, file);
 		}
 
-
 		Module module = myFixture.getModule();
 		ArmaPluginUserData userData = ArmaPluginUserData.getInstance();
 		List<HeaderFile> headerFiles = userData.parseAndGetConfigHeaderFiles(module);

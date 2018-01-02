@@ -61,6 +61,8 @@
 		<psi.treeChangePreprocessor implementation="com.kaylerrenslow.armaplugin.lang.TreeChangePreprocessor"/>
 		<lang.syntaxHighlighterFactory language="Arma.Header"
 									   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderSyntaxHighlighterFactory"/>
+		<colorSettingsPage
+				implementation="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderColorSettingsPage"/>
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Shared -->
