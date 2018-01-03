@@ -565,6 +565,7 @@ public class SQFSyntaxCheckerTest extends SQFSyntaxCheckerTestHelper {
 
 	//----START command expression----
 	public void testCommandExpression_randomExpressions_valid() {
+		assertNoProblems("player setUnitTrait ['Medic', true];");
 		assertNoProblems("for '_n' from 0 to (round ((((_Power/5) max 10)+((round (random (_Power*5))) min 20))*((diag_fps/60) min 1) / ((viewDistance/(viewDistance-((positionCameraToWorld [0,0,0]) distance _Position))) max 1))) step 1 do {};");
 		assertNoProblems("while {isNull assignedTarget _unit and (behaviour (effectiveCommander _unit) in ['COMBAT', 'AWARE', 'STEALTH']) and _ec == effectiveCommander _unit} do{};");
 		assertNoProblems("if (abs _diff > _th and currentCommand _tank != 'MOVE' and speed _tank < 1) then {};");
