@@ -19,8 +19,8 @@ public class SQFBraceMatcher implements PairedBraceMatcher {
 
 	private final BracePair[] pairs = new BracePair[]{
 			new BracePair(SQFTypes.LPAREN, SQFTypes.RPAREN, false),
-			new BracePair(SQFTypes.L_CURLY_BRACE, SQFTypes.R_CURLY_BRACE, false),
-			new BracePair(SQFTypes.L_SQ_BRACKET, SQFTypes.R_SQ_BRACKET, true)};
+			new BracePair(SQFTypes.L_CURLY_BRACE, SQFTypes.R_CURLY_BRACE, true),
+			new BracePair(SQFTypes.L_SQ_BRACKET, SQFTypes.R_SQ_BRACKET, false)};
 
 	@NotNull
 	@Override

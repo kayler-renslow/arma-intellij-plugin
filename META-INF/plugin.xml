@@ -65,6 +65,8 @@
 									   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderSyntaxHighlighterFactory"/>
 		<colorSettingsPage
 				implementation="com.kaylerrenslow.armaplugin.lang.header.psi.codestyle.HeaderColorSettingsPage"/>
+		<lang.braceMatcher language="Arma.Header"
+						   implementationClass="com.kaylerrenslow.armaplugin.lang.header.psi.HeaderBraceMatcher"/>
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Shared -->
