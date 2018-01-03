@@ -40,6 +40,7 @@ public class SQFColorSettingsPage implements ColorSettingsPage {
 			new AttributesDescriptor("Braces", SQFSyntaxHighlighter.BRACE),
 			new AttributesDescriptor("Brackets", SQFSyntaxHighlighter.BRACKET),
 			new AttributesDescriptor("Comma", SQFSyntaxHighlighter.COMMA),
+			new AttributesDescriptor("Control Structure Commands", SQFSyntaxHighlighter.CONTROL_STRUCTURE_COMMAND),
 	};
 
 	@Nullable
