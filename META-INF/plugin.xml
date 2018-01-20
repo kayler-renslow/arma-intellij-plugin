@@ -54,6 +54,7 @@
 				   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.SQFControlStructureCommandAnnotator"/>
 		<lang.braceMatcher language="Arma.SQF"
 						   implementationClass="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFBraceMatcher"/>
+		<breadcrumbsInfoProvider implementation="com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFBreadCrumbsProvider"/>
 	</extensions>
 	<extensions defaultExtensionNs="com.intellij">
 		<!-- Header Language -->

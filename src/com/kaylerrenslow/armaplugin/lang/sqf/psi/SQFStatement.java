@@ -132,7 +132,7 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 		if (thenBlock == null) {
 			return null;
 		}
-		return new SQFIfHelperStatement(condition, thenBlock, elseBlock);
+		return new SQFIfHelperStatement(this, condition, thenBlock, elseBlock);
 	}
 
 	/**
