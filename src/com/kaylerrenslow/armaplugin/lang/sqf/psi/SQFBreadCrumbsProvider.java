@@ -27,10 +27,13 @@ public class SQFBreadCrumbsProvider implements BreadcrumbsProvider {
 			return false;
 		}
 
-		if (element instanceof SQFScope) {
+		if (element instanceof SQFFileScope) {
 			return true;
 		}
 		if (element instanceof SQFStatement) {
+			return true;
+		}
+		if (element instanceof SQFArray) {
 			return true;
 		}
 
@@ -52,13 +55,33 @@ public class SQFBreadCrumbsProvider implements BreadcrumbsProvider {
 	@NotNull
 	@Override
 	public String getElementInfo(@NotNull PsiElement element) {
-		if (element instanceof SQFScope) {
-			return "{}";
-		}
-		if (element instanceof SQFStatement) {
-			return element.getText();
+		if (element instanceof SQFFileScope) {
+			return element.getContainingFile().getName();
 		}
 
+		if (element instanceof SQFStatement) {
+			SQFStatement statement = (SQFStatement) element;
+			SQFControlStructure controlStructure = statement.getControlStructure();
+			if (controlStructure == null) {
+				return ";;";
+			}
+			if (controlStructure instanceof SQFForEachHelperStatement) {
+				return "forEach";
+			} else if (controlStructure instanceof SQFForLoopHelperStatement) {
+				return "for";
+			} else if (controlStructure instanceof SQFIfHelperStatement) {
+				return "if";
+			} else if (controlStructure instanceof SQFSwitchHelperStatement) {
+				return "switch";
+			} else if (controlStructure instanceof SQFWhileLoopHelperStatement) {
+				return "while";
+			} else {
+				return "<ControlStructure>";
+			}
+		}
+		if (element instanceof SQFArray) {
+
+		}
 		return element.getText();
 	}
 }

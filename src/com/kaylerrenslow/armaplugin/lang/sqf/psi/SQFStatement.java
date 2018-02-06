@@ -235,6 +235,45 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 	}
 
 	/**
+	 * @return the {@link SQFForEachHelperStatement} instance if the statement contains a forEach statement,
+	 * or null if the statement isn't a valid forEach statement
+	 */
+	@Nullable
+	public SQFForEachHelperStatement getForEachLoopStatement() {
+		SQFExpression expr;
+		if (this instanceof SQFExpressionStatement) {
+			expr = ((SQFExpressionStatement) this).getExpr().withoutParenthesis();
+		} else {
+			return null;
+		}
+		if (!(expr instanceof SQFCommandExpression)) {
+			return null;
+		}
+		SQFCommandExpression cmdExpr = (SQFCommandExpression) expr;
+		if (!cmdExpr.commandNameEquals("forEach")) {
+			return null;
+		}
+		SQFExpression iteratedExpr;
+		{
+			SQFCommandArgument forEachPostArg = cmdExpr.getPostfixArgument();
+			if (forEachPostArg == null) {
+				return null;
+			}
+			iteratedExpr = forEachPostArg.getExpr().withoutParenthesis();
+		}
+		SQFBlockOrExpression code;
+		{
+			SQFCommandArgument forEachCodeArg = cmdExpr.getPrefixArgument();
+			if (forEachCodeArg == null) {
+				return null;
+			}
+			code = forEachCodeArg;
+		}
+
+		return new SQFForEachHelperStatement(code, iteratedExpr);
+	}
+
+	/**
 	 * @return the {@link SQFForLoopHelperStatement} instance if the statement contains a for loop statement,
 	 * or null if the statement isn't a valid for loop statement
 	 */
@@ -292,6 +331,10 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 			return cs;
 		}
 		cs = getForLoopStatement();
+		if (cs != null) {
+			return cs;
+		}
+		cs = getForEachLoopStatement();
 		if (cs != null) {
 			return cs;
 		}
