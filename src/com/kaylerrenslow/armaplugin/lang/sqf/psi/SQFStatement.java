@@ -5,13 +5,11 @@ import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiComment;
 import com.intellij.psi.PsiElement;
 import com.kaylerrenslow.armaDialogCreator.util.Reference;
-import com.kaylerrenslow.armaplugin.lang.PsiUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 /**
  * @author Kayler
@@ -50,89 +48,46 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 			return null;
 		}
 		SQFExpression condition = null;
-		SQFBlockOrExpression thenBlock = null;
-		SQFBlockOrExpression elseBlock = null;
+		SQFBlockOrExpression thenn = null;
+		SQFBlockOrExpression elsee = null;
 
-		//get condition, then block, and else block
-		{
-			SQFCommandArgument postArg = cmdExpr.getPostfixArgument();
-			if (postArg == null) {
-				return null;
-			}
-			SQFExpression postArgExpr = postArg.getExpr().withoutParenthesis();
-			if (!(postArgExpr instanceof SQFCommandExpression)) {
-				return null;
-			}
+		List<SQFCommandArgument> args = cmdExpr.captureArguments("if $ then $ else $");
+		if (args == null) {
+			args = cmdExpr.captureArguments("if $ then|exitWith $");
+		}
 
-			SQFCommandExpression condExpr = (SQFCommandExpression) postArgExpr;
-			condition = condExpr;
+		if (args == null) {
+			return null;
+		}
 
-			postArg = condExpr.getPostfixArgument();
-			if (postArg == null) {
-				return null;
-			}
-			postArgExpr = postArg.getExpr().withoutParenthesis();
-			if (!(postArgExpr instanceof SQFCommandExpression)) {
-				return null;
-			}
-
-			SQFCommandExpression thenExp = (SQFCommandExpression) postArgExpr;
-			if (!thenExp.commandNameEquals("then")
-					&& !thenExp.commandNameEquals("exitWith")) {
-				return null;
-			}
-
-			{ //get then block and else block
-				SQFCommandArgument thenExpPostfix = thenExp.getPostfixArgument();
-				if (thenExpPostfix == null) {
-					return null;
-				}
-				SQFExpression afterThenExp = thenExpPostfix.getExpr();
-				if (afterThenExp instanceof SQFArray) {
+		condition = args.get(0).getExpr();
+		thenn = args.get(1);
+		if (args.size() == 3) { //if then else
+			elsee = args.get(2);
+		} else { //if then|exitWith
+			if (thenn.getExpr() instanceof SQFLiteralExpression) {
+				SQFArray array = ((SQFLiteralExpression) thenn.getExpr()).getArr();
+				if (array != null) {
 					//if condition then [{/*true cond*/}, {/*false cond*/}]
-
-					SQFArray array = (SQFArray) afterThenExp;
 					List<SQFExpression> arrExps = array.getExpressions();
 					if (arrExps.size() < 1) {
 						return null;
 					}
 					SQFExpression first = arrExps.get(0).withoutParenthesis();
-					thenBlock = new SQFBlockOrExpression.Impl(first);
+					thenn = new SQFBlockOrExpression.Impl(first);
 					if (arrExps.size() > 1) {
 						SQFExpression second = arrExps.get(1).withoutParenthesis();
-						elseBlock = new SQFBlockOrExpression.Impl(second);
+						elsee = new SQFBlockOrExpression.Impl(second);
 					}
-				} else {//if condition then {};
-					Reference<SQFBlockOrExpression> thenBlockRef = new Reference<>(null);
-					Reference<SQFBlockOrExpression> elseBlockRef = new Reference<>(null);
-
-					//using a lambda so we can use return instead of lots of nested if statements!!
-					final Function<Void, Void> getElseBlock = aVoid -> {
-						if (!(afterThenExp.withoutParenthesis() instanceof SQFCommandExpression)) {
-							return null;
-						}
-						SQFCommandExpression afterThenCmdExpr = (SQFCommandExpression) afterThenExp.withoutParenthesis();
-						if (!afterThenCmdExpr.commandNameEquals("else")) {
-							return null;
-						}
-						thenBlockRef.setValue(afterThenCmdExpr.getPrefixArgument());
-						elseBlockRef.setValue(afterThenCmdExpr.getPostfixArgument());
-						return null;
-					};
-					getElseBlock.apply(null);
-					if (thenBlockRef.getValue() == null) {
-						thenBlock = new SQFBlockOrExpression.Impl(afterThenExp);
-					} else {
-						thenBlock = thenBlockRef.getValue();
-					}
-					elseBlock = elseBlockRef.getValue();
 				}
 			}
 		}
-		if (thenBlock == null) {
+
+
+		if (thenn == null) {
 			return null;
 		}
-		return new SQFIfHelperStatement(this, condition, thenBlock, elseBlock);
+		return new SQFIfHelperStatement(this, condition, thenn, elsee);
 	}
 
 	/**
@@ -170,7 +125,7 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 			return null;
 		}
 		SQFCommandArgument spawnPreArg = cmdExpr.getPrefixArgument();
-		return new SQFSpawnHelperStatement(spawnPreArg, spawnPostArg);
+		return new SQFSpawnHelperStatement(this, spawnPreArg, spawnPostArg);
 	}
 
 	/**
@@ -198,40 +153,40 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 		if (!cmdExpr.commandNameEquals("switch")) {
 			return null;
 		}
-		SQFCommandArgument postArg = cmdExpr.getPostfixArgument();
-		if (postArg == null) {
+		List<SQFCommandArgument> args = cmdExpr.captureArguments("switch $ do $");
+		if (args == null) {
 			return null;
 		}
 		SQFScope switchBlockScope = null;
 		List<SQFCaseStatement> caseStatements = new ArrayList<>();
-		Reference<SQFBlockOrExpression> blockOrExprRef = new Reference<>(null);
+		Reference<SQFCommandExpression> defaultExprRef = new Reference<>();
+
 		{ //get case statements as well as default statement
-			SQFCodeBlock block = postArg.getBlock();
+			SQFCodeBlock block = args.get(1).getBlock();
 			if (block == null) {
 				return null;
 			}
 			switchBlockScope = block.getScope();
 			if (switchBlockScope != null) {
-				PsiUtil.traverseInLayers(switchBlockScope.getNode(), astNode -> {
-					PsiElement nodeAsElement = astNode.getPsi();
-					if (nodeAsElement instanceof SQFCaseStatement) {
-						caseStatements.add((SQFCaseStatement) nodeAsElement);
-					} else if (nodeAsElement instanceof SQFExpressionStatement) {
-						SQFExpressionStatement exprStatement = (SQFExpressionStatement) nodeAsElement;
-						SQFExpression exprInExprStatement = exprStatement.getExpr();
-						if (exprInExprStatement instanceof SQFCommandExpression) {
-							SQFCommandExpression cmdExprInSwitch = (SQFCommandExpression) exprInExprStatement;
+				switchBlockScope.iterateStatements(statement -> {
+					if (statement instanceof SQFCaseStatement) {
+						caseStatements.add((SQFCaseStatement) statement);
+					} else if (statement instanceof SQFExpressionStatement) {
+						SQFExpressionStatement exprStatement = (SQFExpressionStatement) statement;
+						SQFExpression exprInStatement = exprStatement.getExpr();
+						if (exprInStatement instanceof SQFCommandExpression) {
+							SQFCommandExpression cmdExprInSwitch = (SQFCommandExpression) exprInStatement;
 							if (cmdExprInSwitch.commandNameEquals("default")) {
-								blockOrExprRef.setValue(cmdExprInSwitch.getPostfixArgument());
+								defaultExprRef.setValue(cmdExprInSwitch);
 							}
 						}
 					}
-					return true; //don't traverse past children
 				});
 			}
+
 		}
 
-		return new SQFSwitchHelperStatement(caseStatements, blockOrExprRef.getValue());
+		return new SQFSwitchHelperStatement(this, caseStatements, defaultExprRef.getValue());
 	}
 
 	/**
@@ -253,24 +208,16 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 		if (!cmdExpr.commandNameEquals("forEach")) {
 			return null;
 		}
-		SQFExpression iteratedExpr;
-		{
-			SQFCommandArgument forEachPostArg = cmdExpr.getPostfixArgument();
-			if (forEachPostArg == null) {
-				return null;
-			}
-			iteratedExpr = forEachPostArg.getExpr().withoutParenthesis();
-		}
-		SQFBlockOrExpression code;
-		{
-			SQFCommandArgument forEachCodeArg = cmdExpr.getPrefixArgument();
-			if (forEachCodeArg == null) {
-				return null;
-			}
-			code = forEachCodeArg;
+		List<SQFCommandArgument> args = cmdExpr.captureArguments("$ forEach $");
+
+		if (args == null || args.size() < 2) {
+			return null;
 		}
 
-		return new SQFForEachHelperStatement(code, iteratedExpr);
+		SQFBlockOrExpression code = args.get(0);
+		SQFExpression iteratedExpr = args.get(1).getExpr();
+
+		return new SQFForEachHelperStatement(this, code, iteratedExpr);
 	}
 
 	/**
@@ -317,7 +264,7 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 		if (whileCondition == null || whileBody == null) {
 			return null;
 		}
-		return new SQFWhileLoopHelperStatement(whileCondition, whileBody);
+		return new SQFWhileLoopHelperStatement(this, whileCondition, whileBody);
 	}
 
 	/**

@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * @author Kayler
@@ -30,14 +31,26 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 	@NotNull
 	public List<SQFStatement> getChildStatements() {
 		List<SQFStatement> statements = new ArrayList<>();
+		iterateStatements(statement -> {
+			statements.add(statement);
+		});
+		return statements;
+	}
+
+
+	/**
+	 * A way to iterate child {@link SQFStatement} without needing to allocate a list/array
+	 *
+	 * @param callback a callback that passes in a {@link SQFStatement}.
+	 */
+	public void iterateStatements(@NotNull Consumer<SQFStatement> callback) {
+		List<SQFStatement> statements = new ArrayList<>();
 		for (PsiElement element : getChildren()) {
 			if (!(element instanceof SQFStatement)) {
 				continue;
 			}
-			SQFStatement statement = (SQFStatement) element;
-			statements.add(statement);
+			callback.accept((SQFStatement) element);
 		}
-		return statements;
 	}
 
 	@NotNull
@@ -174,6 +187,5 @@ public abstract class SQFScope extends ASTWrapperPsiElement implements SQFSyntax
 		}
 		return fileScope;
 	}
-
 
 }

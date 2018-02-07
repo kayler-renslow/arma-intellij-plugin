@@ -6,13 +6,14 @@ import org.jetbrains.annotations.NotNull;
  * @author Kayler
  * @since 02/04/2018
  */
-public class SQFForEachHelperStatement implements SQFControlStructure {
+public class SQFForEachHelperStatement extends SQFHelperStatement implements SQFControlStructure {
 	@NotNull
 	private final SQFBlockOrExpression code;
 	@NotNull
 	private final SQFExpression iterableExpression;
 
-	public SQFForEachHelperStatement(@NotNull SQFBlockOrExpression code, @NotNull SQFExpression iterableExpression) {
+	public SQFForEachHelperStatement(@NotNull SQFStatement statement, @NotNull SQFBlockOrExpression code, @NotNull SQFExpression iterableExpression) {
+		super(statement);
 		this.code = code;
 		this.iterableExpression = iterableExpression;
 	}

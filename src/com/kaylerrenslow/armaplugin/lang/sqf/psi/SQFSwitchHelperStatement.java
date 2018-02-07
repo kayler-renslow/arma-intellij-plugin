@@ -9,15 +9,16 @@ import java.util.List;
  * @author Kayler
  * @since 09/18/2017
  */
-public class SQFSwitchHelperStatement implements SQFControlStructure {
+public class SQFSwitchHelperStatement extends SQFHelperStatement implements SQFControlStructure {
 	@NotNull
 	private final List<SQFCaseStatement> caseStatements;
 	@Nullable
-	private final SQFBlockOrExpression defaultStatementBlock;
+	private final SQFCommandExpression defaultCommandExpr;
 
-	public SQFSwitchHelperStatement(@NotNull List<SQFCaseStatement> caseStatements, @Nullable SQFBlockOrExpression defaultStatementBlock) {
+	public SQFSwitchHelperStatement(@NotNull SQFStatement statement, @NotNull List<SQFCaseStatement> caseStatements, @Nullable SQFCommandExpression defaultCommandExpr) {
+		super(statement);
 		this.caseStatements = caseStatements;
-		this.defaultStatementBlock = defaultStatementBlock;
+		this.defaultCommandExpr = defaultCommandExpr;
 	}
 
 	@NotNull
@@ -26,7 +27,7 @@ public class SQFSwitchHelperStatement implements SQFControlStructure {
 	}
 
 	@Nullable
-	public SQFBlockOrExpression getDefaultStatementBlock() {
-		return defaultStatementBlock;
+	public SQFCommandExpression getDefaultCommandExpr() {
+		return defaultCommandExpr;
 	}
 }

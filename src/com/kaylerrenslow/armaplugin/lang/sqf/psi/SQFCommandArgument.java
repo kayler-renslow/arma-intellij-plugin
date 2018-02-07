@@ -7,6 +7,10 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
+ * Denotes an argument to a {@link SQFCommandExpression}, however, this will never contain a {@link SQFCommandExpression} itself
+ * (i.e. {@link #getExpr()} will never return an instance of {@link SQFCommandExpression}). However,
+ * you should note that the expression can be a {@link SQFParenExpression}.
+ *
  * @author Kayler
  * @since 09/13/2017
  */
