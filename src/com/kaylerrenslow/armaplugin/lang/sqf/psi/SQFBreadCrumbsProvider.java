@@ -26,16 +26,20 @@ public class SQFBreadCrumbsProvider implements BreadcrumbsProvider {
 		if (!(element.getContainingFile() instanceof SQFFile)) {
 			return false;
 		}
-
-		if (element instanceof SQFFileScope) {
+		if (element instanceof SQFScope) {
 			return true;
 		}
+
 		if (element instanceof SQFStatement) {
 			return true;
 		}
 		if (element instanceof SQFArray) {
 			return true;
 		}
+		if (element instanceof SQFCommandExpression) {
+			return element.getParent() instanceof SQFCommandArgument || element.getParent() instanceof SQFParenExpression;
+		}
+
 
 		return false;
 	}
@@ -58,12 +62,37 @@ public class SQFBreadCrumbsProvider implements BreadcrumbsProvider {
 		if (element instanceof SQFFileScope) {
 			return element.getContainingFile().getName();
 		}
+		if (element instanceof SQFScope) {
+			return "{...}";
+		}
+
+		if (element instanceof SQFCommandExpression) {
+			return ((SQFCommandExpression) element).getExprOperator().getText();
+		}
 
 		if (element instanceof SQFStatement) {
 			SQFStatement statement = (SQFStatement) element;
+
+			if (statement instanceof SQFCaseStatement) {
+				return "case";
+			}
+
 			SQFControlStructure controlStructure = statement.getControlStructure();
 			if (controlStructure == null) {
-				return ";;";
+				if (statement instanceof SQFExpressionStatement) {
+					SQFExpressionStatement exprStatement = (SQFExpressionStatement) statement;
+					SQFExpression exprStatementExpr = exprStatement.getExpr();
+					if (exprStatementExpr instanceof SQFCommandExpression) {
+						SQFCommandExpression expr = (SQFCommandExpression) exprStatementExpr;
+						return expr.getExprOperator().getText();
+					} else if (exprStatementExpr instanceof SQFLiteralExpression) {
+						return exprStatementExpr.getText();
+					}
+				}
+				if (statement instanceof SQFAssignmentStatement) {
+					return ((SQFAssignmentStatement) statement).getVar().getText() + " = ...";
+				}
+				return "<SQF Statement>";
 			}
 			if (controlStructure instanceof SQFForEachHelperStatement) {
 				return "forEach";

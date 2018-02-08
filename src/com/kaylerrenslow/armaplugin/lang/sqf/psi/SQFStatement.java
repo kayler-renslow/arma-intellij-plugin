@@ -210,7 +210,7 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 		}
 		List<SQFCommandArgument> args = cmdExpr.captureArguments("$ forEach $");
 
-		if (args == null || args.size() < 2) {
+		if (args == null) {
 			return null;
 		}
 
@@ -249,21 +249,14 @@ public abstract class SQFStatement extends ASTWrapperPsiElement implements SQFSy
 		if (!cmdExpr.commandNameEquals("while")) {
 			return null;
 		}
-		SQFCommandArgument whilePostArg = cmdExpr.getPostfixArgument();
-		if (whilePostArg == null) {
+		List<SQFCommandArgument> args = cmdExpr.captureArguments("while $ do $");
+		if (args == null) {
 			return null;
 		}
-		SQFExpression whilePostArgExpr = whilePostArg.getExpr();
-		whilePostArgExpr = whilePostArgExpr.withoutParenthesis();
-		if (!(whilePostArgExpr instanceof SQFCommandExpression)) {
-			return null;
-		}
-		SQFCommandExpression cmdDoExpr = (SQFCommandExpression) whilePostArgExpr;
-		SQFCommandArgument whileCondition = cmdDoExpr.getPrefixArgument();
-		SQFCommandArgument whileBody = cmdDoExpr.getPostfixArgument();
-		if (whileCondition == null || whileBody == null) {
-			return null;
-		}
+
+		SQFCommandArgument whileCondition = args.get(0);
+		SQFCommandArgument whileBody = args.get(1);
+
 		return new SQFWhileLoopHelperStatement(this, whileCondition, whileBody);
 	}
 
