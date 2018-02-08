@@ -12,5 +12,3 @@
 * WE NEED TO DO THIS: https://github.com/kayler-renslow/arma-intellij-plugin/issues/45
 * What if we automatically mark any Addons in the current module that the user has (they are developing an addon) as a reference directory?
     We could reuse code this way. People could also reference other projects if we had multiple reference directories without needing to copy and paste stuff everywhere
-* custom coloring for control stuctures
-* red for _x and other magic variables isn't good idea
