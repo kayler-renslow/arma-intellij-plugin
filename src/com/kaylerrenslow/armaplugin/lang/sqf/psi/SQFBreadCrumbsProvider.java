@@ -37,7 +37,7 @@ public class SQFBreadCrumbsProvider implements BreadcrumbsProvider {
 			return true;
 		}
 		if (element instanceof SQFCommandExpression) {
-			return element.getParent() instanceof SQFCommandArgument || element.getParent() instanceof SQFParenExpression;
+			return !(element.getParent() instanceof SQFExpressionStatement);
 		}
 
 
@@ -47,14 +47,21 @@ public class SQFBreadCrumbsProvider implements BreadcrumbsProvider {
 	@Nullable
 	@Override
 	public Icon getElementIcon(@NotNull PsiElement element) {
-		return ArmaPluginIcons.ICON_SQF;
+		if (element instanceof SQFFileScope) {
+			return ArmaPluginIcons.ICON_SQF;
+		}
+		if (element instanceof SQFCommandExpression || element instanceof SQFCaseStatement) {
+			return ArmaPluginIcons.ICON_SQF_COMMAND;
+		}
+		if (element instanceof SQFExpressionStatement) {
+			SQFExpressionStatement exprStatement = (SQFExpressionStatement) element;
+			SQFExpression exprStatementExpr = exprStatement.getExpr();
+			if (exprStatementExpr instanceof SQFCommandExpression) {
+				return ArmaPluginIcons.ICON_SQF_COMMAND;
+			}
+		}
+		return null;
 	}
-
-//	@NotNull
-//	@Override
-//	public List<PsiElement> getChildren(@NotNull PsiElement element) {
-//		return Arrays.asList(element.getChildren());
-//	}
 
 	@NotNull
 	@Override
@@ -109,7 +116,7 @@ public class SQFBreadCrumbsProvider implements BreadcrumbsProvider {
 			}
 		}
 		if (element instanceof SQFArray) {
-
+			return "[...]";
 		}
 		return element.getText();
 	}
