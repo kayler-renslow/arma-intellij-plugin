@@ -43,6 +43,7 @@ public class VirtualFileHeaderFileTextProvider implements HeaderFileTextProvider
 		PsiFile file = PsiManager.getInstance(project).findFile(virtualFile);
 		if (file == null) {
 			throw new FileNotFoundException("File " + virtualFile + " couldn't be found");
+
 		}
 		return new Scanner(file.getText());
 	}
