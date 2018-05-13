@@ -8,7 +8,11 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Scanner;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Kayler
@@ -24,6 +28,8 @@ public class Arma3CommandsDocumentationRetriever extends WikiDocumentationRetrie
 	public static final PsiElementLinkType linkType = new PsiElementLinkType(Arma3DocumentationDownloader.PSI_ELE_TYPE_COMMAND);
 
 	private final List<CommandSource> toFormat = new ArrayList<>();
+
+	private CountDownLatch commandsDoneDownloadingLatch;
 
 	public Arma3CommandsDocumentationRetriever() {
 		//load ignored commands
@@ -63,20 +69,8 @@ public class Arma3CommandsDocumentationRetriever extends WikiDocumentationRetrie
 		});
 		HTMLUtil.downloadHTMLToDisk(SOURCE_COMMAND_LIST, Arma3DocumentationDownloader.BASE_WIKI_URL,
 				commandsListUrl, 200,
-				commandsListHTMLFile.getName(), null
+				commandsListHTMLFile.getName(), null, null
 		);
-	}
-
-	@Override
-	public void finish() {
-		for (CommandSource commandSource : toFormat) {
-			ArmaDocumentationIntelliJFormatter.formatAndSaveAsync(
-					getHTMLFile(commandSource.commandName),
-					getResultDocFile(commandSource.commandName),
-					linkType
-			);
-		}
-		ArmaDocumentationIntelliJFormatter.endCommands();
 	}
 
 	private void readAllCommandsDocument(@NotNull Document d, boolean downloadIndividualFiles) {
@@ -87,13 +81,14 @@ public class Arma3CommandsDocumentationRetriever extends WikiDocumentationRetrie
 			e.printStackTrace();
 			return;
 		}
-		Elements e1 = d.select(".mw-content-ltr table");
+		Elements cmdGroups = d.select(".mw-category-group");
+		List<Element> liElements = new ArrayList<>();
+		for (Element cmdGroupEle : cmdGroups) {
+			liElements.addAll(cmdGroupEle.select("ul > li"));
+		}
 
-		//		Element commandsDiv = d.getElementById("mw-content-text");
-		Element commandsDiv = e1.get(0);
-		Elements liElements = commandsDiv.select("li");
-		Iterator<Element> liElementsiter = liElements.iterator();
-		Element liElement;
+		commandsDoneDownloadingLatch = new CountDownLatch(liElements.size());
+
 		Element anchorElement;
 		String url;
 		String commandName;
@@ -102,8 +97,7 @@ public class Arma3CommandsDocumentationRetriever extends WikiDocumentationRetrie
 		int totalCount = liElements.size();
 		int currentCount = 0;
 		String format = "%-30s %3s %s";
-		while (liElementsiter.hasNext()) {
-			liElement = liElementsiter.next();
+		for (Element liElement : liElements) {
 			currentCount++;
 			if (liElement.id().length() == 0) {
 				anchorElement = liElement.child(0);
@@ -127,12 +121,12 @@ public class Arma3CommandsDocumentationRetriever extends WikiDocumentationRetrie
 					}
 				}
 
-
 				if (downloadIndividualFiles) {
 					HTMLUtil.downloadHTMLToDisk(new CommandSource(commandName),
 							Arma3DocumentationDownloader.BASE_WIKI_URL,
 							getUrl(commandName), 200, getHTMLFile(commandName).getName(),
-							commandsSaveFolder.getAbsolutePath()
+							commandsSaveFolder.getAbsolutePath(),
+							commandsDoneDownloadingLatch
 					);
 				} else {
 					toFormat.add(new CommandSource(commandName));
@@ -146,10 +140,37 @@ public class Arma3CommandsDocumentationRetriever extends WikiDocumentationRetrie
 				id++;
 			}
 		}
+
+
 		System.out.println(">>>>>>>Command read complete.\n\n");
 		pwCommands.flush();
 		pwCommands.close();
-		completedRun();
+
+		if (downloadIndividualFiles) {
+			for (int i = 0; i < skipped; i++) {
+				//since we aren't actually downloading these, we will want to "mark" them as complete
+				commandsDoneDownloadingLatch.countDown();
+			}
+			try {
+				commandsDoneDownloadingLatch.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+
+		allDoneDownloading();
+	}
+
+	@Override
+	public void beginFormatting() {
+		for (CommandSource commandSource : toFormat) {
+			ArmaDocumentationAsyncFormattingOperations.formatAndSaveAsync(
+					getHTMLFile(commandSource.commandName),
+					getResultDocFile(commandSource.commandName),
+					linkType
+			);
+		}
+		ArmaDocumentationAsyncFormattingOperations.noMoreCommandsToFormat(this);
 	}
 
 	private String getUrl(@NotNull String commandName) {
@@ -186,6 +207,11 @@ public class Arma3CommandsDocumentationRetriever extends WikiDocumentationRetrie
 
 		public CommandSource(@NotNull String commandName) {
 			this.commandName = commandName;
+		}
+
+		@Override
+		public String toString() {
+			return commandName;
 		}
 	}
 }

@@ -14,6 +14,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.function.Function;
 
@@ -74,8 +75,8 @@ public class HTMLUtil {
 	}
 
 	public static void downloadHTMLToDisk(@Nullable Object source, @NotNull String baseURL, @NotNull String url, int skipLength,
-										  @NotNull String saveName, @Nullable String basePath) {
-		jobs.add(new HTMLSaver(source, baseURL, url, skipLength, saveName, basePath));
+										  @NotNull String saveName, @Nullable String basePath, @Nullable CountDownLatch latch) {
+		jobs.add(new HTMLSaver(source, baseURL, url, skipLength, saveName, basePath, latch));
 	}
 
 	/**
@@ -115,14 +116,16 @@ public class HTMLUtil {
 		private final int skipLength;
 		private final String saveName;
 		private final String basePath;
+		private final CountDownLatch latch;
 
-		public HTMLSaver(@Nullable Object source, @NotNull String baseURL, @NotNull String url, int skipLength, @NotNull String saveName, @Nullable String basePath) {
+		public HTMLSaver(@Nullable Object source, @NotNull String baseURL, @NotNull String url, int skipLength, @NotNull String saveName, @Nullable String basePath, @Nullable CountDownLatch latch) {
 			this.source = source;
 			this.baseURL = baseURL;
 			this.url = url;
 			this.skipLength = skipLength;
 			this.saveName = saveName;
 			this.basePath = basePath;
+			this.latch = latch;
 		}
 
 		public boolean save(@NotNull Document document) throws Exception {
@@ -143,6 +146,10 @@ public class HTMLUtil {
 			fos.write(documentAsString.getBytes());
 			fos.flush();
 			fos.close();
+
+			if (latch != null) {
+				latch.countDown();
+			}
 
 			return true;
 		}

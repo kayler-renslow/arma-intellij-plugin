@@ -1,6 +1,5 @@
 package armadocdownloader;
 
-import javafx.application.Platform;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Attribute;
@@ -19,8 +18,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author Kayler
  * @since 09/20/2017
  */
-public class ArmaDocumentationIntelliJFormatter {
-	private static final String getDocNameCSSCode = "#firstHeading span";
+public class ArmaDocumentationAsyncFormattingOperations {
+	private static final String getDocNameCSSCode = "#firstHeading";
 	private static final String getDocumentationDescriptionCSS = "._description";
 
 	private static final LinkedBlockingQueue<Job> jobs = new LinkedBlockingQueue<>();
@@ -37,21 +36,21 @@ public class ArmaDocumentationIntelliJFormatter {
 					Job take = jobs.take();
 					if (take == END_COMMANDS) {
 						endJobsCount.incrementAndGet();
-						System.out.println("No more commands to format.");
+						END_COMMANDS.retriever.allDoneFormatting();
+						System.out.println("No more commands added to format queue.");
 						continue;
 					}
 					if (take == END_FUNCTIONS) {
 						endJobsCount.incrementAndGet();
-						System.out.println("No more BIS functions to format.");
+						END_FUNCTIONS.retriever.allDoneFormatting();
+						System.out.println("No more BIS functions added to format queue.");
 						continue;
 					}
 					doFormatAndSave(take.srcFile, take.destFile, take.linkType);
-				} catch (InterruptedException e) {
-					continue;
+				} catch (Exception e) {
+					e.printStackTrace(System.out);
 				}
 			}
-			System.out.println("\n\n\nDONE");
-			Platform.exit();
 		};
 		Thread t = new Thread(r);
 		t.setName("IntelliJ Formatted Documentation Saver Thread 1");
@@ -64,12 +63,15 @@ public class ArmaDocumentationIntelliJFormatter {
 		t2.start();
 	}
 
-	public static void endCommands() {
-		jobs.add(END_COMMANDS);
+	/**
+	 * Invoke when you have designated all commands have been queued for formatting
+	 */
+	public static void noMoreCommandsToFormat(@NotNull Arma3CommandsDocumentationRetriever retriever) {
+		jobs.add(END_COMMANDS.bindRetriever(retriever));
 	}
 
-	public static void endFunctions() {
-		jobs.add(END_FUNCTIONS);
+	public static void noMoreFunctionsToFormat(@NotNull Arma3FunctionsDocumentationRetriever retriever) {
+		jobs.add(END_FUNCTIONS.bindRetriever(retriever));
 	}
 
 	public static void formatAndSaveAsync(@NotNull File srcFile, @NotNull File destFile, @NotNull PsiElementLinkType linkType) {
@@ -117,17 +119,17 @@ public class ArmaDocumentationIntelliJFormatter {
 		StringBuilder allNotesBuilder = new StringBuilder();
 		{ //this needs to come before we trim down the description, otherwise it will get deleted
 			/*As of September 21, 2017, the wiki's notes are formatted as follows:
-			* <dl class="command_description"> <!-- This dl element can repeat multiple times-->
-			*     <!-- START_NOTE-->
-			*     <dd class="notedate">note's date</dd>
-			*     <dt class="note">author</dd>
-			*     <dd class="note">the actual note body</dd>
-			*     <!-- END_NOTE-->
-			* </dl>
-			*
-			* Between HTML comment "START_NOTE" "END_NOTE" defines a note's date, author, and body.
-			* Each of those elements are repeated for every note.
-			* */
+			 * <dl class="command_description"> <!-- This dl element can repeat multiple times-->
+			 *     <!-- START_NOTE-->
+			 *     <dd class="notedate">note's date</dd>
+			 *     <dt class="note">author</dd>
+			 *     <dd class="note">the actual note body</dd>
+			 *     <!-- END_NOTE-->
+			 * </dl>
+			 *
+			 * Between HTML comment "START_NOTE" "END_NOTE" defines a note's date, author, and body.
+			 * Each of those elements are repeated for every note.
+			 * */
 			allNotesBuilder.append("<h3>Notes</h3>");
 			int noteCount = 0;
 			for (Element noteCluster : document.getElementsByClass("command_description")) {
@@ -237,6 +239,8 @@ public class ArmaDocumentationIntelliJFormatter {
 		private File destFile;
 		private PsiElementLinkType linkType;
 
+		private WikiDocumentationRetriever retriever;
+
 		public Job() {
 		}
 
@@ -244,6 +248,12 @@ public class ArmaDocumentationIntelliJFormatter {
 			this.srcFile = srcFile;
 			this.destFile = destFile;
 			this.linkType = linkType;
+		}
+
+		@NotNull
+		Job bindRetriever(@NotNull WikiDocumentationRetriever retriever) {
+			this.retriever = retriever;
+			return this;
 		}
 	}
 }

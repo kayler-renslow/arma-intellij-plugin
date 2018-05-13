@@ -11,6 +11,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Kayler
@@ -24,6 +25,8 @@ public class Arma3FunctionsDocumentationRetriever extends WikiDocumentationRetri
 
 	private static final Object SOURCE_FUNCTION_LIST = new Object();
 	private final List<FunctionSource> toFormat = new ArrayList<>();
+
+	private CountDownLatch functionsDoneDownloadingLatch;
 
 	public void run(boolean downloadIndividualFiles) {
 		functionsSaveFolder.mkdirs();
@@ -44,20 +47,8 @@ public class Arma3FunctionsDocumentationRetriever extends WikiDocumentationRetri
 		});
 		HTMLUtil.downloadHTMLToDisk(SOURCE_FUNCTION_LIST, Arma3DocumentationDownloader.BASE_WIKI_URL,
 				functionsListUrl, 200,
-				functionsListHTMLFile.getName(), null
+				functionsListHTMLFile.getName(), null, null
 		);
-	}
-
-	@Override
-	public void finish() {
-		for (FunctionSource functionSource : toFormat) {
-			ArmaDocumentationIntelliJFormatter.formatAndSaveAsync(
-					getHTMLFile(functionSource.functionName),
-					getResultDocFile(functionSource.functionName),
-					linkType
-			);
-		}
-		ArmaDocumentationIntelliJFormatter.endFunctions();
 	}
 
 	private String getUrl(@NotNull String commandName) {
@@ -72,12 +63,14 @@ public class Arma3FunctionsDocumentationRetriever extends WikiDocumentationRetri
 			e.printStackTrace();
 			return;
 		}
-		Elements e1 = d.select(".mw-content-ltr table");
+		Elements cmdGroups = d.select(".mw-category-group");
+		List<Element> liElements = new ArrayList<>();
+		for (Element cmdGroupEle : cmdGroups) {
+			liElements.addAll(cmdGroupEle.select("ul > li"));
+		}
+		functionsDoneDownloadingLatch = new CountDownLatch(liElements.size());
 
-		Element functionsDiv = e1.get(0);
-		Elements liElements = functionsDiv.select("li");
 		Iterator<Element> liElementsiter = liElements.iterator();
-		Element liElement;
 		Element anchorElement;
 		String url;
 		String functionName;
@@ -85,8 +78,7 @@ public class Arma3FunctionsDocumentationRetriever extends WikiDocumentationRetri
 
 		int currentCount = 0;
 		int totalCount = liElements.size();
-		while (liElementsiter.hasNext()) {
-			liElement = liElementsiter.next();
+		for (Element liElement : liElements) {
 			currentCount++;
 			if (liElement.id().length() == 0) {
 				anchorElement = liElement.child(0);
@@ -98,7 +90,8 @@ public class Arma3FunctionsDocumentationRetriever extends WikiDocumentationRetri
 							new FunctionSource(functionName),
 							Arma3DocumentationDownloader.BASE_WIKI_URL,
 							getUrl(functionName), 200, getHTMLFile(functionName).getName(),
-							functionsSaveFolder.getAbsolutePath()
+							functionsSaveFolder.getAbsolutePath(),
+							functionsDoneDownloadingLatch
 					);
 				} else {
 					toFormat.add(new FunctionSource(functionName));
@@ -111,10 +104,31 @@ public class Arma3FunctionsDocumentationRetriever extends WikiDocumentationRetri
 				id++;
 			}
 		}
+
 		System.out.println(">>>>>>>Function read complete.\n\n");
 		functionsPw.flush();
 		functionsPw.close();
-		completedRun();
+
+		if (downloadIndividualFile) {
+			try {
+				functionsDoneDownloadingLatch.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		allDoneDownloading();
+	}
+
+	@Override
+	public void beginFormatting() {
+		for (FunctionSource functionSource : toFormat) {
+			ArmaDocumentationAsyncFormattingOperations.formatAndSaveAsync(
+					getHTMLFile(functionSource.functionName),
+					getResultDocFile(functionSource.functionName),
+					linkType
+			);
+		}
+		ArmaDocumentationAsyncFormattingOperations.noMoreFunctionsToFormat(this);
 	}
 
 	@Override
@@ -138,6 +152,11 @@ public class Arma3FunctionsDocumentationRetriever extends WikiDocumentationRetri
 
 		public FunctionSource(@NotNull String functionName) {
 			this.functionName = functionName;
+		}
+
+		@Override
+		public String toString() {
+			return functionName;
 		}
 	}
 }

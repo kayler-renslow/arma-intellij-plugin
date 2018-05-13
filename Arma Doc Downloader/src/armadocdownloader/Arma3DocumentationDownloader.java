@@ -1,6 +1,7 @@
 package armadocdownloader;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.stage.Stage;
 import org.jetbrains.annotations.NotNull;
 
@@ -82,22 +83,29 @@ public class Arma3DocumentationDownloader extends Application {
 				completedCommands = completedCommands || wikiDocumentationRetriever == commandsDocRetriever;
 				completedFunctions = completedFunctions || wikiDocumentationRetriever == functionsDocRetriever;
 				if (completedFunctions && completedCommands) {
-					//here, all of the commands and functions have been discovered, so we can run the finish methods
+					//here, all of the commands and functions have been discovered, so we can run the beginFormatting methods
 					//and make lookup lists
-					commandsDocRetriever.finish();
-					functionsDocRetriever.finish();
+					commandsDocRetriever.beginFormatting();
+					functionsDocRetriever.beginFormatting();
+
+					commandsDocRetriever.waitForFormattingToFinish();
+					functionsDocRetriever.waitForFormattingToFinish();
 
 					try {
 						saveLookupLists();
 					} catch (FileNotFoundException e) {
 						e.printStackTrace();
 					}
+
+					System.out.println("\n\n\nDONE");
+
+					Platform.exit();
 				}
 				return null;
 			}
 		};
-		commandsDocRetriever.addRunCompletionCallback(callback);
-		functionsDocRetriever.addRunCompletionCallback(callback);
+		commandsDocRetriever.addDownloadCompletionCallback(callback);
+		functionsDocRetriever.addDownloadCompletionCallback(callback);
 
 		commandsDocRetriever.run(downloadCommandFiles);
 		functionsDocRetriever.run(downloadFunctionFiles);
