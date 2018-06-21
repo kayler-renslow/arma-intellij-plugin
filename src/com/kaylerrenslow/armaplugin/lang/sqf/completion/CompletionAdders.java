@@ -3,7 +3,6 @@ package com.kaylerrenslow.armaplugin.lang.sqf.completion;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionResultSet;
 import com.intellij.codeInsight.completion.PrioritizedLookupElement;
-import com.intellij.codeInsight.lookup.AutoCompletionPolicy;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
@@ -89,7 +88,7 @@ public class CompletionAdders {
 						PrioritizedLookupElement.withPriority(LookupElementBuilder.create(trimQuotes ? s.substring(1, s.length() - 1) : s)
 								.bold()
 								.withTailText(" (" + SQFStatic.getSQFBundle().getString("CompletionContributors.literal") + ")")
-								.withAutoCompletionPolicy(AutoCompletionPolicy.ALWAYS_AUTOCOMPLETE), LITERAL_PRIORITY
+								, LITERAL_PRIORITY
 						)
 				);
 			}
