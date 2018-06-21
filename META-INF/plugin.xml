@@ -2,7 +2,7 @@
 <idea-plugin>
 	<id>com.kaylerrenslow.plugin.armaplugin.id</id>
 	<name>Arma IntelliJ Plugin</name>
-	<version>2.0.1</version>
+	<version>2.0.2</version>
 	<vendor url="https://github.com/kayler-renslow/arma-intellij-plugin">
 		Kayler Renslow
 	</vendor>

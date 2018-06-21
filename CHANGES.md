@@ -1,11 +1,13 @@
 **Added**  
-*
+* auto completion for literals (ctrl+space on disableAI will reveal things like "AUTOCOMBAT")
 
 **Changed**  
-*
+* removed duplicate vars from auto completion
+* prioritized auto completion such that literals are always first, config functions are second, vars are third, and commands are last. 
 
 **Fixed**  
-*
+* scenario where config functions couldn't be located when no directory was marked as sources root.
+  This was resolved by assuming the parent directory of the module .iml file was the src root.
 
 **Notes**
 * ArmaAddonsManager needs to finish ArmaAddonsIndexingCallback.java utilization by incrementing an addon's current work progress and total work progress

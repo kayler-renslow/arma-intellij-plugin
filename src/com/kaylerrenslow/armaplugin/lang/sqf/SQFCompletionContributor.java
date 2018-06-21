@@ -1,15 +1,14 @@
 package com.kaylerrenslow.armaplugin.lang.sqf;
 
-import com.intellij.codeInsight.completion.CompletionContributor;
-import com.intellij.codeInsight.completion.CompletionType;
+import com.intellij.codeInsight.completion.*;
 import com.intellij.patterns.PlatformPatterns;
-import com.kaylerrenslow.armaplugin.lang.sqf.completion.SQFDocTagsCompletionProvider;
-import com.kaylerrenslow.armaplugin.lang.sqf.completion.SQFFunctionNameCompletionProvider;
-import com.kaylerrenslow.armaplugin.lang.sqf.completion.SQFLocalizeCompletionProvider;
-import com.kaylerrenslow.armaplugin.lang.sqf.completion.SQFVariableCompletionProvider;
+import com.intellij.psi.PsiElement;
+import com.intellij.util.ProcessingContext;
+import com.kaylerrenslow.armaplugin.lang.sqf.completion.*;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFCommand;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFPsiCommandAfter;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes;
+import org.jetbrains.annotations.NotNull;
 
 import static com.intellij.patterns.PlatformPatterns.*;
 
@@ -26,6 +25,21 @@ public class SQFCompletionContributor extends CompletionContributor {
 		extend(CompletionType.BASIC,
 				PlatformPatterns.psiElement(SQFTypes.LOCAL_VAR).withLanguage(SQFLanguage.INSTANCE),
 				new SQFVariableCompletionProvider(true)
+		);
+		extend(CompletionType.BASIC,
+				PlatformPatterns.psiElement(SQFTypes.STRING_LITERAL).withLanguage(SQFLanguage.INSTANCE),
+				new CompletionProvider<CompletionParameters>() {
+					@Override
+					protected void addCompletions(@NotNull CompletionParameters parameters, ProcessingContext processingContext, @NotNull CompletionResultSet result) {
+						PsiElement cursor = parameters.getOriginalPosition(); //cursor is on a word
+
+						boolean originalPositionNull = cursor == null;
+						if (originalPositionNull) {
+							cursor = parameters.getPosition(); //cursor is after a word
+						}
+						CompletionAdders.addLiterals(cursor, result, true);
+					}
+				}
 		);
 
 		extend(CompletionType.BASIC,

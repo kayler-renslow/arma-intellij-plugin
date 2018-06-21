@@ -3,6 +3,7 @@ package com.kaylerrenslow.armaplugin.lang.sqf.syntax;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -106,6 +107,21 @@ public class CommandDescriptor {
 
 	void setUncertain(boolean uncertain) {
 		this.uncertain = uncertain;
+	}
+
+	/**
+	 * @return a list of all literals across all {@link Param}s
+	 * @see Param#getLiterals()
+	 */
+	@NotNull
+	public Iterable<String> getAllLiterals() {
+		List<String> all = new ArrayList<>();
+		for (CommandSyntax syntax : syntaxList) {
+			for (Param p : syntax.getAllParams()) {
+				all.addAll(p.getLiterals());
+			}
+		}
+		return all;
 	}
 
 	@Override

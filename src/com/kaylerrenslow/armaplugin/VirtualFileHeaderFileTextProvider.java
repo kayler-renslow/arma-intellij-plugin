@@ -1,5 +1,7 @@
 package com.kaylerrenslow.armaplugin;
 
+import com.intellij.openapi.module.Module;
+import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectFileIndex;
 import com.intellij.openapi.vfs.VirtualFile;
@@ -73,7 +75,18 @@ public class VirtualFileHeaderFileTextProvider implements HeaderFileTextProvider
 		if (!path.startsWith("/")) {
 			VirtualFile srcRoot = ProjectFileIndex.getInstance(project).getSourceRootForFile(this.virtualFile);
 			if (srcRoot == null) {
-				return null;
+				Module module = ModuleUtil.findModuleForFile(this.virtualFile, project);
+				if (module == null) {
+					return null;
+				}
+				srcRoot = module.getModuleFile();
+				if (srcRoot == null) {
+					return null;
+				}
+				srcRoot = srcRoot.getParent();
+				if (srcRoot == null) {
+					return null;
+				}
 			}
 
 			resolvedFile = srcRoot.findFileByRelativePath(path);

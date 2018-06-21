@@ -3,13 +3,9 @@ package com.kaylerrenslow.armaplugin.lang.sqf.completion;
 import com.intellij.codeInsight.completion.CompletionParameters;
 import com.intellij.codeInsight.completion.CompletionProvider;
 import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.ProcessingContext;
-import com.kaylerrenslow.armaplugin.ArmaPluginIcons;
-import com.kaylerrenslow.armaplugin.lang.PsiUtil;
-import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFVariable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -42,37 +38,17 @@ public class SQFVariableCompletionProvider extends CompletionProvider<Completion
 			if (cursor.getText().startsWith("_fnc")) {
 				CompletionAdders.addFunctions(parameters, result);
 			}
-			addVariables(parameters, result, cursor);
+			CompletionAdders.addVariables(parameters, context, result, cursor, true);
 		} else {
 			if (cursor.getText().startsWith("BIS_")) {
 				CompletionAdders.addBISFunctions(project, result);
 			} else {
-				addVariables(parameters, result, cursor);
+				CompletionAdders.addLiterals(cursor, result, false);
+				CompletionAdders.addVariables(parameters, context, result, cursor, false);
 				CompletionAdders.addCommands(project, result);
 			}
 		}
 	}
 
-	private void addVariables(@NotNull CompletionParameters parameters, @NotNull CompletionResultSet result, @NotNull PsiElement cursor) {
-		PsiUtil.traverseDepthFirstSearch(parameters.getOriginalFile().getNode(), astNode -> {
-			PsiElement nodeAsElement = astNode.getPsi();
-			if (nodeAsElement == cursor) {
-				return false;
-			}
-			if (!(nodeAsElement instanceof SQFVariable)) {
-				return false;
-			}
-			SQFVariable var = (SQFVariable) nodeAsElement;
-			if ((var.isLocal() && forLocalVars) || (!var.isLocal() && !forLocalVars)) {
-				result.addElement(LookupElementBuilder.createWithSmartPointer(var.getVarName(), var)
-						.withTailText(var.isMagicVar() ? " (Magic Var)" : (
-										forLocalVars ? " (Local Variable)" : " (Global Variable)"
-								)
-						)
-						.withIcon(var.isMagicVar() ? ArmaPluginIcons.ICON_SQF_MAGIC_VARIABLE : ArmaPluginIcons.ICON_SQF_VARIABLE)
-				);
-			}
-			return false;
-		});
-	}
+
 }
