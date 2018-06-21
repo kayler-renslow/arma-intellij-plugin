@@ -1,4 +1,4 @@
-**Version:** 2.0.3 (NOTE TO SELF: update plugin.xml version)  
+**Version:** 2.0.2 (NOTE TO SELF: update plugin.xml version)  
 **Release Date:** June 21, 2018
 
 **Added**  
