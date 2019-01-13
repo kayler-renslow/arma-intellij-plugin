@@ -1,11 +1,10 @@
 package com.kaylerrenslow.armaplugin.lang.sqf;
 
-import com.intellij.lexer.FlexLexer;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.TokenType;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFTypes;
 import com.kaylerrenslow.armaplugin.lang.sqf.psi.SQFParserDefinition;
-import java.util.Collections;
+import com.intellij.lexer.FlexLexer;
 
 %%
 
@@ -67,14 +66,7 @@ MACRO_FUNC = {GLOBAL_VAR} "(" {MACRO_FUNC_BODY} ("," {MACRO_FUNC_BODY})* ")"
     String yytext = yytext().toString();
     int parenIndex = yytext.indexOf('(');
     String identifier = yytext.substring(0, parenIndex);
-    boolean isCommand = false;
-    for(String command : SQFStatic.LIST_COMMANDS) {
-        if(command.equalsIgnoreCase(identifier)) {
-            isCommand = true;
-            break;
-        }
-    }
-    if(isCommand) {
+    if(SQFStatic.COMMANDS_SET.contains(identifier)) {
         yypushback(yytext.length() - identifier.length()); //push the (...) back into stream to re-lex
         return SQFTypes.COMMAND_TOKEN;
     } else {
@@ -83,12 +75,10 @@ MACRO_FUNC = {GLOBAL_VAR} "(" {MACRO_FUNC_BODY} ("," {MACRO_FUNC_BODY})* ")"
 }
 <YYINITIAL> {LOCAL_VAR} { return SQFTypes.LOCAL_VAR; }
 <YYINITIAL> {GLOBAL_VAR} {
-    String yytext = yytext().toString();
-    for(String command : SQFStatic.LIST_COMMANDS){  //don't use binary search so that we can do ignore case search
-        if(command.equalsIgnoreCase(yytext)){
-            return SQFTypes.COMMAND_TOKEN;
-        }
+    if(SQFStatic.COMMANDS_SET.contains(yytext().toString())){
+        return SQFTypes.COMMAND_TOKEN;
     }
+
     return SQFTypes.GLOBAL_VAR;
 }
 

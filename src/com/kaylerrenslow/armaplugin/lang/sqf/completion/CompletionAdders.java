@@ -120,7 +120,7 @@ public class CompletionAdders {
 	 * Adds all SQF commands to the completion result
 	 */
 	public static void addCommands(@NotNull Project project, @NotNull CompletionResultSet result) {
-		for (String command : SQFStatic.LIST_COMMANDS) {
+		for (String command : SQFStatic.COMMANDS_SET) {
 			SQFCommand cmd = PsiUtil.createElement(project, command, SQFFileType.INSTANCE, SQFCommand.class);
 			if (cmd == null) {
 				continue;

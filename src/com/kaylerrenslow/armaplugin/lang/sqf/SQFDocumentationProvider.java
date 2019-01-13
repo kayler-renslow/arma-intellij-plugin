@@ -217,7 +217,7 @@ public class SQFDocumentationProvider extends DocumentationProviderEx {
 		try {
 			return String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(commandName)) + FileResourceContentExtractor.extract(getDocumentationFilePath(commandName));
 		} catch (IllegalArgumentException ignore) {
-			for (String command : SQFStatic.LIST_COMMANDS) {
+			for (String command : SQFStatic.COMMANDS_SET) {
 				if (command.equalsIgnoreCase(commandName)) {
 					return String.format(EXTERNAL_LINK_NOTIFICATION, getWikiUrl(command)) + FileResourceContentExtractor.extract(getDocumentationFilePath(command));
 				}

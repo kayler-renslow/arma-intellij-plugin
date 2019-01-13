@@ -2,12 +2,13 @@ package com.kaylerrenslow.armaplugin.lang.sqf;
 
 import com.kaylerrenslow.armaplugin.ArmaPlugin;
 import com.kaylerrenslow.armaplugin.lang.header.HeaderStatic;
-import com.kaylerrenslow.armaplugin.util.TextFileListToList;
+import com.kaylerrenslow.armaplugin.util.TextFileList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.TreeSet;
 
 /**
  * A bunch of utility methods and static fields for the SQF language
@@ -62,18 +63,17 @@ public class SQFStatic {
 	 * Has all commands stored as presented in Wiki (usually camelCase)
 	 */
 	@NotNull
-	public static final List<String> LIST_COMMANDS = TextFileListToList.getListFromStream(SQFStatic.class.getResourceAsStream(COMMANDS_DOC_FILE_LOOKUP));
+	public static final TreeSet<String> COMMANDS_SET = TextFileList.getTreeSetFromStream(SQFStatic.class.getResourceAsStream(COMMANDS_DOC_FILE_LOOKUP));
 	/**
 	 * Has all BIS functions stored as presented in Wiki
 	 */
 	@NotNull
-	public static final List<String> LIST_BIS_FUNCTIONS = TextFileListToList.getListFromStream(SQFStatic.class.getResourceAsStream(BIS_FUNCTIONS_DOC_FILE_LOOKUP));
+	public static final List<String> LIST_BIS_FUNCTIONS = TextFileList.getListFromStream(SQFStatic.class.getResourceAsStream(BIS_FUNCTIONS_DOC_FILE_LOOKUP));
 
 	@NotNull
 	private static final String FUNCTION_NAMING_RULE_REGEX = "[a-zA-z_0-9]+_fnc_[a-zA-z_0-9]+"; //don't need to check if the function name starts with a number since that is asserted with the lexer
 
 	static {
-		Collections.sort(LIST_COMMANDS);
 		Collections.sort(LIST_BIS_FUNCTIONS);
 	}
 

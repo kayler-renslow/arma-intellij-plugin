@@ -64,7 +64,7 @@ public class CommandCamelCaseInspection extends LocalInspectionTool {
 		@Override
 		public void visitCommand(@NotNull SQFPsiCommand o) {
 			super.visitCommand(o);
-			for (String command : SQFStatic.LIST_COMMANDS) {
+			for (String command : SQFStatic.COMMANDS_SET) {
 				if (o.getText().equalsIgnoreCase(command)) {
 					if (!o.getText().equals(command)) {
 						holder.registerProblem(
@@ -107,7 +107,7 @@ public class CommandCamelCaseInspection extends LocalInspectionTool {
 					if (commandElement == null) {
 						return;
 					}
-					for (String command : SQFStatic.LIST_COMMANDS) {
+					for (String command : SQFStatic.COMMANDS_SET) {
 						if (command.equalsIgnoreCase(commandElement.getText())) {
 							SQFPsiCommand c = PsiUtil.createElement(project, command, SQFFileType.INSTANCE, SQFPsiCommand.class);
 							if (c == null) {

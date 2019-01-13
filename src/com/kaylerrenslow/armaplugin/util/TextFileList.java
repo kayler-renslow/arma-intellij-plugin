@@ -6,13 +6,42 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.TreeSet;
 
 /**
  * @author Kayler
  * @since 01/02/2016
  */
-public class TextFileListToList {
+public class TextFileList {
 
+	/**
+	 * Reads a *.list file and returns a {@link java.util.TreeSet}. Any line starting with # is ignored. Every new line is a new entry. Empty lines are ignored.
+	 * <p>Sample .list file: <br>
+	 * <pre>
+	 *     #comment that is ignored
+	 *     line that will be added
+	 *     this line will be added including comment #comment
+	 * </pre>
+	 * </p>
+	 *
+	 * @param is InputStream that is linked to the list file
+	 * @return list of the contents or null if a problem occurred
+	 */
+	@NotNull
+	public static TreeSet<String> getTreeSetFromStream(@NotNull InputStream is) {
+		Scanner scanner = new Scanner(is);
+		TreeSet<String> set = new TreeSet<>();
+		while (scanner.hasNextLine()) {
+			String l = scanner.nextLine();
+			if (l.startsWith("#")) {
+				continue;
+			}
+			set.add(l);
+		}
+		scanner.close();
+
+		return set;
+	}
 
 	/**
 	 * Reads a *.list file and returns a list. Any line starting with # is ignored. Every new line is a new entry. Empty lines are ignored.
