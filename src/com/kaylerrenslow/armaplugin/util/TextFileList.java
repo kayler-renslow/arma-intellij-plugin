@@ -30,7 +30,7 @@ public class TextFileList {
 	@NotNull
 	public static TreeSet<String> getTreeSetFromStream(@NotNull InputStream is) {
 		Scanner scanner = new Scanner(is);
-		TreeSet<String> set = new TreeSet<>();
+		TreeSet<String> set = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 		while (scanner.hasNextLine()) {
 			String l = scanner.nextLine();
 			if (l.startsWith("#")) {
